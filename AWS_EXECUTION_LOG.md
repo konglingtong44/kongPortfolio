@@ -528,7 +528,7 @@ Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/com
 
 补充执行约束：Terraform precondition 在生成计划时核对 bootstrap 文件；执行保存的 plan 前还要重新 Get-FileHash 比对原 manifest SHA（不能只相信旧 plan 中已计算的文件哈希），并检查资源动作仍在批准范围内。新流水线的真实 Lambda 更新、七次 Invoke、报告导出和待审批状态仍需获批后逐项验证。
 
-## 7. S3-05：获批后创建 STG 并验证到人工审批（进行中）
+## 7. S3-05：获批后创建 STG 并验证到人工审批（已完成，审批保留等待）
 
 你明确批准“创建并验证到人工审批 1 等待”，不等于批准后续生产 Green 或切流。本轮先 Get-Content 读取 AGENTS.md、忽略的 staging-plan.tfvars.json；git status/log 检查工作树和提交；STS 确认账号；Get-FileHash 重核 bootstrap ZIP；git push 发布本地最终记录 d1f1e26。提交/推送扫描通过。
 
@@ -573,3 +573,79 @@ Source、BuildCandidate 成功，构建 `kongportfolio-candidate:df701507-5eba-4
 读取 list-action-executions、batch-get-builds 和 get-log-events 定位，完整日志 `.local/staging-first-build.log`。真正错误是 function-updated-v2 调用了 lambda:GetFunction，而当前角色只授予 GetFunctionConfiguration。原先对 v2 waiter 底层 API 的假设不准确。
 
 公开读取 AWS CLI 的 function-updated / function-updated-v2 文档，确认前者轮询 GetFunctionConfiguration，后者使用 GetFunction。将脚本改为 function-updated，不增加 GetFunction（避免额外获取代码下载元数据），保留原有 IAM 范围。重新做 Node 语法和合约测试，再发布修复并验证。
+
+### 7.3 修复发布及第二次验证
+
+```powershell
+node --check scripts/verify-staging.mjs
+node scripts/test-staging-contract.mjs
+git add -- scripts/verify-staging.mjs AWS_EXECUTION_LOG.md
+git diff --cached --check
+git commit -m 'fix: wait for STG code updates with configuration-only access'
+git push
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=4d12091dd8ce6899949c1653d0855c781129abf5' --client-request-token 'stg-waiter-4d12091' --profile kong-dev --region ap-northeast-1 --output json
+```
+
+修复 source=4d12091，执行 `1222a3dd-3302-4943-b992-8f9f2d2c087e`，记录 `.local/staging-final-execution.json`。需要新执行是因为旧 SourceRef 固定在旧脚本；没有用临时改包跳过源码一致性检查。Terraform 随后 plan No changes，确认 CI 更新 STG 代码后，Terraform 没有把代码回滚到 bootstrap（`.local/staging-code-ownership-plan.log`）。
+
+用同样的 list-action-executions、list-builds-for-project、batch-get-builds 和 get-log-events 观察阶段，避免把旧失败构建误当新执行结果：必须匹配 resolvedSourceVersion。最终候选构建 `kongportfolio-candidate:60bbf9fb-ed89-41b1-b35a-a9833a260bf1` 成功；STG 构建 `kongportfolio-stg:4a224ab2-0e7f-4ef6-9191-dc28ba24e49c` 成功，源码 SHA 均为新修复提交。
+
+STG 脚本在该构建中实际执行的 CLI/API 顺序（使用 CodeBuild IAM role，不使用本机 SSO profile）：
+
+1. 验证 Candidate 的文件、清单、SHA 和 Source/CodeBuild revision；无网络修改。
+2. `aws sts get-caller-identity` 确认账号。
+3. `aws lambda get-function-configuration --function-name kongportfolio-stg` 验证配置/角色。
+4. `aws lambda list-versions-by-function --function-name kongportfolio-stg` 查找可复用的同代码/配置版本。
+5. 需要更新时 `aws lambda update-function-code --function-name kongportfolio-stg --revision-id <读取的RevisionId> --zip-file fileb://<Candidate/backend.zip> --publish`，再 `aws lambda wait function-updated --function-name kongportfolio-stg`。不调用 GetFunction，不更新配置。
+6. `aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 3`，匹配不可变版本与后端 CodeSha256。
+7. 串行七次 `aws lambda invoke --function-name kongportfolio-stg --qualifier 3 --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload file://<模拟事件JSON> --cli-read-timeout 60 <响应文件>`，每次 metadata.ExecutedVersion 必须为 3。
+8. 写 report.json，buildspec 读取并 export VERIFIED_RELEASE / VERIFIED_VERSION，CodeBuild 自动上传 StagingReport artifact；未上传响应原文。
+
+实际通过 health、profile-ja、profile-zh、profile-en、bedrock-placeholder、api-not-found、method-not-allowed 七项；包含 no-store、404/405 和真实 Java Lambda 运行验证。函数版本 **3**；releaseId **f784feab86d0ef506f6d6678e58c8cff43210343bf882c22e29d7182dc11c10a**。原始摘要日志 `.local/staging-successful-build.log`，action/构建元数据 `.local/staging-final-actions.json`、`staging-final-build.json`。
+
+### 7.4 下载报告并独立核对
+
+从该 execution 的 outputArtifacts 读取实际报告 key，不猜测路径：
+
+```powershell
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/BUkArwL --profile kong-dev --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/BUkArwL --version-id p2GoM_W7jym78rVia6lH0MkRoOIb0_Hd --profile kong-dev --region ap-northeast-1 '<仓库>/.local/staging-review-1222a3dd/report.zip' --output json
+Get-FileHash -LiteralPath '<report.zip>' -Algorithm SHA256
+jar --list --file '<report.zip>'
+# 外层 SHA 与 CodeBuild artifacts.sha256sum 匹配，且条目只能为 report.json，才在新建 .local 目录中解压。
+jar --extract --file '<report.zip>'
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 3 --profile kong-dev --region ap-northeast-1 --output json
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Candidate/uccgIXZ --profile kong-dev --region ap-northeast-1 --output json
+```
+
+验证报告 passed=true、七项都 passed、execution/source/function/version 符合预期。Lambda 实际 CodeSha256 解 Base64 为 hex 后等于报告 backendSha256 `8ffd1daa51a71c788d690260e9775e97a2c8256249ce8b863f6bcc44930d7a8a`。报告的 Release/Version 也与 CodeBuild 导出变量及人工审批 CustomData 一致。
+
+候选 key `kongportfolio-candid/Candidate/uccgIXZ`，VersionId `t4QJWmoV5iIHkxLykfR..r1hy8n2lPF4`。报告 key `kongportfolio-candid/StagingRep/BUkArwL`，VersionId `p2GoM_W7jym78rVia6lH0MkRoOIb0_Hd`。本地报告 `.local/staging-review-1222a3dd/report.json`，复核身份 `.local/staging-verified-review.json`。没有读取或写入审批 token。
+
+### 7.5 审批等待、生产与 Terraform 收尾
+
+```powershell
+& $aws codepipeline get-pipeline-state --name kongportfolio-candidate --profile kong-dev --region ap-northeast-1 --query 'stageStates[].{stage:stageName,actions:actionStates[].{action:actionName,status:latestExecution.status}}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --profile kong-dev --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+```
+
+Source、BuildCandidate、VerifyStaging 全为 Succeeded；ApproveProduction / ApproveGreenCreation 为 **InProgress（等待人工）**。整体执行仍在进行中，这是停在审批的预期状态，不称整条流水线 Succeeded。只查询状态字段，排除 token；没有调用 put-approval-result。现有代码没有生产 Green 阶段，所以即便以后人工批准此旧版本执行，也不会创建生产 Green。
+
+生产 live alias 仍为版本 2，未配置权重；公开 HTTPS GET /api/health 返回 UP。最终 Terraform plan No changes（`.local/staging-final-plan.log`）。本 Story 验收到待审批已完成；生产 Green、第二道审批、CodeDeploy 蓝绿/回滚仍待下一 Story。日志、报告均保留，不包含认证码或私有响应原文。
+
+### 7.6 Git 收尾
+
+最终修改本记录、PROJECT_PLAN.md、docs/staging-approval.md，写清“阶段成功、整体执行等待审批”的区别；文档检查、扫描后提交推送：
+
+```powershell
+git add -- AWS_EXECUTION_LOG.md PROJECT_PLAN.md docs/staging-approval.md
+git diff --cached --check
+git commit -m 'docs: record verified STG and pending human approval'
+git push
+git rev-parse HEAD
+git status --porcelain
+```
+
+原始成功元数据、状态摘要和本地下载报告都留在忽略的 .local，没有加入 Git。文档推送仅触发现有 CI，不启动新候选执行、不操作审批。最终 CI 查询沿用 list-builds-for-project / batch-get-builds 和 GitHub statuses GET，记录到 `.local/staging-final-doc-ci.json`；不为等待审批而反复运行新的发布流程。

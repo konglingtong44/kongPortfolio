@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-05 — STG and first approval verified (2026-11-12, completed to human gate)
+
+Approved 8 creates / 2 updates applied; verified bootstrap checksum before apply. Initial STG code update succeeded but v2 waiter required GetFunction; changed to configuration-only waiter without IAM expansion. Execution 1222a3dd-3302-4943-b992-8f9f2d2c087e at 4d12091 has Source/BuildCandidate/VerifyStaging succeeded, Approval 1 InProgress (pending), never approved by agent. STG version 3 passed seven real Lambda contracts and static candidate integrity. Downloaded versioned StagingReport; source/release/code/version agree with published function and approval exported variables. Release f784feab86d0ef506f6d6678e58c8cff43210343bf882c22e29d7182dc11c10a. Final plan No changes, production live v2/no weights/HTTPS health UP. Direct invoke only, no STG browser/API Gateway E2E. No production Green/approval 2/CodeDeploy yet. Full non-AWS/AWS audit in root log section 7. Story complete; pause for human review and next deployment increment.
+
 ## S3-05 — STG verification and first approval preparation (awaiting paid-resource approval)
 
 Prepared isolated STG Lambda plus multi-artifact verifier and human approval 1 after verification. Actual plan 8 create / 2 update / 0 delete; default-off no changes. No apply. Direct version-qualified IAM Lambda invocation and static artifact integrity, no separate STG website/HTTP API/browser E2E. Terraform owns STG config, CI owns code explicitly. Verifier cannot change production/configuration or approve itself. StagingReport preserves source/release/code/version identities; gate displays release/version. Ten mocked Terraform plans and local Node failure-path tests pass. Real STG/multi-artifact/approval validation pending approval and cloud run. All operation categories now recorded in root log section 6, not just AWS. See docs/staging-approval.md.
