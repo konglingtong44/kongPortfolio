@@ -1,5 +1,11 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-03 — Automatic CI triggers and status writeback (in progress)
+
+Owner subsequently accepted the actual pending GitHub App permission request (repository restricted to kongPortfolio). Rechecked two-create-only plan; both webhooks now created successfully, 2 add / 0 change / 0 destroy. No IAM expansion. Real push-triggered build/status validation is next; not yet claimed complete.
+
+Prepared owner-only anchored push/PR filters and five offline plan tests. SSO renewed and account verified. Two-webhook-only apply failed with OAuthProviderException (GitHub API limit or permissions). Added a Terraform-managed account/region default reference to the same existing connection after verifying no previous GitHub credential entry; reference created, but both webhooks still failed. No IAM expansion, website change or new build. Root AWS_EXECUTION_LOG.md records commands, results, historical recap and the failed hypothesis. Awaiting owner review of GitHub App repository/new webhook permissions per AWS documentation. No automatic-trigger/status success claim; Story remains incomplete.
+
 ## S3-02 — First AWS CI execution (2026-11-12, completed)
 
 User explicitly approved eight resources and initial frontend/backend builds. Persisted enable_ci=true in ignored local inputs. Rechecked exact eight-create plan, applied all eight resources; backend project initial OAuth error resolved by retrying only the missing project without permission changes. Final normal Terraform plan No changes. Published scanned source on feat/aws-serverless-ci; main and production remain unchanged.

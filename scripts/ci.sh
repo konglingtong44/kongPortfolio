@@ -34,7 +34,7 @@ run_checks=true
 base="${CI_BASE_SHA:-${CODEBUILD_WEBHOOK_PREV_COMMIT:-}}"
 if [[ "$component" != all && "$base" =~ ^[0-9a-f]{40}$ && ! "$base" =~ ^0+$ ]] && git cat-file -e "$base^{commit}" 2>/dev/null; then
   git diff --name-only "$base" "$sha" > .local/ci-changed-paths
-  shared='^(codebuild/|scripts/|\.githooks/|compose\.yaml$|\.gitignore$|\.gitattributes$|\.gitleaks\.toml$|AGENTS\.md$)'
+  shared='^(infra/|codebuild/|scripts/|\.githooks/|compose\.yaml$|\.gitignore$|\.gitattributes$|\.gitleaks\.toml$|AGENTS\.md$)'
   if ! grep -Eq "$shared|^$component/" .local/ci-changed-paths; then run_checks=false; fi
 fi
 
