@@ -527,3 +527,49 @@ Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/com
 本轮最终记录提交 `docs: record STG preparation verification and full operation audit` 仅本地保存，等获批创建前一起推送，避免只为补验证记录再触发两次 CI。新资源/阶段尚未创建；批准范围是 8 个新增资源、2 项配置更新和一次首次验证，验收到人工审批 1 等待，不自动批准。
 
 补充执行约束：Terraform precondition 在生成计划时核对 bootstrap 文件；执行保存的 plan 前还要重新 Get-FileHash 比对原 manifest SHA（不能只相信旧 plan 中已计算的文件哈希），并检查资源动作仍在批准范围内。新流水线的真实 Lambda 更新、七次 Invoke、报告导出和待审批状态仍需获批后逐项验证。
+
+## 7. S3-05：获批后创建 STG 并验证到人工审批（进行中）
+
+你明确批准“创建并验证到人工审批 1 等待”，不等于批准后续生产 Green 或切流。本轮先 Get-Content 读取 AGENTS.md、忽略的 staging-plan.tfvars.json；git status/log 检查工作树和提交；STS 确认账号；Get-FileHash 重核 bootstrap ZIP；git push 发布本地最终记录 d1f1e26。提交/推送扫描通过。
+
+```powershell
+git status --short
+git log -2 --oneline
+& $aws sts get-caller-identity --profile kong-dev --query Account --output text
+Get-FileHash -LiteralPath '<已核验 bootstrap ZIP>' -Algorithm SHA256
+git push
+```
+
+将已审核的 enable_staging=true、bootstrap 路径、manifest SHA 写入忽略的日常 cicd/terraform.tfvars，保留原有开关。先检查没有重复的 enable_staging 字段，不覆盖未知配置。路径用 JSON 字符串转义后写入 HCL 文件，没有把 JSON 当 shell 转义使用。
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' fmt
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-out=staging-approved.tfplan' -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json staging-approved.tfplan
+# 用精确资源地址 allowlist 核对：8 create + 2 update，禁止其余动作。
+# 紧接 apply 前再次 Get-FileHash 与 manifest 的 SHA 比较。
+& $tf '-chdir=infra/terraform/cicd' apply -input=false staging-approved.tfplan -no-color
+```
+
+实际计划 `.local/staging-approved-plan.log`；bootstrap 校验和匹配。资源创建与验证结果在后文续记，不自动执行 put-approval-result。
+
+### 7.1 创建完成并启动固定提交验证
+
+Apply 完成：8 added / 2 changed / 0 destroyed；Lambda 约 14 秒创建至 Active。新的 CodeBuild/verifier、日志、角色均已创建。用 list-pipeline-executions 查询，确认 UpdatePipeline 未自动产生新执行，没有重复启动。
+
+```powershell
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 3 --profile kong-dev --region ap-northeast-1 --output json
+git rev-parse origin/feat/aws-serverless-ci
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=d1f1e26189db843e64a8c1e9e82aee5725741569' --client-request-token 'stg-first-d1f1e26' --profile kong-dev --region ap-northeast-1 --output json
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --profile kong-dev --region ap-northeast-1 --query '{name:FunctionName,runtime:Runtime,version:Version,state:State,code:CodeSha256}' --output json
+```
+
+执行 `02bbc2cd-88c1-4f19-beb0-5a44cfb2de0d`，指定 source d1f1e26，写入 `.local/staging-execution.json`。Lambda Runtime=java21、State=Active，初始代码哈希与 bootstrap 匹配；这个检查不代表新候选已经通过 STG。
+
+### 7.2 首次 STG 等待器权限问题
+
+Source、BuildCandidate 成功，构建 `kongportfolio-candidate:df701507-5eba-40d9-b3ca-6480595c351a` 生成候选。STG 构建 `kongportfolio-stg:cc55d60a-37b2-4713-b616-92da3396c0d3` 已通过 source/manifest 校验并更新函数代码，随后等待器失败，未生成 report，也未进入审批。
+
+读取 list-action-executions、batch-get-builds 和 get-log-events 定位，完整日志 `.local/staging-first-build.log`。真正错误是 function-updated-v2 调用了 lambda:GetFunction，而当前角色只授予 GetFunctionConfiguration。原先对 v2 waiter 底层 API 的假设不准确。
+
+公开读取 AWS CLI 的 function-updated / function-updated-v2 文档，确认前者轮询 GetFunctionConfiguration，后者使用 GetFunction。将脚本改为 function-updated，不增加 GetFunction（避免额外获取代码下载元数据），保留原有 IAM 范围。重新做 Node 语法和合约测试，再发布修复并验证。

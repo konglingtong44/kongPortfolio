@@ -32,7 +32,7 @@ const existing = aws(['lambda', 'list-versions-by-function', '--function-name', 
 let version = current.CodeSha256 === expectedHash ? matchingVersion(existing, current, expectedHash) : undefined;
 if (!version) {
   const updated = aws(['lambda', 'update-function-code', '--function-name', functionName, '--revision-id', current.RevisionId, '--zip-file', `fileb://${join(directory, 'backend.zip')}`, '--publish']);
-  aws(['lambda', 'wait', 'function-updated-v2', '--function-name', functionName]);
+  aws(['lambda', 'wait', 'function-updated', '--function-name', functionName]);
   const versions = /^[1-9][0-9]*$/.test(updated.Version) ? [] : aws(['lambda', 'list-versions-by-function', '--function-name', functionName]).Versions;
   version = selectVersion(updated, versions, current, expectedHash);
 }
