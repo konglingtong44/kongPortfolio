@@ -307,3 +307,14 @@ node scripts/verify-pipeline-candidate.mjs .local/pipeline-candidate
 复查官方 Source action 文档后，给新流水线角色同时加入 `codeconnections:UseConnection` 与 `codestar-connections:UseConnection`，都限定为同一已有连接；CodeBuild full-clone 使用官方的 FullRepositoryId 条件。重新执行 fmt/test/plan，并解析 JSON 再核对仍然只有 14 个 create。没有 apply。Terraform 测试括号错误已经修复，无待失败的本地检查。
 
 最后把验证结果写回本记录/项目计划/说明，执行 `git commit -m 'docs: record candidate preparation checks and execution commands'`、`git push`。推送只会触发现有 CI，不会创建新流水线（enable_candidate_pipeline 仍未开启）。新流水线的 AWS 执行等待对具体资源计划的付费创建批准。
+
+### 4.5 推送后的现有 AWS CI 复查
+
+推送提交为 `6a225b59b930d1cefdc63a11710d00f570d8e3dc`，现有 webhook 自动触发两个检查（本 Story 没有手动 start-build）。读取命令仍使用第 3.3 节的 list-builds-for-project / batch-get-builds，结果存于 `.local/candidate-preparation-ci.json`，首次读取为 IN_PROGRESS，随后通过同一构建 ID 复查至成功：
+
+```powershell
+& $aws codebuild batch-get-builds --ids 'kongportfolio-ci-frontend:7668eb7a-3026-42f6-8239-802694c2776f' 'kongportfolio-ci-backend:9d687005-8a2d-4e97-90dd-885cfad571c2' --profile kong-dev --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/commits/6a225b59b930d1cefdc63a11710d00f570d8e3dc/statuses?per_page=10' -Headers $headers
+```
+
+结果：两个 AWS 构建都 SUCCEEDED；GitHub 每个 context 按 id 取最新条目，ci/frontend、ci/backend 都 success。这是现有 CI 对新增源码的检查，不是尚未创建的 CodePipeline 运行。最终这段验证记录以本地文档提交保存，待下一次授权执行时一并推送，避免仅为写验证记录再次触发构建。

@@ -6,6 +6,8 @@ Prepared opt-in manual V2 Source → BuildCandidate pipeline, separate artifact 
 
 Local clean-source validation at 37237d4 passed full ci.sh all: frontend 40 tests/build; backend 9 HTTP + 3 Lambda tests/ZIP/JVM smoke; real candidate packager/verifier. Seven Terraform mocked plans, integrity tamper/path tests, format/validate and secret/path checks passed. Candidate releaseId 9aa8d398127a78fe06decc4f36b13434cae0d0f758cf0069781cbf9e38af029a, ignored local output only. IAM Source permission includes required new/legacy UseConnection prefixes; final exact plan regenerated. AWS candidate pipeline/roles/bucket/upload not yet created or verified. Prepared for explicit paid-resource approval.
 
+Source published at 6a225b5; both existing AWS CI jobs and GitHub statuses success (frontend 7668eb7a-3026-42f6-8239-802694c2776f, backend 9d687005-8a2d-4e97-90dd-885cfad571c2). Final verification notes committed locally, not repushed solely to avoid another documentation-triggered CI pair. Pause for approval of the concrete 14-create plan and initial candidate pipeline run.
+
 ## S3-03 — Automatic CI triggers and status writeback (2026-11-12, completed)
 
 Owner subsequently accepted the actual pending GitHub App permission request (repository restricted to kongPortfolio). Rechecked two-create-only plan; both webhooks created successfully, 2 add / 0 change / 0 destroy. No IAM expansion. Final Terraform plan No changes.
