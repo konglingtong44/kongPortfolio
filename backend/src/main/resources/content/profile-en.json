@@ -1,0 +1,715 @@
+{
+  "name": "Kong / 孔 令通",
+  "role": "Software engineer",
+  "introduction": "Hi, I’m Kong. I have around eight years of experience across Java/Spring, Vue/React, Linux, middleware, AWS migration and CI/CD in telecom, insurance and securities. I’ve independently delivered small web systems and APIs from requirements to release, using waterfall and agile approaches. My roles include PG, SE, sub-lead and PMO. I’ve earned PMP and AWS SAP, and I’m learning Amazon Bedrock, LangChain and LangGraph.",
+  "focus": [
+    {
+      "title": "Build it. See it through.",
+      "description": "Independently delivered key APIs and small web systems, from requirements and design through implementation, testing and production release."
+    },
+    {
+      "title": "Connect application and infrastructure.",
+      "description": "Worked across Java changes, Tomcat → WildFly migration, Nginx configuration and validation, and AWS functionality. I look at the connections between systems."
+    },
+    {
+      "title": "Make the unclear, clear.",
+      "description": "Investigate poorly documented systems through code and logs, clarify technical issues, and work with customers and developers to support delivery."
+    }
+  ],
+  "projects": [
+    {
+      "kind": "personal",
+      "title": "kongPortfolio",
+      "period": "2026.11 —",
+      "role": "Personal project / In progress",
+      "description": "A trilingual personal blog about my experience and technical interests. Built with React, TypeScript and Spring Boot, starting with a working local increment.",
+      "outcome": "Implemented: trilingual profile API, saved language selection and automated tests. Next: article features, followed by AWS deployment and AWS-native CI/CD.",
+      "tags": [
+        "React",
+        "TypeScript",
+        "Spring Boot",
+        "Docker / Compose"
+      ],
+      "team": "Personal project",
+      "responsibilities": [
+        "Build the React / TypeScript / Vite frontend and Java 21 / Spring Boot API.",
+        "Maintain file-based trilingual content, saved locale, regex visualization, automated tests and local Compose configuration.",
+        "AWS deployment, AWS CI/CD and Bedrock integration remain planned."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "React",
+            "TypeScript",
+            "Vite",
+            "Java 21",
+            "Spring Boot"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "Docker / Compose",
+            "Vitest",
+            "JUnit"
+          ],
+          "description": ""
+        }
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Securities migration: VB6 to Java Web",
+      "period": "2026.08 — Present",
+      "role": "SE",
+      "team": "12 people",
+      "description": "Migrating existing securities functions to Java Web, covering legacy code investigation, requirements clarification, design, implementation and review.",
+      "outcome": "Clarified assigned behavior and migration changes, feeding confirmed decisions into designs and implementation as migration continues.",
+      "responsibilities": [
+        "Read VB6 sources and existing designs to establish processing rules, dependencies and migration changes.",
+        "Create and revise designs under the agreed migration approach, addressing review feedback.",
+        "Implement, modify and review Java features while checking differences from legacy behavior.",
+        "Clarify uncertain specifications and target behavior with the customer and reflect decisions in code and designs.",
+        "Use AI-assisted code analysis as supporting evidence, validating its output against the existing sources."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java",
+            "VB6 (legacy analysis)"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "Code / design review",
+            "AI-assisted code analysis"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java",
+        "VB6 (legacy analysis)",
+        "Code / design review",
+        "AI-assisted code analysis"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Call-center development and operational delivery",
+      "period": "2025.07 — 2026.07",
+      "role": "PMO / Technical development",
+      "team": "6 people (PMO)",
+      "description": "Support for quarterly releases, operational issues, workflow improvement and follow-on technical validation, spanning requirements, Java support, AWS checks and PoCs.",
+      "outcome": "Supported quarterly release preparation, operational fixes and tool-based workflow improvements; summarized PoC feasibility and constraints for follow-on planning.",
+      "responsibilities": [
+        "Clarify requirements, scope, business and system impact, dependencies, priorities and release schedules.",
+        "Investigate screens, batch jobs and existing VB / Java / C# logic; support Java implementation decisions and code-level fixes.",
+        "Investigate logs and data, triage incidents and develop or adapt internal support tools.",
+        "Check S3, EFS and RDS configuration, environment differences, pipelines, deployment procedures and release settings. RDS involvement is inspection and configuration checking.",
+        "Use Athena to inspect logs and data for operational investigations.",
+        "Research AI call-center approaches, write small Java validation programs and support AWS validation environments and PoCs.",
+        "Compare tools including JMeter and Distributed Load Testing on AWS; document test coverage, procedures and technical issues."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java",
+            "JSP",
+            "React",
+            "VB / C# (legacy analysis)"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "S3",
+            "EFS",
+            "RDS (inspection / configuration)",
+            "Lambda",
+            "CloudWatch",
+            "IAM",
+            "Athena"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "JMeter",
+            "Distributed Load Testing on AWS",
+            "Postman",
+            "SoapUI",
+            "Selenium (PoC)"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java",
+        "JSP",
+        "React",
+        "VB / C# (legacy analysis)",
+        "S3",
+        "EFS",
+        "RDS (inspection / configuration)",
+        "Lambda",
+        "CloudWatch",
+        "IAM",
+        "Athena",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "JMeter",
+        "Distributed Load Testing on AWS",
+        "Postman",
+        "SoapUI",
+        "Selenium (PoC)"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Business tool update following Salesforce changes",
+      "period": "2025.01 — 2025.06",
+      "role": "SE / Sole developer",
+      "team": "1 person",
+      "description": "Independently adapted an existing Java tool to a changed Salesforce environment, from investigation and encrypted communication to startup, distribution and testing.",
+      "outcome": "Enabled continued use after the update and helped standardize installation through MSI packaging and Intune distribution.",
+      "responsibilities": [
+        "Investigate existing Java and VBScript assets, configuration, Salesforce requirements and the change impact.",
+        "Modify and reimplement Java Swing functionality and remove dependencies on the old environment.",
+        "Implement communication encryption required by the system update.",
+        "Create a C# startup wrapper, package the application as MSI and support Intune automated installation.",
+        "Verify and test behavior, coordinate with users and address improvement requests."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java Swing",
+            "C#",
+            "VBScript"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "RDS",
+            "Apigee"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "MSI",
+            "Intune",
+            "Visual Studio",
+            "JMeter"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java Swing",
+        "C#",
+        "VBScript",
+        "RDS",
+        "Apigee",
+        "MSI",
+        "Intune",
+        "Visual Studio",
+        "JMeter"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Insurance applications and AWS migration",
+      "period": "2023.06 — 2024.12",
+      "role": "SE; sub-lead on internal management development",
+      "team": "4–10 people",
+      "description": "Development, changes and AWS migration across insurance and internal management systems, covering design, implementation, testing and production releases.",
+      "outcome": "Delivered features from design through release, supporting continuity after AWS migration and preserving functionality after Vue and Tableau upgrades.",
+      "responsibilities": [
+        "Clarify requirements, write basic and detailed designs, and implement screens and business logic with Java, Spring and Vue.",
+        "Develop customer input, updates and validation, new-product application logic and fee/premium calculations.",
+        "Implement internal lists, activity calendars, expense-related screens and scheduled inter-system data exchange.",
+        "Implement Lambda, S3 and API Gateway functionality and adapt existing modules for AWS operation and migration.",
+        "Handle Apigee API management, authentication, access control and permissions, and verify test-environment connectivity.",
+        "Plan and execute unit, integration and performance tests; tune DB/API responses and prepare and execute production releases.",
+        "Support Vue 2 → 3 and Tableau embedding API v2 → v3 upgrades; coordinate progress, issues and code reviews on internal-system development."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java",
+            "Spring",
+            "Vue.js",
+            "C#",
+            "VBScript"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "DB2",
+            "AWS Lambda",
+            "S3",
+            "API Gateway",
+            "Apigee"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "Git",
+            "Bitbucket",
+            "Artifactory",
+            "Tableau",
+            "TWS",
+            "Postman",
+            "JMeter",
+            "WebSphere"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java",
+        "Spring",
+        "Vue.js",
+        "C#",
+        "VBScript",
+        "DB2",
+        "AWS Lambda",
+        "S3",
+        "API Gateway",
+        "Apigee",
+        "Git",
+        "Bitbucket",
+        "Artifactory",
+        "Tableau",
+        "TWS",
+        "Postman",
+        "JMeter",
+        "WebSphere"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Telecom applications and platform renewal",
+      "period": "2019.05 — 2023.05",
+      "role": "Developer / SE / Sub-lead",
+      "team": "1–15 people",
+      "description": "Long-term telecom web, batch and API work plus multi-system migration and reconstruction, spanning requirements, development, middleware, testing and production delivery.",
+      "outcome": "Independently released key APIs and small web systems; supported platform cutover across application and infrastructure work. The team extended shared API access to more than 30 services.",
+      "responsibilities": [
+        "Independently deliver key APIs and small web systems from requirements through design, code, tests and production release.",
+        "Develop equipment registration, lookup, updates and deletion, data extraction, analysis, CSV output and bulk updates.",
+        "Design shared logging, aggregation, CSV parsing/conversion libraries and internal utility tools.",
+        "Automate periodic analysis and output using Shell and schedulers; investigate legacy VB6 behavior for migration changes.",
+        "Adapt applications for Tomcat-to-WildFly migration, configure WildFly/Nginx/Tomcat and verify related-system connectivity.",
+        "Prepare Linux/Windows environments, inspect logs, configure and verify Jenkins and check behavior during cutover.",
+        "Replace direct DB access with shared APIs to meet security requirements.",
+        "Execute unit, integration and performance tests and tuning; manage progress/issues, assign work, support teammates, review deliverables and coordinate with customers."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java",
+            "Spring",
+            "HTML5",
+            "CSS",
+            "JavaScript",
+            "jQuery",
+            "Shell",
+            "Perl",
+            "VB6 (legacy analysis)"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "Oracle",
+            "SQL Server",
+            "Tomcat",
+            "WildFly",
+            "Nginx"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "Git",
+            "SVN",
+            "Jenkins",
+            "JMeter",
+            "SoapUI",
+            "Linux",
+            "Windows"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java",
+        "Spring",
+        "HTML5",
+        "CSS",
+        "JavaScript",
+        "jQuery",
+        "Shell",
+        "Perl",
+        "VB6 (legacy analysis)",
+        "Oracle",
+        "SQL Server",
+        "Tomcat",
+        "WildFly",
+        "Nginx",
+        "Git",
+        "SVN",
+        "Jenkins",
+        "JMeter",
+        "SoapUI",
+        "Linux",
+        "Windows"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Telecom information lookup development",
+      "period": "2018.12 — 2019.04",
+      "role": "Developer",
+      "team": "7+ people",
+      "description": "Develop and test customer-information retrieval and lookup functions in telecom systems.",
+      "outcome": "Completed assigned development and testing, supporting stable information lookup functionality.",
+      "responsibilities": [
+        "Implement lookup, data extraction, CSV formatting and output under existing specifications.",
+        "Implement data transmission to an upstream system.",
+        "Contribute detailed designs, extend test cases and execute unit and behavior tests.",
+        "Investigate defects and complete the assigned implementation and tests."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Java",
+            "Spring",
+            "HTML5",
+            "CSS",
+            "JavaScript",
+            "jQuery"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "Oracle",
+            "Tomcat"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "SVN",
+            "Linux",
+            "Windows"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Java",
+        "Spring",
+        "HTML5",
+        "CSS",
+        "JavaScript",
+        "jQuery",
+        "Oracle",
+        "Tomcat",
+        "SVN",
+        "Linux",
+        "Windows"
+      ]
+    },
+    {
+      "kind": "work",
+      "title": "Oracle-to-Hadoop task migration",
+      "period": "2018.06 — 2018.12",
+      "role": "Developer",
+      "team": "30+ people",
+      "description": "Database migration affecting hundreds of telecom functions. Responsible for assigned scheduled-task changes, tests and delivery coordination.",
+      "outcome": "Completed assigned migration changes and contributed to the overall database migration.",
+      "responsibilities": [
+        "Investigate the impact of Oracle-to-Hadoop migration on existing task processing.",
+        "Adapt scheduled Shell tasks and manage source and deliverables.",
+        "Extend and run unit tests, checking the results.",
+        "Resolve migration-related defects and coordinate assigned deliverables."
+      ],
+      "environment": [
+        {
+          "title": "Languages & applications",
+          "items": [
+            "Shell"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Cloud, data & platforms",
+          "items": [
+            "Oracle",
+            "Hadoop"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Tools & runtime",
+          "items": [
+            "SVN",
+            "Linux",
+            "Windows"
+          ],
+          "description": ""
+        }
+      ],
+      "tags": [
+        "Shell",
+        "Oracle",
+        "Hadoop",
+        "SVN",
+        "Linux",
+        "Windows"
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "period": "2026.08 — Present",
+      "title": "Securities migration: VB6 to Java Web",
+      "description": "Migrating existing securities functions to Java Web, covering legacy code investigation, requirements clarification, design, implementation and review."
+    },
+    {
+      "period": "2025.07 — 2026.07",
+      "title": "Call-center development and operational delivery",
+      "description": "Support for quarterly releases, operational issues, workflow improvement and follow-on technical validation, spanning requirements, Java support, AWS checks and PoCs."
+    },
+    {
+      "period": "2025.01 — 2025.06",
+      "title": "Business tool update following Salesforce changes",
+      "description": "Independently adapted an existing Java tool to a changed Salesforce environment, from investigation and encrypted communication to startup, distribution and testing."
+    },
+    {
+      "period": "2023.06 — 2024.12",
+      "title": "Insurance applications and AWS migration",
+      "description": "Development, changes and AWS migration across insurance and internal management systems, covering design, implementation, testing and production releases."
+    },
+    {
+      "period": "2019.05 — 2023.05",
+      "title": "Telecom applications and platform renewal",
+      "description": "Long-term telecom web, batch and API work plus multi-system migration and reconstruction, spanning requirements, development, middleware, testing and production delivery."
+    },
+    {
+      "period": "2018.12 — 2019.04",
+      "title": "Telecom information lookup development",
+      "description": "Develop and test customer-information retrieval and lookup functions in telecom systems."
+    },
+    {
+      "period": "2018.06 — 2018.12",
+      "title": "Oracle-to-Hadoop task migration",
+      "description": "Database migration affecting hundreds of telecom functions. Responsible for assigned scheduled-task changes, tests and delivery coordination."
+    },
+    {
+      "period": "2014.09 — 2018.06",
+      "title": "Computer science studies",
+      "description": "Computer Science, Faculty of Information Science, Liaoning Normal University."
+    }
+  ],
+  "skills": [
+    {
+      "title": "Backend & scripting",
+      "items": [
+        "Java",
+        "C#",
+        "Node.js",
+        "VB.NET",
+        "Perl",
+        "Shell"
+      ],
+      "description": "Java-centered business applications, batch jobs and tools; legacy VB6 assets are investigated for migration."
+    },
+    {
+      "title": "Java frameworks & persistence",
+      "items": [
+        "Spring Boot",
+        "Spring MVC",
+        "Spring Cloud",
+        "MyBatis",
+        "Struts",
+        "Hibernate",
+        "Java Swing"
+      ],
+      "description": "Listed in the XLS skills matrix and work details, spanning web frameworks, persistence and existing Swing tools."
+    },
+    {
+      "title": "Frontend",
+      "items": [
+        "React",
+        "Vue.js",
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "jQuery",
+        "Ajax",
+        "JSP",
+        "Bootstrap"
+      ],
+      "description": "Vue implementation and 2 → 3 migration, screen logic and existing web changes. React appears in work materials and this website."
+    },
+    {
+      "title": "Databases & data platforms",
+      "items": [
+        "Oracle",
+        "SQL Server",
+        "PostgreSQL",
+        "Aurora",
+        "MySQL",
+        "DB2",
+        "Redis",
+        "MongoDB",
+        "Hadoop"
+      ],
+      "description": "From the PDF technology inventory and Oracle-to-Hadoop migration. Scope and depth vary across products."
+    },
+    {
+      "title": "AWS services",
+      "items": [
+        "AWS Lambda",
+        "Amazon S3",
+        "API Gateway",
+        "EFS",
+        "RDS",
+        "EC2",
+        "IAM",
+        "VPC"
+      ],
+      "description": "Lambda/S3 implementation, AWS migration and validation-environment support. Recent PMO RDS work is inspection/configuration checking."
+    },
+    {
+      "title": "Web/app servers & API management",
+      "items": [
+        "Tomcat",
+        "WebLogic",
+        "WildFly",
+        "Nginx",
+        "Apigee",
+        "WebSphere"
+      ],
+      "description": "Tomcat-to-WildFly migration, Nginx configuration/connectivity checks, and Apigee API management, authentication and access control."
+    },
+    {
+      "title": "Containers, CI/CD & distribution",
+      "items": [
+        "Docker",
+        "Jenkins",
+        "CodePipeline",
+        "CodeBuild",
+        "CodeDeploy",
+        "MSI",
+        "Intune"
+      ],
+      "description": "Jenkins configuration, release procedure checks and MSI/Intune distribution. This website’s AWS CI/CD is not deployed."
+    },
+    {
+      "title": "Testing & performance",
+      "items": [
+        "JMeter",
+        "SoapUI",
+        "Postman",
+        "Distributed Load Testing on AWS",
+        "Selenium (PoC)"
+      ],
+      "description": "Unit/integration/performance testing and validation procedures. Selenium comparisons and PoCs are tool investigation, not production delivery."
+    },
+    {
+      "title": "Monitoring & log investigation",
+      "items": [
+        "Amazon CloudWatch",
+        "Datadog",
+        "Grafana",
+        "Athena"
+      ],
+      "description": "From the PDF monitoring inventory, including Athena log/data inspection and incident investigation."
+    },
+    {
+      "title": "Version control & collaboration",
+      "items": [
+        "Git",
+        "SVN",
+        "Jira",
+        "Redmine",
+        "Confluence",
+        "Backlog",
+        "Bitbucket"
+      ],
+      "description": "Source/deliverable management, progress and issue tracking, requirements coordination and team documentation."
+    },
+    {
+      "title": "Development & operating systems",
+      "items": [
+        "Windows",
+        "macOS",
+        "Linux"
+      ],
+      "description": "From the PDF environment inventory, with Linux/Windows environment preparation, configuration checks and log investigation."
+    },
+    {
+      "title": "AI assistance & technical research",
+      "items": [
+        "ChatGPT",
+        "GitHub Copilot",
+        "Amazon Bedrock (research)",
+        "Amazon Lex (research)"
+      ],
+      "description": "Support for code analysis, documentation and research. Bedrock/Lex are research/PoC scope; this website’s Q&A integration is not implemented."
+    }
+  ],
+  "qualifications": [
+    {
+      "date": "Earned 2021.08",
+      "name": "AWS Solutions Architect – Professional"
+    },
+    {
+      "date": "Earned 2026.05",
+      "name": "Project Management Professional (PMP)"
+    }
+  ],
+  "note": {
+    "date": "2026-11-11",
+    "title": "Growing a trilingual blog, starting locally.",
+    "summary": "Building kongPortfolio with React and Spring Boot. The first small increment and what comes next.",
+    "paragraphs": [
+      "The first increment is a profile page in Japanese, Chinese and English. It uses browser preferences on the first visit and remembers a manually selected language.",
+      "React / TypeScript handles the interface; a Spring Boot API serves the content. There is no database initially: the backend reads public localized JSON. A Vite proxy connects the local frontend and API.",
+      "Working local increments come first. Article lists and detail pages precede the first AWS deployment, followed by CodePipeline / CodeBuild / ECR and then blue/green deployment."
+    ]
+  }
+}

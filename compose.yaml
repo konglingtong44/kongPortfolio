@@ -1,0 +1,16 @@
+name: kongportfolio
+services:
+  backend:
+    build: ./backend
+    mem_limit: 512m
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+  frontend:
+    build: ./frontend
+    ports: ["127.0.0.1:3000:8080"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    mem_limit: 128m
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]

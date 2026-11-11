@@ -1,0 +1,49 @@
+# Credentials and local configuration: never commit, including examples.
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials
+credentials.*
+.aws/
+.ssh/
+secrets/
+# Source resume is local reference material, not a public download.
+Resume_*.pdf
+*secret*.json
+*service-account*.json
+
+# Generated and machine-local files
+node_modules/
+dist/
+target/
+coverage/
+.vite/
+.local/
+*.log
+*.tsbuildinfo
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+履歴書*.xls
+履歴書*.xlsx
+# Private reference documents and certificates.
+[Rr][Ee][Ss][Uu][Mm][Ee][_. -]*
+[Cc][Vv][_. -]*
+*職務経歴書*
+*履歴書*
+*简历*
+*履历*
+*.crt
+*.cer
+*.der
+*.csr
+*.p7b
+*.p7c
+*.p8

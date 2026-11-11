@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "Gitleaks is required. Install it and add it to PATH before committing." >&2
+  exit 1
+fi
+# Reject forbidden paths even if someone used git add -f.
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js is required to check private file paths before committing." >&2
+  exit 1
+fi
+node "$(dirname "$0")/check-staged-paths.mjs"
+gitleaks git --pre-commit --staged --redact --no-banner .

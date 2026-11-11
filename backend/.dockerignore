@@ -1,0 +1,13 @@
+target
+.env*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.aws
+.ssh
+secrets
+credentials*
+*.log

@@ -1,0 +1,7 @@
+title = "kongortfolio secret scanning"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated dependencies and build output only"
+paths = ['''(^|/)(node_modules|target|dist|coverage|\.git|\.local)/''']

@@ -1,0 +1,101 @@
+.home-section.intro-layout { padding-top: 28px; }
+.intro-layout .home-layout {
+  grid-template-columns: 1fr 1.08fr;
+  gap: 64px;
+  padding: 36px 0 42px;
+  align-items: center;
+}
+.intro-layout .home-copy h1 { font-size: clamp(48px, 5.4vw, 74px); letter-spacing: -3.5px; }
+.intro-layout .home-copy .greeting { margin-bottom: 17px; }
+.intro-layout .hero-role { margin-top: 20px; }
+.intro-layout .hero-intro { margin: 22px 0 28px; max-width: 480px; }
+.intro-timeline {
+  min-width: 0;
+  background: #fff4d6;
+  border: 3px solid #a36231;
+  box-shadow: 5px 5px 0 #9b6a3533;
+  position: relative;
+}
+.intro-timeline-art { height: 104px; overflow: hidden; border-bottom: 3px solid #ad7338; }
+.intro-timeline-art .pixel-garden { width: 100%; height: 100%; object-fit: cover; object-position: center 55%; }
+.intro-timeline-content { padding: 22px 27px 24px; }
+.intro-timeline-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.intro-timeline-heading > span { font: 10px ui-monospace, monospace; color: #9a6b3c; }
+.intro-timeline-heading h2 { font-size: 18px; font-weight: 600; letter-spacing: -.3px; color: #63391e; }
+.intro-milestones { list-style: none; padding: 0; margin: 0; }
+.intro-milestones li { position: relative; padding: 0 0 22px 23px; border-left: 1px solid #b4824a70; margin-left: 4px; }
+.intro-milestones li:last-child { padding-bottom: 0; border-left-color: transparent; }
+.intro-milestones li::before { content: ''; position: absolute; left: -4px; top: 5px; width: 7px; height: 7px; background: #d9bb7c; border: 1px solid #9d6a36; }
+.intro-milestones li:last-child::before { background: #62873f; border-color: #48632e; }
+.intro-period { display: flex; align-items: center; gap: 8px; font: 10px/1.6 ui-monospace, monospace; color: #8b6238; margin-bottom: 5px; }
+.intro-milestone-title { display: flex; align-items: baseline; gap: 8px 14px; justify-content: space-between; flex-wrap: wrap; }
+.intro-milestone-title h3 { font-size: 15px; line-height: 1.7; font-weight: 600; color: #5d381f; }
+.intro-milestone-title > span { color: #536d35; font-size: 10px; line-height: 1.7; }
+.intro-milestone-detail { font-size: 11px; line-height: 1.85; color: #7d6143; margin-top: 3px; }
+.gallery-heading .gallery-home-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 9px 16px;
+  background: #ffe4a7;
+  border: 2px solid #9d602f;
+  box-shadow: inset 0 0 0 1px #fff0c5, 3px 3px 0 #78542d35;
+  color: #683b21;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.gallery-heading .gallery-home-button:hover { background: #fff0c6; transform: translateY(-1px); }
+.gallery-heading .gallery-home-button:active { transform: translate(1px, 1px); box-shadow: inset 0 0 0 1px #fff0c5, 1px 1px 0 #78542d35; }
+.gallery-home-button > span { font-size: 17px; }
+@media (max-width: 1100px) {
+  .intro-layout .home-layout { gap: 36px; }
+  .intro-layout .home-copy h1 { font-size: 60px; }
+  .intro-timeline-content { padding: 20px; }
+  .gallery-heading { gap: 18px; }
+  .gallery-heading > p { max-width: 265px; }
+}
+@media (max-width: 800px) {
+  .intro-layout .home-layout { grid-template-columns: 1fr; gap: 34px; padding: 32px 0; }
+  .intro-layout .home-copy { max-width: 580px; }
+  .intro-layout .hero-intro { max-width: none; }
+  .intro-timeline-art { height: 125px; }
+  .intro-milestone-title h3 { font-size: 16px; }
+}
+@media (max-width: 600px) {
+  .home-section.intro-layout { padding-top: 24px; }
+  .intro-layout .home-copy h1 { font-size: clamp(51px, 14vw, 66px); }
+  .intro-layout .home-layout { padding: 32px 0 25px; }
+  .intro-timeline-content { padding: 22px 20px; }
+  .intro-timeline-heading { margin-bottom: 23px; }
+  .intro-timeline-art { height: 100px; }
+  .intro-milestones li { padding-bottom: 24px; padding-left: 19px; }
+  .intro-period { font-size: 10px; }
+  .intro-milestone-title { display: block; }
+  .intro-milestone-title > span { font-size: 11px; }
+  .intro-milestone-detail { font-size: 12px; }
+  .gallery-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 12px; }
+  .gallery-heading > p { grid-column: 1 / -1; grid-row: 2; margin-top: 0; max-width: none; }
+  .gallery-heading h2 { font-size: 25px; }
+  .gallery-heading .gallery-home-button { grid-column: 2; grid-row: 1; padding: 7px 10px; gap: 7px; font-size: 10px; min-height: 44px; }
+}
+@media (max-height: 800px) and (min-width: 801px) {
+  .site-header { height: 76px; }
+  .home-section.intro-layout { min-height: calc(100svh - 76px); padding-top: 16px; padding-bottom: 12px; }
+  .intro-layout .home-layout { padding: 20px 0 24px; }
+  .intro-layout .home-copy h1 { font-size: 57px; }
+  .intro-layout .home-copy .greeting { margin-bottom: 12px; }
+  .intro-layout .hero-intro { font-size: 13px; margin: 17px 0 20px; }
+  .intro-layout .hero-role { margin-top: 16px; }
+  .intro-layout .home-bottom { padding-top: 10px; }
+  .intro-timeline-art { height: 68px; }
+  .intro-timeline-content { padding: 16px 21px; }
+  .intro-timeline-heading { margin-bottom: 12px; }
+  .intro-timeline-heading h2 { font-size: 16px; }
+  .intro-milestones li { padding-bottom: 14px; }
+  .intro-milestone-title h3 { font-size: 14px; }
+  .intro-milestone-detail { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .gallery-heading .gallery-home-button:hover, .gallery-heading .gallery-home-button:active { transform: none; } }

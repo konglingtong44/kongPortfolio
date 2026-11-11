@@ -1,0 +1,102 @@
+/* A complete grid at any category count, including the older three-category API. */
+.skills-layout .section-heading { margin-bottom: 32px; }
+.skills-layout .skills-category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.skills-layout .bento-card {
+  grid-column: auto;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #b47b42;
+  box-shadow: 3px 3px 0 #bd854426;
+  background: #fff5db;
+}
+.skills-layout .technology-category { display: flex; flex-direction: column; }
+.skills-layout .technology-category:nth-child(3n + 2) { background: #f2efd5; }
+.skills-layout .skill-card-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 18px;
+}
+.skills-layout .skill-index {
+  flex-shrink: 0;
+  margin-top: 4px;
+  padding-top: 2px;
+  font: 10px/1.6 ui-monospace, monospace;
+  color: #947044;
+}
+.skills-layout .skill-card-heading h3 {
+  flex: 1;
+  margin: 0;
+  color: #63391e;
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -.3px;
+  overflow-wrap: anywhere;
+}
+.skills-layout .skill-card-heading .pixel-mark {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  margin-top: -1px;
+}
+.skills-layout .bento-card > p {
+  min-height: 0;
+  margin: 0 0 18px;
+  color: #755338;
+  font-size: 12px;
+  line-height: 1.95;
+}
+.skills-layout .technology-category .tags { margin: auto 0 0; padding-top: 4px; }
+.skills-layout .tags { gap: 7px 6px; }
+.skills-layout .tags li {
+  padding: 4px 8px;
+  font-size: 11px;
+  line-height: 1.65;
+  background: #fffaf0;
+  border-color: #b27b4538;
+  overflow-wrap: anywhere;
+}
+.skills-layout .skills-extras {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid #b27b4538;
+}
+.skills-layout .site-technology { background: #eaf0d2; }
+.skills-layout .site-technology .tags { margin: 0; }
+.skills-layout .qualifications { margin: 0; background: #ffebbf; }
+.skills-layout .qualifications summary {
+  min-height: 44px;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1.7;
+}
+.skills-layout .qualifications .qualification-note {
+  margin: 2px 0 16px;
+  font-size: 11px;
+  line-height: 1.9;
+}
+.skills-layout .qualifications > div { grid-template-columns: 1fr; gap: 14px; }
+.skills-layout .qualifications > div > p { padding-top: 12px; }
+.skills-layout .qualifications p span { margin-bottom: 5px; font-size: 10px; }
+.skills-layout .qualifications p strong { font-size: 13px; }
+@media (max-width: 1000px) {
+  .skills-layout .skills-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .skills-layout .technology-category:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .skills-layout .bento-card { padding: 21px; }
+}
+@media (max-width: 600px) {
+  .skills-layout .skills-category-grid,
+  .skills-layout .skills-extras { grid-template-columns: 1fr; gap: 15px; }
+  .skills-layout .technology-category:last-child:nth-child(odd) { grid-column: auto; }
+  .skills-layout .skills-extras { margin-top: 22px; padding-top: 22px; }
+  .skills-layout .bento-card { padding: 21px; }
+  .skills-layout .skill-card-heading h3 { font-size: 18px; }
+  .skills-layout .bento-card > p { font-size: 13px; }
+}
