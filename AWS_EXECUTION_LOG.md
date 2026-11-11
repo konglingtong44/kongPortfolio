@@ -355,3 +355,37 @@ git push
 # 核对：仅两个角色策略和一个保留前缀更新，0 新增/删除。
 & $tf '-chdir=infra/terraform/cicd' apply -input=false candidate-prefix-fix.tfplan -no-color
 ```
+
+修复 apply 结果为 0 add / 3 change / 0 destroy；lifecycle 更新同样等待约 56 秒。修复源码、测试和当时记录提交为 39a404f6594b40c26585b68b5d9db54bf44ea168，并通过提交/推送扫描后 git push。
+
+### 5.2 固定提交启动首次验证
+
+```powershell
+git commit -m 'fix: scope candidate artifacts to the actual pipeline S3 prefix'
+git push
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=39a404f6594b40c26585b68b5d9db54bf44ea168' --client-request-token 'candidate-prefix-fix-39a404f' --profile kong-dev --region ap-northeast-1 --output json
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+```
+
+执行 ID `9a3de5f9-ce36-40a9-816f-ccb397cf51d3`，请求结果存于 `.local/candidate-execution.json`；没有重复启动 CreatePipeline 的失败执行。后续 plan 无差异，日志 `.local/candidate-post-apply-plan.log`。
+
+```powershell
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 9a3de5f9-ce36-40a9-816f-ccb397cf51d3 --profile kong-dev --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=9a3de5f9-ce36-40a9-816f-ccb397cf51d3 --profile kong-dev --region ap-northeast-1 --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-candidate --sort-order DESCENDING --profile kong-dev --region ap-northeast-1 --output json
+```
+
+先确认 Source 已 Succeeded，source revision 正好为上述 SHA，进入 BuildCandidate；action 输出存于 `.local/candidate-actions.json`，构建状态存于 `.local/candidate-build.json`。最终结果在后文记录。
+
+### 5.3 构建通过后，打包环境隔离问题
+
+构建 ID `kongportfolio-candidate:6cacd5e1-78e1-45ec-a159-363d9d2dc0b8` 的 initiator 是 `codepipeline/kongportfolio-candidate`，source SHA 正确。Source/full clone、前端 40 测试、后端 9+3 测试和实际 ZIP smoke 全部通过；后续打包命令失败，未生成 artifact。
+
+```powershell
+& $aws codebuild batch-get-builds --ids kongportfolio-candidate:6cacd5e1-78e1-45ec-a159-363d9d2dc0b8 --profile kong-dev --region ap-northeast-1 --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-candidate --log-stream-name 6cacd5e1-78e1-45ec-a159-363d9d2dc0b8 --start-from-head --limit 1000 --profile kong-dev --region ap-northeast-1 --output json
+```
+
+原始日志存于 `.local/candidate-first-build.log`。真实错误为 `Candidate packaging requires explicit CI=true and a clean checkout`，实际 CI 未定义。`bash scripts/ci.sh all` 只在子进程内 export CI，不影响 CodeBuild 后续的独立命令。本地检查明确设置了 CI，因此没暴露这个 buildspec 环境问题。
+
+修改 `codebuild/candidate.yml` 的全局 env.variables.CI 为字符串 true；不移除包脚本的干净来源检查，不改变 IAM、AWS 资源或应用代码。提交/扫描/推送后，以新 SHA 再启动流水线，验证完整链路。
