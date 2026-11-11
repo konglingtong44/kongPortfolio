@@ -493,3 +493,37 @@ Get-FileHash -LiteralPath '<已验证候选目录>/backend.zip' -Algorithm SHA25
 脚本解析 JSON 核对：**8 create / 2 update / 0 delete**（两日志组、两角色、两策略、Lambda、CodeBuild；更新已有 pipeline 和对应 StartBuild 权限）。未执行 apply、update-function-code 或 invoke。默认关闭的新配置 plan 无差异。输出 `.local/staging-plan.log`、`staging-disabled-plan.log` 和忽略的 staging.tfplan。Bootstrap 预条件防止本地文件变更后继续部署；后续机器也必须恢复有效的已验证 bootstrap 输入。
 
 估算额外 STG 使用：每月 20 次，每次 verifier 两分钟，CodeBuild $0.20 + CodePipeline $0.08 = $0.28，未扣免费额度；另计少量 Lambda、S3/日志/税。原候选构建费用另算。审批等待不按 action-minute 收费，Lambda 未设 provisioned concurrency。实际新阶段时长待获批后实测；新资源尚未创建。
+
+### 6.4 Git、安全检查和已有 CI
+
+补充查阅公开 variables reference 和 buildspec reference，确认 `#{codepipeline.PipelineExecutionId}`、SourceVars.CommitId 以及 env.exported-variables 的传递方式：
+
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-variables.html
+- https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
+
+```powershell
+node scripts/test-staging-contract.mjs
+node --check scripts/verify-staging.mjs
+git add -- AWS_EXECUTION_LOG.md PROJECT_PLAN.md docs/staging-approval.md codebuild/staging.yml infra/terraform/cicd/staging.tf infra/terraform/cicd/candidate-pipeline.tf infra/terraform/cicd/tests/build.tftest.hcl infra/terraform/cicd/tests/candidate.tftest.hcl infra/terraform/cicd/tests/webhooks.tftest.hcl infra/terraform/cicd/tests/staging.tftest.hcl infra/terraform/cicd/tests/fixtures/staging-bootstrap.txt scripts/ci.sh scripts/staging-contract.mjs scripts/verify-staging.mjs scripts/test-staging-contract.mjs
+node .githooks/check-staged-paths.mjs
+git diff --cached --check
+git commit -m 'feat: prepare isolated STG verification and first human approval'
+git push
+git rev-parse HEAD
+git status --porcelain
+```
+
+结果：提交 `17f55f9e7ee60d92bf57d25e829b027ede919198`，Gitleaks 提交/推送 hooks 通过，功能分支已推送。没有合并 main、没有启动候选流水线、没有写入生产。现有 webhook CI 自动执行，用前文相同的 list-builds-for-project / batch-get-builds 查询；这不是新 STG 阶段运行。
+
+```powershell
+& $aws codebuild batch-get-builds --ids kongportfolio-ci-frontend:9e212b16-d362-4ae3-9c9b-307724b94642 kongportfolio-ci-backend:dcca2b09-166e-4c77-914d-224a214691ed --profile kong-dev --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/commits/17f55f9e7ee60d92bf57d25e829b027ede919198/statuses?per_page=10' -Headers $headers
+```
+
+首次查询时前端成功、后端仍在 BUILD；等待最终状态后再记录结论。原始 JSON 位于 `.local/staging-preparation-ci.json`，没有将 CodeBuild 临时凭证或 payload 上传到日志。
+
+最终两个构建均 SUCCEEDED，source 都为 17f55f9；GitHub ci/frontend、ci/backend 最新状态均 success。再用 get-log-events 读取上述两个构建 UUID 的日志，分别存为 `.local/staging-preparation-frontend.log` / `staging-preparation-backend.log`，确认 STG 合约检查实际在 Linux CI 中执行，且 applicationChecksRan=true：前端 40 项测试/build，后端 9 HTTP + 3 Lambda 测试及 ZIP smoke 全通过。
+
+本轮最终记录提交 `docs: record STG preparation verification and full operation audit` 仅本地保存，等获批创建前一起推送，避免只为补验证记录再触发两次 CI。新资源/阶段尚未创建；批准范围是 8 个新增资源、2 项配置更新和一次首次验证，验收到人工审批 1 等待，不自动批准。
+
+补充执行约束：Terraform precondition 在生成计划时核对 bootstrap 文件；执行保存的 plan 前还要重新 Get-FileHash 比对原 manifest SHA（不能只相信旧 plan 中已计算的文件哈希），并检查资源动作仍在批准范围内。新流水线的真实 Lambda 更新、七次 Invoke、报告导出和待审批状态仍需获批后逐项验证。
