@@ -319,7 +319,7 @@ Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/com
 
 结果：两个 AWS 构建都 SUCCEEDED；GitHub 每个 context 按 id 取最新条目，ci/frontend、ci/backend 都 success。这是现有 CI 对新增源码的检查，不是尚未创建的 CodePipeline 运行。最终这段验证记录以本地文档提交保存，待下一次授权执行时一并推送，避免仅为写验证记录再次触发构建。
 
-## 5. S3-04：获批后创建并验证候选流水线（进行中）
+## 5. S3-04：获批后创建并验证候选流水线（已完成）
 
 你明确批准创建上述 14 个资源和首次云端验证。本轮先读取 AGENTS.md、git status/log、本地 tfvars，并用 STS 确认账号。`git push` 发布上一轮本地记录提交 72539a8；推送 hook 的 Gitleaks 通过。此推送只触发现有 CI，候选流水线此时还未创建。
 
@@ -389,3 +389,53 @@ git push
 原始日志存于 `.local/candidate-first-build.log`。真实错误为 `Candidate packaging requires explicit CI=true and a clean checkout`，实际 CI 未定义。`bash scripts/ci.sh all` 只在子进程内 export CI，不影响 CodeBuild 后续的独立命令。本地检查明确设置了 CI，因此没暴露这个 buildspec 环境问题。
 
 修改 `codebuild/candidate.yml` 的全局 env.variables.CI 为字符串 true；不移除包脚本的干净来源检查，不改变 IAM、AWS 资源或应用代码。提交/扫描/推送后，以新 SHA 再启动流水线，验证完整链路。
+
+### 5.4 修复环境后执行成功
+
+修复提交 `4d00463b90231efc89c872c32c230e516d158780`，提交信息 `fix: share CI mode across candidate buildspec commands`，git push 扫描通过。
+
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=4d00463b90231efc89c872c32c230e516d158780' --client-request-token 'candidate-ci-env-4d00463' --profile kong-dev --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id e7b0712d-6cbb-4046-92a7-ce4a26fb98f9 --profile kong-dev --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=e7b0712d-6cbb-4046-92a7-ce4a26fb98f9 --profile kong-dev --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-candidate:82d6bdee-9a94-41b7-bfd5-ca7690a81ce9 --profile kong-dev --region ap-northeast-1 --output json
+```
+
+执行 `e7b0712d-6cbb-4046-92a7-ce4a26fb98f9` 最终 **Succeeded**，Source/BuildCandidate 两个 action 都成功；CodeBuild `82d6bdee-9a94-41b7-bfd5-ca7690a81ce9` 为 SUCCEEDED，resolvedSourceVersion 与指定 SHA 一致。构建约 103 秒。前端 40 项测试/build、后端 9+3 测试、实际 ZIP JVM smoke、真实候选包生成/校验均通过，上传 9 个文件的 artifact 成功。结果保存在 `.local/candidate-final-pipeline.json`、`candidate-final-build.json`、`candidate-final-actions.json`、`candidate-successful-build.log`。
+
+### 5.5 从 S3 按版本下载并复核
+
+从成功 action 的 outputArtifacts 读取实际 bucket/key，没有推测路径。对候选 artifact 执行：
+
+```powershell
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Candidate/OlNePu1 --profile kong-dev --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Candidate/OlNePu1 --version-id LRR8Sr9BeVXnbqAMNnvMlqtvESuxeC1Z --profile kong-dev --region ap-northeast-1 '<仓库>/.local/candidate-verification-e7b0712d/artifact.zip' --output json
+Get-FileHash -LiteralPath '<下载的 artifact.zip>' -Algorithm SHA256
+jar --list --file '<下载的 artifact.zip>'
+# 校验所有条目只在 backend.zip、manifest.json、SHA256SUMS、frontend/ 下；
+# 拒绝绝对路径、..、反斜杠等，再进入新建的 .local/.../unpacked 目录：
+jar --extract --file '<下载的 artifact.zip>'
+node scripts/verify-pipeline-candidate.mjs '<解压目录>'
+```
+
+下载路径在仓库 .local 下新建且不覆盖已有目录；先验证 ZIP 条目再解压。外层 artifact SHA256 等于 CodeBuild 返回的 checksum；逐文件 manifest/SHA256SUMS、版本前缀、release identity、sourceDirty=false 和 Git SHA 全通过。
+
+| 字段 | 已验证值 |
+| --- | --- |
+| S3 key | kongportfolio-candid/Candidate/OlNePu1 |
+| S3 VersionId | LRR8Sr9BeVXnbqAMNnvMlqtvESuxeC1Z |
+| Artifact bytes | 27357380 |
+| Artifact SHA256 | bf60b3fcd7bdc283ef701e6b102aa26990634c5a3d5aac28789fed5d5d4880b4 |
+| ReleaseId | f6c6341fa32de2315789c757d9b563f5a04d9ec6cd7a3c7b93361a0728337a2e |
+| Source commit | 4d00463b90231efc89c872c32c230e516d158780 |
+| Backend ZIP SHA256 | 88e27021494b7f63c38af9b11cd332be5c7849bba4e75d81a9162fef9e22a4c8 |
+
+注意加密区别：`s3api get-bucket-encryption` 的桶默认是 AES256，但 CodePipeline 实际 artifact head 显示 `aws:kms`。以 head 的 SSEKMSKeyId 调用 `kms describe-key --query 'KeyMetadata.{Manager:KeyManager,State:KeyState}'`，确认 KeyManager=AWS、Enabled，没有创建客户管理密钥。没有把桶默认配置误当作对象实际加密方式。元数据在 `.local/verified-candidate.json` 和 `candidate-download-metadata.json`。
+
+### 5.6 收尾、费用范围与下一步
+
+再次执行 `terraform -chdir=infra/terraform/cicd plan -input=false -detailed-exitcode -no-color`，结果 No changes，日志 `.local/candidate-final-plan.log`。没有修改生产 Lambda、CloudFront、网站文件或域名，也没有进行 STG/生产部署和审批。
+
+为估算本轮候选流水线的费用，读取三个 execution 的 action startTime/lastUpdateTime，以及两次候选 CodeBuild 的 start/endTime，逐项向上取整。约 9 个 Pipeline action-minutes × $0.002 + 4 个 CodeBuild 墙钟分钟 × $0.005 = **$0.038**，未扣免费额度；不是账单，未包含现有 webhook CI、S3、日志、KMS 请求、传输和税。明细 `.local/candidate-cost-estimate.json`。
+
+最终文档和执行记录提交/推送到现有功能分支；这只触发现有 CI，候选流水线 DetectChanges=false，不会仅因文档推送重复运行。原始 AWS JSON/日志/ZIP 都留在被忽略的 .local。下一 Story 才接 STG 验证与生产审批 1，再接 Green 验证、审批 2 和蓝绿流量切换/回滚。

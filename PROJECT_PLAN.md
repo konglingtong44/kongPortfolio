@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-04 — Candidate pipeline cloud verification (2026-11-12, completed)
+
+Approved 14 resources created. Fixed actual 20-character artifact prefix in two role policies/lifecycle (0 add / 3 update / 0 delete) and global buildspec CI env. Successful execution e7b0712d-6cbb-4046-92a7-ce4a26fb98f9, CodeBuild 82d6bdee-9a94-41b7-bfd5-ca7690a81ce9, commit 4d00463. Full clone, frontend 40 tests/build, backend 9+3 tests/ZIP smoke and package/upload pass. Downloaded exact S3 object version, outer CodeBuild SHA and complete candidate manifest checks pass. Release f6c6341fa32de2315789c757d9b563f5a04d9ec6cd7a3c7b93361a0728337a2e. Actual object uses AWS-managed KMS; no customer key. Final plan No changes. Seven Terraform tests pass; log includes both failed runs and corrections. No STG/production/deployment gates or traffic changes. Candidate-only Story complete; pause for review before STG/approval/deployment increment.
+
 ## S3-04 — CodePipeline candidate preparation (awaiting paid-resource approval)
 
 Approval received in the next turn; 14 resources created. Initial CreatePipeline execution failed in Source due to artifact prefix truncation. Corrected only two S3 role scopes and lifecycle filter to actual `kongportfolio-candid/`; seven tests passed. Cloud execution/artifact verification underway; follow root execution log section 5.
