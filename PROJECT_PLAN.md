@@ -1,8 +1,10 @@
 # S1-01T — timeline and resume reconciliation
 
-## S3-03 — Automatic CI triggers and status writeback (in progress)
+## S3-03 — Automatic CI triggers and status writeback (2026-11-12, completed)
 
-Owner subsequently accepted the actual pending GitHub App permission request (repository restricted to kongPortfolio). Rechecked two-create-only plan; both webhooks now created successfully, 2 add / 0 change / 0 destroy. No IAM expansion. Real push-triggered build/status validation is next; not yet claimed complete.
+Owner subsequently accepted the actual pending GitHub App permission request (repository restricted to kongPortfolio). Rechecked two-create-only plan; both webhooks created successfully, 2 add / 0 change / 0 destroy. No IAM expansion. Final Terraform plan No changes.
+
+Pushed e3836738037a411c2f75435dfd065dc69b5ffb55; both builds show GitHub-Hookshot initiator and matching source revision, with no manual start-build. Frontend 2afb920b-f930-451d-9e0f-78e87c025dad: SUCCEEDED, 40 tests/build/package, 41.6 s. Backend e009d765-916b-475c-8b62-67b424b2dc20: SUCCEEDED, 9 HTTP + 3 Lambda tests/ZIP smoke, 82.6 s. GitHub combined status success, ci/frontend and ci/backend both success. Approximately 3 rounded wall-time minutes / USD0.015 compute before allowance for this validation pair, logs/tax extra; not a bill. Five Terraform plan tests and actual AWS filter/account/log checks passed. PR created/reopened filters are configured but were not live-tested; branch protection and production deployment remain untouched. Root AWS_EXECUTION_LOG.md records execution. Story complete; pause for review before CodePipeline/two production approval gates/blue-green.
 
 Prepared owner-only anchored push/PR filters and five offline plan tests. SSO renewed and account verified. Two-webhook-only apply failed with OAuthProviderException (GitHub API limit or permissions). Added a Terraform-managed account/region default reference to the same existing connection after verifying no previous GitHub credential entry; reference created, but both webhooks still failed. No IAM expansion, website change or new build. Root AWS_EXECUTION_LOG.md records commands, results, historical recap and the failed hypothesis. Awaiting owner review of GitHub App repository/new webhook permissions per AWS documentation. No automatic-trigger/status success claim; Story remains incomplete.
 

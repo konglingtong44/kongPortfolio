@@ -168,3 +168,56 @@ gitleaks dir --redact --no-banner .
 ```
 
 结果：**2 add / 0 change / 0 destroy**，两个触发器成功创建。权限接受后成功这一事实支持 GitHub App 权限是此次创建失败的原因；默认连接引用的独立影响没有做移除实验。接下来将通过真实 git push 验证自动构建和 GitHub 状态，不使用 start-build 冒充自动触发。
+
+### 3.3 真实推送验收通过
+
+执行五个 Terraform 离线测试，通过后提交并推送：
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' fmt -check -recursive
+& $tf '-chdir=infra/terraform/cicd' test
+git add -- AWS_EXECUTION_LOG.md PROJECT_PLAN.md infra/terraform/cicd/webhooks.tf infra/terraform/cicd/tests/build.tftest.hcl infra/terraform/cicd/tests/webhooks.tftest.hcl scripts/ci.sh
+node .githooks/check-staged-paths.mjs
+git diff --cached --check
+git commit -m 'feat: trigger owner-only AWS CI from GitHub events'
+git push
+git rev-parse HEAD
+```
+
+结果：提交 `e3836738037a411c2f75435dfd065dc69b5ffb55`。提交和推送 hook 的 Gitleaks 扫描均通过。没有调用 start-build，AWS 自动出现两个构建。通过以下只读命令检查：
+
+```powershell
+& $aws codebuild list-builds-for-project --project-name 'kongportfolio-ci-frontend' --sort-order DESCENDING --profile kong-dev --region ap-northeast-1 --output json
+& $aws codebuild list-builds-for-project --project-name 'kongportfolio-ci-backend' --sort-order DESCENDING --profile kong-dev --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids 'kongportfolio-ci-frontend:2afb920b-f930-451d-9e0f-78e87c025dad' 'kongportfolio-ci-backend:e009d765-916b-475c-8b62-67b424b2dc20' --profile kong-dev --region ap-northeast-1 --output json
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+& $aws codebuild batch-get-projects --names kongportfolio-ci-frontend kongportfolio-ci-backend --profile kong-dev --region ap-northeast-1 --query 'projects[].{name:name,filters:webhook.filterGroups}' --output json
+```
+
+两个构建的 initiator 都是 `GitHub-Hookshot/80c5d1c`，resolvedSourceVersion 均匹配上述提交，证明此次是推送触发。计划 No changes；实际 AWS 过滤器与代码一致。
+
+| 项目 | 结果 | 实际验证 | 墙钟耗时 |
+| --- | --- | --- | --- |
+| frontend | SUCCEEDED | 40 测试、TypeScript/Vite、clean 静态验证包 | 41.6 秒 |
+| backend | SUCCEEDED | 9 HTTP + 3 Lambda 测试、ZIP、独立 JVM smoke | 82.6 秒 |
+
+读取完整日志时，Windows AWS CLI 的 GBK 输出无法编码前端的勾选符号；只在当前终端设置 UTF-8 后读取，未改应用设置：
+
+```powershell
+$env:PYTHONUTF8 = '1'
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new()
+# 再用第 2 节的 get-log-events 读取上述两个 UUID 的日志。
+```
+
+用 GitHub 只读 API 检查状态：
+
+```powershell
+$headers = @{ Accept='application/vnd.github+json'; 'User-Agent'='kongPortfolio-CI'; 'Cache-Control'='no-cache' }
+Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/commits/e3836738037a411c2f75435dfd065dc69b5ffb55/status?per_page=100' -Headers $headers
+```
+
+最终 combined state 为 `success`，`ci/frontend` 和 `ci/backend` 都是 `success`。状态回写是异步的，早期读取短暂显示 pending。原始结果和日志存于 `.local/ci-auto-build-results.json`、`.local/ci-auto-frontend.log`、`.local/ci-auto-backend.log`、`.local/ci-auto-github-status.json`。
+
+这一对验收构建的墙钟时间分别向上取整约 1+2 分钟，按已核对的 $0.005/分钟估算 $0.015（未扣免费额度，另有日志/税），不是实际账单。没有部署生产网站；PR 创建/重新打开过滤器仅配置/离线检查，未进行真实 PR 事件测试。下一 Story 才接 CodePipeline 与生产两道审批、蓝绿切流。
+
+最后仅更新本文件、PROJECT_PLAN.md、docs/aws-ci.md 并提交推送 `docs: record verified webhook CI and GitHub status reporting`。这次文档推送也会走已有 CI；应用未变时 CI 会保留通用安全检查并跳过应用构建，不需要为此改变触发规则。

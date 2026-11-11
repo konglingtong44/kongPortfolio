@@ -1,4 +1,14 @@
-# CodeBuild CI — S3-02 completed
+# CodeBuild CI
+
+## S3-03 — automatic CI verified (2026-11-12)
+
+Both owner-only webhooks are now active, managed in `webhooks.tf`. Owner accepted the pending AWS Connector GitHub App permissions with repository access restricted to kongPortfolio. The same existing connection is also registered as the Tokyo account default source reference; no PAT, raw token or production IAM permission was added. Preserve both `enable_ci=true` and `enable_ci_webhooks=true` in ignored local inputs. Final Terraform plan No changes; five offline plan tests pass.
+
+Real push of `e3836738037a411c2f75435dfd065dc69b5ffb55` automatically started both builds (`GitHub-Hookshot` initiator, matching resolvedSourceVersion). Frontend 40 tests/build/package and backend 9 HTTP + 3 Lambda tests/ZIP smoke all pass. Both GitHub statuses `ci/frontend` / `ci/backend` are success; prior writeback gap is resolved. Build suffixes: frontend `2afb920b-f930-451d-9e0f-78e87c025dad`, backend `e009d765-916b-475c-8b62-67b424b2dc20`. About 3 rounded wall minutes / $0.015 compute before allowance, not an invoice.
+
+Only actor `14041257` may trigger builds. PUSH accepts main and feat/feature/fix/hotfix branches; PR-created/reopened accepts those feature branches targeting main. Same-repository PR updates are covered by PUSH to avoid duplicate builds. Fork/other-contributor automation is not an intended workflow. Real PR events and required branch checks have not been tested/configured. No production deployment, CodePipeline or blue/green yet. Commands/results: [root execution log](../AWS_EXECUTION_LOG.md).
+
+## S3-02 — historical initial manual CI verification
 
 Execution (2026-11-12): user approved all eight resources and initial builds. All eight resources are created; final Terraform plan has no changes. Initial backend project creation returned an OAuth authorization error; retry of only that missing project succeeded with unchanged IAM policies. Source was published on `feat/aws-serverless-ci`; main and production remain unchanged. Preparation commands below are historical; do not repeat the create plan.
 
