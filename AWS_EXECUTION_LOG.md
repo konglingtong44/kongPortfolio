@@ -274,3 +274,36 @@ node scripts/test-pipeline-candidate.mjs
 启用预览：14 create / 0 update / 0 delete；默认关闭：No changes。计划和输出保存在忽略的 `.local/candidate-plan.log`、`candidate-default-plan.log` 及 cicd/candidate.tfplan。没有执行 apply，也未在输入文件中启用候选流水线。Source 的 UseConnection 按官方要求包含新旧服务前缀，权限仍只针对现有连接；实际云端鉴权待验证。
 
 费用估算：一次 Source 1 分钟 + Build 5 分钟，Pipeline $0.012 + Build $0.025 = $0.037，20 次约 $0.74（均未扣免费额度；另计 S3、日志、加密请求可能费用和税）。运行时间未经新流水线实测。创建后可能首次执行，批准范围应包含该次及必要的首次验收。详见 docs/candidate-pipeline.md。
+
+### 4.4 干净提交的本地完整检查及真实打包
+
+先通过 Git 路径、格式及 Gitleaks hooks，将代码提交到现有功能分支：
+
+```powershell
+& 'D:\software\Git\bin\bash.exe' -n scripts/ci.sh
+node scripts/test-pipeline-candidate.mjs
+node .githooks/check-staged-paths.mjs
+git diff --cached --check
+git commit -m 'feat: prepare source-verified CodePipeline candidate artifacts'
+```
+
+完整 git add 文件列表：candidate-pipeline.tf、tests/candidate.tftest.hcl、codebuild/candidate.yml、ci.sh、3 个 pipeline-candidate Node 脚本、docs/candidate-pipeline.md、PROJECT_PLAN.md、AWS_EXECUTION_LOG.md。没有加入 .local、计划或 tfvars。提交 `37237d4aaa123b5aaf6a31642dc88a5dd9ee521d` 后工作树干净；真实候选打包要求干净提交，不能跳过。
+
+```powershell
+. ./scripts/tools.ps1
+$env:DEBUG = 'false'
+& 'D:\software\Git\bin\bash.exe' scripts/ci.sh all
+$env:CI = 'true'
+$env:CODEBUILD_RESOLVED_SOURCE_VERSION = (git rev-parse HEAD).Trim()
+node scripts/package-pipeline-candidate.mjs
+node scripts/verify-pipeline-candidate.mjs .local/pipeline-candidate
+# 完成后清除仅为本地模拟设置的 CI 和 CODEBUILD_RESOLVED_SOURCE_VERSION。
+```
+
+实际执行时 stdout/stderr 重定向到 `.local/candidate-local-ci.log` 和 `candidate-local-package.log`；每条命令检查退出码，失败时读取日志尾部再停止。ci.sh 内部顺序：扫描 Git 历史和工作目录、禁止私有路径、hook/routing/候选完整性检查、npm ci/test/build、静态验证包、Maven 常规 verify、Lambda verify、实际 ZIP 的独立 JVM smoke。npm/Maven 按各自缓存和锁定依赖下载所需包；本记录不声称抓取了每条依赖 HTTP 请求，详细工具输出在上述日志中。没有执行 AWS 部署请求。
+
+结果：前端 40 项测试/build；后端 9 HTTP + 3 Lambda 测试；ZIP 24.1 MiB、解压库 26.8 MiB、独立启动通过；全部 CI 检查通过。真实候选 ID 为 `9aa8d398127a78fe06decc4f36b13434cae0d0f758cf0069781cbf9e38af029a`，source=37237d4，生成并逐文件校验通过，输出位于 `.local/pipeline-candidate`。未上传，未部署。
+
+复查官方 Source action 文档后，给新流水线角色同时加入 `codeconnections:UseConnection` 与 `codestar-connections:UseConnection`，都限定为同一已有连接；CodeBuild full-clone 使用官方的 FullRepositoryId 条件。重新执行 fmt/test/plan，并解析 JSON 再核对仍然只有 14 个 create。没有 apply。Terraform 测试括号错误已经修复，无待失败的本地检查。
+
+最后把验证结果写回本记录/项目计划/说明，执行 `git commit -m 'docs: record candidate preparation checks and execution commands'`、`git push`。推送只会触发现有 CI，不会创建新流水线（enable_candidate_pipeline 仍未开启）。新流水线的 AWS 执行等待对具体资源计划的付费创建批准。
