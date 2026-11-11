@@ -13,3 +13,20 @@ coverage
 secrets
 credentials*
 *.log
+
+# Private references and local logs never enter the build context.
+.local
+.git
+*.crt
+*.cer
+*.der
+*.csr
+*.p7b
+*.p7c
+*.p8
+[Rr][Ee][Ss][Uu][Mm][Ee]*
+[Cc][Vv]*
+*履歴書*
+*職務経歴書*
+*简历*
+*履历*

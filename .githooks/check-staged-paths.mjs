@@ -1,7 +1,8 @@
 import { spawnSync } from 'node:child_process';
 
 // NUL delimiters preserve spaces, Unicode and line breaks in Git paths.
-const result = spawnSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'], { encoding: 'utf8' });
+const args = process.argv.includes('--all') ? ['ls-files', '-z'] : ['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'];
+const result = spawnSync('git', args, { encoding: 'utf8' });
 if (result.error || result.status !== 0) {
   console.error('Commit blocked: could not inspect staged file paths.');
   process.exit(1);

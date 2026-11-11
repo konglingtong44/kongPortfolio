@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,9 +47,13 @@ mkdirSync(noTools);
 const env = { ...process.env };
 for (const key of Object.keys(env)) if (key.toLowerCase() === 'path') delete env[key];
 env.PATH = noTools;
-const shell = process.platform === 'win32'
-  ? resolve(dirname(spawnSync('where.exe', ['git'], { encoding: 'utf8' }).stdout.trim().split(/\r?\n/)[0]), '../bin/sh.exe')
-  : '/bin/sh';
+let shell = '/bin/sh';
+if (process.platform === 'win32') {
+  const gitPath = spawnSync('where.exe', ['git'], { encoding: 'utf8' }).stdout.trim().split(/\r?\n/)[0];
+  shell = ['../bin/sh.exe', '../../bin/sh.exe', 'sh.exe']
+    .map(path => resolve(dirname(gitPath), path)).find(existsSync);
+  assert.ok(shell, 'Could not find Git for Windows shell');
+}
 const missing = spawnSync(shell, [join(root, '.githooks/pre-commit')], { cwd: fixture, env, encoding: 'utf8' });
 assert.equal(missing.status, 1, missing.stderr);
 assert.match(missing.stderr, /Gitleaks is required/);

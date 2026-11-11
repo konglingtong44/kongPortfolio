@@ -15,10 +15,16 @@ try {
         & $npm test
         if ($LASTEXITCODE -ne 0) { throw 'Frontend tests failed.' }
     } finally { Pop-Location }
+    & node "$repo/scripts/package-frontend.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Static artifact verification failed.' }
     & $maven -B -ntp -f "$repo/backend/pom.xml" verify
     if ($LASTEXITCODE -ne 0) { throw 'Backend verification failed.' }
     & $gitleaks dir --redact --no-banner .
     if ($LASTEXITCODE -ne 0) { throw 'Secret scan failed.' }
+    & node "$repo/.githooks/check-staged-paths.mjs" --all
+    if ($LASTEXITCODE -ne 0) { throw 'Private tracked path check failed.' }
+    & node "$repo/scripts/test-hooks.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Hook verification failed.' }
     if (Get-Command docker -ErrorAction SilentlyContinue) {
         docker compose config --quiet
         if ($LASTEXITCODE -ne 0) { throw 'Compose configuration failed.' }

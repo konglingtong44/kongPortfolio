@@ -1,0 +1,23 @@
+# Prepared for AWS CodeBuild; no project or webhook is created by this file.
+# Managed image: aws/codebuild/amazonlinux-x86_64-standard:5.0, privileged=false.
+version: 0.2
+env:
+  shell: bash
+  variables:
+    CI_COMPONENT: all
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+      java: corretto21
+  build:
+    commands:
+      - bash scripts/ci.sh "$CI_COMPONENT"
+artifacts:
+  base-directory: .local/ci-results
+  files:
+    - '**/*'
+cache:
+  paths:
+    - '/root/.m2/repository/**/*'
+    - '/root/.npm/**/*'

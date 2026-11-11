@@ -98,7 +98,10 @@ it('opens each module, restores focus and handles the side navigation', async ()
     button.focus(); fireEvent.click(button);
     expect(screen.getByRole('dialog', { name: heading })).toHaveAttribute('open');
     if (module === 'REGEX') expect(screen.getByLabelText(/Regular expression/)).toHaveValue('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
-    if (module === 'ABOUT') expect(screen.getByText(/not connected yet/)).toBeInTheDocument();
+    if (module === 'ABOUT') {
+      expect(screen.getByText(/not connected yet/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'test' })).toBeInTheDocument();
+    }
     if (module === 'SYSTEM') expect(screen.getByText('AWS CodeConnections')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

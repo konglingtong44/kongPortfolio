@@ -24,3 +24,13 @@ Acceptance: shorten the three introductions; do not intercept 01 wheel scrolling
 Verification: frontend production build and 33 tests; Maven verify with 7 tests, including local content reload without service restart; PowerShell startup syntax parsed; the local API matched the source in all three languages. Native wide/narrow visual checks could not be completed: Computer Use stopped because it could not reliably establish the browser URL. Container build remains unverified.
 
 Local development: run `scripts/dev.ps1`, then open http://localhost:5173 (API 8080).
+
+## S1-02 — Docker API test button
+
+Acceptance: replace the About dialog's pending badge with `test`; call Java, log access at INFO, then show a localized pixel-style popup; handle connection failures and prevent duplicate requests. No Bedrock/AWS calls.
+
+Implemented `POST /api/bedrock` and the frontend dialog. Verified: 39 frontend tests and production build; Maven verify with 8 tests including HTTP response and captured INFO log; both Docker images built and containers healthy; POST through Nginx on port 3000 returned PREPARING and appeared in backend INFO logs. Native browser appearance remains unverified. No AWS resources created.
+
+## Phase 1 ? API logging and DevOps preparation
+
+Scope: all synchronous /api calls get INFO stdout + rotated info.log; POST /api/bedrock remains a testing placeholder. Keep local independent frontend/backend containers and dev scripts. Prepare AWS CodeBuild CI, static verification bundle and AWS architecture/cost/release documents. No AWS resources, production deployment, branch protection, commits or pushes. See docs/verification.md for actual checks and gaps.

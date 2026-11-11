@@ -4,6 +4,7 @@ import { isProfile, type Profile } from './profile';
 import { modules, modulesCopy, type ModuleId } from './modules';
 import { RegexLab } from './RegexLab';
 import { Modal } from './Modal';
+import { BedrockEntry } from './BedrockEntry';
 import { PixelMark } from './PixelGarden';
 import { ProjectGallery } from './ProjectGallery';
 import { SkillsBento } from './SkillsBento';
@@ -18,7 +19,7 @@ function FloatingModule({ id, locale, profile, onClose }: { id: ModuleId; locale
   const t = modulesCopy[locale];
   return <Modal title={t[id]} kicker={`Kong / ${modules.find(m => m.id === id)?.number}`} closeLabel={t.close} onClose={onClose}>
     {id === 'regex' && <RegexLab locale={locale}/>}
-    {id === 'about' && <div className="bedrock-placeholder"><div className="about-pixel"><PixelMark variant={3}/></div><span className="status-chip">{t.pending}</span><h3>{t.noChat}</h3><p>{t.bedrock}</p>{profile && <p className="about-preview">{profile.name} / {profile.role}</p>}</div>}
+    {id === 'about' && <div className="bedrock-placeholder"><div className="about-pixel"><PixelMark variant={3}/></div><BedrockEntry locale={locale}/><h3>{t.noChat}</h3><p>{t.bedrock}</p>{profile && <p className="about-preview">{profile.name} / {profile.role}</p>}</div>}
     {id === 'system' && <div className="system-content"><span className="status-chip">{t.status}</span><h3>{t.architecture}</h3><p>{t.localText}</p><div className="flow local-flow">{['Browser', 'React + Vite', 'Spring Boot', 'JSON'].map((name, i) => <div key={name}><span>0{i + 1}</span><strong>{name}</strong>{i < 3 && <b aria-hidden="true">→</b>}</div>)}</div><span className="status-chip planned">{t.futureStatus}</span><h3>{t.delivery}</h3><p>{t.futureText}</p><ol className="pipeline">{['GitHub', 'AWS CodeConnections', 'CodePipeline', 'CodeBuild', 'Amazon ECR', t.bluegreen].map((name, i) => <li key={name}><span>{String(i + 1).padStart(2, '0')}</span>{name}</li>)}</ol>{profile && <details className="development-note"><summary>{t.notes} ↗</summary><h4>{profile.note.title}</h4>{profile.note.paragraphs.map(p => <p key={p}>{p}</p>)}</details>}</div>}
   </Modal>;
 }
