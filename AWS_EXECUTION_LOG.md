@@ -1,6 +1,6 @@
-# AWS 操作记录与复习路线
+# 项目操作记录与复习路线（本地、Git、请求与 AWS）
 
-这是人工整理的操作记录，不是完整终端录屏。前面已完成部分按执行记录重建；本轮开始逐步补记。命令以仓库根目录 `D:\study\kongPortfolio` 为起点，注明不同工作目录。`<...>` 是占位符，不能直接复制执行。含 `apply`、`push`、`start-build` 的命令会产生实际变更或费用，不要为了复习重复运行。
+这是人工整理的全项目操作记录，不是完整终端录屏。范围包括文件读取/修改、Git、本地构建和测试、公开文档/API 请求、AWS CLI、Terraform、电脑操作，以及失败、修复和验证结果；不只记录 AWS。前面已完成部分按执行记录重建；后续逐步补记。命令以仓库根目录 `D:\study\kongPortfolio` 为起点，注明不同工作目录。`<...>` 是占位符，不能直接复制执行。含 `apply`、`push`、`start-build` 的命令会产生实际变更或费用，不要为了复习重复运行。
 
 登录码、SSO 缓存、持有人资料、密钥不写入本文件。原始构建日志及结果放在被 Git 忽略的 `.local/`，不提交。`terraform.tfvars`、`backend.hcl`、计划文件和 State 也不提交。
 
@@ -439,3 +439,57 @@ node scripts/verify-pipeline-candidate.mjs '<解压目录>'
 为估算本轮候选流水线的费用，读取三个 execution 的 action startTime/lastUpdateTime，以及两次候选 CodeBuild 的 start/endTime，逐项向上取整。约 9 个 Pipeline action-minutes × $0.002 + 4 个 CodeBuild 墙钟分钟 × $0.005 = **$0.038**，未扣免费额度；不是账单，未包含现有 webhook CI、S3、日志、KMS 请求、传输和税。明细 `.local/candidate-cost-estimate.json`。
 
 最终文档和执行记录提交/推送到现有功能分支；这只触发现有 CI，候选流水线 DetectChanges=false，不会仅因文档推送重复运行。原始 AWS JSON/日志/ZIP 都留在被忽略的 .local。下一 Story 才接 STG 验证与生产审批 1，再接 Green 验证、审批 2 和蓝绿流量切换/回滚。
+
+## 6. S3-05：STG 与第一道生产审批准备（全部操作类型记录）
+
+日志范围已按你的要求扩展：除了 AWS，还记录本地读取/修改、Git、测试、公开请求、失败和修复。仍不保存登录码、凭证、私有原始响应或实际审批 token；不是抓包或逐键录屏。
+
+### 6.1 读取、查阅和方案选择
+
+实际用 Get-Content 读取 AGENTS.md、cicd/candidate-pipeline.tf、portfolio/api.tf、LambdaPackageSmoke.java、codebuild/candidate.yml、现有 candidate 测试、本地 verified-candidate.json 和被忽略的 tfvars；用 git status 确认原始工作树。目的是复用已有候选和运行参数，避免影响生产。
+
+公开只读文档 GET / 搜索核对：
+
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html ：PrimarySource 和 CODEBUILD_SRC_DIR_Candidate；多输入最多五个。
+- https://docs.aws.amazon.com/codebuild/latest/userguide/sample-codepipeline.html ：多 artifact 输入示例。
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html ：人工审批默认七天、无人审批则失败。
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html ：审批超时可配置；本轮沿用默认。
+- https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionCode.html ：RevisionId 乐观锁、Publish、代码哈希。
+- https://docs.aws.amazon.com/lambda/latest/api/API_PublishVersion.html ：无代码/配置变化时不重复发布版本。
+- https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html ：reserved concurrency 本身不另收费；不同于 provisioned concurrency。
+
+为了省钱，本 Story 采用 IAM 直接调用独立 STG Lambda，没有新建 STG CloudFront/域名/API Gateway；前端只做候选包完整性检查，不能当作浏览器/HTTP E2E。选择已在 commentary 说明。未进行任何电脑 UI 操作，也未读取邮件或其他连接服务。
+
+### 6.2 文件修改
+
+用补丁新增 staging.tf、tests/staging.tftest.hcl、明确标注不可部署的 bootstrap 文本测试 fixture、codebuild/staging.yml、staging-contract.mjs、verify-staging.mjs、test-staging-contract.mjs 和 docs/staging-approval.md。修改 candidate-pipeline.tf：启用时追加 STG 验证和第一道人工审批，并只给 pipeline role 新 verifier 的 StartBuild/BatchGetBuilds 权限；关闭时保持原配置。其他 Terraform 测试显式关闭新开关，防止本机 tfvars 污染测试。ci.sh 增加 STG 合约单元检查。没有修改应用业务代码。
+
+验证脚本先核对候选所有文件、SHA、目标固定为 kongportfolio-stg、账号、角色和配置；只更新该函数代码，带 RevisionId，检查不可变版本/CodeSha256。相同代码/配置已有版本则复用。以版本号串行调用七个 API Gateway v2 模拟事件，检查真实 Lambda 运行/HTTP 合约；Invoke 元数据 ExecutedVersion 也必须匹配。只把摘要 report.json 上传为 StagingReport，调用原始数据不上传。没有自动审批代码。
+
+### 6.3 本地测试和真实账号只读计划
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' fmt -recursive
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test
+node scripts/test-staging-contract.mjs
+node --check scripts/verify-staging.mjs
+& 'D:\software\Git\bin\bash.exe' -n scripts/ci.sh
+git diff --check
+git diff --stat
+```
+
+结果：10 个 mock plan 通过；STG 合约测试覆盖禁止 production 目标、不可变版本复用、哈希不一致、Lambda FunctionError、HTTP 500 和缓存策略错误；语法/格式通过。这些测试不调用 AWS，不代表 STG 已运行。
+
+从已经下载并验证的候选元数据中读取 backend ZIP 路径和 SHA256，用 Get-FileHash 再核对；未发起新下载。用 ConvertTo-Json 写入被忽略的 `.local/staging-plan.tfvars.json`，包含 enable_staging=true、本地 bootstrap ZIP 及原 manifest SHA256。没有把这些输入提交进 Git，也没有启用当前日常 tfvars 的 STG 开关。
+
+```powershell
+Get-FileHash -LiteralPath '<已验证候选目录>/backend.zip' -Algorithm SHA256
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-var-file=../../../.local/staging-plan.tfvars.json' '-out=staging.tfplan' -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json staging.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+```
+
+脚本解析 JSON 核对：**8 create / 2 update / 0 delete**（两日志组、两角色、两策略、Lambda、CodeBuild；更新已有 pipeline 和对应 StartBuild 权限）。未执行 apply、update-function-code 或 invoke。默认关闭的新配置 plan 无差异。输出 `.local/staging-plan.log`、`staging-disabled-plan.log` 和忽略的 staging.tfplan。Bootstrap 预条件防止本地文件变更后继续部署；后续机器也必须恢复有效的已验证 bootstrap 输入。
+
+估算额外 STG 使用：每月 20 次，每次 verifier 两分钟，CodeBuild $0.20 + CodePipeline $0.08 = $0.28，未扣免费额度；另计少量 Lambda、S3/日志/税。原候选构建费用另算。审批等待不按 action-minute 收费，Lambda 未设 provisioned concurrency。实际新阶段时长待获批后实测；新资源尚未创建。

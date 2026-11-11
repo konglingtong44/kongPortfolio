@@ -28,6 +28,7 @@ gitleaks dir --redact --no-banner .
 node scripts/test-hooks.mjs
 node scripts/test-cloudfront-routing.mjs
 node scripts/test-pipeline-candidate.mjs
+node scripts/test-staging-contract.mjs
 
 # Always report a stable CodeBuild status, even for unrelated changes.
 # Unknown/missing diff base runs checks rather than guessing that nothing changed.

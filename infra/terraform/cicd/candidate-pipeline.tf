@@ -176,7 +176,7 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
   role  = aws_iam_role.candidate_pipeline[0].id
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       {
         Effect   = "Allow", Action = ["s3:GetBucketVersioning", "s3:GetBucketAcl", "s3:GetBucketLocation"]
         Resource = aws_s3_bucket.artifacts[0].arn
@@ -195,7 +195,9 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
         Effect   = "Allow", Action = ["codeconnections:UseConnection", "codestar-connections:UseConnection"]
         Resource = aws_codeconnections_connection.github.arn
       }
-    ]
+      ], var.enable_staging ? [{
+        Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.staging_project_arn
+    }] : [])
   })
 }
 resource "aws_codepipeline" "candidate" {
@@ -239,6 +241,46 @@ resource "aws_codepipeline" "candidate" {
       output_artifacts = ["Candidate"]
       configuration = {
         ProjectName = aws_codebuild_project.candidate[0].name
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_staging ? [1] : []
+    content {
+      name = "VerifyStaging"
+      action {
+        name             = "DeployAndVerifyStg"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        input_artifacts  = ["SourceRef", "Candidate"]
+        output_artifacts = ["StagingReport"]
+        namespace        = "StagingVars"
+        configuration = {
+          ProjectName   = aws_codebuild_project.staging[0].name
+          PrimarySource = "SourceRef"
+          EnvironmentVariables = jsonencode([
+            { name = "STAGING_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
+            { name = "STAGING_PIPELINE_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" }
+          ])
+        }
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_staging ? [1] : []
+    content {
+      name = "ApproveProduction"
+      action {
+        name     = "ApproveGreenCreation"
+        category = "Approval"
+        owner    = "AWS"
+        provider = "Manual"
+        version  = "1"
+        configuration = {
+          CustomData = "Approval 1: review StagingReport for release #{StagingVars.VERIFIED_RELEASE}, STG version #{StagingVars.VERIFIED_VERSION}, commit #{SourceVars.CommitId}. This Story stops here; no production change follows yet."
+        }
       }
     }
   }

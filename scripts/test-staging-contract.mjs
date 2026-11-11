@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import { apiEvent, checkResponse, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+
+assert.throws(() => requireStagingTarget('kongportfolio-prod', '123456789012'), /isolated STG/);
+requireStagingTarget('kongportfolio-stg', '123456789012');
+assert.throws(() => requireStagingTarget('kongportfolio-stg', 'wrong-account'), /match/);
+const config = { Runtime: 'java21', Handler: 'handler', MemorySize: 1024, Timeout: 28, Architectures: ['x86_64'], Environment: { Variables: { DEBUG: 'false' } } };
+const published = { ...config, Version: '3', CodeSha256: 'expected' };
+assert.equal(selectVersion({ Version: '$LATEST', CodeSha256: 'expected' }, [published, { ...published, Version: '4', MemorySize: 512 }], config, 'expected'), '3');
+assert.throws(() => selectVersion({ Version: '5', CodeSha256: 'wrong' }, [], config, 'expected'), /checksum/);
+assert.throws(() => selectVersion({ Version: '$LATEST', CodeSha256: 'expected' }, [], config, 'expected'), /immutable/);
+const contract = { label: 'health', status: 200, marker: 'UP' };
+const response = { statusCode: 200, headers: { 'cache-control': 'no-store' }, body: '{"status":"UP"}' };
+checkResponse({ StatusCode: 200 }, response, contract);
+checkResponse({ StatusCode: 200 }, { ...response, isBase64Encoded: true, body: Buffer.from(response.body).toString('base64') }, contract);
+assert.throws(() => checkResponse({ StatusCode: 200, FunctionError: 'Unhandled' }, response, contract), /runtime/);
+assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, statusCode: 500 }, contract), /HTTP contract/);
+assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, headers: {} }, contract), /cache/);
+assert.equal(apiEvent('GET', '/api/profile', 'lang=ja').rawQueryString, 'lang=ja');
+console.log('STG contract checks passed: production target blocked, immutable version selection, checksum/runtime/HTTP/cache failures rejected. No AWS calls.');
