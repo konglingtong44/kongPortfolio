@@ -221,3 +221,56 @@ Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/com
 这一对验收构建的墙钟时间分别向上取整约 1+2 分钟，按已核对的 $0.005/分钟估算 $0.015（未扣免费额度，另有日志/税），不是实际账单。没有部署生产网站；PR 创建/重新打开过滤器仅配置/离线检查，未进行真实 PR 事件测试。下一 Story 才接 CodePipeline 与生产两道审批、蓝绿切流。
 
 最后仅更新本文件、PROJECT_PLAN.md、docs/aws-ci.md 并提交推送 `docs: record verified webhook CI and GitHub status reporting`。这次文档推送也会走已有 CI；应用未变时 CI 会保留通用安全检查并跳过应用构建，不需要为此改变触发规则。
+
+## 4. S3-04：候选版本 CodePipeline 准备（尚未创建资源）
+
+目标：GitHub Source → AWS CodeBuild 全部检查 → 前后端候选包 → 私有 S3 artifact。先准备可以审核、运行的增量，再确认付费创建。生产审批 1 放在 STG 验证后、创建 Green 前；审批 2 放在 Green 验证后、正式切流前；本 Story 尚未加入部署和两道审批，不把空审批当作完整发布。
+
+### 4.1 读取与只读请求
+
+实际读取 AGENTS.md、cicd/main.tf、ci.sh、codebuild/ci.yml、现有首次发布脚本、Lambda ZIP smoke 脚本、Gitleaks 配置，检查 git status；用 rg 定位 Terraform IAM 字段，再按 fmt 后的实际内容修改。
+
+```powershell
+git status --short
+& $aws codepipeline list-pipelines --profile kong-dev --region ap-northeast-1 --query pipelines --output json
+Test-Path backend/target/kongPortfolio-lambda.zip
+```
+
+结果：工作树初始干净；该区域尚无流水线；已有本地 Lambda ZIP。公开文档 GET / 搜索核对来源：
+
+- https://aws.amazon.com/codepipeline/pricing/ ：V2 每 action-minute $0.002，包含 Source/Build；共享 100 免费分钟。此前没有按“source 免费”的假设定价。
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html ：full clone、DetectChanges=false；Source role 需要新旧两个 UseConnection action。
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/troubleshooting.html ：CodeBuild full-clone 连接权限及 FullRepositoryId 条件。
+- https://docs.aws.amazon.com/codepipeline/latest/userguide/how-to-custom-role.html ：artifact S3 角色权限。
+- https://raw.githubusercontent.com/hashicorp/terraform-provider-aws/v6.72.0/website/docs/r/codepipeline.html.markdown ：锁定 Provider 版本对应的参数。
+
+所有文档请求都是公开只读请求，没有附带账号令牌。AWS CLI 使用现有 SSO，没有读出或写入新凭证。
+
+### 4.2 文件修改与离线验证
+
+- 新增 `infra/terraform/cicd/candidate-pipeline.tf`：默认关闭的候选流水线，独立最小角色/构建项目，私有、加密、版本化 S3，7 天日志和 30 天候选保留。
+- 新增 `codebuild/candidate.yml`：完整 CI 后打包并校验，再由 CodePipeline 收集 artifact。
+- 新增 `scripts/package-pipeline-candidate.mjs` / `verify-pipeline-candidate.mjs`：仅干净提交、校验 CodeBuild SHA、版本化路径、逐文件 SHA256、禁止覆盖已有候选、拒绝目录穿越/符号链接/未列文件。
+- 新增完整性测试和两个 Terraform mock plan；ci.sh 加入候选完整性测试。没有更改应用 API 或生产资源。
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' fmt -recursive
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test
+node scripts/test-pipeline-candidate.mjs
+```
+
+首次 Terraform 测试文件括号写错，validate 报 Invalid for expression；修正后 7 个 plan 测试通过。候选测试覆盖正常包清单、ZIP 改动、目录穿越、重复路径和未列文件；测试 ZIP 是假数据，不能当作 Lambda 运行验证。
+
+### 4.3 真实账号计划（只预览）
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-var=enable_candidate_pipeline=true' '-out=candidate.tfplan' -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json candidate.tfplan
+# 脚本检查所有动作都是 create，且资源数量正好 14。
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+```
+
+启用预览：14 create / 0 update / 0 delete；默认关闭：No changes。计划和输出保存在忽略的 `.local/candidate-plan.log`、`candidate-default-plan.log` 及 cicd/candidate.tfplan。没有执行 apply，也未在输入文件中启用候选流水线。Source 的 UseConnection 按官方要求包含新旧服务前缀，权限仍只针对现有连接；实际云端鉴权待验证。
+
+费用估算：一次 Source 1 分钟 + Build 5 分钟，Pipeline $0.012 + Build $0.025 = $0.037，20 次约 $0.74（均未扣免费额度；另计 S3、日志、加密请求可能费用和税）。运行时间未经新流水线实测。创建后可能首次执行，批准范围应包含该次及必要的首次验收。详见 docs/candidate-pipeline.md。

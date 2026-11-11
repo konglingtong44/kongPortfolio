@@ -1,0 +1,18 @@
+# CodePipeline full-clone source; candidate generation only, no deployment.
+version: 0.2
+env:
+  shell: bash
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+      java: corretto21
+  build:
+    commands:
+      - bash scripts/ci.sh all
+      - node scripts/package-pipeline-candidate.mjs
+      - node scripts/verify-pipeline-candidate.mjs .local/pipeline-candidate
+artifacts:
+  base-directory: .local/pipeline-candidate
+  files:
+    - '**/*'

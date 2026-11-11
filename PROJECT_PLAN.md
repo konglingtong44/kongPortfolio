@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-04 — CodePipeline candidate preparation (awaiting paid-resource approval)
+
+Prepared opt-in manual V2 Source → BuildCandidate pipeline, separate artifact bucket/project/roles, clean source candidate manifest v2 and checksum/path verifier. Actual plan reviewed: 14 create / 0 update / 0 delete; default-off plan no changes. Full-clone reference, 15-minute small build, seven-day logs and 30-day candidate expiration. No production/STG/deployment stages or new AWS resources applied. Two production approval gates remain required in the later deployment order. See docs/candidate-pipeline.md and root execution log. Local packaging validation and cloud gap are recorded below as completed; cloud run requires explicit approval.
+
 ## S3-03 — Automatic CI triggers and status writeback (2026-11-12, completed)
 
 Owner subsequently accepted the actual pending GitHub App permission request (repository restricted to kongPortfolio). Rechecked two-create-only plan; both webhooks created successfully, 2 add / 0 change / 0 destroy. No IAM expansion. Final Terraform plan No changes.
