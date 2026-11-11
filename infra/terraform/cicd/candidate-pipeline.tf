@@ -15,9 +15,12 @@ variable "candidate_source_branch" {
 }
 
 locals {
-  candidate_count       = var.enable_candidate_pipeline ? 1 : 0
-  candidate_name        = "kongportfolio-candidate"
-  candidate_project_arn = "arn:aws:codebuild:ap-northeast-1:${var.expected_account_id}:project/${local.candidate_name}"
+  candidate_count = var.enable_candidate_pipeline ? 1 : 0
+  candidate_name  = "kongportfolio-candidate"
+  # Observed Source artifact key: kongportfolio-candid/SourceRef/<id>.
+  # CodePipeline truncates this pipeline's artifact prefix to 20 characters.
+  candidate_artifact_prefix = substr(local.candidate_name, 0, 20)
+  candidate_project_arn     = "arn:aws:codebuild:ap-northeast-1:${var.expected_account_id}:project/${local.candidate_name}"
 }
 
 resource "aws_s3_bucket" "artifacts" {
@@ -56,7 +59,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
   rule {
     id     = "temporary-candidates"
     status = "Enabled"
-    filter { prefix = "${local.candidate_name}/" }
+    filter { prefix = "${local.candidate_artifact_prefix}/" }
     expiration { days = 30 }
     noncurrent_version_expiration { noncurrent_days = 7 }
     abort_incomplete_multipart_upload { days_after_initiation = 7 }
@@ -114,7 +117,7 @@ resource "aws_iam_role_policy" "candidate_build" {
       },
       {
         Effect   = "Allow", Action = ["s3:GetObject", "s3:GetObjectVersion", "s3:PutObject"]
-        Resource = "${aws_s3_bucket.artifacts[0].arn}/${local.candidate_name}/*"
+        Resource = "${aws_s3_bucket.artifacts[0].arn}/${local.candidate_artifact_prefix}/*"
       },
       {
         Effect    = "Allow", Action = ["codeconnections:UseConnection"]
@@ -180,7 +183,7 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
       },
       {
         Effect   = "Allow", Action = ["s3:GetObject", "s3:GetObjectVersion", "s3:PutObject"]
-        Resource = "${aws_s3_bucket.artifacts[0].arn}/${local.candidate_name}/*"
+        Resource = "${aws_s3_bucket.artifacts[0].arn}/${local.candidate_artifact_prefix}/*"
       },
       {
         Effect   = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"]

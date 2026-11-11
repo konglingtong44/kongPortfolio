@@ -318,3 +318,40 @@ Invoke-RestMethod 'https://api.github.com/repos/konglingtong44/kongPortfolio/com
 ```
 
 结果：两个 AWS 构建都 SUCCEEDED；GitHub 每个 context 按 id 取最新条目，ci/frontend、ci/backend 都 success。这是现有 CI 对新增源码的检查，不是尚未创建的 CodePipeline 运行。最终这段验证记录以本地文档提交保存，待下一次授权执行时一并推送，避免仅为写验证记录再次触发构建。
+
+## 5. S3-04：获批后创建并验证候选流水线（进行中）
+
+你明确批准创建上述 14 个资源和首次云端验证。本轮先读取 AGENTS.md、git status/log、本地 tfvars，并用 STS 确认账号。`git push` 发布上一轮本地记录提交 72539a8；推送 hook 的 Gitleaks 通过。此推送只触发现有 CI，候选流水线此时还未创建。
+
+在忽略的 cicd/terraform.tfvars 中保留已有两个 true 开关，并增加 `enable_candidate_pipeline=true`，供后续日常 plan 重现真实状态。没有提交此文件。
+
+```powershell
+& $aws sts get-caller-identity --profile kong-dev --query Account --output text
+git push
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-out=candidate-approved.tfplan' -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json candidate-approved.tfplan
+# 检查只有批准的 14 个 create、类型匹配，无 update/delete。
+& $tf '-chdir=infra/terraform/cicd' apply -input=false candidate-approved.tfplan -no-color
+```
+
+实际计划日志在 `.local/candidate-approved-plan.log`。创建结果和流水线执行结果继续记录在下文；不会把“创建成功”当作“云端构建已验证”。
+
+### 5.1 创建与首次失败原因
+
+14 个资源全部创建完成；S3 lifecycle 配置等待约 56 秒后完成。`list-pipeline-executions` 显示 CreatePipeline 自动产生执行 `3ae050d8-f04c-4206-8f75-2e17a77297a1`，Source 阶段失败，尚未进入构建。
+
+```powershell
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 3 --profile kong-dev --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=3ae050d8-f04c-4206-8f75-2e17a77297a1 --profile kong-dev --region ap-northeast-1 --output json
+```
+
+实际错误：Source PutObject 写入 `kongportfolio-candid/SourceRef/z6dr7H1`，IAM 原先只允许 `kongportfolio-candidate/*`。流水线 artifact 前缀被截短，不能用完整流水线名称推断。将两个角色对象范围和 lifecycle 前缀统一为实际 20 字符的 `kongportfolio-candid/`，没有放开整个桶。修复时先误按 19 字符计算，新增断言捕获不一致；改为 20 后 7 个 Terraform 测试通过。另为各测试显式关闭候选开关，避免本机已启用的 tfvars 污染 mock 默认测试。
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' fmt -recursive
+& $tf '-chdir=infra/terraform/cicd' test
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-out=candidate-prefix-fix.tfplan' -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json candidate-prefix-fix.tfplan
+# 核对：仅两个角色策略和一个保留前缀更新，0 新增/删除。
+& $tf '-chdir=infra/terraform/cicd' apply -input=false candidate-prefix-fix.tfplan -no-color
+```

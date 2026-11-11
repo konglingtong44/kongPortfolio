@@ -1,9 +1,10 @@
 mock_provider "aws" {}
 
 variables {
-  expected_account_id = "123456789012"
-  enable_ci           = false
-  enable_ci_webhooks  = false
+  expected_account_id       = "123456789012"
+  enable_ci                 = false
+  enable_ci_webhooks        = false
+  enable_candidate_pipeline = false
 }
 
 run "default_creates_no_build_capacity" {

@@ -2,6 +2,8 @@
 
 ## S3-04 — CodePipeline candidate preparation (awaiting paid-resource approval)
 
+Approval received in the next turn; 14 resources created. Initial CreatePipeline execution failed in Source due to artifact prefix truncation. Corrected only two S3 role scopes and lifecycle filter to actual `kongportfolio-candid/`; seven tests passed. Cloud execution/artifact verification underway; follow root execution log section 5.
+
 Prepared opt-in manual V2 Source → BuildCandidate pipeline, separate artifact bucket/project/roles, clean source candidate manifest v2 and checksum/path verifier. Actual plan reviewed: 14 create / 0 update / 0 delete; default-off plan no changes. Full-clone reference, 15-minute small build, seven-day logs and 30-day candidate expiration. No production/STG/deployment stages or new AWS resources applied. Two production approval gates remain required in the later deployment order. See docs/candidate-pipeline.md and root execution log. Local packaging validation and cloud gap are recorded below as completed; cloud run requires explicit approval.
 
 Local clean-source validation at 37237d4 passed full ci.sh all: frontend 40 tests/build; backend 9 HTTP + 3 Lambda tests/ZIP/JVM smoke; real candidate packager/verifier. Seven Terraform mocked plans, integrity tamper/path tests, format/validate and secret/path checks passed. Candidate releaseId 9aa8d398127a78fe06decc4f36b13434cae0d0f758cf0069781cbf9e38af029a, ignored local output only. IAM Source permission includes required new/legacy UseConnection prefixes; final exact plan regenerated. AWS candidate pipeline/roles/bucket/upload not yet created or verified. Prepared for explicit paid-resource approval.

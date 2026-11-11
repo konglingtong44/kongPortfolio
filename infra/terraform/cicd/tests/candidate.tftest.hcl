@@ -43,6 +43,12 @@ run "candidate_only_no_production_deployment" {
     error_message = "Candidate roles must not gain deployment, Terraform state, IAM or Bedrock actions."
   }
   assert {
+    condition = alltrue([for policy in [aws_iam_role_policy.candidate_build[0], aws_iam_role_policy.candidate_pipeline[0]] : alltrue([
+      for statement in jsondecode(policy.policy).Statement : statement.Resource == "arn:aws:s3:::candidate-test/kongportfolio-candid/*" if contains(statement.Action, "s3:PutObject")
+    ])]) && aws_s3_bucket_lifecycle_configuration.artifacts[0].rule[0].filter[0].prefix == "kongportfolio-candid/"
+    error_message = "IAM and retention must match the actual truncated pipeline artifact prefix."
+  }
+  assert {
     condition     = aws_codebuild_project.candidate[0].build_timeout == 15 && aws_codebuild_project.candidate[0].concurrent_build_limit == 1 && !aws_codebuild_project.candidate[0].environment[0].privileged_mode && aws_s3_bucket_public_access_block.artifacts[0].block_public_policy && aws_s3_bucket_public_access_block.artifacts[0].restrict_public_buckets && aws_s3_bucket_versioning.artifacts[0].versioning_configuration[0].status == "Enabled"
     error_message = "Preserve bounded build capacity and private versioned artifacts."
   }
