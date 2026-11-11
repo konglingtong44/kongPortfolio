@@ -1,8 +1,12 @@
 # S1-01T — timeline and resume reconciliation
 
-## S3-02 — First AWS CI execution (2026-11-12, in progress)
+## S3-02 — First AWS CI execution (2026-11-12, completed)
 
-User explicitly approved eight resources and initial frontend/backend builds. Persisted enable_ci=true in ignored local inputs. Rechecked exact eight-create plan, applied all eight resources; backend project initial OAuth error resolved by retrying only the missing project without permission changes. Final normal Terraform plan No changes. Preparing scanned source on feat/aws-serverless-ci; main and production remain unchanged. Actual cloud builds are still pending.
+User explicitly approved eight resources and initial frontend/backend builds. Persisted enable_ci=true in ignored local inputs. Rechecked exact eight-create plan, applied all eight resources; backend project initial OAuth error resolved by retrying only the missing project without permission changes. Final normal Terraform plan No changes. Published scanned source on feat/aws-serverless-ci; main and production remain unchanged.
+
+First two builds at 8f4f7f3 failed because Windows-created hooks lacked executable Git mode. Fixed both hooks to 100755 and added index-mode checks. Retry builds pinned to 00b64d9972bb9e6d34b6c1698791026849abd167 both SUCCEEDED: frontend 40 tests, production build, clean verification bundle; backend 9 HTTP + 3 Lambda tests, ZIP assembly and ZIP-only JVM smoke. Both ran all application checks. AWS build IDs: frontend 16ecf0db-bd4d-4abb-9acd-5d34330a9dc5 (38.7 s), backend 553f9286-9ca9-4cf2-87bc-81c37d331259 (78.5 s). Including initial failures, four wall-clock durations round to approximately five minutes / USD0.025 compute before free allowance, not an invoice; logs/taxes additional.
+
+Verified actual runtime, clone, IAM/log boundaries and no webhooks. Public GitHub status/check APIs returned zero entries despite report_build_status=true; status writeback is not verified and must be resolved before required PR checks. No automatic trigger/release, main merge, blue/green, real Bedrock or production deployment. Story complete; pause for review before automatic CI/CodePipeline increment. Full execution details in docs/aws-ci.md; raw logs/results remain ignored under .local.
 
 ## S3-02 — Bounded CodeBuild CI preparation (2026-11-12, awaiting paid-resource approval)
 

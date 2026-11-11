@@ -1,6 +1,6 @@
 # AWS source connection — S3-01
 
-S3-02 CodeBuild preparation is now available in `build.tf`, disabled by default. See [scope, costs and execution](../../../docs/aws-ci.md). Source connection Story below describes the already completed baseline.
+S3-02 CodeBuild resources in `build.tf` are now applied, with `enable_ci=true` persisted in ignored local inputs. Both first verification builds passed after fixing hook executable modes. New checkouts default to disabled: restore the local input before planning to avoid accidental CI removal. See [scope, costs, verified builds and writeback gap](../../../docs/aws-ci.md). Source connection Story below describes the already completed baseline.
 
 Acceptance: one Terraform-managed GitHub CodeConnection in Tokyo, isolated locked remote state, account restriction and repeatable read-only readiness check. The repository owner completes OAuth in the console. No CodeBuild, pipeline, webhook or deployment is created by this Story.
 

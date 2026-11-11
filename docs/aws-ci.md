@@ -1,6 +1,17 @@
-# CodeBuild CI — S3-02 preparation
+# CodeBuild CI — S3-02 completed
 
-Current execution status (2026-11-12): user approved all eight resources and the first two builds. All eight resources are now created; final Terraform plan has no changes. Initial backend project creation returned an OAuth authorization error; retry of only that missing project succeeded with unchanged IAM policies. Source is being published on `feat/aws-serverless-ci` for commit-pinned AWS verification; no webhook or production release is configured. Preparation instructions below are historical; do not repeat the create plan.
+Execution (2026-11-12): user approved all eight resources and initial builds. All eight resources are created; final Terraform plan has no changes. Initial backend project creation returned an OAuth authorization error; retry of only that missing project succeeded with unchanged IAM policies. Source was published on `feat/aws-serverless-ci`; main and production remain unchanged. Preparation commands below are historical; do not repeat the create plan.
+
+First builds exposed missing executable Git modes on hooks. Both hooks now use 100755 and local tests inspect the Git index to catch Linux incompatibility. Both retry builds at `00b64d9972bb9e6d34b6c1698791026849abd167` succeeded:
+
+| Component | AWS build ID suffix | Wall time | Verified |
+| --- | --- | --- | --- |
+| frontend | 16ecf0db-bd4d-4abb-9acd-5d34330a9dc5 | 38.7 s | 40 tests, TypeScript/Vite, clean verification bundle |
+| backend | 553f9286-9ca9-4cf2-87bc-81c37d331259 | 78.5 s | 9 HTTP + 3 Lambda tests, ZIP and packaged JVM smoke |
+
+Including the two initial failed builds, rounded wall times total approximately five minutes / $0.025 compute before allowance. This is an estimate, not a billing statement; logs/taxes are separate. AWS source revision matches the pinned commit and both builds ran application checks. Raw logs/results are in ignored `.local/`. No automatic trigger or production release is configured.
+
+Remaining gap: GitHub public commit-status and check-run APIs returned zero entries despite status reporting being configured. Do not make `ci/frontend` / `ci/backend` required branch checks until real writeback is verified. Investigate during the automatic CI increment; do not substitute a PAT or expand production permissions. No claim that PR checks or automatic CI are complete.
 
 Acceptance: Terraform plan for separate React and Spring Boot checks, least-privilege roles, bounded on-demand builds and reproducible source revision. Production remains unchanged. Actual AWS build success is required after approval; a local check is not a cloud build.
 
@@ -31,6 +42,6 @@ terraform -chdir=infra/terraform/cicd plan -input=false '-var=enable_ci=true' '-
 
 Approved plan: **8 add / 0 change / 0 destroy**, now applied. `enable_ci = true` is persisted in ignored `terraform.tfvars`; omitting it on another machine would propose removing CI. Recheck plan freshness and scope before future apply. Never commit tfvars, plan or state files.
 
-Current GitHub main is still the earlier baseline. Publish the reviewed local source after secret/path checks, then start one build per component pinned to that exact full commit SHA, not a moving branch. Verify `resolvedSourceVersion`, both final statuses and logs. No webhook is enabled initially: automatic triggering belongs after first-build validation. No AWS execution, GitHub clone permission, managed-image runtime or status-reporting claim until tested in AWS. Builds cannot deploy the website.
+GitHub main is still the earlier baseline; reviewed source is on the feature branch. For future manual builds, start each project pinned to the exact full commit SHA, not a moving branch. Verify `resolvedSourceVersion`, both final statuses and logs. Clone permission and managed-image runtime are now verified. No webhook is enabled: automatic triggering is the next increment. Builds cannot deploy the website.
 
-Local verification: Terraform fmt/validate; two mocked plans covering default-off capacity, time/concurrency limits, retention and action allowlist; Bash syntax; frontend tests/build; backend HTTP/Lambda tests and ZIP smoke; routing/hooks and Gitleaks. See PROJECT_PLAN.md for completion status. Next Story: AWS first build (after approval), then automatic CI triggering and release pipeline, two production approval gates and CodeDeploy blue/green.
+Local verification: Terraform fmt/validate; two mocked plans covering default-off capacity, time/concurrency limits, retention and action allowlist; Bash syntax; frontend tests/build; backend HTTP/Lambda tests and ZIP smoke; routing/hooks and Gitleaks. See PROJECT_PLAN.md for completion status. Next Story: automatic CI triggering/status writeback, then release pipeline, two production approval gates and CodeDeploy blue/green.
