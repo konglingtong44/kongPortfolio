@@ -1,0 +1,2 @@
+expected_account_id = "<ACCOUNT_ID>"
+state_bucket_name   = "kongportfolio-tfstate-<ACCOUNT_ID>-ap-northeast-1"

@@ -12,7 +12,10 @@
   <version>0.1.0</version>
   <name>kongPortfolio</name>
   <description>Database-free portfolio API</description>
-  <properties><java.version>21</java.version></properties>
+  <properties>
+    <java.version>21</java.version>
+    <spring-boot.repackage.skip>false</spring-boot.repackage.skip>
+  </properties>
   <dependencies>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
@@ -20,6 +23,58 @@
   </dependencies>
   <build>
     <finalName>kongPortfolio</finalName>
-    <plugins><plugin><groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId></plugin></plugins>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Do not inherit an unrelated host DEBUG environment variable. -->
+          <systemPropertyVariables><debug>false</debug></systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId><artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration><skip>${spring-boot.repackage.skip}</skip></configuration>
+      </plugin>
+    </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>lambda</id>
+      <properties><spring-boot.repackage.skip>true</spring-boot.repackage.skip></properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.amazonaws.serverless</groupId>
+          <artifactId>aws-serverless-java-container-springboot4</artifactId>
+          <version>3.0.5</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <!-- HTTP server tests run in the default build; Lambda has no listening port. -->
+              <includes><include>**/lambda/*Test.java</include></includes>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId><artifactId>build-helper-maven-plugin</artifactId><version>3.6.1</version>
+            <executions>
+              <execution><id>lambda-source</id><phase>generate-sources</phase><goals><goal>add-source</goal></goals>
+                <configuration><sources><source>src/lambda/java</source></sources></configuration>
+              </execution>
+              <execution><id>lambda-tests</id><phase>generate-test-sources</phase><goals><goal>add-test-source</goal></goals>
+                <configuration><sources><source>src/lambda-test/java</source></sources></configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId><artifactId>maven-assembly-plugin</artifactId><version>3.7.1</version>
+            <configuration><descriptors><descriptor>src/assembly/lambda.xml</descriptor></descriptors></configuration>
+            <executions><execution><id>lambda-zip</id><phase>package</phase><goals><goal>single</goal></goals></execution></executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

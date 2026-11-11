@@ -1,5 +1,9 @@
 # AWS 月费预算 — Planned，需创建前批准
 
+当前用户选定的低流量 Serverless 方案预算见 [Serverless 路线](serverless-plan.md)，约 USD 2–5/月目标。下文 USD 55–80 等为原 ECS/ALB 历史方案，仅供比较；不能当作当前资源报价或创建授权。
+
+2026-11-11 账号核查更新：已有 USD 10 月度 Budget 和 Zero-Spend 邮件提醒，本轮未重复创建。具体规则、验证范围见 [首次部署前核查](aws-preflight.md)。下表仍为原完整架构的规划估算，不表示用户已批准整站费用，也不是当前账号账单。
+
 2026-11-11 估算；假设东京 ap-northeast-1、730 小时/月、Linux x86、低流量约 10 GB/月，不扣 Free Tier/credits、不含税/汇率、域名续费及其他既有资源。区域/访问量改变需重算，不保证账单上限。
 
 公开 AWS Price List：东京 Fargate vCPU USD 0.05056/小时、内存 USD 0.00553/GB小时；ALB USD 0.0243/小时 + 0.008/LCU小时；IPv4 USD 0.005/地址小时。[ECS 东京价格](https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonECS/current/ap-northeast-1/index.json)、[ALB 东京价格](https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AWSELB/current/ap-northeast-1/index.json)、[IPv4](https://aws.amazon.com/vpc/pricing/)

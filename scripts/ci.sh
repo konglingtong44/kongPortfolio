@@ -26,6 +26,7 @@ node .githooks/check-staged-paths.mjs --all
 gitleaks git --redact --no-banner .
 gitleaks dir --redact --no-banner .
 node scripts/test-hooks.mjs
+node scripts/test-cloudfront-routing.mjs
 
 # Always report a stable CodeBuild status, even for unrelated changes.
 # Unknown/missing diff base runs checks rather than guessing that nothing changed.
@@ -45,7 +46,9 @@ if [[ "$run_checks" == true ]]; then
     cp ".local/artifacts/$sha/frontend.tar.gz" ".local/artifacts/$sha/manifest.json" ".local/artifacts/$sha/SHA256SUMS" .local/ci-results/frontend/
   fi
   if [[ "$component" == all || "$component" == backend ]]; then
-    mvn -B -ntp -f backend/pom.xml verify
+    mvn -B -ntp -f backend/pom.xml clean verify
+    mvn -B -ntp -f backend/pom.xml -Plambda clean verify
+    node scripts/test-lambda-package.mjs
   fi
 fi
 printf '{"commit":"%s","component":"%s","applicationChecksRan":%s}\n' "$sha" "$component" "$run_checks" > .local/ci-results/result.json

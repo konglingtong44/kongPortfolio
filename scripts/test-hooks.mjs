@@ -25,12 +25,18 @@ const forbidden = [
   '履歴書_架空.xls', '職務経歴書_架空.xlsx', '简历.docx', 'CV example.pdf',
   '.env.local', '.aws/credentials', 'nested/.ssh/config', 'secrets/example.txt',
   'certificate.crt', 'private.pem', 'debug.log', 'service-account-test.json',
+  'infra/.terraform/terraform.tfstate', 'infra/terraform.tfstate',
+  'infra/terraform.tfstate.backup', 'infra/review.tfplan', 'infra/terraform.tfvars',
+  'infra/prod.tfvars.json', 'infra/terraform.tfstate.tflock', 'infra/backend.hcl',
+  'infra/override.tf', 'infra/local_override.tf.json', '.terraformrc', 'terraform.rc',
+  'infra/review.tfplan.json',
 ];
 for (const path of forbidden) {
   checked(['read-tree', '--empty']);
   const absolute = join(fixture, path);
   mkdirSync(dirname(absolute), { recursive: true });
   writeFileSync(absolute, 'Synthetic fixture only.\n');
+  assert.equal(git(['check-ignore', '-q', '--', path]).status, 0, `Not ignored: ${path}`);
   checked(['add', '-f', '--', path]);
   const result = git(['hook', 'run', 'pre-commit']);
   assert.notEqual(result.status, 0, `Hook allowed ${path}`);
@@ -39,6 +45,16 @@ for (const path of forbidden) {
 checked(['read-tree', '--empty']);
 writeFileSync(join(fixture, 'README.md'), '# Synthetic public source\n');
 checked(['add', '--', 'README.md']);
+checked(['hook', 'run', 'pre-commit']);
+
+// Public Terraform source, lockfile and placeholder templates must remain trackable.
+for (const path of ['infra/main.tf', 'infra/.terraform.lock.hcl', 'infra/backend.hcl.example', 'infra/terraform.tfvars.example']) {
+  const absolute = join(fixture, path);
+  mkdirSync(dirname(absolute), { recursive: true });
+  writeFileSync(absolute, '# Public configuration fixture\n');
+  assert.equal(git(['check-ignore', '-q', '--', path]).status, 1, `Public source ignored: ${path}`);
+  checked(['add', '--', path]);
+}
 checked(['hook', 'run', 'pre-commit']);
 
 // The hook must refuse to continue when the scanner is unavailable.

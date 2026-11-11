@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <springProperty scope="context" name="LOG_DIRECTORY" source="portfolio.logging.directory" defaultValue=".local/logs"/>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <springProfile name="!lambda">
+    <springProperty scope="context" name="LOG_DIRECTORY" source="portfolio.logging.directory" defaultValue=".local/logs"/>
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_DIRECTORY}/info.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -17,4 +18,8 @@
         <encoder><pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level %logger{40} - %msg%n</pattern></encoder>
     </appender>
     <root level="INFO"><appender-ref ref="CONSOLE"/><appender-ref ref="INFO_FILE"/></root>
+    </springProfile>
+    <springProfile name="lambda">
+        <root level="INFO"><appender-ref ref="CONSOLE"/></root>
+    </springProfile>
 </configuration>

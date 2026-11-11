@@ -1,5 +1,57 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-02 — First AWS CI execution (2026-11-12, in progress)
+
+User explicitly approved eight resources and initial frontend/backend builds. Persisted enable_ci=true in ignored local inputs. Rechecked exact eight-create plan, applied all eight resources; backend project initial OAuth error resolved by retrying only the missing project without permission changes. Final normal Terraform plan No changes. Preparing scanned source on feat/aws-serverless-ci; main and production remain unchanged. Actual cloud builds are still pending.
+
+## S3-02 — Bounded CodeBuild CI preparation (2026-11-12, awaiting paid-resource approval)
+
+Prepared `infra/terraform/cicd/build.tf` and `docs/aws-ci.md`: opt-in frontend/backend CodeBuild projects, separate source-and-own-logs-only roles, seven-day logs, small Linux on-demand, concurrency one per project, 15-minute timeout, no auto retry/privileged Docker/webhooks/deployment/artifact storage. Saved actual plan `ci.tfplan`: 8 add / 0 change / 0 destroy. Existing default-off plan No changes. Nothing applied; no AWS builds started, no commit/push.
+
+Verified Terraform fmt/validate and two mocked plans for default-off behavior, permissions and cost controls; actual saved-plan scope/limits; Bash syntax; frontend 40 tests/build; default backend 9 tests; Lambda 3 tests/ZIP and packaged JVM smoke; 28 hook checks, 12 routing cases, Gitleaks and diff whitespace. Full Linux CodeBuild execution, GitHub clone/status permissions and first-build duration remain unverified. Current source is not yet published. Removed unused CI artifact/cache declarations to match NO_ARTIFACTS projects.
+
+Tokyo price verified against AWS catalog: $0.005/minute, 100 shared small-build minutes/month free. Example 20 pairs at 5 minutes each component: 200 minutes, $1 before allowance / $0.50 with 100 minutes remaining, plus logs/tax. Initial pair at 15-minute limits is approximately $0.15 compute before allowance. Review concrete scope and cost before creation and initial runs, per paid-resource agreement. After approval persist enable_ci=true locally, recheck/apply plan, publish scanned reviewed source and run both projects pinned to full commit SHA. No automatic release or blue/green claim.
+
+## S3-01 — AWS GitHub source connection (2026-11-12, completed)
+
+Owner completed GitHub OAuth; live AWS CLI readiness check reports AVAILABLE. Terraform refresh-only apply records the authorization status without changing AWS resources; subsequent normal plan No changes. Source connection Story complete. Repository clone/build remains unverified and no CodeBuild/pipeline/webhook exists yet.
+
+Acceptance: Terraform-managed GitHub connection in Tokyo; separate S3 state key and account restriction; read-only readiness guard; owner completes GitHub OAuth. Created exactly one CodeConnection `kongportfolio-github`, no application changes or build/pipeline/webhook resources. ARN suffix `ff3ddf98-05c3-41fa-8bfe-f738a90df1d6`, status PENDING. GitHub main remains the earlier baseline; current deployment/CI changes have not been committed or pushed.
+
+Terraform fmt/validate, saved one-create plan and guarded apply passed; post-apply plan No changes. PowerShell syntax, real PENDING rejection, wrong-account rejection before AWS call, 28 hook checks and Gitleaks passed. No application code changed, so frontend/backend tests were not rerun. This is not a working CI/CD or blue/green deployment yet. Owner action: complete the existing pending connection with repository-only access. Next Story: approved bounded CodeBuild CI and its first real source/build checks, followed by CodePipeline/two approval gates and Lambda CodeDeploy traffic shift/rollback. See `infra/terraform/cicd/README.md`. Pause for OAuth and review.
+
+## S2-04D — Custom domain registration and binding (2026-11-12, completed)
+
+User requested existing konglingtong44.com name. Confirmed hosted zone survives but registration expired in 2024. User chose one-year re-registration at quoted USD16 and supplied real contact data. Registration SUCCESSFUL, expiry 2027-11-11 Tokyo, auto-renew false, privacy true, contact reachability DONE. Contacts/request remain only under ignored .local, never repository/frontend.
+
+Restored registrar NS to original zone; Google/Cloudflare public delegation verified. Strictly verified and removed only the automatic new empty zone. Terraform domain apply: 5 add / 1 update / 0 delete (planned S3 policy update evaluated identical); free non-exportable us-east-1 ACM, verification and A/AAAA aliases, original CloudFront now Deployed. Existing testec2 preserved. Three offline plan tests and real delegation guard pass. Live custom-domain HTTPS, valid TLS/SAN, HTTP→HTTPS, SPA/assets/version, 3 languages, health/POST/error/cache checks pass. Final plan No changes. Original CloudFront URL still works; no app/code deployment, no new Bedrock/CI resources, no browser visual retest, commit or push. See docs/custom-domain.md. Story complete; pause for review.
+
+## S2-04 — First AWS deployment completed (2026-11-11)
+
+User approved concrete 23-create plan and frontend candidate. Created 23 resources and uploaded six immutable frontend files; CloudFront https://d4htln25bw5g5.cloudfront.net is Deployed. Initial health exposed read-only /var/task disk indicator; Terraform now sets diskspace=/tmp, publishing live version 2 (0 add / 2 update / 0 delete), same approved ZIP. Removed redundant empty S3 origin block to eliminate OAC plan drift. Final plan exited 0 / No changes.
+
+Live HTTPS smoke passed HTML/assets/version, three-language profile, UP health, POST PREPARING, no-store API and genuine API/asset errors. SPA deep link 200, anonymous S3 index 403; S3 security settings, logs-only execution role, Lambda ZIP checksum and idempotent upload verified. Computer Use stopped because browser URL could not be established; no visual/mobile/interaction claim. No real Bedrock, CI/CD/blue-green/custom domain, commit or push. Details: `infra/terraform/portfolio/DEPLOYMENT.md`. Story complete; pause for review.
+
+## S2-04 — First serverless deployment preparation (2026-11-11)
+
+Acceptance: runnable Terraform for Lambda/HTTP API/private S3/CloudFront, isolated remote state, immutable explicit build candidate, real account plan and artifact/routing safeguards; paid creation requires review. Prepared 23 creates / 0 updates / 0 deletes, no apply. Java 21 1 GB / 28 s / reserved concurrency 5; HTTP API 1 rps/burst 5; 7-day logs; logs-only execution role; default CloudFront HTTPS domain, no DNS change.
+
+Lambda 3 tests/ZIP smoke, frontend 40 tests/typecheck/versioned build and 12 routing cases passed. Real fmt/validate/plan review passed; tampered frontend copy rejected by Terraform and the offline pre-apply guard. Offline publisher verifies skip-existing/create-only/checksum/wrong-account behavior. Current working-tree candidate honestly records sourceDirty and content snapshot hashes. No live function/upload/CloudFront/cold-start validation; no Bedrock/CI/CD/blue-green resources or commit/push. See `infra/terraform/portfolio/README.md`. Pause for explicit approval of the concrete plan and candidate before creating paid resources.
+
+## S2-03 — Spring Boot Lambda adaptation (2026-11-11)
+
+User selected Lambda + API Gateway HTTP API + S3/CloudFront, AWS-only CI/CD and blue/green, followed by bounded Bedrock Q&A. Acceptance: retain local HTTP/Compose; isolated Lambda build and HTTP API v2 entry point; test language/fallback, health, POST placeholder, 404/405, warm invocations and private query omission; validate the actual ZIP independently.
+
+Implemented Maven lambda profile with pinned AWS Spring Boot 4 adapter 3.0.5, console-only Lambda logging, lib-JAR ZIP and CI checks. Verified frontend 40 tests/build; default backend 9 tests/executable JAR; Lambda 3 tests/ZIP; ZIP-only JVM smoke (24.1 MiB compressed / 26.8 MiB libraries); 27 hook checks and secret/diff checks. Local tests explicitly disable unrelated host DEBUG variable. No Docker image rebuild or actual AWS runtime/cold-start check. No AWS writes, commit or push. Current plan: `docs/serverless-plan.md`; old ECS docs marked historical. Pause for review before first-deployment Terraform Story.
+
+## S2-01 — Terraform State bootstrap (2026-11-11)
+
+Approved and completed: Tokyo S3 state bucket with private access, SSE-S3, versioning, ACL disabled and HTTPS policy; local state migrated to S3 with native locking. Apply: 6 add / 0 change / 0 destroy. Post-migration and post-lock-test plans: no changes. Real concurrent lock rejection and release verified; 27 hook checks, fmt/validate and configuration secret scan passed. See `infra/terraform/EXECUTION.md`. No application changes, no application/container checks rerun, no commit/push. Budget and website resources remain uncreated. Pause for review.
+
+## S2-02 — AWS deployment preflight (2026-11-11)
+
+Completed read-only inventory via `scripts/aws-preflight.ps1`: two existing account-wide email Budgets discovered, so no duplicate created; one public hosted zone; no certificates in Tokyo/us-east-1; no queried CloudFront distributions or Tokyo ECS clusters/ECR repositories/load balancers. Full real query and wrong-account rejection verified; local report excludes subscriber addresses. See `docs/aws-preflight.md` for alert rules and gaps. No AWS writes, application changes or commit/push. Deployment scope selection pending; pause for review.
+
 Acceptance: large Stardew-inspired 03 button; synchronized vertical timeline on the left and horizontal cards on the right; selecting a timeline entry scrolls before opening its detail; cancel pending opens on interruption; 01 ↔ 02 ↔ 03 navigation survives manual scrolling and fractional alignment; richer source-backed project detail; technology-based Bento categories.
 
 Content: 7 professional projects, 1 personal project, 8 career/education timeline records, 12 technology categories plus a separate website-technology card. Professional periods follow the October 2026 PDF; the April XLS supplies supporting scope/tools. Contact, address, birthday and customer/internal-project identifiers excluded.

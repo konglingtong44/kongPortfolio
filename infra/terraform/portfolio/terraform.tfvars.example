@@ -1,0 +1,4 @@
+expected_account_id = "<ACCOUNT_ID>"
+release_directory   = "D:/study/kongPortfolio/.local/releases/<RELEASE_ID>"
+# Only enable after registered ownership and public DNS delegation are verified:
+# custom_domain = { name = "example.com", hosted_zone_id = "ZEXISTINGPUBLICZONE" }
