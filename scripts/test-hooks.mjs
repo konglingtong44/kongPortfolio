@@ -5,6 +5,13 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Windows can execute hooks without Unix mode bits; Linux requires them.
+// Inspect Git's index so local verification catches broken cloud checkouts.
+for (const hook of ['pre-commit', 'pre-push']) {
+  const tracked = spawnSync('git', ['ls-files', '--stage', '--', `.githooks/${hook}`], { cwd: root, encoding: 'utf8' });
+  assert.equal(tracked.status, 0, tracked.stderr);
+  assert.match(tracked.stdout, /^100755 /, `${hook} must be executable in Git for Linux CI`);
+}
 mkdirSync(join(root, '.local'), { recursive: true });
 const fixture = mkdtempSync(join(root, '.local', 'hook-test-'));
 function git(args, env = process.env) {
