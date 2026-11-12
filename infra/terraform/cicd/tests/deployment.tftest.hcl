@@ -1,5 +1,6 @@
 mock_provider "aws" {}
 variables {
+  enable_frontend_release   = false
   expected_account_id       = "123456789012"
   enable_ci                 = false
   enable_ci_webhooks        = false

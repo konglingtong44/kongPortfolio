@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { contracts } from './staging-contract.mjs';
 import { liveSnapshot, requireApprovedContext } from './green-contract.mjs';
 
-export function requireDeploymentContext(execution, actions, manifest, staging, green, executionId, live) {
+export function requireGreenEvidence(execution, actions, manifest, staging, green, executionId) {
   const first = requireApprovedContext(execution, actions, manifest, staging, executionId);
   assert.ok(actions.some(a => a.stageName === 'VerifyGreen' && a.actionName === 'PublishAndVerifyGreen' && a.status === 'Succeeded'));
   assert.ok(actions.some(a => a.stageName === 'ApproveTrafficShift' && a.actionName === 'ApproveBlueGreenDeployment' && a.status === 'Succeeded'), 'Human approval 2 required');
@@ -19,6 +19,9 @@ export function requireDeploymentContext(execution, actions, manifest, staging, 
   assert.notEqual(green.greenVersion, green.blueVersion);
   assert.equal(green.checks.length, contracts.length);
   for (const c of contracts) assert.ok(green.checks.some(x => x.name === c.label && x.status === 'passed'));
+}
+export function requireDeploymentContext(execution, actions, manifest, staging, green, executionId, live) {
+  requireGreenEvidence(execution, actions, manifest, staging, green, executionId);
   assert.deepEqual(liveSnapshot(live), { version: green.blueVersion, revisionId: green.liveAliasRevisionId }, 'Approved live snapshot is stale');
 }
 export function appSpec(blue, target) {

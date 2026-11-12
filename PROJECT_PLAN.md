@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Frontend automatic publication preparation (2026-11-12, awaiting approval)
+
+Prepared optional eighth pipeline stage after successful backend deployment, same candidate/five report inputs and both human gates; rollback_drill skips frontend. Immutable conditional S3 uploads with checksum/MIME/cache validation, public asset verification, ETag-protected CloudFront DEVELOPMENT tests then LIVE pointer publish, bounded public identity/HTML/API checks and old-pointer recovery on failure. Separate restricted role cannot delete objects/update distribution/backend alias/approve. Actual plan4 create/2 update/0 delete; disabled and production code-ownership handoff plans No changes. Terraform continues runtime/distribution ownership, pipeline owns router code prefix.19 CICD+3 domain mocked plans and Node failure/concurrency/context tests pass; AWS upload/TestFunction/propagation/recovery unverified. No frontend apply/upload/publish yet. docs/frontend-publication.md; root log21.
+
 ## S3-07R — Controlled stop and automatic rollback verified (2026-11-12)
 
 User completed both gates for96861976/8ad190b/rollback_drill. Blue5-only baseline d-CRSIZL0EM Succeeded; canary d-2OPWFF0EM observed Green6 at10%, then Stopped/MANUAL_STOP as intended. AWS automatic rollback d-M40WD11EM Succeeded with bidirectional triggering-deployment links; actual live5/no weights and immutable stable code unchanged. Report outer SHA/source/mode/outcome/observations/recovery IDs independently matched AWS. Controller8a900c73 and whole pipeline Succeeded. Seven restored public HTTPS contracts pass, alarmOK, production/CICD plans No changes. This verifies stop-on-request automatic rollback, not independently app-failure/alarm-trigger scenarios. No bad code, alarm-state manipulation, extra manual recovery or direct alias update. Root log20, concise docs/rollback-drill.md; pause for review before frontend publishing increment.

@@ -1,0 +1,16 @@
+version: 0.2
+env:
+  shell: bash
+  variables:
+    CI: "true"
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+  build:
+    commands:
+      - node scripts/publish-frontend.mjs
+artifacts:
+  base-directory: .local/frontend-verification
+  files:
+    - report.json

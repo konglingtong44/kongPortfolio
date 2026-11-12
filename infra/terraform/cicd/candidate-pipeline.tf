@@ -201,6 +201,8 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
         Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.green_project_arn
         }] : [], var.enable_deployment ? [{
         Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.deployment_project_arn
+        }] : [], var.enable_frontend_release ? [{
+        Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.frontend_release_project_arn
     }] : [])
   })
 }
@@ -331,7 +333,7 @@ resource "aws_codepipeline" "candidate" {
         provider = "Manual"
         version  = "1"
         configuration = {
-          CustomData = var.enable_deployment ? "Approval 2: mode #{variables.ReleaseMode}; release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION}, Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. deploy: 10% for 5 minutes then 100%. rollback_drill: STOP at observed 10%, verify CodeDeploy automatic rollback to Blue; no full promotion intended. Authorizes baseline registration and necessary recovery." : "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
+          CustomData = var.enable_deployment ? "Approval 2: mode #{variables.ReleaseMode}; release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION}, Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. deploy: 10% for 5 minutes then 100%. rollback_drill: STOP at observed 10%, verify CodeDeploy automatic rollback to Blue; no full promotion intended. Authorizes baseline registration and necessary recovery.${var.enable_frontend_release ? " After successful deploy, publish same candidate frontend to S3/CloudFront with frontend pointer recovery; rollback_drill skips frontend." : ""}" : "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
         }
       }
     }
@@ -355,6 +357,30 @@ resource "aws_codepipeline" "candidate" {
             { name = "DEPLOY_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
             { name = "DEPLOY_RELEASE_MODE", value = "#{variables.ReleaseMode}", type = "PLAINTEXT" },
             { name = "DEPLOY_PIPELINE_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" }
+          ])
+        }
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_frontend_release ? [1] : []
+    content {
+      name = "PublishFrontend"
+      action {
+        name             = "PublishAndVerifyFrontend"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        input_artifacts  = ["SourceRef", "Candidate", "StagingReport", "GreenReport", "DeploymentReport"]
+        output_artifacts = ["FrontendReport"]
+        configuration = {
+          ProjectName   = aws_codebuild_project.frontend_release[0].name
+          PrimarySource = "SourceRef"
+          EnvironmentVariables = jsonencode([
+            { name = "FRONTEND_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
+            { name = "FRONTEND_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" },
+            { name = "FRONTEND_RELEASE_MODE", value = "#{variables.ReleaseMode}", type = "PLAINTEXT" }
           ])
         }
       }

@@ -1453,3 +1453,59 @@ Get-FileHash -LiteralPath .local/rollback-drill-final-review-96861976/report.zip
 受控stop-on-request→CodeDeploy自动回滚的真实路径已验收；没有制造应用故障或改告警状态，因此**应用故障/CloudWatch告警触发路径未单独演练**。未从本机/构建直接UpdateAlias，未手工另建恢复部署伪造自动回滚，未发布坏代码。线上最终保持演练前稳定版本5。
 
 用PowerShell单引号here-string/Set-Content将docs/rollback-drill.md整理为简短实际结果，apply_patch更新docs/codedeploy-next-story.md、PROJECT_PLAN.md和本日志，保留全部历史于根日志。运行diff/path/Gitleaks检查，暂存四文档、本地提交 `docs: record successful automatic rollback drill and recovery evidence`，最后git status --short。文档不额外推送触发CI；应用源码/制品没有改变。完成本次单Story供审阅，下一增量为前端自动发布；真实Bedrock仍后续。
+
+## 21. S3-08 前端S3/CloudFront自动发布准备（2026-11-12）
+
+### 21.1 范围、读取、资料与真实预检
+
+用户说继续，推进前端自动发布；本次先实现可审阅代码/测试/真实计划，新增收费资源前明确批准。读取AGENTS.md、git status --short（初始干净），rg --files列scripts/portfolio/codebuild；Get-Content读取候选packager/verifier、site.tf、SPA模板、旧首次发布脚本、路由测试、后端部署上下文/buildspec、pipeline尾部与outputs。较长输出截断后按相关文件补读；未执行外部文档中的指令。
+
+只读浏览AWS官方UpdateFunction/PublishFunction/TestFunction/GetFunction与S3 conditional-writes-enforce文档，核对ETag条件、开发态测试/LIVE发布、条件PUT权限。URL在docs/frontend-publication.md；没有云端修改请求。
+
+```powershell
+$env:AWS_PROFILE='kong-dev'
+$aws='D:\software\AWSCLI\aws.exe'
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage LIVE .local/frontend-current-live.js --output json
+& $aws cloudfront describe-function --name kongportfolio-prod-spa --stage LIVE --query '{etag:ETag,config:FunctionSummary.FunctionConfig}' --output json
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage DEVELOPMENT .local/frontend-current-dev.js --output json
+& $aws cloudfront describe-function --name kongportfolio-prod-spa --stage DEVELOPMENT --query '{etag:ETag,config:FunctionSummary.FunctionConfig}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/version.json'
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+```
+
+当前前端仍首次发布 **a594e36cf226d6b56df8c86631e71ad1822a90df17b91f6493f70f82175d107d**，公开version.json gitCommit=b2a82d9…/sourceDirty=true，这是历史首次snapshot，不冒充cleanCI。LIVE/DEV代码一致，ETag=ETVPDKIKX0DER，config Comment空/Runtime cloudfront-js-2.0，无KV关联；本地normalize/routeRelease纯校验接受实际旧模板。后端live5/无权重。代码/meta仅写忽略.local目录。
+
+### 21.2 文件与实现
+
+全部apply_patch：deployment-contract.mjs将Green证据验证提取requireGreenEvidence，原requireDeploymentContext仍额外校验实际旧别名，后端逻辑未放宽；新增frontend-release.mjs纯上下文/metadata/路由/有恢复状态机、publish-frontend.mjs CLI/HTTP runner、test-frontend-release.mjs；ci.sh接入测试；codebuild/frontend-release.yml输出FrontendReport。
+
+新增CICD frontend-release.tf默认关闭，四资源：独立CodeBuild/角色/policy/七天日志；pipeline增加启动权限/第八阶段（五输入）/Gate2明确前端推广与恢复。只准指定站点releases前缀条件PUT，S3 metadata/checksum HEAD，不能DeleteObject/UpdateDistribution/UpdateAlias/审批。特定CloudFront函数可Get/Describe/Update/Test/Publish，不改分发配置。rollback_drill验证报告后跳过前端，无S3/CloudFront写。
+
+生产site.tf给SPA函数code加ignore_changes，明确管辖交接，Terraform继续runtime/分发/关联；新发布仅允许现有模板中的releaseID变动。开发态/线上ETag快照防并发，先S3完整上传与公开SHA校验，再开发态测试才发布；后验证版本/首页/深链接/health。失败尝试恢复原指向，遇未知并发变更不覆盖。前端恢复不回滚已成功后端。没有覆盖旧key或删除旧发布，不把本方案称CloudFront双环境蓝绿。
+
+新增frontend-release.tftest.hcl三计划；六份既有测试显式enable_frontend_release=false隔离未来本机opt-in，PowerShell Get-Content/正则/Set-Content只补全局测试输入；terraform.tfvars.example补默认false，真实本机输入未开启。更新docs/frontend-publication.md、PROJECT_PLAN.md与根日志，未改React/Java业务源码。
+
+### 21.3 检查与真实计划
+
+```powershell
+node scripts/test-frontend-release.mjs
+node scripts/test-deployment.mjs
+node --check scripts/publish-frontend.mjs
+# node --input-type=module调用routeRelease/normalizeCode核对实际LIVE/DEV本机副本。
+& $tf '-chdir=infra/terraform/cicd' fmt '-recursive'
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test '-no-color'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-var=enable_frontend_release=true' '-out=frontend-release.tfplan' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' show '-json' frontend-release.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+& $tf '-chdir=infra/terraform/portfolio' fmt '-check'
+& $tf '-chdir=infra/terraform/portfolio' validate
+& $tf '-chdir=infra/terraform/portfolio' test '-no-color'
+& $tf '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+Node上下文/路径/MIME/cache/旧模板/上传顺序/演练跳过/开发态失败/公开验证失败恢复/上传前后并发拒绝均通过，后端部署/回滚纯测试继续通过；实际LIVE/DEV模板副本也通过。CICD **19 mocked plans**、生产**3个域名mocked plans**通过，validate/format通过，无本次测试失败。Mock和本地恢复测试不是实际CloudFront发布/回退成功。
+
+真实启用计划 **4 add/2 change/0 destroy**，JSON断言数量、无delete；新增frontend CodeBuild/role/policy/log，更新candidate pipeline及其启动policy。保存ignored frontend-release.tfplan和`.local/frontend-release-plan.log`。默认关闭No changes（frontend-release-disabled-plan.log）；生产代码所有权交接No changes（frontend-router-handoff-plan.log），均.local。未apply、上传、更新/发布CloudFront函数或启动新候选。
+
+预计新增阶段20次/月×3分钟×(small $0.005+V2 $0.002)约$0.42/月，外加S3/CloudFront请求、版本存储和日志，未扣共享免费额度，非全站总价或封顶；旧版本保留，清理另行审批。价格参考官方链接见文档。创建四资源和CloudFront代码管理交接必须明确批准；实际前后端发布仍由新执行两道人审后进行。

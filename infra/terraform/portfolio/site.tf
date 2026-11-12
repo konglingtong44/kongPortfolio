@@ -62,6 +62,8 @@ data "aws_cloudfront_response_headers_policy" "security" {
 }
 
 resource "aws_cloudfront_function" "spa" {
+  # Reviewed frontend pipeline owns only release-pointer code after handoff.
+  lifecycle { ignore_changes = [code] }
   name    = "${local.name}-spa"
   runtime = "cloudfront-js-2.0"
   publish = true
