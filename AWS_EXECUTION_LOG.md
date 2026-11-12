@@ -1318,3 +1318,45 @@ Node演练/失败路径测试及语法通过，Terraform validate通过。初次
 实际计划 **0 add/1 update/0 destroy**，JSON断言唯一变化为aws_codepipeline.candidate[0]，否则停止。保存ignored rollback-drill.tfplan和`.local/rollback-drill-plan.log`。仅更新现有流水线模式/审批/参数，不新增收费资源；仍有既有CI/部署分钟、日志/请求费用。模式测试不能代表真实自动回滚已成功。
 
 本次“继续”授权回滚练习的准备和现有流水线配置；不新增收费资源，无需重复请求资源创建批准。实际生产影响仍需新执行两道用户手动审批，第二道明确模式与恢复目标。接下来先扫描/提交推送、确认现有AWS CI，再应用此唯一pipeline更新，启动固定新SHA/rollback_drill，停第一道审批供用户审阅，不代批或自动进入生产演练。
+
+### 18.4 Git、现有CI、唯一配置更新和演练执行
+
+运行Node测试、path检查、Gitleaks dir、git diff --check，git add（仅三个部署脚本、candidate-pipeline、六份测试、docs/rollback-drill.md、PROJECT_PLAN.md、根日志），cached diff检查后 `git commit -m 'feat: add execution-bound controlled rollback drill'`、git push、rev-parse/status。提交 **8ad190ba366b6967793675098f5df1fab26fd324**，dir/暂存/push全历史扫描无泄露，无main合并。推送也带上此前本地文档记录；候选仍DetectChanges=false，不自动发布。
+
+list-builds-for-project分别查询现有两个CI，再 `batch-get-builds --ids kongportfolio-ci-frontend:1646d1e9-ceaa-4cbe-84c7-a36a4f20f2af kongportfolio-ci-backend:5018cf31-20a0-4d08-91fc-dbc157cbb848` 按SHA核对；约35秒/25秒短等待后，两项SUCCEEDED/SHA8ad190b。读取两个CI日志组对应stream的get-log-events，存 `.local/rollback-drill-frontend-ci.log`、`rollback-drill-backend-ci.log`，证实rollback drill注入测试在AWS Linux通过、前端40 tests/build、后端9+3 tests/ZIP smoke、applicationChecksRan=true。只读GET GitHub commit8ad190b `/status` 最终success，两context均success；摘要 `.local/rollback-drill-source-ci.json`。
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' apply '-input=false' '-no-color' rollback-drill.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+& $aws codepipeline get-pipeline --name kongportfolio-candidate --region ap-northeast-1 --output json
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 1 --region ap-northeast-1 --query 'pipelineExecutionSummaries[].{id:pipelineExecutionId,status:status}' --output json
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=8ad190ba366b6967793675098f5df1fab26fd324' --variables 'name=ReleaseMode,value=rollback_drill' --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 96861976-0f9e-4a0c-b49e-9c75c0c1762b --region ap-northeast-1 --query 'pipelineExecution.{id:pipelineExecutionId,version:pipelineVersion,status:status,variables:variables}' --output json
+```
+
+Apply **0 added/1 changed/0 destroyed**（`.local/rollback-drill-apply.log`），后续plan No changes（`.local/rollback-drill-post-apply-plan.log`）。实际pipeline version5，变量ReleaseMode/defaultValue deploy，schema与期望一致；配置更新没有自动执行，最近旧执行仍Succeeded。
+
+只启动一次新执行 **96861976-0f9e-4a0c-b49e-9c75c0c1762b**，返回信息 `.local/rollback-drill-execution.json`。立即GetPipelineExecution遇到短暂PipelineExecutionNotFoundException；只重试该只读GET，没有重复start。随后成功读回InProgress/version5、**ReleaseMode resolvedValue=rollback_drill**，证明模式已绑定本次执行。没有创建生产部署、修改别名、代理审批或新增收费资源。
+
+### 18.5 新候选/STG到第一道人审及报告复核
+
+约40/35/20秒短等待，用 `codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=96861976-0f9e-4a0c-b49e-9c75c0c1762b --output json` 更新 `.local/rollback-drill-actions.json`；分别list-builds-for-project确认Candidate/STG ID，再batch-get-builds按resolvedSourceVersion核对：Candidate **3895c434-6edb-487e-88d3-f1ec24de3e92**、STG **3dbc6f8a-bd85-4201-8849-5cb3eab7a4df** 均SUCCEEDED、源码8ad190b；元数据 `.local/rollback-drill-candidate-stg.json`。Candidate执行全ci.sh all/打包/候选完整性；STG脚本用同次ZIP发布并直接调用数字**版本7**七项通过，无真实Bedrock调用。
+
+```powershell
+New-Item -ItemType Directory -Path .local/rollback-drill-stg-review-96861976 -Force
+# key从本次STG action outputArtifacts读取。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/S49xu6L --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/S49xu6L --version-id 5X5ipLLdhxFRSGPG__IDFnuyRwJSPC1j --region ap-northeast-1 .local/rollback-drill-stg-review-96861976/report.zip --output json
+Get-FileHash -LiteralPath .local/rollback-drill-stg-review-96861976/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限制唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 7 --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 96861976-0f9e-4a0c-b49e-9c75c0c1762b --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion,mode:variables}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+外层SHA **40b5138f10d1fca52f14dfd35e4ddfb7f4e50dd7cfeb3da73934b4b8ee0ff9d4** 匹配CodeBuild artifacts.sha256sum；report schema/kind/passed/七项、execution/source/function/version正确，Release **13d4d232f880fb581fcd890881eaf13be39ff19d02693f7059901a1b40ebf506**、backend SHA **3d765d2a17cc880a99349c47b2355b1cc771b0ea34a20ccb647e5c7140e299b3** 与实际Lambda qualifier7 CodeSha256和审批导出变量相符。原件/report/object/review仅留上述忽略目录。
+
+整体InProgress/version5/ReleaseMode rollback_drill，**ApproveProduction InProgress**；没有运行Green/部署/停止/回滚。live仍5/无权重，公开healthUP。给用户第一道审批链接，明确新96861976/STG7，第一道只验证Green；第二道显示演练模式并授权实际10%后的停止/自动回滚，最终目标恢复演练前Blue。
+
+更新本日志/PROJECT_PLAN.md/docs/rollback-drill.md，diff/path/Gitleaks检查后仅本地提交 `docs: record rollback drill configuration and first approval evidence`、git status --short，不为文档推送触发重复CI。没有改React/Java、没有新增资源或IAM权限、没有代替用户提交任一人工审批。当前只验收到第一道人审，真实自动回滚仍待下一阶段。

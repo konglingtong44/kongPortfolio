@@ -2,6 +2,10 @@
 
 ## S3-07R — Controlled rollback drill preparation (2026-11-12)
 
+Reached gate1: execution96861976/v5/ReleaseMode rollback_drill has Source/Candidate/STG Succeeded, STGv7 seven contracts pass. Exact StagingReport object version/outer SHA/source/release/backend code and approval exports independently match actual Lambda. Release13d4d232…. Live remains5/no weights/healthUP; no stop or rollback performed yet. Await both fresh human gates. Root log18.5.
+
+Source8ad190b AWS frontend/backend CI and GitHub statuses success (40 frontend tests/build, 9+3 backend tests/ZIP smoke, drill logic tested on AWS Linux). Applied only existing pipeline update: 0 add/1 update/0 destroy, post-plan No changes. Pipelinev5/new execution96861976 pinned8ad190b resolves ReleaseMode=rollback_drill. GetPipelineExecution initial eventual-consistency not-found resolved on read-only retry; no duplicate start. Validating to human gate1, no production drill yet; live remains5.
+
 Prepared explicit execution-bound ReleaseMode (deploy default / rollback_drill). Drill stops only after observed 10% canary, requires AWS automatic rollback ID/Succeeded plus restored Blue/no weights/public health to pass; missing/failed rollback cannot be replaced by a manual deployment and called success. Both human gates retained, gate2 exposes mode. Actual plan 0 add / 1 pipeline update / 0 delete, no IAM expansion; existing resources reused. Node negative/failure/stop drill tests and 16 Terraform mocked plans pass. Cloud rollback and alarm-trigger testing remain unverified; this increment tests stop-on-request path, not induced application failure or alarm state. docs/rollback-drill.md, root log18.
 
 ## S3-07 — First real canary succeeded (2026-11-12; rollback drill pending)
