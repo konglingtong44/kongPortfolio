@@ -1,6 +1,6 @@
 # kongPortfolio
 
-持续开发中的三语网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot，资料保存在日／中／英 JSON 文件中，无数据库。默认日语，支持浏览器语言识别和手动选择记忆。
+持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
 在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 尚待接入，目前 `/api/bedrock` 仅返回 `PREPARING`。
 

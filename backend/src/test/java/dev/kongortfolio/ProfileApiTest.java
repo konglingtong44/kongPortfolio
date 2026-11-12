@@ -38,11 +38,17 @@ class ProfileApiTest {
         var mapper = new tools.jackson.databind.ObjectMapper();
         for (String language : new String[] {"ja", "zh", "en"}) {
             var content = mapper.readTree(get("/api/profile?lang=" + language).body());
-            assertThat(content.path("projects").size()).isEqualTo(8);
+            assertThat(content.path("projects").size()).isEqualTo(6);
             assertThat(content.path("projects").get(0).path("kind").asText()).isEqualTo("personal");
             assertThat(content.path("projects").get(1).path("kind").asText()).isEqualTo("work");
             assertThat(content.path("projects").get(5).path("outcome").asText()).contains("30");
-            assertThat(content.path("timeline").size()).isEqualTo(8);
+            assertThat(content.path("timeline").size()).isEqualTo(6);
+            var telecom = content.path("projects").get(5);
+            assertThat(telecom.path("period").asText()).isEqualTo("2018.06 — 2023.05");
+            assertThat(telecom.path("team").asText()).contains("1–15");
+            assertThat(telecom.path("tags").toString()).contains("Hadoop", "WildFly", "Nginx");
+            assertThat(content.path("timeline").get(4).path("period").asText()).isEqualTo(telecom.path("period").asText());
+            assertThat(content.path("timeline").get(5).path("period").asText()).isEqualTo("2014.09 — 2018.06");
             assertThat(content.path("timeline").get(0).path("period").asText()).startsWith("2026.08");
             assertThat(content.path("qualifications").get(0).path("date").asText()).contains("2021.08");
             assertThat(content.path("note").path("paragraphs").size()).isEqualTo(3);
@@ -57,9 +63,9 @@ class ProfileApiTest {
         assertThat(get("/api/beans").statusCode()).isEqualTo(404);
     }
 
-    @Test void servesPdfPeriodsAndDetailedTechnologyEvidence() throws Exception {
+    @Test void servesReviewedPeriodsAndDetailedTechnologyEvidence() throws Exception {
         var mapper = new tools.jackson.databind.ObjectMapper();
-        String[] starts = {"2026.08", "2025.07", "2025.01", "2023.06", "2019.05", "2018.12", "2018.06"};
+        String[] starts = {"2026.08", "2025.07", "2025.01", "2023.06", "2018.06"};
         for (String language : new String[] {"ja", "zh", "en"}) {
             var content = mapper.readTree(get("/api/profile?lang=" + language).body());
             for (int index = 0; index < starts.length; index++) {

@@ -135,16 +135,14 @@
       "period": "2025.07 — 2026.07",
       "role": "PMO / 技术开发",
       "team": "6 人（PMO）",
-      "description": "支持季度大型发布、日常运维、业务效率改善与后续技术验证，涵盖需求协调、技术调查、Java 实现支援、AWS 环境确认和 PoC。",
-      "outcome": "支持季度大型发布准备；通过故障调查、代码改修和业务工具改善日常工作，并将 PoC 可行性与问题整理用于后续方案讨论。",
+      "description": "负责季度大型发布的需求、规格及范围协调，通过技术调查、Java 开发支持、日常运维改善、AWS 环境确认与发布支持、技术验证及 PoC，推动客户与开发团队协作。",
+      "outcome": "协调客户与开发团队的应对方针、优先级和日程，推动问题解决与季度发布准备；通过业务辅助工具提升效率，并将验证结果和技术问题整理用于后续方案讨论。",
       "responsibilities": [
-        "整理客户需求、改造范围、业务及系统影响和依赖，协调优先级、范围与发布时间。",
-        "调查画面、批处理和既有 VB / Java / C# 逻辑，讨论 Java 实现方案并进行代码级修正支援。",
-        "通过日志和数据定位故障，处理问询，开发或改造业务辅助工具。",
-        "确认 S3、EFS、RDS 构成与环境差异，检查流水线、部署步骤和发布配置；RDS 为查询与构成确认层面的参与。",
-        "使用 Athena 检查日志与数据，支持运行问题调查。",
-        "调查 AI 呼叫中心技术，编写简易 Java 验证代码，支持 AWS 验证环境准备及 PoC。",
-        "比较 JMeter、Distributed Load Testing on AWS 等工具，整理测试观点、验证步骤及技术问题。"
+        "季度发布推进与需求协调：面向季度大型发布，整理客户需求、确认规格并协调范围。梳理改造的业务影响、系统影响及跨系统依赖，支持相关方达成共识。与客户及开发团队协调应对方针、优先级和日程，推动问题解决及发布准备。",
+        "技术调查与开发支持：调查页面、批处理和业务逻辑，梳理改造及影响范围。结合客户需求与既有系统约束，同开发团队讨论实现方式和实施方针。根据具体问题提供 Java 实现支持及代码级修正等技术支持。",
+        "日常运维与业务改善：针对日常问询和故障，确认规格、调查日志与数据并定位原因。梳理依赖其他系统的工作和持续性问题，与相关部门协作推进处理。审视业务流程和手工作业，通过开发、改造业务辅助工具提升效率。",
+        "AWS 环境确认与发布支持：确认 S3、EFS、RDS 等 AWS 环境构成，梳理环境差异并检查发布配置。确认发布流水线和部署步骤，支持自动化。使用 Athena 检查日志及数据，支持故障调查和运维问题解决。",
+        "技术验证与 PoC 支持：调查 AI 呼叫中心相关技术及 AWS 服务，评估其对需求的适用性。调查自动化测试、负载测试工具并支持 PoC。整理验证结果与技术问题，支持客户和开发团队讨论方针、推进后续措施。"
       ],
       "environment": [
         {
@@ -152,28 +150,27 @@
           "items": [
             "Java",
             "JSP",
-            "React",
-            "VB / C# （旧代码分析）"
+            "React"
           ],
           "description": ""
         },
         {
           "title": "数据库",
           "items": [
-            "RDS （查询与构成确认）"
+            "RDS"
           ],
           "description": ""
         },
         {
           "title": "AWS",
           "items": [
-            "EC2",
             "S3",
             "EFS",
             "Lambda",
             "CloudWatch",
             "IAM",
             "Athena",
+            "EC2",
             "VPC"
           ],
           "description": ""
@@ -185,7 +182,7 @@
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
-            "Selenium （PoC）"
+            "Selenium"
           ],
           "description": ""
         },
@@ -204,21 +201,20 @@
         "Java",
         "JSP",
         "React",
-        "VB / C# （旧代码分析）",
-        "RDS （查询与构成确认）",
-        "EC2",
+        "RDS",
         "S3",
         "EFS",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
+        "EC2",
         "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium （PoC）",
+        "Selenium",
         "Git",
         "Backlog",
         "Confluence",
@@ -235,64 +231,42 @@
       "outcome": "使工具在系统更新后继续可用；通过 MSI 打包和 Intune 自动分发促进安装步骤标准化。",
       "responsibilities": [
         "调查 Java、VBScript 等既有资产与构成，确认 Salesforce 侧要求、影响范围及改造方针。",
-        "改造并重实现 Java Swing 既有功能，调整依赖旧环境的处理。",
+        "改造并重实现 Java 既有功能，调整依赖旧环境的处理。",
         "实现系统更新所需的通信加密。",
         "开发 C# 启动包装，改为 MSI 打包，并适配 Intune 自动安装。",
         "完成动作确认和测试，与使用部门协调并处理改善需求。"
       ],
       "environment": [
         {
-          "title": "语言与框架",
+          "title": "语言",
           "items": [
-            "Java Swing",
+            "Java",
             "C#",
             "VBScript"
           ],
           "description": ""
         },
         {
-          "title": "数据库",
+          "title": "其他",
           "items": [
-            "RDS"
-          ],
-          "description": ""
-        },
-        {
-          "title": "中间件与平台",
-          "items": [
-            "Salesforce",
-            "Apigee"
-          ],
-          "description": ""
-        },
-        {
-          "title": "测试工具",
-          "items": [
-            "JMeter"
-          ],
-          "description": ""
-        },
-        {
-          "title": "开发与运维工具",
-          "items": [
+            "JMeter",
             "Intune",
             "MSI (Windows Installer)",
-            "Visual Studio"
+            "Visual Studio",
+            "Salesforce"
           ],
           "description": ""
         }
       ],
       "tags": [
-        "Java Swing",
+        "Java",
         "C#",
         "VBScript",
-        "RDS",
-        "Salesforce",
-        "Apigee",
         "JMeter",
         "Intune",
         "MSI (Windows Installer)",
-        "Visual Studio"
+        "Visual Studio",
+        "Salesforce"
       ]
     },
     {
@@ -307,10 +281,10 @@
         "整理需求，编写基本和详细设计，以 Java / Spring / Vue 实现画面及业务逻辑。",
         "开发客户信息输入、更新与校验，新商品申请逻辑，以及手续费和保险费试算。",
         "设计和实现内部管理列表、活动日历、经费相关画面和跨系统定期数据联携。",
-        "实现 Lambda、S3、API Gateway 功能，改造既有功能以支持云端运行和迁移。",
+        "实现 AWS 相关功能，改造既有功能以支持云端运行和迁移。",
         "处理 Apigee API 管理、认证、访问控制及权限设计，进行测试环境通信和连接验证。",
         "计划并执行单元、集成及性能测试，改进 DB / API 响应，准备生产发布资源并执行发布。",
-        "对应 Vue 2 → 3、Tableau 嵌入 API v2 → v3；内部管理开发中还负责进度、问题共享、代码评审和团队协调。"
+        "对应 Vue 2 → 3；内部管理开发中还负责进度、问题共享、代码评审和团队协调。"
       ],
       "environment": [
         {
@@ -334,38 +308,24 @@
         {
           "title": "AWS",
           "items": [
-            "AWS Lambda",
-            "S3",
-            "API Gateway"
+            "AWS"
           ],
           "description": ""
         },
         {
-          "title": "中间件与平台",
-          "items": [
-            "Apigee",
-            "WebSphere"
-          ],
-          "description": ""
-        },
-        {
-          "title": "测试工具",
-          "items": [
-            "Postman",
-            "JMeter"
-          ],
-          "description": ""
-        },
-        {
-          "title": "开发与运维工具",
+          "title": "其他",
           "items": [
             "Git",
             "Bitbucket",
             "majorFlow",
-            "Jasper",
             "Artifactory",
             "Tableau",
-            "TWS"
+            "TWS",
+            "Postman",
+            "Apigee",
+            "JMeter",
+            "Jasper",
+            "WebSphere"
           ],
           "description": ""
         }
@@ -377,39 +337,34 @@
         "C#",
         "VBScript",
         "DB2",
-        "AWS Lambda",
-        "S3",
-        "API Gateway",
-        "Apigee",
-        "WebSphere",
-        "Postman",
-        "JMeter",
+        "AWS",
         "Git",
         "Bitbucket",
         "majorFlow",
-        "Jasper",
         "Artifactory",
         "Tableau",
-        "TWS"
+        "TWS",
+        "Postman",
+        "Apigee",
+        "JMeter",
+        "Jasper",
+        "WebSphere"
       ]
     },
     {
       "kind": "work",
-      "title": "通信业务系统开发与基础平台升级",
-      "period": "2019.05 — 2023.05",
+      "title": "通信系统开发、平台升级与团队推进",
+      "period": "2018.06 — 2023.05",
       "role": "PG / SE / 副组长",
-      "team": "1–15 人",
-      "description": "长期参与通信 Web、批处理、API 和多个系统的迁移、重建，覆盖需求、开发、平台配置、测试、客户协调和生产发布。",
-      "outcome": "独立交付主要 API 和小型 Web 的商业运行版本，从应用和基础设施两侧支持新平台切换；团队将公共 API 访问方案推广至 30 多个服务。",
+      "team": "负责团队 1–15 人",
+      "description": "2018 年大学毕业后长期参与同一通信客户的项目，涵盖小型网站及主要 API 从零独立开发、大规模系统迁移、基础平台升级，以及资料不足甚至无法取得源码时的紧急调查。担任 PG、SE 和副组长，从编码实现到客户协调、团队管理均有实际经验。",
+      "outcome": "独立完成主要 API 与小型网站从零搭建、需求到生产发布的全过程；从应用改造与平台配置、验证两方面支持系统切换，团队将公共 API 访问方式推广至 30 多项服务。作为副组长参与涉及数十个关联项目的大型迁移，负责团队进度、问题管理、技术支援与客户协调，推动开发及迁移工作。",
       "responsibilities": [
-        "独立完成主要 API 和小型 Web 系统从需求定义、设计、实现、测试到生产发布的全过程。",
-        "开发设备信息注册、查询、更新、删除，以及信息抽取、分析、CSV 输出和批量更新。",
-        "独立设计日志输出、数据汇总、CSV 解析转换等公共库与业务辅助工具。",
-        "通过 Shell 和调度器实现定期分析及自动输出，调查 VB6 等旧逻辑并反映到改造中。",
-        "改造应用以支持 Tomcat → WildFly，调整 WildFly、Nginx、Tomcat 配置并验证关联设备连通。",
-        "准备 Linux / Windows 环境，检查日志，配置和验证 Jenkins，进行切换时的动作确认。",
-        "为满足安全要求，将数据库直连改为通过公共 API 访问。",
-        "进行单元、集成、性能测试和调优；作为副组长管理进度和问题、安排任务、技术支援、成果评审及客户协调。"
+        "从零独立开发网站与 API（PG／SE）：独立负责部分主要 API 和小型 Web 系统的需求、设计、实现、测试及生产发布。开发 Web、批处理业务功能、信息查询、数据抽取与 CSV 输出、公共库和辅助工具；对应客户规格确认、追加需求、单元／集成／性能测试、故障修正、性能优化及发布资源准备和切换验证。",
+        "多系统迁移与基础平台升级（SE）：调查多台服务器上运行系统的迁移影响，梳理对应事项并改造既有功能。负责 Tomcat → WildFly 迁移的应用改造，WildFly、Nginx、Tomcat 配置和动作确认，以及关联设备、系统连通验证；配置和验证 Jenkins，推动数据库直连改为公共 API 访问。",
+        "资料不足及无源码情况下的紧急应对：面对文档不完整或无法取得源码的情况，对照日志、配置与实际运行行为等可用信息调查既有逻辑及影响。整理技术疑点和处理方针，与客户及相关方确认，支持故障处理和改造。",
+        "团队管理与大型项目推进（副组长）：参与涉及数十个关联项目的大规模系统迁移，掌握负责团队（按项目为 1–15 人）的进度、问题和处理状态，协调优先级与日程。负责作业安排、技术支援、成果评审及客户、关联团队协调，推动问题解决和发布准备。",
+        "早期开发与数据库迁移：自 2018 年参与起，负责 Oracle → Hadoop 迁移相关 Shell 定期任务的影响调查、改造、测试和成果联携；开发信息查询及向上游系统发送数据的功能，参与详细设计与单元测试，逐步从开发扩展至设计、平台对应和团队推进。"
       ],
       "environment": [
         {
@@ -421,9 +376,7 @@
             "CSS",
             "JavaScript",
             "jQuery",
-            "Shell",
-            "Perl",
-            "VB6 （旧代码分析）"
+            "Shell"
           ],
           "description": ""
         },
@@ -431,7 +384,7 @@
           "title": "数据库",
           "items": [
             "Oracle",
-            "SQL Server"
+            "Hadoop"
           ],
           "description": ""
         },
@@ -455,12 +408,9 @@
         {
           "title": "开发与运维工具",
           "items": [
-            "Git",
             "SVN",
             "LoadStar",
-            "Jenkins",
-            "Linux",
-            "Windows"
+            "Jenkins"
           ],
           "description": ""
         }
@@ -473,137 +423,16 @@
         "JavaScript",
         "jQuery",
         "Shell",
-        "Perl",
-        "VB6 （旧代码分析）",
         "Oracle",
-        "SQL Server",
+        "Hadoop",
         "Tomcat",
         "WildFly",
         "Nginx",
         "JMeter",
         "SoapUI",
-        "Git",
         "SVN",
         "LoadStar",
-        "Jenkins",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "通信服务信息查询功能开发",
-      "period": "2018.12 — 2019.04",
-      "role": "PG",
-      "team": "7 人以上",
-      "description": "开发和测试通信业务系统中客户信息的取得与查询功能。",
-      "outcome": "完成负责功能的开发和测试，支持信息查询功能稳定运行。",
-      "responsibilities": [
-        "按既有规格开发查询，以及信息抽取、CSV 整理和输出处理。",
-        "实现向上游系统发送数据的功能。",
-        "参与详细设计、补充测试用例、执行单元测试和动作确认。",
-        "调查修正缺陷，完成担当功能的开发与测试。"
-      ],
-      "environment": [
-        {
-          "title": "语言与框架",
-          "items": [
-            "Java",
-            "Spring",
-            "HTML5",
-            "CSS",
-            "JavaScript",
-            "jQuery"
-          ],
-          "description": ""
-        },
-        {
-          "title": "数据库",
-          "items": [
-            "Oracle"
-          ],
-          "description": ""
-        },
-        {
-          "title": "中间件与平台",
-          "items": [
-            "Tomcat"
-          ],
-          "description": ""
-        },
-        {
-          "title": "开发与运维工具",
-          "items": [
-            "SVN",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Java",
-        "Spring",
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "jQuery",
-        "Oracle",
-        "Tomcat",
-        "SVN",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "Oracle → Hadoop 迁移配套任务改造",
-      "period": "2018.06 — 2018.12",
-      "role": "PG",
-      "team": "30 人以上",
-      "description": "通信系统数据库迁移涉及数百功能，负责其中定期任务处理的改造、测试及成果联携。",
-      "outcome": "完成担当功能的迁移对应，为整体数据库迁移工作作出贡献。",
-      "responsibilities": [
-        "调查 Oracle → Hadoop 迁移对既有任务处理的影响。",
-        "改造定期执行的 Shell 任务，管理源代码及成果。",
-        "补充和执行单元测试，核对测试结果。",
-        "处理迁移相关问题并联携负责范围的成果。"
-      ],
-      "environment": [
-        {
-          "title": "语言与框架",
-          "items": [
-            "Shell"
-          ],
-          "description": ""
-        },
-        {
-          "title": "数据库",
-          "items": [
-            "Oracle",
-            "Hadoop"
-          ],
-          "description": ""
-        },
-        {
-          "title": "开发与运维工具",
-          "items": [
-            "SVN",
-            "LoadStar",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Shell",
-        "Oracle",
-        "Hadoop",
-        "SVN",
-        "LoadStar",
-        "Linux",
-        "Windows"
+        "Jenkins"
       ]
     }
   ],
@@ -616,7 +445,7 @@
     {
       "period": "2025.07 — 2026.07",
       "title": "呼叫中心业务系统开发与运维推进",
-      "description": "支持季度大型发布、日常运维、业务效率改善与后续技术验证，涵盖需求协调、技术调查、Java 实现支援、AWS 环境确认和 PoC。"
+      "description": "负责季度大型发布的需求、规格及范围协调，通过技术调查、Java 开发支持、日常运维改善、AWS 环境确认与发布支持、技术验证及 PoC，推动客户与开发团队协作。"
     },
     {
       "period": "2025.01 — 2025.06",
@@ -629,19 +458,9 @@
       "description": "参与保险业务和内部管理多个系统的开发、改造及 AWS 迁移，涵盖设计、实现、测试与生产发布。"
     },
     {
-      "period": "2019.05 — 2023.05",
-      "title": "通信业务系统开发与基础平台升级",
-      "description": "长期参与通信 Web、批处理、API 和多个系统的迁移、重建，覆盖需求、开发、平台配置、测试、客户协调和生产发布。"
-    },
-    {
-      "period": "2018.12 — 2019.04",
-      "title": "通信服务信息查询功能开发",
-      "description": "开发和测试通信业务系统中客户信息的取得与查询功能。"
-    },
-    {
-      "period": "2018.06 — 2018.12",
-      "title": "Oracle → Hadoop 迁移配套任务改造",
-      "description": "通信系统数据库迁移涉及数百功能，负责其中定期任务处理的改造、测试及成果联携。"
+      "period": "2018.06 — 2023.05",
+      "title": "通信系统开发、平台升级与团队推进",
+      "description": "2018 年大学毕业后长期参与同一通信客户的项目，涵盖小型网站及主要 API 从零独立开发、大规模系统迁移、基础平台升级，以及资料不足甚至无法取得源码时的紧急调查。担任 PG、SE 和副组长，从编码实现到客户协调、团队管理均有实际经验。"
     },
     {
       "period": "2014.09 — 2018.06",
