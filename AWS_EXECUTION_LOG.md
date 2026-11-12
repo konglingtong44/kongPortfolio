@@ -865,3 +865,22 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 ### 10.3 文档与本地提交
 
 用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/green-approval.md，标明 Green 验证已通过、整体仍等待第二道人工审批。运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，暂存上述三份文档并 `git commit -m 'docs: record verified production Green and second approval gate'`，最后 `git status --short`。文档提交留本地，避免为等待审批触发额外构建；本次没有推送/合并、没有修改已批准制品。后续 CodeDeploy 和前端推广仍单独增量。
+
+## 11. 第二道审批确认与 S3-06 收尾（2026-11-12）
+
+用户回复 ok 后仍先检查 AWS 实际状态，没有代替手动审批。读取 AGENTS.md、根日志尾部、PROJECT_PLAN.md、docs/green-approval.md、docs/serverless-plan.md、green.tf 和已审本地 report.json；`rg --files infra/terraform/cicd scripts codebuild` 只读查看现有路径；`git status --short` 原本干净，`git log -2 --oneline` 确认前次两份文档提交。
+
+```powershell
+$env:AWS_PROFILE='kong-dev'
+$aws='D:\software\AWSCLI\aws.exe'
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=c02bc4e6-079b-4a53-835b-84c6877bb2d6 --region ap-northeast-1 --query 'actionExecutionDetails[].{stage:stageName,status:status,external:output.executionResult.externalExecutionId}' --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id c02bc4e6-079b-4a53-835b-84c6877bb2d6 --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+结果：第二道 ApproveTrafficShift **Succeeded**，人工审阅 ID b9f9288a-dbc4-4019-85ea-9cb95c304d20；整个 execution **Succeeded**、pipeline version3。生产 live 仍版本2/无权重，health UP。复读本地 GreenReport 确认同一 release 07ad6c1f…、Blue2/Green3/liveTrafficUnchanged=true。没有 publish、UpdateAlias、创建部署或审批 API 调用。
+
+本 Story 完成，下一 Story 的实现验收范围写入新文档 `docs/codedeploy-next-story.md`，不把方案描述称为实现。浏览器工具只读搜索并打开 AWS 官方 CodeDeploy deployment-configurations、deployment-groups-configure-advanced-options、reference-appspec-file-example 页面，并阅读搜索返回的 hooks 文档摘要：核对拟用 LambdaCanary10Percent5Minutes、AppSpec、告警/回滚及 Hooks。URL 均列在新文档内，无外部写入。方案注明低流量需主动验证、HTTP5xx 与 LambdaErrors 的区别，以及首次 CodeDeploy 回滚恢复路径仍需验证。
+
+用 apply_patch 更新 PROJECT_PLAN.md 和 docs/green-approval.md 的当前状态、追加本日志，并新建下一 Story 短方案。只做文档，不运行应用测试、不创建资源、不执行 Terraform apply、不启动新流水线、不修改旧候选或复用旧审批。收尾执行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，暂存这四份文档后 `git commit -m 'docs: close Green validation and scope CodeDeploy increment'`、`git status --short`，本地保留，未推送触发额外 CI。

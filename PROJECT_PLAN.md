@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-06 — Completed after human approval 2 (2026-11-12)
+
+AWS confirms ApproveTrafficShift Succeeded (review b9f9288a-dbc4-4019-85ea-9cb95c304d20); execution c02bc4e6 / pipeline v3 Succeeded. Both approvals were performed by the user. Live remains Blue v2/no weights, verified Green v3 retained, public health UP. This completes the Green/two-gate validation Story, with no traffic deployment stage. Next Story scope in docs/codedeploy-next-story.md; CodeDeploy/real cutover/rollback are not implemented, and old approvals must not authorize a new candidate or amended pipeline execution. Audit root log section 11.
+
 ## S3-06 — Production Green verified (2026-11-12, waiting human gate 2)
 
 User completed approval 1 in AWS for c02bc4e6 / source 776e24f. Green build f3a7e052 succeeded, production published version 3 passed seven direct-invoke contracts; downloaded versioned GreenReport and matched outer SHA, same-run approval/STG/release/code identity, actual immutable Lambda SHA and approval exports. Live remains Blue v2 with unchanged RevisionId/no weights; public health UP; production Terraform plan No changes after Green publication. ApproveTrafficShift/ApproveBlueGreenDeployment InProgress; no agent approval, no traffic stage exists yet. Direct Green invocation is not API Gateway/CloudFront E2E. CodeDeploy traffic shifting/rollback, frontend promotion and bounded Bedrock remain later Stories. Full operation audit root log section 10.

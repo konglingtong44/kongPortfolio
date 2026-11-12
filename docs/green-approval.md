@@ -1,5 +1,7 @@
 # S3-06：生产 Green 验证（基础设施已创建）
 
+**当前结论：已完成。** 用户已在 AWS 完成两道人工审批，执行 c02bc4e6-079b-4a53-835b-84c6877bb2d6 Succeeded；线上仍 Blue2、Green3 未切流、公开 health UP。下文是阶段历史记录。真实切流/回滚见待实现的 [下一 Story](codedeploy-next-story.md)。
+
 验收：同一次流水线完成 STG、人工审批 1 后，发布同一候选 ZIP 为生产函数的独立版本；直接调用验证七项 API 合约，核对 `live` 版本、修订号和权重未变，生成 GreenReport，停在人工审批 2。
 
 流程：Source → BuildCandidate → VerifyStaging → ApproveProduction → VerifyGreen → ApproveTrafficShift。当前 Story 没有流量切换阶段；CodeDeploy、自动回滚、前端正式推广属于后续增量。Green 通过版本号直接调用，没有独立浏览器入口，因此不代表 API Gateway/CloudFront 端到端验证。
