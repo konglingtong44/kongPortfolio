@@ -1799,3 +1799,549 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 ### 26.3 文档整理与本地版本记录
 
 用PowerShell Set-Content将docs/frontend-publication.md整理为简短的当前验收状态/机制/边界，ReadAllText/WriteAllText在PROJECT_PLAN.md顶部加入已完成增量；本日志通过Add-Content追加，保留所有历史。此前重复“待审批”的长历史归并到本日志，没有删除部署代码。将执行git diff --check、暂存路径校验、Gitleaks工作区扫描和提交钩子的staged扫描，仅本地提交 `docs: verify successful full-stack AWS publication`，不push，不为文档触发CI。后续若检查失败会另行补记。前端LIVE发布后的真实回退、报警故障触发路径和实际Bedrock模型仍未验收，留待下一个小Story。
+
+
+## 27. 从GitHub代码到AWS完整发布：人工作业复盘（2026-11-12补记）
+
+本章按用户要求，把先前分散在其他文档/脚本中的早期操作补回根日志，并把后期自动化展开成人可以理解的作业步骤。**这是历史复盘和复习手册，本轮没有重新部署。** 截至第26节的线上状态是后端8、前端242f8cb4…，两道人审和八阶段完整成功。
+
+记录等级：
+- **[实录]**：前述日志、专门执行记录、Git历史或用户截图能确认发生过；引用相应文件/节。
+- **[脚本展开]**：仓库脚本内真正执行的命令/逻辑，不代表当时有人逐条手敲。AWS里的CodeBuild也会执行CLI。
+- **[复习步骤]**：为了你亲手操作而整理的入口/等价命令；不冒充历史逐键记录。控制台文案可能随语言/界面变化。
+- **[缺口]**：找不到可靠记录；保留未知，不编造时间、参数或鼠标路径。
+
+代码块中的<...>均是待填值；下面的创建/启动/审批部分属于已完成历史流程，不是一份从现在开始整段粘贴的脚本。当前仓库已交接代码所有权，旧计划/首次创建流程不适合直接重放。
+
+### 27.0 完整时间线和工具分工
+
+从本地初版代码上传GitHub之后，实际顺序是：
+
+| 阶段 | 做了什么 | 主要执行工具 | 人需要做什么 | 证据 |
+|---|---|---|---|---|
+| 起点 | 已有React/Spring Boot本地项目与GitHub仓库，初步Terraform账号测试成功 | Git、AWS CLI/SSO、Terraform测试目录 | 已完成本地开发/账号登录 | 用户贴出的terraform-test输出；Git 01ac1b0、b2a82d9 |
+| 1 | 建安全远程State、迁移并验证锁 | Terraform + AWS只读CLI | 审核State费用并批准 | infra/terraform/EXECUTION.md |
+| 2 | 检查现有预算、DNS、证书、AWS资源 | PowerShell包装AWS CLI | 核对账号/预算 | docs/aws-preflight.md |
+| 3 | 把Spring Boot适配成Lambda ZIP，保留本地HTTP运行 | Maven、Node、Java、代码修改 | 阅读测试结果 | docs/lambda.md |
+| 4 | 首次建网站23项资源，上传React6文件，修health | Terraform、AWS CLI、Node HTTPS | 批准具体资源计划 | portfolio/DEPLOYMENT.md |
+| 5 | 重新注册域名、修委派、接ACM和CloudFront | 注册/NS用CLI；网站DNS/证书用Terraform | 提供并确认真实联系人/付费注册 | docs/custom-domain.md |
+| 6 | AWS与GitHub建立CodeConnection | Terraform创建；浏览器授权；CLI检查 | 在GitHub选择仓库并授权 | cicd/README.md，用户截图 |
+| 7 | 云端前后端CI，随后开自动触发/状态回写 | Terraform、Git push、CodeBuild | 更新GitHub App请求的权限 | 根日志2–3节 |
+| 8 | 建CodePipeline，打包同一干净源码候选 | Terraform + CodeBuild/Node | 批准资源计划；指定源码启动 | 根日志4–5节 |
+| 9 | 自动部署独立STG并测试，加入第一道人审 | Terraform + Lambda CLI | 审STG报告并手动批准 | 根日志6–7节 |
+| 10 | 发布生产Green数字版本并直接测试，加入第二道人审 | Terraform + Lambda CLI | 审Green/Blue/模式并批准 | 根日志8–11节 |
+| 11 | CodeDeploy真实10%/五分钟后全量，告警/自动回滚配置 | Terraform + CodeDeploy CLI | 对新执行重新完成两道人审 | 根日志12–17节 |
+| 12 | 在10%时受控停止，验证AWS自动回滚 | CodeBuild调用CodeDeploy CLI | 审批rollback_drill模式 | 根日志18–20节 |
+| 13 | React版本化自动上传与CloudFront路由发布 | Terraform建阶段/IAM；流水线CLI发布 | 两道人审仍保留 | 根日志21–26节 |
+
+Terraform是“声明AWS资源及配置”的工具；它通过AWS Provider调用AWS API。AWS CLI也是AWS API客户端。PowerShell/Node脚本把检查与CLI调用串起来。CodeBuild提供临时构建环境；CodePipeline决定执行顺序/传递制品/等待审批；CodeDeploy实际控制Lambda别名权重。浏览器主要用于SSO、GitHub授权、人工审批以及观察结果。
+
+这期间写了很多代码与配置文件：并非只在控制台点出全部环境，也并非所有写操作都由Terraform完成。首次Lambda ZIP由Terraform上传；首次React文件由本地AWS CLI上传；后来的后端代码、权重、前端文件/路由由AWS流水线里的CLI管理。
+
+### 27.1 起点：Terraform已经能读AWS，但还没有网站
+
+[实录，用户提供] 最初在 `D:\software\terraform-test` 执行 `terraform init`、`terraform plan`，Provider安装成功，`data.aws_caller_identity.current` 读到账号561798268037。计划只有aws_account_id输出，无真实资源变化。这个测试目录后来没有被项目bootstrap替换或修改。
+
+[缺口] 最早工具安装包如何下载/安装、`aws configure sso`逐字段输入、IAM Identity Center用户/permission set建立的鼠标点击，没有完整原始记录。用户上下文确认了Windows、kong-dev、东京、AdministratorAccess与STS临时凭证链路；不能据此声称那些设置全部由本代理创建。若想补成逐点击教程，需要用户提供当时记录或明确要另写一份“重新配置参考”，与已执行历史区分。
+
+[复习步骤] 项目中使用PowerShell，从仓库根开始：
+
+```powershell
+Set-Location D:\study\kongPortfolio
+$aws = 'D:\software\AWSCLI\aws.exe'
+$tf = 'D:\software\Terraform\terraform.exe'
+$env:AWS_PROFILE = 'kong-dev'
+. ./scripts/tools.ps1
+& $aws --version
+& $tf version
+& $aws sso login --profile kong-dev
+& $aws sts get-caller-identity --query '{Account:Account}' --output json
+```
+
+登录会打开浏览器，由你完成AWS SSO认证；CLI缓存的是临时登录信息。历史也实际用过 `sso login --use-device-code --no-browser`，由你在浏览器完成设备认证。控制台已登录不等于本机CLI已登录。预期STS账号561798268037；第26节就是CLI登录过期后恢复，再继续查流水线。
+
+[缺口] 本项目未保存完整终端录屏，所以不能精确还原每次重复的版本查询、文件读取或认证页面点击。认证码、缓存内容和联系人资料不补入公开日志。
+
+### 27.2 先做State：让Terraform记住自己创建的资源
+
+[实录] 2026-11-11，目录 `infra/terraform/bootstrap`。编写main.tf、变量模板、安全忽略规则、依赖锁文件；本机填写被忽略的terraform.tfvars/backend.hcl。账号限制allowed_account_ids避免误入别的AWS账号。
+
+三个root各自有State，最后都存进同一个私有bucket：
+- bootstrap：`bootstrap/terraform.tfstate`，只管State bucket自身。
+- portfolio：`portfolio/prod/terraform.tfstate`，管网站。
+- cicd：`cicd/terraform.tfstate`，管连接、构建、流水线等。
+
+[复习步骤] 文件作用：
+- `main.tf`等.tf：公开的资源声明。
+- `terraform.tfvars`：本机账号、启用开关、候选目录等输入，不能提交。
+- `backend.hcl`：State bucket/key/region/锁配置，不能提交。
+- `.terraform.lock.hcl`：Provider版本/校验信息，要提交。
+- `.terraform/`、state、plan：不提交。
+
+bootstrap的本地输入包含expected_account_id、region、state_bucket_name；backend包含bucket、key、region、encrypt=true、use_lockfile=true、allowed_account_ids。第一次创建bucket时不能先依赖这个尚不存在的bucket，先用本地State。
+
+[实录，下面命令的cwd为bootstrap]：
+
+```powershell
+Set-Location D:\study\kongPortfolio\infra\terraform\bootstrap
+& $tf init -input=false -lockfile=readonly
+& $tf fmt -check
+& $tf validate -no-color
+& $tf plan -input=false -no-color '-out=bootstrap.tfplan'
+& $tf show -no-color bootstrap.tfplan
+# 审核并经当时用户批准后：
+& $tf apply -input=false -no-color bootstrap.tfplan
+$stateBucket = & $tf output -raw state_bucket_name
+```
+
+6个Terraform resource是“一个bucket + 五项配置”，不是6个S3桶：
+1. bucket：kongportfolio-tfstate-561798268037-ap-northeast-1。
+2. 四项Public access block均true。
+3. ownership=BucketOwnerEnforced，禁用ACL。
+4. Versioning=Enabled。
+5. SSE-S3/AES256加密。
+6. bucket policy拒绝HTTP非TLS请求。
+
+[实录] 使用 `s3api get-bucket-location/get-public-access-block/get-bucket-versioning/get-bucket-encryption/get-bucket-ownership-controls/get-bucket-policy` 分别核对上面结果。没建DynamoDB锁表或客户管理KMS key。
+
+随后才加入backend.tf并迁移：
+
+```powershell
+'yes' | & $tf init -migrate-state '-backend-config=backend.hcl' -no-color
+& $tf plan -input=false -no-color -detailed-exitcode -lock-timeout=10s
+& $aws s3api head-object --bucket $stateBucket --key bootstrap/terraform.tfstate
+& $aws s3api list-object-versions --bucket $stateBucket --prefix bootstrap/terraform.tfstate
+```
+
+迁移后No changes。State对象12469 bytes、有版本ID/AES256。额外做真实并发锁测试：临时output触发refresh-only apply，第一终端停在确认提示持锁；第二终端plan -lock-timeout=3s按预期失败（Error acquiring the state lock/S3 412），读取.tflock确认存在；第一终端输入no取消，删除临时探针后plan恢复No changes。最早terraform console尝试没观察到锁，因此没有当成成功证据。详见infra/terraform/EXECUTION.md。
+
+[复习画面] AWS控制台→S3→上述State bucket→Objects可以看到不同State key；查看历史需显示版本。不要在控制台直接编辑State。
+
+### 27.3 部署前盘点：预算和已有资源有没有
+
+[实录] 回仓库根运行：
+
+```powershell
+Set-Location D:\study\kongPortfolio
+./scripts/aws-preflight.ps1 -ExpectedAccountId 561798268037 -Profile kong-dev -AwsExecutable D:\software\AWSCLI\aws.exe
+```
+
+[脚本展开] 它先STS校验账号，然后只读调用：
+- budgets describe-budgets、describe-notifications-for-budget、describe-subscribers-for-notification。
+- route53 list-hosted-zones。
+- acm list-certificates，分别东京/us-east-1。
+- ecs list-clusters、ecr describe-repositories。
+- cloudfront list-distributions、elbv2 describe-load-balancers。
+
+报告 `.local/aws-preflight.json`，不输出订阅邮箱。找到现成USD10/月Monthly Budget和USD1/月Zero-Spend Budget，所以没有重复创建预算，也没有用Terraform接管旧预算。该时点东京相关ECS/ECR/ELB为空、无CloudFront分发、两个所查区域无证书；不是“整个账号全区域绝对无资源”的证明。
+
+[复习画面] AWS搜索Budgets→打开已有预算，查看Budget amount、通知规则和收件设置。预算提醒不是消费封顶；没有验证实际邮件送达。细节docs/aws-preflight.md。
+
+### 27.4 本地改代码：Spring Boot为什么不能直接原样上传Lambda
+
+[实录] 保留本地HTTP模式，新增Lambda handler和Maven lambda profile。使用Spring Boot4适配库3.0.5，将HTTP API payload2.0事件交给共用Spring应用；Lambda不监听Tomcat公网端口。Java21，静态Spring context支持warm请求。没有改成ECS/Docker部署。
+
+```powershell
+. ./scripts/tools.ps1
+mvn -B -ntp -f backend/pom.xml clean verify
+mvn -B -ntp -f backend/pom.xml -Plambda clean verify
+node scripts/test-lambda-package.mjs
+```
+
+第一个构建验证本地HTTP/JAR（9tests）；第二个验证Lambda（3tests），生成 `backend/target/kongPortfolio-lambda.zip`，内部lib/*.jar；第三个只从ZIP依赖独立加载handler冒烟，防止“测试classpath有包但发布包缺包”。前端40tests与构建也通过。两种Maven模式共用target，切换时clean；Lambda普通JAR不能直接当本地可执行java -jar使用。
+
+handler为 `dev.kongortfolio.lambda.PortfolioLambdaHandler::handleRequest`。拼写沿用实际包名，不能凭感觉改成另一个包。云端配置DEBUG=false；Lambda模式不写只读工作目录文件。此阶段不调用Bedrock，无AWS资源写入，未重建Docker镜像。详见docs/lambda.md。
+
+### 27.5 首次部署前：把要上传的东西冻结成候选
+
+[实录] 运行本地包装：
+
+```powershell
+./scripts/prepare-first-release.ps1
+```
+
+[脚本展开] 依次运行Maven Lambda clean verify、ZIP smoke、Node prepare-first-release.mjs。Node读取当前Git提交及源码内容哈希，做TypeScript/40tests/12路由检查，Vite使用 `--base=/releases/<releaseId>/` 构建，写version.json，复制backend.zip，生成manifest.json。
+
+产物在 `.local/releases/<releaseId>/`：
+- backend.zip：后端Lambda包。
+- frontend/：index.html、JS、CSS、图片、favicon、version。
+- manifest.json：源码来源、sourceDirty、前后端文件SHA/MIME/cache等。
+
+首次releaseId=a594e36cf226d6b56df8c86631e71ad1822a90df17b91f6493f70f82175d107d，base commit b2a82d9，**sourceDirty=true**。原因是当时AWS适配改动尚未提交Git，只有人工冻结的本地快照；不能说当时已完成“从干净GitHub提交自动发版”。后面才改成AWS固定干净提交构建。
+
+### 27.6 首次Terraform部署：到底给AWS配了哪些环境
+
+[实录] 在portfolio root初始化远程backend，填写expected_account_id和冻结候选release_directory。从仓库根运行：
+
+```powershell
+& $tf '-chdir=infra/terraform/portfolio' init '-backend-config=backend.hcl' -lockfile=readonly
+& $tf '-chdir=infra/terraform/portfolio' fmt -check
+& $tf '-chdir=infra/terraform/portfolio' validate
+& $tf '-chdir=infra/terraform/portfolio' plan -input=false '-out=first.tfplan'
+& $tf '-chdir=infra/terraform/portfolio' show -json first.tfplan |
+  Set-Content -Encoding utf8 .local/first.tfplan.json
+node scripts/review-first-plan.mjs .local/first.tfplan.json
+```
+
+当时计划23新增/0修改/0删除。用户看到费用/计划批准后，执行：
+
+```powershell
+./scripts/apply-first-release.ps1 -TerraformExecutable D:\software\Terraform\terraform.exe -AwsExecutable D:\software\AWSCLI\aws.exe
+```
+
+[脚本展开] apply-first-release先检查STS账号、保存计划只含批准的23create、manifest和ZIP/前端文件哈希未变化；然后真正执行 `terraform -chdir=<portfolio绝对路径> apply -input=false -no-color first.tfplan`。Terraform Provider调用AWS API建资源，首次Lambda ZIP也在这一步上传并发布数字版本。
+
+| 分类 | Terraform resource数量 | 实际配置/作用 |
+|---|---:|---|
+| S3 | 6 | 私有site bucket及公开阻止/ownership/versioning/AES256/policy；只允许指定CloudFront读releases |
+| CloudFront | 4 | distribution、OAC、SPA function、静态cache policy；S3和API两个源站 |
+| Lambda | 4 | prod函数、live别名、2条限定API调用权限 |
+| IAM | 2 | Lambda执行角色、只写自身日志流policy |
+| HTTP API | 5 | HTTP API、AWS_PROXY integration、ANY /api与ANY /api/{proxy+}、$default stage |
+| CloudWatch | 2 | Lambda/API日志组，各保留7天 |
+
+Lambda：java21、x86_64、1024MB、28秒、reserved concurrency5，未开预置并发。API integration payload2.0，timeout30秒；stage默认限流1请求/秒、burst5、auto_deploy=true。API访问日志只记requestId/method/route/status/responseLength，不记录正文/query/IP。
+
+CloudFront：默认走私有S3，OAC签名；/api和/api/*走API Gateway，使用CachingDisabled和AllViewerExceptHostHeader，避免缓存动态API及错误Host头。HTTP跳HTTPS。SPA function把无扩展名前端路由映射当前release/index.html，但不把API404/丢失JS/图片错误吞成首页。/releases/*是不可变资产路径。
+
+这一轮没有VPC/NAT/EC2/ECS/ALB/RDS/ECR，也没建真实模型调用环境。生产Lambda角色此时只有日志权，不包含Bedrock权限。
+
+[复习画面] 在东京区域搜索：
+- Lambda→Functions→kongportfolio-prod→Configuration查看Runtime/Memory/Timeout/Environment；Versions/Aliases看数字版本与live。
+- API Gateway→HTTP API kongportfolio-prod→Routes、Integrations、Stages；API ID7fiaa91yq2。
+- S3→kongportfolio-site-561798268037-ap-northeast-1→Permissions/Properties。
+- CloudFront（全局）→Distributions→E2NYEXSOAQ1TWE→Origins/Behaviors/Functions关联。
+- CloudWatch→Log groups→/aws/lambda/kongportfolio-prod及API日志组。
+以上是观察Terraform结果的入口，不是要求你手工再创建同名资源。
+
+### 27.7 首次React上传、线上故障与修复
+
+[实录] Terraform建完空网站资源还不够，需要把同一候选的公开文件上传：
+
+```powershell
+./scripts/publish-first-release.ps1 -ExpectedAccountId 561798268037 -ReleaseDirectory 'D:\study\kongPortfolio\.local\releases\a594e36cf226d6b56df8c86631e71ad1822a90df17b91f6493f70f82175d107d' -AwsExecutable D:\software\AWSCLI\aws.exe
+node scripts/smoke-first-deployment.mjs https://d4htln25bw5g5.cloudfront.net a594e36cf226d6b56df8c86631e71ad1822a90df17b91f6493f70f82175d107d
+```
+
+[脚本展开] 每个manifest文件先校验本地SHA，再s3api head-object检查是否已有；新文件用 `s3api put-object --if-none-match '*' --server-side-encryption AES256 --checksum-algorithm SHA256 --checksum-sha256 <Base64摘要> --content-type <MIME> --cache-control <策略>`。key为releases/<id>/<文件>。六个文件上传成功，再跑一次只核验/跳过，没覆盖或删除旧发布。不能把这步说成Terraform自动上传了React。
+
+[实录] 首次/api/health=503/DOWN，查CloudWatch日志发现DiskSpaceHealthIndicator检查只读/var/task/.，可用空间0。修改api.tf环境变量 `MANAGEMENT_HEALTH_DISKSPACE_PATH=/tmp`，保留真实健康检查；重新生成health-fix.tfplan，核对仅函数/live alias两项update，apply后live=2。没有改ZIP/前端候选或扩大IAM。另移除OAC多余空s3_origin_config，消除永久计划差异。
+
+再次HTTPS冒烟通过首页/JS/CSS/favicon/version、三语profile、healthUP、POST bedrock PREPARING、API真实404、SPA深链接、缺失资源错误、S3匿名读取403。最后portfolio plan No changes。首次CloudFront创建约2分37秒；一次初始化约4.1秒/最大内存204MB只是一条观测，不代表长期性能。
+
+[缺口] 当时尝试Computer Use做视觉验收，被URL识别限制停止，没有继续UI输入。所以没有完成浏览器交互/移动端视觉验收；HTTP测试不能代替。
+
+### 27.8 域名：注册、托管区和证书是三件事
+
+[实录] 用户截图显示已有konglingtong44.com托管区及testec2记录；但检查公共DNS NXDOMAIN、AWS注册列表空、注册局无记录、CheckDomainAvailability=AVAILABLE。旧操作显示2024年到期。**有hosted zone不代表仍持有域名。**
+
+用户明确选择继续该名称、同意一年最高USD16税另计，并提供真实资料。注册本身使用AWS CLI，不是Terraform。完整请求含私人联系人，保存在ignored .local，不放入教程。
+
+[复习命令，按实际使用的API重建；不是保留的完整逐字终端]：
+
+```powershell
+& $aws route53domains list-domains --region us-east-1
+& $aws route53domains check-domain-availability --domain-name konglingtong44.com --region us-east-1
+& $aws route53domains list-prices --tld com --region us-east-1
+# 当时付费注册：真实且已核对的请求保存在本机文件中，含联系人/价格同意/隐私设置。
+& $aws route53domains register-domain --region us-east-1 --cli-input-json file://.local/domain-registration-request.json
+# OperationId来自刚才响应，不猜测或重复提交：
+& $aws route53domains get-operation-detail --operation-id '<OperationId>' --region us-east-1
+& $aws route53domains get-contact-reachability-status --domain-name konglingtong44.com --region us-east-1
+```
+
+真实结果SUCCESSFUL，autoRenew=false，四类联系人隐私保护开启，联系人可达状态DONE；2026-11-11注册完成、东京时间2027-11-11到期。一次地址地区代码格式被拒绝，先确认没有创建新注册操作，再修ISO subdivision格式后提交成功，未重复购买。上面注册命令只是历史，不是建议现在再次购买。
+
+注册API自动建了一个空hosted zone。我们用route53 get-hosted-zone/list-resource-record-sets核对原区，使用route53domains update-domain-nameservers把注册商NS指回原区Z05184721X76TVPH1GCMX；Google/Cloudflare公共DNS验证匹配。确认新空区只有NS/SOA、没有用户记录、确实为本次注册新建后，执行route53 delete-hosted-zone删该重复区，原区/NS/SOA/testec2均保留。此处不写可盲复制的删除命令；具体删除对象ID与返回记录在.local/domain-empty-zone-deletion.json。
+
+接入证书/网站才使用Terraform：
+
+```powershell
+./scripts/enable-custom-domain.ps1 -DomainName konglingtong44.com -HostedZoneId Z05184721X76TVPH1GCMX -ExpectedAccountId 561798268037 -AwsExecutable D:\software\AWSCLI\aws.exe -TerraformExecutable D:\software\Terraform\terraform.exe
+# 上一条只生成/审核计划；当时授权后加-Apply：
+./scripts/enable-custom-domain.ps1 -DomainName konglingtong44.com -HostedZoneId Z05184721X76TVPH1GCMX -ExpectedAccountId 561798268037 -AwsExecutable D:\software\AWSCLI\aws.exe -TerraformExecutable D:\software\Terraform\terraform.exe -Apply
+```
+
+[脚本展开] 先核STS/区归属/公开NS匹配，不匹配即停止；写ignored custom-domain.auto.tfvars.json，生成custom-domain.tfplan并只接受域名范围的变更。Terraform：
+- us-east-1申请非导出ACM证书，DNS验证；
+- 原hosted zone加证书CNAME、主域名A/AAAA Alias→CloudFront；
+- 更新现有CloudFront alias/SNI/TLSv1.2_2021；
+- 不新建/接管原hosted zone，不改testec2。
+
+计划5add/2update，实际5add/1change（S3 policy重算后无变化），证书ISSUED、CF Deployed、公开DNS/TLS/网站通过，最终No changes。2026-11-12自定义域名上线；原cloudfront.net地址仍能访问。证书是us-east-1，应用资源仍东京。
+
+[复习画面] Route53→Registered domains看注册/有效期/NS；Hosted zones→原区看解析；ACM切us-east-1看证书；CloudFront看Alternate domain names和证书。历史没有通过浏览器自动点击邮箱完成验证。
+
+### 27.9 AWS连接GitHub：Terraform只能创建连接，授权由你完成
+
+[实录] 新建cicd独立root和State。当时只启用CodeConnection：
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' init '-backend-config=backend.hcl' -lockfile=readonly
+& $tf '-chdir=infra/terraform/cicd' fmt -check
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' plan -input=false '-out=connection.tfplan'
+# 当时审核恰好一个aws_codeconnections_connection create后：
+& $tf '-chdir=infra/terraform/cicd' apply -input=false connection.tfplan
+```
+
+连接kongportfolio-github，初始PENDING，ARN：
+`arn:aws:codeconnections:ap-northeast-1:561798268037:connection/ff3ddf98-05c3-41fa-8bfe-f738a90df1d6`。
+
+[实录/复习画面，依据仓库说明和用户截图]：
+1. 打开东京Connections：https://ap-northeast-1.console.aws.amazon.com/codesuite/settings/connections?region=ap-northeast-1 。
+2. 打开已有kongportfolio-github，完成待处理连接；选/安装AWS Connector for GitHub。
+3. GitHub账号konglingtong44，授权仓库选择Only select repositories→kongPortfolio；完成后回AWS点连接/完成。
+4. 不另建第二个连接，不用PAT替代。
+
+随后运行只读检查：
+
+```powershell
+./scripts/check-source-connection.ps1 -ExpectedAccountId 561798268037 -ConnectionArn arn:aws:codeconnections:ap-northeast-1:561798268037:connection/ff3ddf98-05c3-41fa-8bfe-f738a90df1d6 -Profile kong-dev -AwsExecutable D:\software\AWSCLI\aws.exe
+```
+
+[脚本展开] STS + codeconnections get-connection，检查账号/provider/name/ARN/status；PENDING会报错，AVAILABLE才通过。之后Terraform refresh-only记录外部授权状态，不重新创建AWS连接：
+
+```powershell
+# 复习等价：先审只读刷新计划，再保存外部状态；不创建云资源。
+& $tf '-chdir=infra/terraform/cicd' plan -refresh-only '-out=connection-refresh.tfplan'
+& $tf '-chdir=infra/terraform/cicd' apply connection-refresh.tfplan
+```
+
+[缺口] refresh-only确实执行过，但以上计划文件名是复习写法，现有根日志没保留当次完整参数。AVAILABLE只证明连接就绪，克隆/构建/webhook权限要后面真实运行才算证明。
+
+### 27.10 先做CI：GitHub代码能不能在AWS构建
+
+[实录] build.tf新增8项：2个CodeBuild项目、2角色、2policy、2七天日志组。本机tfvars启用enable_ci=true，plan保存ci.tfplan并经批准apply。开始backend项目遇OAuth错误，只重试缺失项目成功，没有扩大IAM。
+
+构建环境：AWS托管Linux small/standard5.0，Node24、Corretto21，15分钟超时、并发各1、0自动重试，无privileged Docker。前端项目kongportfolio-ci-frontend，后端kongportfolio-ci-backend。角色只能连接取源码/写自身日志，没有生产部署/State/Bedrock权。
+
+先把本地AWS改动发布到功能分支：
+```powershell
+git switch -c feat/aws-serverless-ci
+node .githooks/check-staged-paths.mjs
+git diff --cached --check
+gitleaks git --pre-commit --staged --redact --no-banner .
+gitleaks git --redact --no-banner .
+git commit -m 'feat: manage serverless deployment and bounded AWS CI with Terraform'
+git push -u origin feat/aws-serverless-ci
+```
+
+提交8f4f7f3；main没有合并。这是“本地AWS配置后来上传GitHub”，与最早网站初版上传、首次人工快照上线不是同一件事。
+
+[实录，模板中的SHA当时为固定完整提交]：
+```powershell
+& $aws codebuild start-build --project-name kongportfolio-ci-frontend --source-version '<完整提交SHA>' --idempotency-token '<本次唯一标识>' --region ap-northeast-1
+& $aws codebuild start-build --project-name kongportfolio-ci-backend --source-version '<完整提交SHA>' --idempotency-token '<本次唯一标识>' --region ap-northeast-1
+& $aws codebuild batch-get-builds --ids '<两个返回的构建ID>' --region ap-northeast-1
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-ci-frontend --log-stream-name '<本次stream>' --region ap-northeast-1
+```
+
+首次失败因为Windows提交的hook Git文件模式100644，Linux不能执行。修：
+```powershell
+git update-index --chmod=+x .githooks/pre-commit .githooks/pre-push
+node scripts/test-hooks.mjs
+```
+
+提交/推送00b64d9后重跑成功：前端40tests/build/package，后端9HTTP+3Lambda/ZIP smoke。CI只检查，不部署。此时GitHub状态API仍无条目，所以没有宣称回写已完成。可在AWS CodeBuild→Build projects→项目→Build history→构建→Build logs看结果；检查resolvedSourceVersion，不能拿旧绿色构建冒充本次。
+
+### 27.11 自动触发和GitHub状态：一次真实权限故障
+
+[实录] 新增webhooks.tf，启用enable_ci_webhooks=true；限制GitHub actor14041257、main/feat/feature/fix/hotfix分支及指定PR事件。先plan预期2webhook，apply两条都报OAuthProviderException：可能限流或权限，不能仅凭报错断定。
+
+只读list-source-credentials发现东京默认GitHub源凭证为空。Terraform增加aws_codebuild_source_credential引用已有CodeConnection ARN（不是PAT），再试仍失败。你在GitHub页面看到黄色“requesting an update to its permissions”。
+
+[实录，用户截图/回复] 你操作：
+1. https://github.com/settings/installations → AWS Connector for GitHub → Configure。
+2. Only select repositories包含konglingtong44/kongPortfolio。
+3. Review request→查看新增权限→接受/更新；仅保存仓库范围并不能消除待权限更新。
+4. 回来告知已接受。没有卸载App/删除AWS连接。
+
+重新生成plan只创建缺失两个webhook，apply成功，最终No changes。真实git push e383673触发两个构建，initiator=GitHub-Hookshot、源码SHA相符，AWS成功，GitHub ci/frontend与ci/backend均success。PR真实事件与分支保护required checks没单独验收/配置。
+
+[复习画面] GitHub仓库→对应Commit/Checks或状态详情→打开AWS构建；AWS CodeBuild项目→Source/Webhook查看触发过滤。**push自动触发CI，但生产候选流水线DetectChanges=false，不是push就自动上线。**
+
+### 27.12 CodePipeline候选：只构建一次，后面用同一份包
+
+[实录] Terraform增加候选流水线/独立制品bucket/IAM/CodeBuild/日志等14项，启用enable_candidate_pipeline。固定干净Git提交，Source使用CodeConnections/full clone，BuildCandidate调用：
+```bash
+bash scripts/ci.sh all
+node scripts/package-pipeline-candidate.mjs
+node scripts/verify-pipeline-candidate.mjs .local/pipeline-candidate
+```
+
+产物含backend.zip、frontend/、manifest.json、SHA256SUMS。新的schema2 releaseId由gitCommit与backendSha256派生，sourceDirty必须false，验证拒绝额外文件/越界路径/符号链接/错误摘要。后续STG、Green、前端使用同一候选，不分别任意重编译。
+
+制品桶kongportfolio-artifacts-561798268037-ap-northeast-1，私有/版本化，实际对象AWS托管KMS加密；生命周期当前30天/非当前7天/不完整上传7天。没有客户管理KMS key。State/site/artifact三个bucket职责不同。
+
+实际失败/修复：
+- S3前缀权限按完整pipeline名配置，但CodePipeline实际key前缀截成 `kongportfolio-candid/`；按真实对象/最小前缀修IAM，39a404f。
+- buildspec命令间CI环境没有按原方式保留，修到env.variables.CI，4d00463。
+- 重新固定源码启动、真实成功后下载精确对象版本并核验ZIP SHA/清单，没有忽略错误强行继续。
+
+[实录模板；每次启动会产生构建费用]：
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=<已推送的完整SHA>' --region ap-northeast-1
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id '<返回的executionId>' --region ap-northeast-1
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter 'pipelineExecutionId=<同一个executionId>' --region ap-northeast-1
+```
+
+CodePipeline→kongportfolio-candidate→Executions→指定执行，查看Source revision、各阶段、输出Artifacts。第一次候选成功时尚无STG或生产发布，后来逐步扩展为八阶段。DetectChanges=false、QUEUED，避免随便push即部署和发布并发。
+
+### 27.13 STG与第一道人审：先验包，再允许生产Green
+
+[实录] Terraform为STG增加8资源并更新pipeline/权限2项：独立kongportfolio-stg函数/执行角色/日志，加STG验证CodeBuild及自己的角色/policy/日志。本机启用enable_staging及审核过的bootstrap ZIP。STG并发1，没建单独公开STG站点/API。
+
+[脚本展开] codebuild/staging.yml执行 `node scripts/verify-staging.mjs`。先核账号/源码/候选/配置，再：
+```powershell
+# 在CodeBuild中由脚本带真实RevisionId与制品路径执行；此处仅展开，不直接本机重放：
+aws lambda get-function-configuration --function-name kongportfolio-stg
+aws lambda list-versions-by-function --function-name kongportfolio-stg
+aws lambda update-function-code --function-name kongportfolio-stg --revision-id '<当前RevisionId>' --zip-file 'fileb://<候选backend.zip>' --publish
+aws lambda wait function-updated --function-name kongportfolio-stg
+aws lambda invoke --function-name kongportfolio-stg --qualifier '<数字版本>' --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload 'file://<合成HTTP事件.json>' '<响应.json>'
+```
+
+如果已有完全匹配的不可变版本就复用，不无条件重复发版。七契约：health、ja/zh/en profile、POST Bedrock占位、404、405；检查ExecutedVersion、HTTP状态/内容/no-store。生成StagingReport，导出VERIFIED_RELEASE/VERIFIED_VERSION。最早wait function-updated-v2需要多余GetFunction权限，改用配置级function-updated，4d12091，不扩大权限。
+
+[实录/复习画面] AWS CodePipeline→当前执行→ApproveProduction→ApproveGreenCreation→Review/审阅。先看本次STG报告、release/source/mode，再选批准、可填写评论、提交。你手机截图就是此审阅窗。**第一道只授权生产Green数字版本创建/验证，尚不切live流量。**
+
+Terraform定义了这个审批action；每次“批准”是人对具体执行的操作，不应每次再terraform apply，也不是代理在聊天里看到ok便自动替你put-approval-result。
+
+### 27.14 Green与第二道人审：同一生产函数的不同版本
+
+[实录] 新增Green CodeBuild/role/policy/log4资源及pipeline/权限更新，enable_green=true。生产函数ZIP管理交给发布流水线，Terraform ignore filename/source_code_hash；配置/角色/内存/环境仍由Terraform管。live版本/权重交接用ignore_changes function_version/routing_config，避免TF把发布倒退。
+
+[脚本展开] codebuild/green.yml→`node scripts/verify-green.mjs`：验证同一次STG+第一审批成功，读取当前live/RevisionId为Blue快照；对kongportfolio-prod使用update-function-code --publish发布Green数字版本（或复用匹配版本），**没有update-alias**；对数字版本直接lambda invoke七契约；再读live确认版本/权重/RevisionId完全没变。生成GreenReport并导出GREEN_RELEASE/BLUE_VERSION/GREEN_VERSION。
+
+Blue/Green是发布角色，不是永远名叫blue和green的两台机器。数字版本递增可能跳号，因为失败重试/验证也可产生不可变版本。曾Blue2→Green5，后来Blue5→Green6演练恢复5，再正常到7，最终Blue7→Green8。不能只看版本号猜流量，必须get-alias看live/weights。
+
+[复习命令，只读]：
+```powershell
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1
+& $aws lambda list-versions-by-function --function-name kongportfolio-prod --region ap-northeast-1
+```
+
+[实录/复习画面] CodePipeline→当前execution→ApproveTrafficShift→ApproveBlueGreenDeployment→Review。核对本次mode、release、源码、Blue/Green数字版本、GreenReport。选批准/提交后才允许切真实流量。旧执行的批准不能借给新提交。两道门最初先单独接通验证，后来才接上真实CodeDeploy阶段。
+
+### 27.15 CodeDeploy蓝绿：不是ALB切两台机器
+
+[实录] Terraform启用enable_deployment，新建9项/更新2项：Lambda compute platform的CodeDeploy application kongportfolio、生产deployment group production、CodeDeploy角色/policy、live错误报警、部署CodeBuild及角色/policy/log。配置BLUE_GREEN/WITH_TRAFFIC_CONTROL、LambdaCanary10Percent5Minutes；live Errors>=1/60秒，missing不算breach；失败/报警/请求停止自动回滚开启。
+
+[脚本展开] codebuild/deployment.yml→`node scripts/deploy-production.mjs`。检查候选/STG/Green/两道人审都来自本execution、当前live仍Blue、没有并行/同execution已尝试的部署。生成Lambda AppSpec，固定FunctionName=kongportfolio-prod、Alias=live、CurrentVersion=Blue、TargetVersion=Green，传给：
+```powershell
+# 请求文件由流水线脚本生成，不能用随意拼的AppSpec绕过门禁：
+aws deploy create-deployment --cli-input-json 'file://<本次生成的请求.json>'
+aws deploy get-deployment --deployment-id '<返回的deploymentId>'
+aws lambda get-alias --function-name kongportfolio-prod --name live
+```
+
+注意AWS CLI命名空间是 `aws deploy`。部署角色能调用CodeDeploy，不能直接改alias；实际别名由CodeDeploy服务角色修改。无需ALB。
+
+首次先注册Blue→Blue AllAtOnce可信基线，后续失败才有可回滚上一成功版本。第一次基线d-0XJZB7ZDM成功后控制器因GetDeployment只返回AppSpec摘要、不含原content而停止，修c0a0a2c按精确AppSpec SHA核验，不放宽为“任何成功部署都算基线”。
+
+首次真实成功：execution98380c85…，d-K1QJSA0EM，live2→5，观测Green5权重0.1、约五分钟后live5无权重；public/TF验证通过。最终本轮execution5d55596a…是7→8，d-BIHP8K2EM，相同流程。
+
+[复习画面] CodeDeploy→Applications→kongportfolio→production→Deployments→deployment ID；看Status、流量迁移/目标、Events。Lambda→Aliases→live可以看当前主版本/附加权重；CLI更适合精确保存观测。CloudWatch→Alarms→kongportfolio-prod-live-errors观察报警。历史GetDeploymentTarget可能保存旧目标快照，不能用它代替实时GetAlias。
+
+### 27.16 真正练过一次回滚：在10%时停止
+
+[实录] 增加受控rollback_drill模式，不上传故意损坏代码，不伪造报警。用户两道审批明确同意演练。实际启动命令记录在第18节：
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=8ad190ba366b6967793675098f5df1fab26fd324' --variables 'name=ReleaseMode,value=rollback_drill' --region ap-northeast-1
+```
+
+execution96861976…，Blue5/Green6。Blue5基线d-CRSIZL0EM成功；d-2OPWFF0EM观测Green6=10%后，脚本执行：
+```powershell
+aws deploy stop-deployment --deployment-id '<自己创建的本次deploymentId>' --auto-rollback-enabled
+```
+
+AWS将其Stopped/MANUAL_STOP，并自动创建d-M40WD11EM回滚Succeeded；双向rollback关联指向正确，实际live回5/无权重、代码SHA未变、网站恢复七项通过。流水线把“已观察且证据完整的自动回滚”记为演练成功，不把手动恢复冒充自动回滚。
+
+本次证明的是请求停止触发路径；应用故障/报警触发回滚尚未分别真实演练。rollback_drill不预期全量升Green，后来前端阶段对此模式明确跳过。
+
+### 27.17 React也自动发：S3文件和CloudFront指向由流水线管理
+
+[实录] 之前自动CD只处理后端，前端仍首次a594…且sourceDirty=true。因此另写frontend-release.tf、受限IAM、CodeBuild和路由发布脚本，enable_frontend_release=true。用户批准4新增/2更新以及CloudFront code所有权交接；Terraform仍管runtime/distribution/association，ignore_changes=[code]让流水线管理发布指向。没有增加ALB或新CloudFront分发。
+
+[脚本展开] codebuild/frontend-release.yml执行 `node scripts/publish-frontend.mjs`，只在同execution后端成功报告/live版本/SHA与两道审批均匹配后：
+1. 按候选manifest上传S3 releases/<releaseId>的6文件，用If-None-Match=*、AES256、SHA256、MIME/cache；已有同key只允许精确匹配，不覆盖/删除。
+2. HEAD核摘要和公开HTTPS核所有文件SHA。
+3. get-function/describe-function读取LIVE和DEVELOPMENT的代码/ETag/config，拒绝未知并发改动。
+4. update-function更新DEVELOPMENT代码里的release prefix，带If-Match避免覆盖并发；test-function跑7路由用例。
+5. publish-function发布到LIVE；轮询公开/version.json、首页/深链接/health，检查clean/source/id。
+6. 失败尝试恢复旧路由，保留旧S3文件。已成功后端不随前端失败自动倒退。
+
+CLI展开示意：
+```powershell
+aws s3api put-object --bucket '<site bucket>' --key 'releases/<releaseId>/<文件>' --body '<文件路径>' --if-none-match '*' --server-side-encryption AES256 --checksum-algorithm SHA256 --checksum-sha256 '<Base64摘要>' --content-type '<MIME>' --cache-control '<策略>'
+aws cloudfront get-function --name kongportfolio-prod-spa --stage LIVE '<输出代码文件>'
+aws cloudfront describe-function --name kongportfolio-prod-spa --stage LIVE
+aws cloudfront update-function --name kongportfolio-prod-spa --if-match '<当前DEVELOPMENT ETag>' --function-config 'file://<原配置.json>' --function-code 'fileb://<新路由.js>'
+aws cloudfront test-function --name kongportfolio-prod-spa --stage DEVELOPMENT --if-match '<更新后ETag>' --event-object 'fileb://<合成事件.json>'
+aws cloudfront publish-function --name kongportfolio-prod-spa --if-match '<测试通过的DEVELOPMENT ETag>'
+```
+
+这些是脚本在AWS中发出的请求，不应本机绕过pipeline逐条修改生产。ETag每次读取得到，不是固定秘密/常量。新release前缀避免旧缓存键被覆盖，因此没做全站invalidation。前端目前是版本化指向切换，不是CloudFront双环境10%灰度。
+
+真实失败：execution2a56d7b1…的后端5→7成功，前端6文件上传成功，但TestFunction实际输出是{request:{uri:…}}，旧解析器读顶层uri而失败；DEV恢复旧指向，LIVE从未切新，报告restoredOld=true。修7a2e1b8，补真实响应回归/负例，然后全新执行/两道新审批，不借旧审批。
+
+最终execution5d55596a-4238-4240-bfbf-3e8ae47ee264：
+- 源码7a2e1b897848328d112d44e45802849ad52bbd5c、release242f8cb4…、sourceDirty=false。
+- STG9→第一审批成功→生产Green8验证/Blue7不动→第二审批成功。
+- d-BIHP8K2EM后端7→8成功。
+- frontend build1b295d27…成功，CloudFront LIVE/DEV指向242…。
+- 精确版本制品SHA、实际代码/路由/六文件公开SHA、首页/深链接/七API通过；两个TFplan无变化。
+详见第26节。前端LIVE发布后的真实回退仍未演练。
+
+### 27.18 以后你亲手发一次版，日常做什么
+
+这是**当前架构的复习流程**，与最初资源创建分开。资源已经存在，常规代码发版不需要重新创建State/域名/连接，也无需每次terraform apply。
+
+1. 本地改代码，运行相应检查；`./scripts/check.ps1`是完整本地检查入口，读取scripts/tools.ps1获得工具路径。检查包括前端npm ci/build/test、后端HTTP/Lambda/ZIP、Gitleaks/path/hooks/routing；Compose config检查不等于Docker镜像构建。
+2. `git diff`审改动；按文件明确git add；commit时pre-commit做staged扫描，push时pre-push做历史扫描。hooks用 `./scripts/install-hooks.ps1` 安装（内部git config core.hooksPath .githooks），缺Gitleaks会拒绝提交。
+3. push到现有允许分支feat/aws-serverless-ci；看AWS两个CI/GitHub ci/frontend/backend真实成功，核对源码SHA。
+4. 用 `git rev-parse HEAD` 取完整已推送SHA，手动启动candidate，mode明确deploy；当前main仍早期基线，不要误选旧main源码。
+5. Candidate/STG完成后，去当前execution第一道Review，读STG报告、批准Green创建。
+6. Green完成后，去同execution第二道Review，读Blue/Green/源码/release/mode，确认正常上线再批准。若mode=rollback_drill，它的含义是停止并恢复演练，不是正常上线。
+7. 观察CodeDeploy灰度/最终live，随后前端发布。
+8. 查公开version/health、候选报告及实际AWS状态，记录结果。若失败，先读失败阶段/本次日志，不盲目重跑同deployment或旧plan。
+
+正常启动模板（替换SHA；会启动实际构建）：
+```powershell
+$sourceSha = '<已推送且已通过CI的完整40位SHA>'
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions "actionName=GitHub,revisionType=COMMIT_ID,revisionValue=$sourceSha" --variables 'name=ReleaseMode,value=deploy' --region ap-northeast-1
+```
+
+当前pipeline页面：
+https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1
+
+网站：https://konglingtong44.com
+版本：https://konglingtong44.com/version.json
+健康：https://konglingtong44.com/api/health
+
+如果改的是基础设施：恢复同一机器的ignored本地输入（新机器不要让默认false导致删除既有CI）；Terraform fmt/validate/test→plan保存→show审核→对新的付费/删除变更取得相应授权→apply该计划→plan确认。`plan -detailed-exitcode`：0无变化，2有变化，1错误。不能把2当已部署，不能把apply成功当应用健康已验收。
+
+### 27.19 还没做什么；哪里需要你补记忆
+
+已经完成：State/锁、首次serverless上线、自定义域名、GitHub连接、云CI及push触发/回写、候选包、独立STG、两道人审、生产Green、CodeDeploy10%灰度全量、停止触发自动回滚演练、React自动上传/路由发布。
+
+未完成/未独立验证：
+- 真正调用Bedrock模型：现在/api/bedrock返回PREPARING，生产角色尚无模型调用权限；未选模型/开通权限/加入调用计费。
+- 前端发布后的真实故障回退演练，CloudFront双环境渐进灰度。
+- 报警触发或应用失败触发的独立后端回滚演练；当前仅配置了它们。
+- 浏览器视觉/移动交互验收、这轮Docker镜像构建。
+- main合并/真实PR事件/required branch checks配置验证。
+- ECS/ALB/ECR、数据库、SSM业务配置均未作为当前部署上线。
+- 最初工具安装、IAM Identity Center建立、profile配置的逐次点击/输入，现有材料不足。
+
+需要补材料时最有价值的是最初AWS SSO/profile设置记录、Terraform测试目录公开.tf片段（不要发凭证）、早期安装步骤。现在其余主线已有可靠文件/日志，先无需你翻找所有聊天。没有证据的细小鼠标路径不补造；上面的控制台入口已经足够定位当前资源，逐点击可在你复习对应一章时再核对。
+
+### 27.20 本次复盘自身执行的操作
+
+本轮只做本地取证、整理和文档验证，没有AWS查询/写入、没有HTTP联网请求、没有部署/构建启动。操作清单：
+- Get-Content读取AGENTS.md、根日志头/尾/分段、PROJECT_PLAN、各部署说明、Terraform资源与模板、PowerShell/Node/buildspec/hooks/ignore；rg/rg --files检索命令、章节和资源定义；git log --oneline -55、git status --short核历史/工作区。
+- Get-ChildItem .local -File -Name仅查域名/首次部署相关原件文件名，没有读取联系人请求/缓存/密码。
+- 一次检索命令误用Bash风格scripts/{...}.mjs，在PowerShell解析阶段报Missing argument，未执行该批读取；改为显式文件列表后成功。一次读取codebuild/deploy.yml不存在，随后确认实际文件codebuild/deployment.yml并读取；无源码/云影响。
+- 结合既有专门执行记录和脚本，补写本章；历史等价命令有单独标记，没把本轮未执行的register/apply/start算成本轮操作。
+- 本章由PowerShell Add-Content追加；apply_patch新增docs/aws-learning-index.md，含阅读顺序和请求路径Mermaid图。首次git diff --check发现末尾多空行；通过ReadAllText/WriteAllText规范到一个结尾换行后重查。tracked path与Gitleaks工作区扫描已通过；再做Markdown围栏/本地链接检查、staged路径/扫描和本地提交，不push以免触发现有CI。仅文档增量，不重跑应用或云测试。
