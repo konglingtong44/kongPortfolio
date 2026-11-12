@@ -22,3 +22,5 @@
 2026-11-12 用户已批准创建和管理边界交接。实际 apply 4 新增/2 更新/0 删除，后续 plan No changes；六阶段、两道 Manual gate 和 Green 十分钟/并发一配置已从 AWS 读取核对。新执行 `c02bc4e6-079b-4a53-835b-84c6877bb2d6` 固定源码 `776e24f566bfff160fcc27b7d5b17ea48cd33f53`，先等待新 STG 与人工审批 1。Green 真实运行及审批 2 尚未验证。
 
 目前 Candidate/STG 已成功，STG 版本 **4**、七项检查通过。已独立下载版本化报告并核对外层 SHA、执行/源码/候选/后端代码身份及审批导出变量。Release `07ad6c1f23a3abdeb6332719ba846aa81f101db71a786a8681827b797eaa3d5b`。流水线停在 **ApproveProduction / ApproveGreenCreation**，整体 InProgress，生产 live 仍版本 2、无权重。请在 [AWS 流水线](https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1) 核对本次执行与 STG 版本后手动批准；批准将运行 Green 发布/验证，然后停在第二道审批。当前没有切流阶段。
+
+最新结果：用户已在 AWS 完成第一道审批；Green 构建 `f3a7e052-2215-41cc-a42e-2199d293335d` 成功，生产 Green **版本 3** 七项检查通过。独立复核 GreenReport 外层 SHA、同次审批/候选/STG 身份、实际 Green CodeSha256 及审批导出变量全部一致。线上 Blue **版本 2**、别名 RevisionId、空权重均未变；health UP；生产 Terraform plan No changes。现在停在 **ApproveTrafficShift → ApproveBlueGreenDeployment**，请核对执行 `c02bc4e6…`、Blue2/Green3 后手动批准。**本 Story 审批后仅结束流水线，尚无切流阶段**；实际 CodeDeploy/自动回滚及前端推广继续在后续增量实现。日志第 10 节含完整命令与验证。

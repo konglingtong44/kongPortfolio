@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-06 — Production Green verified (2026-11-12, waiting human gate 2)
+
+User completed approval 1 in AWS for c02bc4e6 / source 776e24f. Green build f3a7e052 succeeded, production published version 3 passed seven direct-invoke contracts; downloaded versioned GreenReport and matched outer SHA, same-run approval/STG/release/code identity, actual immutable Lambda SHA and approval exports. Live remains Blue v2 with unchanged RevisionId/no weights; public health UP; production Terraform plan No changes after Green publication. ApproveTrafficShift/ApproveBlueGreenDeployment InProgress; no agent approval, no traffic stage exists yet. Direct Green invocation is not API Gateway/CloudFront E2E. CodeDeploy traffic shifting/rollback, frontend promotion and bounded Bedrock remain later Stories. Full operation audit root log section 10.
+
 ## S3-06 — Production Green preparation (2026-11-12, awaiting approval)
 
 User subsequently approved: 4 creates / 2 updates / 0 deletes applied, post-apply plan No changes. Actual six-stage pipeline version 3 has both Manual gates; Green role lacks routing/config/approval operations. New pinned-source execution c02bc4e6 at 776e24f started, waiting for fresh STG and human gate 1. No production Green version or traffic update yet.

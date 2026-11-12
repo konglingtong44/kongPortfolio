@@ -812,3 +812,56 @@ Get-FileHash -LiteralPath .local/green-staging-review-c02bc4e6/report.zip -Algor
 ### 9.4 文档和 Git 收尾
 
 用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/green-approval.md，随后运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，仅提交这三个文档：`git commit -m 'docs: record Green infrastructure and fresh STG approval gate'`。文档留本地，不为本次等待审批再触发额外 CI；下次获授权继续时推送。既有已固定候选源码和制品不变。日志覆盖本地读取/输入修改/文档编辑、Git/扫描、AWS 写入/读取、公开 HTTP 和等待，不保存凭证、审批 token 或私有响应原文。
+
+## 10. 人工审批 1 后的真实 Green 验证（2026-11-12）
+
+用户回复 ok 后，先只读检查 AWS，没有把聊天回复当成 CLI 代批授权。`git status --short` 工作区干净；`Get-Content AWS_EXECUTION_LOG.md -Tail 12` 读取前次结论。以下所有 AWS 命令使用 `$env:AWS_PROFILE='kong-dev'`、`$aws='D:\software\AWSCLI\aws.exe'`、Tokyo region。
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=c02bc4e6-079b-4a53-835b-84c6877bb2d6 --region ap-northeast-1 --query 'actionExecutionDetails[].{stage:stageName,action:actionName,status:status,external:output.executionResult.externalExecutionId,error:output.executionResult.errorDetails.message}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-green --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:f3a7e052-2215-41cc-a42e-2199d293335d --region ap-northeast-1 --output json
+```
+
+AWS 显示 ApproveGreenCreation 已 Succeeded（外部审阅 ID 6cec887f-19c2-4191-ae29-22eb380190e9），VerifyGreen InProgress；生产 live 仍 2/无权重。Green 构建 f3a7e052-2215-41cc-a42e-2199d293335d 的 resolvedSourceVersion 为固定的 776e24f，元数据保存忽略目录 `.local/green-production-build.json`。没有新 start-build/start-pipeline-execution 或 put-approval-result；当前流程沿用同一已批准候选。
+
+### 10.1 Green 构建与同次审批证据
+
+`aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-green --log-stream-name f3a7e052-2215-41cc-a42e-2199d293335d --region ap-northeast-1 --query 'events[].message' --output json` 保存 `.local/green-production-build.log`；设置 PYTHONUTF8=1 和控制台 UTF8，使用 Select-String 摘要 health/ja/zh/en/Bedrock placeholder/404/405 七项 Green passed，全部在生产不可变版本 **3** 上执行。再次 batch-get-builds 确认 SUCCEEDED、源码 776e24f，导出 GREEN_VERSION=3、BLUE_VERSION=2、GREEN_RELEASE=07ad6c1f…。
+
+CodeBuild 中实际运行 `node scripts/verify-green.mjs`，其 CLI/API 顺序：
+
+1. 本地严格验证同次 Candidate 完整性、SourceRef revision、STG report。
+2. `aws sts get-caller-identity` → `codepipeline get-pipeline-execution` → `list-action-executions --filter pipelineExecutionId=<本次ID>`，验证第一道人工审批确实成功且属于同次执行。
+3. `lambda get-function-configuration --function-name kongportfolio-stg --qualifier 4`，确认候选后端哈希就是实际已测 STG 版本。
+4. `lambda get-alias --function-name kongportfolio-prod --name live` 保存版本 2/RevisionId/空权重，读取生产 get-function-configuration 与 list-versions-by-function。
+5. `lambda update-function-code --function-name kongportfolio-prod --revision-id <读取值> --zip-file fileb://<本次Candidate/backend.zip> --publish`，再 `lambda wait function-updated --function-name kongportfolio-prod`；生成生产版本 3，没有重新打包后端。
+6. `lambda get-function-configuration --function-name kongportfolio-prod --qualifier 3`，检查代码 SHA、角色、运行时、内存、超时和环境。
+7. 七次 `lambda invoke --function-name kongportfolio-prod --qualifier 3 --invocation-type RequestResponse --cli-binary-format raw-in-base64-out --payload file://<事件文件> --cli-read-timeout 60 <响应文件>`；每次核对 ExecutedVersion=3、响应内容/HTTP status/no-store。
+8. 再读 live alias，版本/RevisionId/权重必须与第 4 步相同；写 GreenReport，buildspec 导出三项变量，仅上传 report.json。
+
+再次 list-action-executions 保存 `.local/green-production-actions.json`：VerifyGreen Succeeded，**ApproveTrafficShift / ApproveBlueGreenDeployment InProgress**，没有执行第二道审批。真实多输入制品、同次审批读取、GetAlias 函数 ARN 授权、发布/调用版本及报告导出本次均成功；没有遇到 IAM 扩权或构建修复。
+
+### 10.2 独立下载 GreenReport、核对生产与 Terraform
+
+从本次 VerifyGreen outputArtifacts 读取实际 key，不猜路径。PowerShell New-Item 创建 `.local/green-production-review-c02bc4e6/`；命令：
+
+```powershell
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/JP6FoMr --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/JP6FoMr --version-id g_Dz1smCkglPg26ZTpI1ZAxOhduLtoqL --region ap-northeast-1 .local/green-production-review-c02bc4e6/report.zip --output json
+Get-FileHash -LiteralPath .local/green-production-review-c02bc4e6/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 限定唯一 report.json，读取并释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 3 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+报告外层 SHA **ce69d5b3f0b183bf08025d1a9d35a0ebaf3fe3d46737c2b6473867ed0838ebec** 与 CodeBuild artifacts.sha256sum 一致。解析后逐项断言：report kind/passed/liveTrafficUnchanged、同次 execution/source/release/backend SHA 与已审 STG 一致、STG4/Blue2/Green3、七项全通过、approval1ActionId 与 AWS 成功审阅 actionExecutionId 一致。生产实际 version3 CodeSha256 解码后匹配后端 SHA ece55eafae91e22c4a92c3e57355151752063dc34e1bc87e939b0ff81fd5634f；live 仍2、RevisionId 845346d0-c1f5-4731-929a-9600ae9bfe9b、无权重，等于报告记录，第二道审批导出变量也相符。
+
+下载原件、报告、复核摘要仅在忽略目录 `.local/green-production-review-c02bc4e6/`；公开 HTTPS health UP。Green 发布后生产 Terraform **No changes**（`.local/green-after-publication-production-plan.log`），实际验证代码/别名管理边界不会导致 bootstrap 回滚或误切到 Green。没有更新网站前端、没有 API Gateway/CloudFront Green 端到端验证、没有 CodeDeploy/自动回滚/切流操作。直接调用 Green API 合约不等于真实 Bedrock 模型调用。
+
+### 10.3 文档与本地提交
+
+用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/green-approval.md，标明 Green 验证已通过、整体仍等待第二道人工审批。运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，暂存上述三份文档并 `git commit -m 'docs: record verified production Green and second approval gate'`，最后 `git status --short`。文档提交留本地，避免为等待审批触发额外构建；本次没有推送/合并、没有修改已批准制品。后续 CodeDeploy 和前端推广仍单独增量。
