@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — First real canary succeeded (2026-11-12; rollback drill pending)
+
+User completed both approvals for 98380c85 / c0a0a2c. Controller 0a1ce867 and CodeDeploy d-K1QJSA0EM Succeeded; whole pipeline Succeeded. Independently observed live Blue2 with Green5 weight0.1, then live5/no weights. Downloaded exact DeploymentReport object version; outer SHA, approved source/release/versions/deployment ID and 15 observations (including canary/final success) match AWS. Actual live5 code equals approved Green SHA. Seven public HTTPS contracts pass; alarm OK, no rollback triggered. Production and CICD post-cutover plans No changes. Baseline fix validated in real run, no duplicate baseline created. Real failure/alarm rollback drill remains unverified; no frontend promotion/real Bedrock. Audit root log section17; concise current state docs/codedeploy-next-story.md. Pause for review of this runnable cutover increment.
+
 ## S3-07 — Fixed execution Green verified; gate 2 pending (2026-11-12)
 
 User completed gate 1 for 98380c85. Green build a9b6d691 at c0a0a2c Succeeded; production Green v5 passed seven contracts, STG v6 same release a578af2e…. Downloaded versioned report; outer SHA, same-run approval/artifact identity, immutable Green code, exports and unchanged Blue v2 alias/RevisionId/weights all verified. Health UP. ApproveTrafficShift InProgress: user must approve Blue2→Green5 actual CodeDeploy canary; no agent approval. Existing baseline digest fix has actual metadata verification; real canary/rollback remain unverified. Audit section16.

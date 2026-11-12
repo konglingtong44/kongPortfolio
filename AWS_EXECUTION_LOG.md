@@ -1220,3 +1220,63 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 原件/report/object/review JSON 只留上述 .local 目录，不进入 Git。当前 **ApproveTrafficShift InProgress**，DeployProduction 未执行；旧基线已成功，修复匹配真实digest，但首次 canary/回滚仍未验证。向用户提供新执行98380c85的第二道审批链接，明确 **Blue2/Green5**，批准会真实10%/五分钟→100%，第一道不再重复。
 
 apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；diff/path/Gitleaks 校验后仅本地 `git commit -m 'docs: record fixed Green verification and pending canary approval'`，包含之前15.5未提交日志，最后 git status --short。不修改源码/制品，不推送触发额外CI，不代批、不直接调用部署或UpdateAlias。
+
+## 17. 修复后 CodeDeploy 真实灰度执行（2026-11-12）
+
+用户说“ok 继续”，先只读核对 AWS。git status --short 干净；kong-dev profile/ap-northeast-1。命令：
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=98380c85-fbbc-4b50-9416-7f10ddccdc0c --region ap-northeast-1 --query 'actionExecutionDetails[].{stage:stageName,status:status,external:output.executionResult.externalExecutionId,error:output.executionResult.errorDetails.message}' --output json
+& $aws deploy list-deployments --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query deployments --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-deploy --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+& $aws deploy get-deployment --deployment-id d-K1QJSA0EM --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-deploy:0a1ce867-7916-443e-be58-aab3556c37ea --region ap-northeast-1 --query 'builds[].{id:id,status:buildStatus,phase:currentPhase,sha:resolvedSourceVersion}' --output json
+& $aws cloudwatch describe-alarms --alarm-names kongportfolio-prod-live-errors --region ap-northeast-1 --query 'MetricAlarms[].{name:AlarmName,state:StateValue}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+本次第二道人审 **Succeeded**，审阅 ID **3b58f932-20fe-4e8f-a091-1e131666c9b6**；DeployProduction InProgress。部署构建 **0a1ce867-7916-443e-be58-aab3556c37ea**，固定源码c0a0a2ce2e8f1018e30b968fa6e40e5969792a75。已有基线 d-0XJZB7ZDM 之后，实际主 canary **d-K1QJSA0EM** 已创建，描述绑定本次98380c85，配置LambdaCanary10Percent5Minutes，创建时间13:22:26 JST。初次独立读取已观察到 **live主版本2、AdditionalVersionWeights={5:0.1}**，真实10%灰度确实发生；当前告警OK、healthUP、没有错误/rollbackInfo。部署元数据 `.local/deployment-canary.json`。发布由经两道用户审批的 CodeBuild 控制器执行，本机没有代理审批、重复启动或直接UpdateAlias。
+
+### 17.1 观察到真实灰度与全量完成
+
+约40秒短等待后，重复只读 get-deployment/GetAlias/describe-alarms/HTTPS health，用 PowerShell DateTimeOffset 计算 elapsedSeconds，并将时间/部署状态/版本/权重/告警/health/错误/rollback摘要 ConvertTo-Json -Compress 后 Add-Content 到 `.local/deployment-canary-observations.jsonl`。13:27:28.58 JST，距创建303秒，仍主版本2+Green5权重0.1，alarmOK、healthUP，无错误/回滚。
+
+再等约30秒并查询：CodeDeploy **d-K1QJSA0EM Succeeded**，完成时间 **13:27:28.995 JST**；live **5/无权重**，errorInformation/rollbackInfo为空。CodeBuild **0a1ce867-7916-443e-be58-aab3556c37ea SUCCEEDED**、源码c0a0a2c；DeployProduction action Succeeded。刷新完整元数据 `.local/deployment-canary.json`、`.local/deployment-fixed-live-build.json`、actions `.local/deployment-success-actions.json`。只出现已有Blue基线和一个正式canary，没有重复基线。修复后的digest判断已在真实控制器中通过。
+
+### 17.2 下载最终部署报告并独立匹配
+
+```powershell
+New-Item -ItemType Directory -Path .local/deployment-final-review-98380c85 -Force
+# key来自本次DeployProduction.outputArtifacts。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Deployment/8X2JaCE --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Deployment/8X2JaCE --version-id _v31Ry3oglCKiH6iK44b5KN5.tVmFinA --region ap-northeast-1 .local/deployment-final-review-98380c85/report.zip --output json
+Get-FileHash -LiteralPath .local/deployment-final-review-98380c85/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限唯一report.json，读取并释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 5 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 98380c85-fbbc-4b50-9416-7f10ddccdc0c --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion}' --output json
+```
+
+报告外层SHA **3375e1783c51db25c5ee9944b7c0de639a94597b17227a832231635bfd84b665** 等于CodeBuild artifacts.sha256sum。逐项校验schema1/kind production-deployment/passed=true、execution/source/release与已审Green一致、deploymentId=d-K1QJSA0EM、Blue2/Green5、观察中确有Blue2/Green5 0.1以及最后Succeeded/live5/空权重。报告共 **15次观察**，从Created/Blue2到Succeeded/Green5；实际qualifier5 CodeSha256仍等于已批准Green。API Gateway仍调用live别名，未修改集成/域名。流水线整体 **Succeeded**、version4。
+
+原件ZIP、report.json/object.json/review.json仅在 `.local/deployment-final-review-98380c85/`，不加入Git，不上传请求/响应原文。
+
+### 17.3 全量后的公开HTTPS与Terraform
+
+PowerShell单引号here-string经 `node --input-type=module` 执行验证：import assert、fs.writeFileSync、timers/promises.sleep及现有staging-contract.mjs的contracts；逐项fetch固定公开域名，redirect=error、超时30秒，断言HTTP status、成功内容marker/no-store，间隔1200ms避免节流；只保存检查摘要 `.local/deployment-final-public-api.json`。
+
+实际请求七项：GET /api/health=200/UP，GET /api/profile?lang=ja、zh、en各200/语言标记，POST /api/bedrock=200/PREPARING，GET /api/not-a-route=404，POST /api/profile=405，全部通过。POST仍为占位，无真实Bedrock模型调用。这里是CloudFront/API Gateway公开HTTP验证，不声称原生浏览器视觉检查或容器重新构建。
+
+```powershell
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+两套实际plan均 **No changes**，日志 `.local/deployment-final-production-plan.log`、`deployment-final-cicd-plan.log`；证明Terraform没有回滚CI代码或覆盖CodeDeploy的live版本/权重。没有为复核再次apply。
+
+### 17.4 文档与收尾边界
+
+用PowerShell单引号here-string/Set-Content重写 docs/codedeploy-next-story.md 为简短当前状态（旧阶段完整历史留本日志），apply_patch更新PROJECT_PLAN.md、本日志，明确首次灰度成功，但**真实故障/告警回滚演练尚未完成**：本次没有触发回滚，不能把配置/模拟测试或部署成功当成实际回滚验收。未故意制造生产故障，未更新前端静态包，真实Bedrock仍待后续增量。
+
+收尾执行diff/path/Gitleaks校验、暂存这三份文档、本地 `git commit -m 'docs: record successful CodeDeploy canary and public API verification'`、git status --short。未为文档额外推送/构建；没有代理审批、直接UpdateAlias或修改已批准制品。按单Story工作约定在本次可运行切流增量完成后暂停供审阅；S3-07的实际回滚演练仍列为未验收，不虚报整套路线全部完成。
