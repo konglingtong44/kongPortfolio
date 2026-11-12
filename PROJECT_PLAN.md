@@ -1,5 +1,11 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — CodeDeploy infrastructure applied (2026-11-12, validating to gate 1)
+
+Reached fresh human gate 1: Candidate and STG succeeded for ff77d62; STG v5 passed seven contracts. Downloaded exact versioned report; outer CodeBuild SHA, execution/source/release/backend SHA, immutable Lambda and approval exports match. Release 6af4a796faf697721d69148c95d9e81cd96abc2a0bf15e29b09de1eddc3d5910. Execution f2ed11c5 InProgress at ApproveProduction, no agent approval; no CodeDeploy deployments yet. Production live v2/no weights, health UP; error alarm now OK. Real canary/rollback remain pending both human gates.
+
+User explicitly approved creation: apply 9 add / 2 change / 0 destroy, post-apply plan No changes. Actual Lambda CodeDeploy group has 10%/5min, alarms fail closed and three rollback events; pipeline v4 has seven stages with two Manual gates before deployment. New execution f2ed11c5 pinned to ff77d62 started; no CodeDeploy deployment yet, live v2/no weights, public health UP. Real first baseline/canary/rollback remain unverified until both fresh human approvals. Audit root log section 13.
+
 ## S3-07 — CodeDeploy preparation (2026-11-12, awaiting paid-resource approval)
 
 Source 0add5d0 published; both existing AWS CI builds and GitHub statuses success, applicationChecksRan=true. Frontend 40 tests/build; backend 9+3 tests/ZIP smoke; injected deployment guards run on AWS Linux. No deployment resources or traffic changes applied. Final evidence recorded locally pending explicit 9-create/2-update approval.

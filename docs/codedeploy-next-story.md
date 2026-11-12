@@ -1,4 +1,8 @@
-# S3-07：CodeDeploy 真实切流（代码已准备，待批准创建）
+# S3-07：CodeDeploy 真实切流（基础设施已创建，待人工审批）
+
+最新：2026-11-12 用户已批准，实际 apply **9 新增/2 更新/0 删除**；后续 plan No changes。七阶段 pipeline version4 与告警/回滚配置已从 AWS 核对；新执行 `f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466` 固定源码 `ff77d627f3a5182bac6872375dcd828199e1e57a`。当前先验收到人工审批 1；尚未执行 CodeDeploy 发布，生产仍 live2。下文“待批准创建”为准备阶段历史，不代表还需重复批准这次已授权资源。
+
+本次 Candidate、STG 均成功，STG **版本5** 七项通过。Release `6af4a796faf697721d69148c95d9e81cd96abc2a0bf15e29b09de1eddc3d5910`；报告对象版本/外层 SHA、源码/执行/后端哈希、实际 Lambda 和审批导出变量已独立交叉核对。现在 **ApproveProduction / ApproveGreenCreation InProgress**，整体 InProgress。请在 [AWS 流水线](https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1) 核对执行 `f2ed11c5…`、STG5 后手动批准。第一道批准只运行 Green 验证；第二道批准后将真实执行 CodeDeploy。当前 list-deployments 为空、生产 live2/无权重、health UP、告警 OK。日志第13节。
 
 前置结果：S3-06 的执行 c02bc4e6 已由用户完成两道审批并成功结束；生产 live=2，Green=3。该执行没有切流阶段，不能追加步骤后拿旧审批授权新制品。
 

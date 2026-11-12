@@ -961,3 +961,80 @@ git check-ignore infra/terraform/cicd/deployment.tfplan infra/terraform/cicd/ter
 两个 CI 的 SHA 同为 0add5d0，均 applicationChecksRan=true，部署纯逻辑测试在 AWS Linux 上通过；前端 40 tests/build、后端 9 HTTP + 3 Lambda tests/ZIP smoke 成功；GitHub combined/ci/frontend/ci/backend 都 success。云日志和元数据保存 `.local/deployment-source-ci.json`、`deployment-frontend-ci.log`、`deployment-backend-ci.log`，没有加入 Git。公开状态 API 为只读 GET。生产 live 仍2/无权重，私有 plan/tfvars/.local 均被忽略。
 
 最终补入本日志、PROJECT_PLAN.md 和下一 Story 文档；再做 diff/path/Gitleaks 检查，仅本地提交 `docs: record CodeDeploy preparation CI and approval scope`，不为文档再推送触发重复 CI。等待用户明确批准 **9 新增/2 更新及首次新执行验证**；之后两道流水线人工审批仍必须重新由用户完成，第二道批准才授权实际生产切流和必要恢复。真实基线/切流/告警/回滚演练未验证。
+
+## 13. 已批准 CodeDeploy 资源创建与新执行（2026-11-12）
+
+用户对具体 9 新增/2 更新、首次新执行验证回复“开始”，确认资源创建已授权。验收本次到新执行第一道人工 gate：不代用户审批，不使用旧执行两道审批切流。
+
+### 13.1 本地、认证与计划重核
+
+读取 AGENTS.md、本日志尾部及本机忽略输入；`git status --short` 干净、`git log -2 --oneline` 确认 HEAD=ff77d62（仅文档，运行代码仍已验证的 0add5d0 内容）。设置 `$env:AWS_PROFILE='kong-dev'` 后 `aws sts get-caller-identity --query Account --output text` 返回 561798268037；Get-FileHash 再核对 STG bootstrap ZIP SHA 88e27021494b7f63c38af9b11cd332be5c7849bba4e75d81a9162fef9e22a4c8。GetAlias 的 version/weights 查询确认生产仍2/无权重。
+
+PowerShell Get-Content/正则检查后，Add-Content 仅在本机 ignored `infra/terraform/cicd/terraform.tfvars` 增加 `enable_deployment=true`。随后：
+
+```powershell
+git check-ignore infra/terraform/cicd/terraform.tfvars infra/terraform/cicd/deployment.tfplan
+. ./scripts/tools.ps1
+git push
+git rev-parse HEAD
+$tf='D:\software\Terraform\terraform.exe'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-out=deployment.tfplan' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' show '-json' deployment.tfplan
+```
+
+ff77d627f3a5182bac6872375dcd828199e1e57a 已经 push hook 全历史 Gitleaks 扫描无泄露后推送。无 main 合并；推送触发现有 CI，但候选流水线 DetectChanges=false。新计划保存 `.local/deployment-approved-plan.log`、ignored deployment.tfplan，解析 JSON 必须恰为9 create/2 update/无 delete，否则停止，不沿用旧计划猜测执行。
+
+### 13.2 已 apply、核对真实配置并启动新执行
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' apply '-input=false' '-no-color' deployment.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+$aws='D:\software\AWSCLI\aws.exe'
+& $aws deploy get-deployment-group --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query 'deploymentGroupInfo.{app:applicationName,group:deploymentGroupName,config:deploymentConfigName,platform:computePlatform,style:deploymentStyle,alarms:alarmConfiguration,rollback:autoRollbackConfiguration}' --output json
+& $aws codepipeline get-pipeline --name kongportfolio-candidate --region ap-northeast-1 --query 'pipeline.{version:version,mode:executionMode,stages:stages[].name}' --output json
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 2 --region ap-northeast-1 --query 'pipelineExecutionSummaries[].{id:pipelineExecutionId,status:status}' --output json
+& $aws cloudwatch describe-alarms --alarm-names kongportfolio-prod-live-errors --region ap-northeast-1 --query 'MetricAlarms[].{name:AlarmName,state:StateValue,metric:MetricName,dimensions:Dimensions,missing:TreatMissingData}' --output json
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=ff77d627f3a5182bac6872375dcd828199e1e57a' --region ap-northeast-1 --output json
+```
+
+Apply **9 added/2 changed/0 destroyed**，`.local/deployment-apply.log`。后续 plan **No changes**，`.local/deployment-post-apply-plan.log`。真实 CodeDeploy 平台 Lambda、BLUE_GREEN/WITH_TRAFFIC_CONTROL、10%/5min 配置、告警启用/不忽略轮询失败、三种自动回滚事件符合代码。告警初始 INSUFFICIENT_DATA（新建未满一个周期），Errors 精确维度 production:live，missing=notBreaching；不把配置成功称为告警触发已验证。Pipeline version4/QUEUED，七阶段，两个 Manual gate 均在 DeployProduction 前。列执行确认 update 没有自动运行，随后只启动一次固定 SHA。
+
+新执行 **f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466**，返回信息保存 `.local/deployment-pipeline-execution.json`。此次有真实切流阶段，但只有新的两道用户审批成功后才会运行；旧 c02bc4e6 审批不会复用。当前尚未 create-deployment，也未更新 live alias。
+
+### 13.3 执行观察、STG 报告下载与复核
+
+观察使用 `aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --region ap-northeast-1 --output json`，保存 `.local/deployment-run-actions.json`；摘要只打印阶段/状态/外部ID/错误，不请求审批 token。两次约40秒短等待，先看到候选构建，后 Candidate/VerifyStaging 均 Succeeded，ApproveProduction InProgress。用 list-builds-for-project --sort-order DESCENDING --max-items 1 分别查询 Candidate/STG，batch-get-builds 对照实际 source SHA。
+
+`aws iam get-role-policy --role-name kongportfolio-deploy-build --policy-name approved-codedeploy-and-observation --query PolicyDocument --output json` 保存 `.local/deployment-controller-role-policy.json`，解析确认无直接 UpdateAlias/UpdateFunctionCode/PutApprovalResult。`deploy list-deployments --application-name kongportfolio --deployment-group-name production --query deployments` 返回空，证明尚未部署而非已切流。
+
+Candidate build **kongportfolio-candidate:4bffc0d9-f63c-4744-a8ff-43de4f0c8154**、STG build **kongportfolio-stg:e82ea489-03aa-493b-b220-b741cf265a99**，batch-get-builds 都 SUCCEEDED 且 resolvedSourceVersion=ff77d627f3a5182bac6872375dcd828199e1e57a；完整元数据 `.local/deployment-candidate-stg-builds.json`。Candidate 执行固定源码全套 ci.sh all/构建/候选校验；STG 沿用已验证脚本顺序（见7.3、9.3），用原候选 ZIP 更新/发布 **STG 版本5** 并直接调用七项合约，不是生产新版本。
+
+本机复核命令：
+
+```powershell
+& $aws codebuild batch-get-builds --ids kongportfolio-candidate:4bffc0d9-f63c-4744-a8ff-43de4f0c8154 kongportfolio-stg:e82ea489-03aa-493b-b220-b741cf265a99 --region ap-northeast-1 --output json
+New-Item -ItemType Directory -Path .local/deployment-staging-review-f2ed11c5 -Force
+# 从本次 action outputArtifacts 获取实际 bucket/key。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/yal5Nc6 --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/yal5Nc6 --version-id BdYYJTPDDSiyMnyt.HIj0sC178aGDM78 --region ap-northeast-1 .local/deployment-staging-review-f2ed11c5/report.zip --output json
+Get-FileHash -LiteralPath .local/deployment-staging-review-f2ed11c5/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 限唯一 report.json，读取后释放 stream/zip，不解压任意路径。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 5 --region ap-northeast-1 --output json
+```
+
+下载外层 SHA **e55ffc473231429b1aa08785dfe7e0298daf38a9840017e9cfc176258a74afe3** 等于 CodeBuild artifacts.sha256sum；JSON schema/kind/function/execution/source/passed/七项结果正确。Release **6af4a796faf697721d69148c95d9e81cd96abc2a0bf15e29b09de1eddc3d5910**；backend SHA **09a30e2ad79cf7a0ca85054fc43d378da860f64063b0486461239de6a9d7aa6e** 与实际数字版本 Lambda CodeSha256 解码后相同；审批导出 VERIFIED_RELEASE/VERIFIED_VERSION 与报告一致。report.zip/report.json/object.json/review.json 仅存 `.local/deployment-staging-review-f2ed11c5/`。
+
+### 13.4 停在新第一道人工审批
+
+```powershell
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws deploy list-deployments --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query deployments --output json
+& $aws cloudwatch describe-alarms --alarm-names kongportfolio-prod-live-errors --region ap-northeast-1 --query 'MetricAlarms[].{name:AlarmName,state:StateValue}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+整体 **InProgress**/pipeline version4、第一道 ApproveProduction / ApproveGreenCreation **InProgress**；生产仍2/无权重，list-deployments 仍空，health UP；新告警经过评估后现在 OK（不是已验证触发）。STG 更新后 CICD plan No changes，日志 `.local/deployment-staging-final-plan.log`。没有代理审批或调用 create-deployment。用户需在控制台核对 f2ed11c5/STG5 后“审阅→批准→提交”；第一道只发布/验证 Green，第二道才授权真实切流与必要恢复。
+
+用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；运行 diff/path/Gitleaks 检查，仅本地提交 `docs: record CodeDeploy infrastructure and fresh approval gate`，最后 git status --short。没有为文档反复推送/启动新候选；下次获授权继续时推送，当前固定源码与制品不变。日志记录了本地输入修改、文件读取/编辑、Git、扫描、Terraform、AWS CLI、HTTP、等待和报告请求全部操作类型；不含凭证/审批 token 或私有响应原文。
