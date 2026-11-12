@@ -2345,3 +2345,18 @@ https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/k
 - 一次检索命令误用Bash风格scripts/{...}.mjs，在PowerShell解析阶段报Missing argument，未执行该批读取；改为显式文件列表后成功。一次读取codebuild/deploy.yml不存在，随后确认实际文件codebuild/deployment.yml并读取；无源码/云影响。
 - 结合既有专门执行记录和脚本，补写本章；历史等价命令有单独标记，没把本轮未执行的register/apply/start算成本轮操作。
 - 本章由PowerShell Add-Content追加；apply_patch新增docs/aws-learning-index.md，含阅读顺序和请求路径Mermaid图。首次git diff --check发现末尾多空行；通过ReadAllText/WriteAllText规范到一个结尾换行后重查。tracked path与Gitleaks工作区扫描已通过；再做Markdown围栏/本地链接检查、staged路径/扫描和本地提交，不push以免触发现有CI。仅文档增量，不重跑应用或云测试。
+
+## 28. 独立逐步学习手册（2026-11-12）
+
+用户确认IAM配置已掌握，要求基于第27章制作独立最新学习文档：从代码已上传GitHub、尚无本项目AWS资源开始，逐步说明目的、工具/CLI或鼠标操作、命令作用、实际执行结果；后续学习仅标题，不预写实现。
+
+验收范围：新文档从第1步独立编号，覆盖State/首次部署/域名/GitHub连接/CI/候选/STG/双审批/Green/灰度/停止回滚/前端发布/日常发版；明确既有预算和旧zone的真实起点，不虚构全空账号；分清首次本机执行与后来AWS内执行。IAM创建过程按用户要求略过，保留登录/账号核对。历史与学习示例区分，当前环境不重新部署。
+
+本次操作：
+- PowerShell Get-Content读取AGENTS.md、docs/aws-learning-index.md、根日志27章/尾部、bootstrap/cicd模板、check-source-connection和其他脚本；rg检索Terraform开关、STG bootstrap变量、buildspec路径；git status --short核工作区。
+- 误读codebuild/frontend.yml、backend.yml时返回文件不存在；同次rg确认实际两个CI项目均引用codebuild/ci.yml，学习手册使用正确路径。无云或源码影响。
+- PowerShell here-string/Set-Content新建根AWS_LEARNING_GUIDE.md：22个已完成学习步骤、每组命令/参数说明、实际故障和成功标准、控制台入口、两条Mermaid流程图；后续23–36只列学习标题。
+- apply_patch给docs/aws-learning-index.md加入新手册入口。ReadAllText/WriteAllText补充DNS不转发HTTP的说明、规范未来标题空行及文件结尾；本日志Add-Content追加本节。
+- 将运行Markdown标题/围栏/相对链接和引用脚本存在性检查，git diff --check、私有路径/Gitleaks扫描；仅文档增量，不运行应用构建/测试，不访问AWS或公网，不创建资源/启动CI/CD/替人审批。验证后仅本地提交，不push。若验证失败会补记修正。
+
+验证结果：22个步骤连续、未来14项仅标题、代码围栏闭合、所有相对链接及抽查脚本/buildspec路径存在，全部通过；git diff --check、tracked path与Gitleaks工作区扫描通过。将明确暂存本次3个文档，执行staged路径/diff及提交钩子的Gitleaks检查，本地提交 `docs: add numbered hands-on AWS learning guide`；不推送，不改变AWS。提交结果在本次回复报告。
