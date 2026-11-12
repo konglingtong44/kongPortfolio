@@ -1547,3 +1547,68 @@ node node_modules/vite/bin/vite.js build --base=/releases/aaaaaaaaaaaaaaaaaaaaaa
 构建及上述断言通过；Vite提示outDir在项目根外不会清空，这是使用新ignored目录的预期提示，没有使用emptyOutDir删除目录或改源文件。它不替代浏览器视觉验收。未修改已通过CI的代码。
 
 最终用apply_patch补入本日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks检查后仅本地提交 `docs: record frontend publication preparation and CI evidence`，git status --short。未为文档重复推送/启动CI。等待明确批准 **4新增/2更新及首次新执行验证**，同时批准CloudFront函数code发布指向管理交接；实际更新前后端仍有两道新的人工审批。真实条件上传/AWS TestFunction/传播/前端回退未验收，不能宣称已上线自动前端发布。
+
+## 22. 已批准前端发布资源与新执行（2026-11-12）
+
+用户明确回复“批准ok”，授权4新增/2更新、CloudFront代码发布指向管理交接和首次新流水线验证。生产发布继续由新执行两道人审控制，本次先验收到第一道。
+
+### 22.1 本地、认证与输入核对
+
+读取AGENTS.md、git status --short（干净）、git log -2 --oneline、本机忽略terraform.tfvars。HEAD c073e196b7740c9555cb800e8e49911dc282b65c 为上次CI证据文档提交，实际脚本是已通过AWS CI的b00264a内容。设置kong-dev profile，STS get-caller-identity Account=561798268037；GetAlias live5/无权重；公开/version.json仍原a594e36…/b2a82d9…/sourceDirty=true。Get-FileHash复核STG bootstrap ZIP SHA88e27021494b7f63c38af9b11cd332be5c7849bba4e75d81a9162fef9e22a4c8。
+
+PowerShell只在本机ignored输入追加enable_frontend_release=true；git check-ignore确认输入和plan不进Git。加载scripts/tools.ps1后git push将c073e19通过全历史Gitleaks扫描推送，未合并main。没有从文档推送自动发版（DetectChanges=false）。
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-out=frontend-release.tfplan' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' show '-json' frontend-release.tfplan
+& $tf '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+重核实际计划4add/2change/0destroy，JSON数量/无删除检查通过，日志.local/frontend-release-approved-plan.log；生产代码管理交接No changes，.local/frontend-release-approved-handoff-plan.log。只apply本次重核计划。追加日志时apply_patch因上下文末句措辞不匹配失败、未修改文件；读取尾部后用PowerShell单引号here-string/Add-Content追加本节，无源码或云操作影响。
+
+### 22.2 已创建与真实配置核对
+
+```powershell
+& $tf '-chdir=infra/terraform/cicd' apply '-input=false' '-no-color' frontend-release.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+& $aws codepipeline get-pipeline --name kongportfolio-candidate --region ap-northeast-1 --output json
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 1 --region ap-northeast-1 --query 'pipelineExecutionSummaries[].{id:pipelineExecutionId,status:status}' --output json
+& $aws codebuild batch-get-projects --names kongportfolio-frontend-release --region ap-northeast-1 --query 'projects[].{name:name,role:serviceRole,timeout:timeoutInMinutes,concurrency:concurrentBuildLimit,buildspec:source.buildspec}' --output json
+& $aws iam get-role-policy --role-name kongportfolio-frontend-release-build --policy-name immutable-site-upload-and-reviewed-pointer --query PolicyDocument --output json
+```
+
+Apply **4 added/2 changed/0 destroyed**（`.local/frontend-release-apply.log`），后续plan **No changes**（`.local/frontend-release-post-apply-plan.log`）。实际pipeline **version6/QUEUED**、八阶段，PublishFrontend位于两个人审与DeployProduction之后，五输入SourceRef/Candidate/STG/Green/DeploymentReport齐全；ReleaseMode默认deploy。新的CodeBuild实际角色、15min/并发1/buildspec正确。角色policy保存`.local/frontend-release-deployed-role.json`，解析确认无DeleteObject/UpdateDistribution/UpdateAlias/PutApprovalResult，不假称真实上传IAM已验证。
+
+列执行确认配置更新没有自动启动（最近旧96861976 Succeeded）。随后仅一次启动固定新源码正常发布：
+
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=c073e196b7740c9555cb800e8e49911dc282b65c' --variables 'name=ReleaseMode,value=deploy' --region ap-northeast-1 --output json
+```
+
+返回ID保存在`.local/frontend-release-execution.json`；显式选择deploy，避免混淆前次rollback_drill。当前没有上传新前端、更新/发布CloudFront代码或新生产部署，先等待本次STG与第一道审批。旧审批不复用。
+
+### 22.3 新执行到第一道人审及独立报告核对
+
+新执行 **2a56d7b1-840e-45b0-8ac4-7b37872cbb4f**。约40/35/20秒短等待，每次list-action-executions按本次execution过滤，保存`.local/frontend-release-actions.json`；get-pipeline-execution读回version6/ReleaseMode.resolvedValue=deploy。Source成功取得固定c073e19，Candidate **bf260a32-51ea-4f6d-8724-ce7cc4507cd0**、STG **6f4f501c-9014-4da8-b33c-acecd4dab600** 均SUCCEEDED；batch-get-builds匹配完整源码SHA，存`.local/frontend-release-candidate-stg.json`。Candidate运行全ci.sh all/打包/完整性，STG用同次候选ZIP发布并直接调用数字**版本8**七项通过（仍是Bedrock占位，无模型调用）。
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=2a56d7b1-840e-45b0-8ac4-7b37872cbb4f --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 2a56d7b1-840e-45b0-8ac4-7b37872cbb4f --region ap-northeast-1 --query 'pipelineExecution.{version:pipelineVersion,status:status,variables:variables}' --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-candidate:bf260a32-51ea-4f6d-8724-ce7cc4507cd0 kongportfolio-stg:6f4f501c-9014-4da8-b33c-acecd4dab600 --region ap-northeast-1 --output json
+New-Item -ItemType Directory -Path .local/frontend-release-stg-review-2a56d7b1 -Force
+# bucket/key从本次STG outputArtifacts读出。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/pLjyi9j --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/pLjyi9j --version-id bCmvaxl4suS9r9TWgUQtJj2D863IfO6C --region ap-northeast-1 .local/frontend-release-stg-review-2a56d7b1/report.zip --output json
+Get-FileHash -LiteralPath .local/frontend-release-stg-review-2a56d7b1/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 8 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/version.json'
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+报告外层SHA **a8f0dc6cd989406a5d189391e58385fc20a54fbc69a8684bc169fd5302247d1c** 匹配CodeBuild artifacts.sha256sum；schema/kind/passed、execution/source/function/version、七项全通过正确。Release **0dfbd04490393ec56e8c0c554d032167676f068a8fca0d71ce282a5e874b09b2**，backend SHA **e596fcd3bfb1b108dc7b3c823ed7bb3b06aaa4adca1bf67ab4831658c0f63bd2** 等于实际STG8 CodeSha256解码值；Gate1 VERIFIED_RELEASE/VERIFIED_VERSION匹配报告。原件ZIP/report/object/review仅存上述ignored目录。
+
+当前Source/BuildCandidate/VerifyStaging Succeeded，**ApproveProduction / ApproveGreenCreation InProgress**，整体仍InProgress；未自行审批。生产live仍5/无权重、旧前端/version仍a594e36…/sourceDirty=true、healthUP。新前端资源虽已创建，尚无网站上传、CloudFront代码更新或发布。第一道批准只发布/验证Green；第二道才授权正常后端切流及同候选前端发布与必要恢复，明确区别前次rollback_drill。
+
+apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md；运行diff/path/Gitleaks检查，暂存三文档、本地提交 `docs: record frontend publication infrastructure and first approval gate`，git status --short。不为文档推送额外CI，不改固定源码/制品，不启动重复执行或代理审批。真实前端上传/IAM/TestFunction/传播/恢复仍待后续阶段验收。

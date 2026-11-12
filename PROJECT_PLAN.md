@@ -1,5 +1,11 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Frontend publication infrastructure applied (2026-11-12)
+
+Reached gate1: execution2a56d7b1/v6/deploy, Source/Candidate/STG succeeded atc073e19; STGv8 seven checks pass. Downloaded exact StagingReport version and matched outer CodeBuild SHA/source/release/backend code/approval exports against immutable Lambda. Release0dfbd044…. ApproveProduction waiting user, live backend5/no weights, old frontend a594e36…/healthUP. No site upload/router publication yet. Gate2 now authorizes backend promotion then same-candidate frontend publication/recovery. Root log22.3.
+
+User approved4create/2update/code-pointer ownership handoff. Actual apply4add/2change/0destroy; post-plan No changes. Actual pipelinev6/QUEUED has8stages, both human gates and backend deployment precede frontend5-input stage; independent project15min/concurrency1, role mutation boundaries verified. New execution2a56d7b1 pinnedc073e19/ReleaseMode deploy started; validating to gate1, no static upload/router switch yet. Live backend5, old frontend a594e36… unchanged. Root log22.
+
 ## S3-08 — Frontend automatic publication preparation (2026-11-12, awaiting approval)
 
 Sourceb00264a published, both existing AWS CI builds and GitHub statuses success; frontend40 tests/build, backend9+3 tests/ZIP smoke, frontend publication guards tested on AWS Linux. Local prefixed Vite build confirms HTML/CSS/JS/public image URLs. No apply/site upload/router update or new candidate execution; final docs evidence local only pending explicit4-create/2-update and CloudFront code-pointer ownership approval.
