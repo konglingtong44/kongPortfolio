@@ -1084,3 +1084,19 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 向用户说明本次不同于旧六阶段验证：第二道批准会实际执行 CodeDeploy，不再只是结束流水线；应核对执行 f2ed11c5、Blue2/Green4、release6af4a796… 后“ApproveTrafficShift → ApproveBlueGreenDeployment → 审阅 → 批准 → 提交”。基线接受、真实权重、告警触发和回滚演练仍未验收，不因配置/模拟测试通过而宣称成功。
 
 apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，仅提交三份文档 `git commit -m 'docs: record fresh Green verification before real traffic approval'` 并 git status --short。本地保留文档提交，不推送触发额外 CI，等待用户第二道手动审批；已固定源码/制品没有改变。
+
+### 14.4 用户询问额度并要求继续后的状态检查
+
+用户问“额度够了吗 继续吧”。说明无法从当前工具读取 Codex 剩余额度，也未核实 AWS 账号共享免费额度，不能承诺免费；未读取账单或推测额度足够。继续只读核对同次执行，不将“继续”变成代理人工审批：
+
+```powershell
+git status --short
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --region ap-northeast-1 --query 'actionExecutionDetails[].{stage:stageName,status:status,external:output.executionResult.externalExecutionId,error:output.executionResult.errorDetails.message}' --output json
+& $aws deploy list-deployments --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query deployments --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-deploy --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+```
+
+结果：第二道 ApproveTrafficShift 仍 **InProgress**，第一道/Green 及之前阶段均 Succeeded，CodeDeploy deployments 与 deploy CodeBuild builds 均空，live仍2/无权重。这是等待用户第二道手动审批，并非构建失败或已切流。将控制台链接、f2ed11c5、Blue2/Green4 和真实10%/五分钟→100%后果明确告知用户。
+
+只编辑本日志；执行 `git diff --check`、路径检查、Gitleaks，暂存日志并本地 `git commit -m 'docs: record pending manual traffic approval status'`、`git status --short`。没有云端写入/构建/推送/审批，也未改候选或部署代码。
