@@ -199,6 +199,8 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
         Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.staging_project_arn
         }] : [], var.enable_green ? [{
         Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.green_project_arn
+        }] : [], var.enable_deployment ? [{
+        Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.deployment_project_arn
     }] : [])
   })
 }
@@ -321,7 +323,30 @@ resource "aws_codepipeline" "candidate" {
         provider = "Manual"
         version  = "1"
         configuration = {
-          CustomData = "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
+          CustomData = var.enable_deployment ? "Approval 2: authorize CodeDeploy production traffic shift and rollback for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION}, Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. 10% canary for 5 minutes then 100%; initial Blue baseline registration may precede it." : "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
+        }
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_deployment ? [1] : []
+    content {
+      name = "DeployProduction"
+      action {
+        name             = "CanaryAndVerify"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        input_artifacts  = ["SourceRef", "Candidate", "StagingReport", "GreenReport"]
+        output_artifacts = ["DeploymentReport"]
+        configuration = {
+          ProjectName   = aws_codebuild_project.deployment[0].name
+          PrimarySource = "SourceRef"
+          EnvironmentVariables = jsonencode([
+            { name = "DEPLOY_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
+            { name = "DEPLOY_PIPELINE_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" }
+          ])
         }
       }
     }

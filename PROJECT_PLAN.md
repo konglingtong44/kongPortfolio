@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — CodeDeploy preparation (2026-11-12, awaiting paid-resource approval)
+
+Prepared opt-in seven-stage pipeline: deployment follows both same-run human gates, verifies candidate/STG/Green/report/live snapshot, seeds a verified Blue baseline before first canary, observes 10% for five minutes then full Green, checks public health/profile and requests CodeDeploy rollback on failures. CodeBuild has no direct alias/code-write/approval rights. Actual plan 9 create / 2 update / 0 delete; default disabled plan No changes. Terraform 16 mocked plans and injected Node success/failure/timeout/recovery guards pass. No apply/create-deployment/traffic shift; actual IAM/baseline acceptance/alarm/rollback remain cloud gaps. docs/codedeploy-next-story.md; audit root log section 12.
+
 ## S3-06 — Completed after human approval 2 (2026-11-12)
 
 AWS confirms ApproveTrafficShift Succeeded (review b9f9288a-dbc4-4019-85ea-9cb95c304d20); execution c02bc4e6 / pipeline v3 Succeeded. Both approvals were performed by the user. Live remains Blue v2/no weights, verified Green v3 retained, public health UP. This completes the Green/two-gate validation Story, with no traffic deployment stage. Next Story scope in docs/codedeploy-next-story.md; CodeDeploy/real cutover/rollback are not implemented, and old approvals must not authorize a new candidate or amended pipeline execution. Audit root log section 11.

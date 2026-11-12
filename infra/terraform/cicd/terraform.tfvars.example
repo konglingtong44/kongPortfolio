@@ -1,1 +1,5 @@
 expected_account_id = "<ACCOUNT_ID>"
+
+# Requires enable_candidate_pipeline, enable_staging and enable_green.
+# Opt in only after reviewing the paid-resource plan and both production gates.
+enable_deployment = false

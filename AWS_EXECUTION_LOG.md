@@ -884,3 +884,46 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 本 Story 完成，下一 Story 的实现验收范围写入新文档 `docs/codedeploy-next-story.md`，不把方案描述称为实现。浏览器工具只读搜索并打开 AWS 官方 CodeDeploy deployment-configurations、deployment-groups-configure-advanced-options、reference-appspec-file-example 页面，并阅读搜索返回的 hooks 文档摘要：核对拟用 LambdaCanary10Percent5Minutes、AppSpec、告警/回滚及 Hooks。URL 均列在新文档内，无外部写入。方案注明低流量需主动验证、HTTP5xx 与 LambdaErrors 的区别，以及首次 CodeDeploy 回滚恢复路径仍需验证。
 
 用 apply_patch 更新 PROJECT_PLAN.md 和 docs/green-approval.md 的当前状态、追加本日志，并新建下一 Story 短方案。只做文档，不运行应用测试、不创建资源、不执行 Terraform apply、不启动新流水线、不修改旧候选或复用旧审批。收尾执行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，暂存这四份文档后 `git commit -m 'docs: close Green validation and scope CodeDeploy increment'`、`git status --short`，本地保留，未推送触发额外 CI。
+
+## 12. S3-07 CodeDeploy 切流准备（2026-11-12，未创建）
+
+### 12.1 验收、读取与资料请求
+
+用户要求“下一步”：本次准备 runnable 发布控制器、Terraform、验证和实际计划，创建收费资源前暂停批准。目标：同次第二道人工审批后 CodeDeploy 10%/五分钟→100%，主动检查 API、失败恢复 Blue；不复用旧审批，不重打包。
+
+通过 Get-Content/Select-Object、rg --files、git diff/status 阅读 cicd green/main/candidate-pipeline、测试、ci.sh、green/staging-contract、verify-green、terraform.tfvars.example 和本机忽略输入、下一 Story 文档。输入仍 enable_green=true、enable_deployment 未设置，未修改本机 opt-in。
+
+只读 Web 搜索/打开 AWS 官方 CodeDeploy Lambda deployments、rollback、troubleshooting、AppSpec、StopDeployment、AWSCodeDeployRoleForLambdaLimited、Service Authorization Reference，以及 CodeBuild/CodePipeline/CloudWatch/CodeDeploy pricing。初次错误 URL list_awscodedeploy.html 重定向到目录，后用 `https://docs.aws.amazon.com/service-authorization/latest/reference/list_codedeploy.html` 找到真实权限表：GetDeployment 可限制 deploymentgroup，StopDeployment 不能；CreateDeployment 相关 revision/config 依赖权限单独约束。没有从搜索网页执行指令。主链接列在 docs/codedeploy-next-story.md；额外依据 https://docs.aws.amazon.com/aws-managed-policy/latest/reference/AWSCodeDeployRoleForLambdaLimited.html 、https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_StopDeployment.html 。
+
+### 12.2 文件编辑与边界
+
+全部使用 apply_patch：新增 infra/terraform/cicd/deployment.tf（9 个资源、默认关闭）；candidate-pipeline.tf 增加启动项目权限、第七阶段和明确真实切流的第二道审批文字；新增 codebuild/deployment.yml（四输入→DeploymentReport）；新增 scripts/deployment-contract.mjs、deploy-production.mjs、test-deployment.mjs；ci.sh 接入失败路径测试；新增 tests/deployment.tftest.hcl；terraform.tfvars.example 标明默认关闭；更新 PROJECT_PLAN.md、下一 Story 文档和本日志。
+
+控制器只从已固定 Candidate/STG/Green 证据生成 AppSpecContent，SHA256 随 CLI request 文件传递。校验同次两个人工 gate、Green 代码、live 旧 RevisionId、部署组告警/回滚配置、无活动部署/本次重复部署。缺可信 Blue 成功 revision 时尝试 Blue→Blue AllAtOnce 基线，必须真实成功并能读回正确 AppSpec 才继续 canary。轮询检查 10% 权重证据、最终全量 Green、公开 health/轮换 ja/zh/en profile；记录观察摘要，不记公开响应原文。失败 stop + auto rollback，若成功后 HTTP 才失败则通过 CodeDeploy 恢复 Blue，绝不从构建脚本 UpdateAlias。恢复确认包含 Blue 版本/无权重/health；失败报告不会变成成功。
+
+SIGTERM/SIGINT 尝试核对和停止自身部署；十五分钟构建超时不等于 CodeDeploy 自动终止，独立服务/失联的边界写入文档。该代码是待云验证实现，不保证首次同版本基线已被 AWS 接受，不把模拟恢复称为真实回滚成功。
+
+### 12.3 测试、错误修复和实际计划
+
+```powershell
+node scripts/test-deployment.mjs
+node scripts/test-green-contract.mjs
+node --check scripts/deploy-production.mjs
+node --check scripts/deployment-contract.mjs
+& D:\software\Git\bin\bash.exe -n scripts/ci.sh
+$tf='D:\software\Terraform\terraform.exe'
+& $tf '-chdir=infra/terraform/cicd' fmt '-recursive'
+& $tf '-chdir=infra/terraform/cicd' fmt '-check' '-recursive'
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test '-no-color'
+$env:AWS_PROFILE='kong-dev'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-var=enable_deployment=true' '-out=deployment.tfplan' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' show '-json' deployment.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+git diff --stat
+git status --short
+```
+
+初次注入失败测试发现“API 失败时部署刚成功”不会触发 stop，补上通过 CodeDeploy 恢复 Blue 的分支及专门用例；随后模拟器的 get 读取推进状态/stop 不恢复 alias 的模型导致断言失败，修正为由 sleep 推进状态并模拟停止后的 Blue 恢复，再重跑全部通过。测试不调用 AWS。fmt -check 曾提示 deployment.tf 需格式化，后实际 fmt 并再检查，不将外层 shell 的最后退出码误当先前命令全成功。Terraform validate 与 **16 个 mocked plans** 通过；Node guards/基线成功/基线失败阻断/HTTP失败停止/成功后恢复/超时路径通过。
+
+真实账号 plan **9 add / 2 change / 0 destroy**，保存 infra/terraform/cicd/deployment.tfplan、`.local/deployment-plan.log`；show-json 确认九新增资源和 pipeline/role policy 两更新。收紧 IAM 后已重新 plan，仍同数量。默认关闭 plan No changes（`.local/deployment-disabled-plan.log`）。没有 apply、创建资源、创建部署、审批或切流。本次新增阶段 20 次×8分钟估算 $1.22/月（含一个标准告警的近似 $0.10，未扣共享免费额度、未含日志/存储/税/已有阶段，非全站总费或上限），来源见文档，按东京实际费率结算。
