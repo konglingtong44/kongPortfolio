@@ -5,6 +5,13 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// Windows can execute hooks without Unix mode bits; Linux requires them.
+// Inspect Git's index so local verification catches broken cloud checkouts.
+for (const hook of ['pre-commit', 'pre-push']) {
+  const tracked = spawnSync('git', ['ls-files', '--stage', '--', `.githooks/${hook}`], { cwd: root, encoding: 'utf8' });
+  assert.equal(tracked.status, 0, tracked.stderr);
+  assert.match(tracked.stdout, /^100755 /, `${hook} must be executable in Git for Linux CI`);
+}
 mkdirSync(join(root, '.local'), { recursive: true });
 const fixture = mkdtempSync(join(root, '.local', 'hook-test-'));
 function git(args, env = process.env) {
@@ -25,12 +32,18 @@ const forbidden = [
   '履歴書_架空.xls', '職務経歴書_架空.xlsx', '简历.docx', 'CV example.pdf',
   '.env.local', '.aws/credentials', 'nested/.ssh/config', 'secrets/example.txt',
   'certificate.crt', 'private.pem', 'debug.log', 'service-account-test.json',
+  'infra/.terraform/terraform.tfstate', 'infra/terraform.tfstate',
+  'infra/terraform.tfstate.backup', 'infra/review.tfplan', 'infra/terraform.tfvars',
+  'infra/prod.tfvars.json', 'infra/terraform.tfstate.tflock', 'infra/backend.hcl',
+  'infra/override.tf', 'infra/local_override.tf.json', '.terraformrc', 'terraform.rc',
+  'infra/review.tfplan.json',
 ];
 for (const path of forbidden) {
   checked(['read-tree', '--empty']);
   const absolute = join(fixture, path);
   mkdirSync(dirname(absolute), { recursive: true });
   writeFileSync(absolute, 'Synthetic fixture only.\n');
+  assert.equal(git(['check-ignore', '-q', '--', path]).status, 0, `Not ignored: ${path}`);
   checked(['add', '-f', '--', path]);
   const result = git(['hook', 'run', 'pre-commit']);
   assert.notEqual(result.status, 0, `Hook allowed ${path}`);
@@ -39,6 +52,16 @@ for (const path of forbidden) {
 checked(['read-tree', '--empty']);
 writeFileSync(join(fixture, 'README.md'), '# Synthetic public source\n');
 checked(['add', '--', 'README.md']);
+checked(['hook', 'run', 'pre-commit']);
+
+// Public Terraform source, lockfile and placeholder templates must remain trackable.
+for (const path of ['infra/main.tf', 'infra/.terraform.lock.hcl', 'infra/backend.hcl.example', 'infra/terraform.tfvars.example']) {
+  const absolute = join(fixture, path);
+  mkdirSync(dirname(absolute), { recursive: true });
+  writeFileSync(absolute, '# Public configuration fixture\n');
+  assert.equal(git(['check-ignore', '-q', '--', path]).status, 1, `Public source ignored: ${path}`);
+  checked(['add', '--', path]);
+}
 checked(['hook', 'run', 'pre-commit']);
 
 // The hook must refuse to continue when the scanner is unavailable.

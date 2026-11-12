@@ -1,0 +1,1 @@
+Synthetic Terraform mock fixture only. Not a Lambda ZIP; never deploy this file.

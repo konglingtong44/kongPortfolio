@@ -1,0 +1,14 @@
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    if (request.method !== 'GET' && request.method !== 'HEAD') return request;
+    if (uri === '/api' || uri.indexOf('/api/') === 0) return request;
+    if (uri.indexOf('/releases/') === 0 || uri.indexOf('/assets/') === 0 || uri.indexOf('/images/') === 0) return request;
+    var prefix = '/releases/${release_id}';
+    if (uri === '/version.json' || uri === '/favicon.svg') {
+        request.uri = prefix + uri;
+    } else if (uri.substring(uri.lastIndexOf('/') + 1).indexOf('.') === -1) {
+        request.uri = prefix + '/index.html';
+    }
+    return request;
+}

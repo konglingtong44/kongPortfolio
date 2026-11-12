@@ -21,37 +21,67 @@
       "kind": "personal",
       "title": "kongPortfolio",
       "period": "2026.11 —",
-      "role": "Personal project / In progress",
-      "description": "A trilingual personal blog about my experience and technical interests. Built with React, TypeScript and Spring Boot, starting with a working local increment.",
-      "outcome": "Implemented: trilingual profile API, saved language selection and automated tests. Next: article features, followed by AWS deployment and AWS-native CI/CD.",
+      "role": "Design, development, AWS infrastructure & operations",
+      "description": "An evolving website built with React / TypeScript and Java 21 / Spring Boot. AWS infrastructure is managed with Terraform, with CI/CD, blue/green deployment and canary releases implemented.",
+      "outcome": "Live on AWS and under continued development. Verified Lambda releases from 10% canary traffic to full traffic, plus automatic rollback after a controlled stop. Amazon Bedrock Q&A integration is planned next; the endpoint currently returns a preparation status.",
       "tags": [
-        "React",
-        "TypeScript",
-        "Spring Boot",
-        "Docker / Compose"
+        "React / TypeScript",
+        "Java / Spring Boot",
+        "Terraform",
+        "AWS CI/CD"
       ],
-      "team": "Personal project",
+      "team": "1 developer",
       "responsibilities": [
-        "Build the React / TypeScript / Vite frontend and Java 21 / Spring Boot API.",
-        "Maintain file-based trilingual content, saved locale, regex visualization, automated tests and local Compose configuration.",
-        "AWS deployment, AWS CI/CD and Bedrock integration remain planned."
+        "Built the frontend with React / TypeScript / Vite and the backend API with Java 21 / Spring Boot, including Japanese, Chinese and English language selection and a regular expression tool.",
+        "Provisioned AWS infrastructure with Terraform: private S3 + CloudFront for the frontend and API Gateway HTTP API + Lambda for the backend.",
+        "Connected source retrieval, tests, builds, staging verification and production releases with CodeConnections / CodePipeline / CodeBuild, retaining two manual production approval gates.",
+        "Implemented Lambda blue/green deployment with CodeDeploy, shifting 10% of traffic for five minutes before full rollout. Verified canary traffic shifts and automatic rollback after a controlled stop.",
+        "Implemented versioned frontend releases in S3, switching the CloudFront release pointer after verification."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Frontend",
           "items": [
             "React",
             "TypeScript",
-            "Vite",
+            "Vite"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Backend",
+          "items": [
             "Java 21",
             "Spring Boot"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "AWS runtime & delivery",
           "items": [
-            "Docker / Compose",
+            "S3",
+            "CloudFront",
+            "API Gateway HTTP API",
+            "Lambda",
+            "IAM",
+            "CloudWatch"
+          ],
+          "description": ""
+        },
+        {
+          "title": "IaC & CI/CD",
+          "items": [
+            "Terraform",
+            "CodeConnections",
+            "CodePipeline",
+            "CodeBuild",
+            "CodeDeploy"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Testing",
+          "items": [
             "Vitest",
             "JUnit"
           ],
@@ -105,52 +135,64 @@
       "period": "2025.07 — 2026.07",
       "role": "PMO / Technical development",
       "team": "6 people (PMO)",
-      "description": "Support for quarterly releases, operational issues, workflow improvement and follow-on technical validation, spanning requirements, Java support, AWS checks and PoCs.",
-      "outcome": "Supported quarterly release preparation, operational fixes and tool-based workflow improvements; summarized PoC feasibility and constraints for follow-on planning.",
+      "description": "Coordinate requirements, specifications and scope for quarterly releases, supporting customers and developers through technical investigation, Java development, operational improvements, AWS environment checks, release support and PoCs.",
+      "outcome": "Coordinated implementation approaches, priorities and schedules to resolve issues and prepare quarterly releases. Improved workflows with support tools and documented validation findings and technical issues for follow-on planning.",
       "responsibilities": [
-        "Clarify requirements, scope, business and system impact, dependencies, priorities and release schedules.",
-        "Investigate screens, batch jobs and existing VB / Java / C# logic; support Java implementation decisions and code-level fixes.",
-        "Investigate logs and data, triage incidents and develop or adapt internal support tools.",
-        "Check S3, EFS and RDS configuration, environment differences, pipelines, deployment procedures and release settings. RDS involvement is inspection and configuration checking.",
-        "Use Athena to inspect logs and data for operational investigations.",
-        "Research AI call-center approaches, write small Java validation programs and support AWS validation environments and PoCs.",
-        "Compare tools including JMeter and Distributed Load Testing on AWS; document test coverage, procedures and technical issues."
+        "Quarterly releases and requirements coordination: Clarify customer requirements, confirm specifications and coordinate release scope. Assess business and system impacts and cross-system dependencies, supporting stakeholder agreement. Align approaches, priorities and schedules with customers and developers to resolve issues and prepare releases.",
+        "Technical investigation and development support: Investigate screens, batch processing and business logic to clarify change scope and impact. Discuss implementation approaches with developers based on customer requirements and existing system constraints. Provide Java implementation support and code-level fixes as needed.",
+        "Daily operations and workflow improvement: Investigate inquiries and defects through specification checks, logs, data and cause isolation. Coordinate cross-system work and ongoing issues with relevant departments. Review procedures and manual tasks, developing or adapting support tools to improve efficiency.",
+        "AWS environment checks and release support: Inspect AWS configuration including S3, EFS and RDS, document environment differences and verify release settings. Review release pipelines and deployment procedures and support automation. Use Athena to inspect logs and data for defect investigation and operational issue resolution.",
+        "Technical validation and PoC support: Research AI call-center technologies and AWS services and assess their applicability to requirements. Investigate automated testing and load-testing tools and support PoCs. Document findings and technical issues to support customer/developer decisions and follow-on initiatives."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "JSP",
-            "React",
-            "VB / C# (legacy analysis)"
+            "React"
           ],
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
+          "items": [
+            "RDS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "AWS",
           "items": [
             "S3",
             "EFS",
-            "RDS (inspection / configuration)",
             "Lambda",
             "CloudWatch",
             "IAM",
-            "Athena"
+            "Athena",
+            "EC2",
+            "VPC"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Testing tools",
           "items": [
-            "Git",
-            "Backlog",
-            "Confluence",
             "JMeter",
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
-            "Selenium (PoC)"
+            "Selenium"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "CI/CD"
           ],
           "description": ""
         }
@@ -159,22 +201,24 @@
         "Java",
         "JSP",
         "React",
-        "VB / C# (legacy analysis)",
+        "RDS",
         "S3",
         "EFS",
-        "RDS (inspection / configuration)",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
-        "Git",
-        "Backlog",
-        "Confluence",
+        "EC2",
+        "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium (PoC)"
+        "Selenium",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "CI/CD"
       ]
     },
     {
@@ -187,50 +231,42 @@
       "outcome": "Enabled continued use after the update and helped standardize installation through MSI packaging and Intune distribution.",
       "responsibilities": [
         "Investigate existing Java and VBScript assets, configuration, Salesforce requirements and the change impact.",
-        "Modify and reimplement Java Swing functionality and remove dependencies on the old environment.",
+        "Modify and reimplement existing Java functionality and remove dependencies on the old environment.",
         "Implement communication encryption required by the system update.",
         "Create a C# startup wrapper, package the application as MSI and support Intune automated installation.",
         "Verify and test behavior, coordinate with users and address improvement requests."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages",
           "items": [
-            "Java Swing",
+            "Java",
             "C#",
             "VBScript"
           ],
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Other tools & platforms",
           "items": [
-            "RDS",
-            "Apigee"
-          ],
-          "description": ""
-        },
-        {
-          "title": "Tools & runtime",
-          "items": [
-            "MSI",
+            "JMeter",
             "Intune",
+            "MSI (Windows Installer)",
             "Visual Studio",
-            "JMeter"
+            "Salesforce"
           ],
           "description": ""
         }
       ],
       "tags": [
-        "Java Swing",
+        "Java",
         "C#",
         "VBScript",
-        "RDS",
-        "Apigee",
-        "MSI",
+        "JMeter",
         "Intune",
+        "MSI (Windows Installer)",
         "Visual Studio",
-        "JMeter"
+        "Salesforce"
       ]
     },
     {
@@ -245,14 +281,14 @@
         "Clarify requirements, write basic and detailed designs, and implement screens and business logic with Java, Spring and Vue.",
         "Develop customer input, updates and validation, new-product application logic and fee/premium calculations.",
         "Implement internal lists, activity calendars, expense-related screens and scheduled inter-system data exchange.",
-        "Implement Lambda, S3 and API Gateway functionality and adapt existing modules for AWS operation and migration.",
+        "Implement AWS functionality and adapt existing modules for cloud operation and migration.",
         "Handle Apigee API management, authentication, access control and permissions, and verify test-environment connectivity.",
         "Plan and execute unit, integration and performance tests; tune DB/API responses and prepare and execute production releases.",
-        "Support Vue 2 → 3 and Tableau embedding API v2 → v3 upgrades; coordinate progress, issues and code reviews on internal-system development."
+        "Support Vue 2 → 3 upgrades; coordinate progress, issues and code reviews on internal-system development."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "Spring",
@@ -263,26 +299,32 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Database",
           "items": [
-            "DB2",
-            "AWS Lambda",
-            "S3",
-            "API Gateway",
-            "Apigee"
+            "DB2"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "AWS",
+          "items": [
+            "AWS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Other tools & platforms",
           "items": [
             "Git",
             "Bitbucket",
+            "majorFlow",
             "Artifactory",
             "Tableau",
             "TWS",
             "Postman",
+            "Apigee",
             "JMeter",
+            "Jasper",
             "WebSphere"
           ],
           "description": ""
@@ -295,41 +337,38 @@
         "C#",
         "VBScript",
         "DB2",
-        "AWS Lambda",
-        "S3",
-        "API Gateway",
-        "Apigee",
+        "AWS",
         "Git",
         "Bitbucket",
+        "majorFlow",
         "Artifactory",
         "Tableau",
         "TWS",
         "Postman",
+        "Apigee",
         "JMeter",
+        "Jasper",
         "WebSphere"
       ]
     },
     {
       "kind": "work",
-      "title": "Telecom applications and platform renewal",
-      "period": "2019.05 — 2023.05",
+      "title": "Telecom development, platform migration & team delivery",
+      "period": "2018.06 — 2023.05",
       "role": "Developer / SE / Sub-lead",
-      "team": "1–15 people",
-      "description": "Long-term telecom web, batch and API work plus multi-system migration and reconstruction, spanning requirements, development, middleware, testing and production delivery.",
-      "outcome": "Independently released key APIs and small web systems; supported platform cutover across application and infrastructure work. The team extended shared API access to more than 30 services.",
+      "team": "Assigned teams of 1–15 people",
+      "description": "Long-term work for the same telecom customer after graduating in 2018, spanning independently built web systems and APIs, large migrations, platform renewal and urgent investigation with limited documentation or unavailable source code. Worked as a developer, SE and sub-lead across implementation, customer coordination and team delivery.",
+      "outcome": "Independently delivered key APIs and small websites from initial requirements through production release. Supported cutovers through application changes and infrastructure configuration and verification; the team rolled out shared API access to more than 30 services. As sub-lead, supported a large migration spanning dozens of related projects through assigned-team progress and issue management, technical support and customer coordination.",
       "responsibilities": [
-        "Independently deliver key APIs and small web systems from requirements through design, code, tests and production release.",
-        "Develop equipment registration, lookup, updates and deletion, data extraction, analysis, CSV output and bulk updates.",
-        "Design shared logging, aggregation, CSV parsing/conversion libraries and internal utility tools.",
-        "Automate periodic analysis and output using Shell and schedulers; investigate legacy VB6 behavior for migration changes.",
-        "Adapt applications for Tomcat-to-WildFly migration, configure WildFly/Nginx/Tomcat and verify related-system connectivity.",
-        "Prepare Linux/Windows environments, inspect logs, configure and verify Jenkins and check behavior during cutover.",
-        "Replace direct DB access with shared APIs to meet security requirements.",
-        "Execute unit, integration and performance tests and tuning; manage progress/issues, assign work, support teammates, review deliverables and coordinate with customers."
+        "Independent web and API delivery (Developer / SE): Build selected key APIs and small web systems from scratch, owning requirements, design, implementation, testing and production release. Develop web and batch functions, information lookup, extraction and CSV output, shared libraries and support tools. Coordinate specifications and additional requirements, execute unit/integration/performance tests, fix defects, tune performance and prepare releases and cutover checks.",
+        "Multi-system migration and platform renewal (SE): Assess migration impacts across multi-server systems, clarify required changes and adapt existing functions. Modify applications for Tomcat-to-WildFly migration; configure and verify WildFly, Nginx and Tomcat and test connected systems. Configure and verify Jenkins and help replace direct database access with shared APIs.",
+        "Urgent investigation with limited documentation or unavailable source: Compare available logs, configuration and observed behavior to investigate existing processing and impacts. Clarify technical uncertainties and response options with customers and stakeholders to support incident handling and changes.",
+        "Team management and large migration delivery (Sub-lead): Participate in a large system migration spanning dozens of related projects. Track assigned-team progress, issues and responses across teams of 1–15 people depending on the project, adjusting priorities and schedules. Assign work, provide technical support, review deliverables and coordinate customers and related teams to resolve issues and prepare releases.",
+        "Early development and database migration: From 2018, investigate, modify and test scheduled Shell tasks for Oracle-to-Hadoop migration and coordinate deliverables. Develop information lookup and upstream data transmission, contribute detailed designs and unit tests, and expand from implementation into design, platform work and team delivery."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "Spring",
@@ -337,144 +376,12 @@
             "CSS",
             "JavaScript",
             "jQuery",
-            "Shell",
-            "Perl",
-            "VB6 (legacy analysis)"
-          ],
-          "description": ""
-        },
-        {
-          "title": "Cloud, data & platforms",
-          "items": [
-            "Oracle",
-            "SQL Server",
-            "Tomcat",
-            "WildFly",
-            "Nginx"
-          ],
-          "description": ""
-        },
-        {
-          "title": "Tools & runtime",
-          "items": [
-            "Git",
-            "SVN",
-            "Jenkins",
-            "JMeter",
-            "SoapUI",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Java",
-        "Spring",
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "jQuery",
-        "Shell",
-        "Perl",
-        "VB6 (legacy analysis)",
-        "Oracle",
-        "SQL Server",
-        "Tomcat",
-        "WildFly",
-        "Nginx",
-        "Git",
-        "SVN",
-        "Jenkins",
-        "JMeter",
-        "SoapUI",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "Telecom information lookup development",
-      "period": "2018.12 — 2019.04",
-      "role": "Developer",
-      "team": "7+ people",
-      "description": "Develop and test customer-information retrieval and lookup functions in telecom systems.",
-      "outcome": "Completed assigned development and testing, supporting stable information lookup functionality.",
-      "responsibilities": [
-        "Implement lookup, data extraction, CSV formatting and output under existing specifications.",
-        "Implement data transmission to an upstream system.",
-        "Contribute detailed designs, extend test cases and execute unit and behavior tests.",
-        "Investigate defects and complete the assigned implementation and tests."
-      ],
-      "environment": [
-        {
-          "title": "Languages & applications",
-          "items": [
-            "Java",
-            "Spring",
-            "HTML5",
-            "CSS",
-            "JavaScript",
-            "jQuery"
-          ],
-          "description": ""
-        },
-        {
-          "title": "Cloud, data & platforms",
-          "items": [
-            "Oracle",
-            "Tomcat"
-          ],
-          "description": ""
-        },
-        {
-          "title": "Tools & runtime",
-          "items": [
-            "SVN",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Java",
-        "Spring",
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "jQuery",
-        "Oracle",
-        "Tomcat",
-        "SVN",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "Oracle-to-Hadoop task migration",
-      "period": "2018.06 — 2018.12",
-      "role": "Developer",
-      "team": "30+ people",
-      "description": "Database migration affecting hundreds of telecom functions. Responsible for assigned scheduled-task changes, tests and delivery coordination.",
-      "outcome": "Completed assigned migration changes and contributed to the overall database migration.",
-      "responsibilities": [
-        "Investigate the impact of Oracle-to-Hadoop migration on existing task processing.",
-        "Adapt scheduled Shell tasks and manage source and deliverables.",
-        "Extend and run unit tests, checking the results.",
-        "Resolve migration-related defects and coordinate assigned deliverables."
-      ],
-      "environment": [
-        {
-          "title": "Languages & applications",
-          "items": [
             "Shell"
           ],
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
             "Oracle",
             "Hadoop"
@@ -482,22 +389,50 @@
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Middleware & platforms",
+          "items": [
+            "Tomcat",
+            "WildFly",
+            "Nginx"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Testing tools",
+          "items": [
+            "JMeter",
+            "SoapUI"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
           "items": [
             "SVN",
-            "Linux",
-            "Windows"
+            "LoadStar",
+            "Jenkins"
           ],
           "description": ""
         }
       ],
       "tags": [
+        "Java",
+        "Spring",
+        "HTML5",
+        "CSS",
+        "JavaScript",
+        "jQuery",
         "Shell",
         "Oracle",
         "Hadoop",
+        "Tomcat",
+        "WildFly",
+        "Nginx",
+        "JMeter",
+        "SoapUI",
         "SVN",
-        "Linux",
-        "Windows"
+        "LoadStar",
+        "Jenkins"
       ]
     }
   ],
@@ -510,7 +445,7 @@
     {
       "period": "2025.07 — 2026.07",
       "title": "Call-center development and operational delivery",
-      "description": "Support for quarterly releases, operational issues, workflow improvement and follow-on technical validation, spanning requirements, Java support, AWS checks and PoCs."
+      "description": "Coordinate requirements, specifications and scope for quarterly releases, supporting customers and developers through technical investigation, Java development, operational improvements, AWS environment checks, release support and PoCs."
     },
     {
       "period": "2025.01 — 2025.06",
@@ -523,19 +458,9 @@
       "description": "Development, changes and AWS migration across insurance and internal management systems, covering design, implementation, testing and production releases."
     },
     {
-      "period": "2019.05 — 2023.05",
-      "title": "Telecom applications and platform renewal",
-      "description": "Long-term telecom web, batch and API work plus multi-system migration and reconstruction, spanning requirements, development, middleware, testing and production delivery."
-    },
-    {
-      "period": "2018.12 — 2019.04",
-      "title": "Telecom information lookup development",
-      "description": "Develop and test customer-information retrieval and lookup functions in telecom systems."
-    },
-    {
-      "period": "2018.06 — 2018.12",
-      "title": "Oracle-to-Hadoop task migration",
-      "description": "Database migration affecting hundreds of telecom functions. Responsible for assigned scheduled-task changes, tests and delivery coordination."
+      "period": "2018.06 — 2023.05",
+      "title": "Telecom development, platform migration & team delivery",
+      "description": "Long-term work for the same telecom customer after graduating in 2018, spanning independently built web systems and APIs, large migrations, platform renewal and urgent investigation with limited documentation or unavailable source code. Worked as a developer, SE and sub-lead across implementation, customer coordination and team delivery."
     },
     {
       "period": "2014.09 — 2018.06",

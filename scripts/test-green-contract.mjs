@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import { contracts } from './staging-contract.mjs';
+import { liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged } from './green-contract.mjs';
+
+requireGreenTarget('kongportfolio-prod', '123456789012');
+assert.throws(() => requireGreenTarget('kongportfolio-other', '123456789012'), /intended/);
+const before = { Name: 'live', FunctionVersion: '2', RevisionId: 'revision-1' };
+assert.equal(liveSnapshot(before).version, '2');
+assert.throws(() => liveSnapshot({ ...before, RoutingConfig: { AdditionalVersionWeights: { '3': 0.1 } } }), /existing live traffic/);
+assert.throws(() => requireLiveUnchanged(before, { ...before, FunctionVersion: '3' }), /Live alias changed/);
+const manifest = { gitCommit: 'a'.repeat(40), releaseId: 'b'.repeat(64), backend: { sha256: 'c'.repeat(64) } };
+const execution = { pipelineName: 'kongportfolio-candidate', pipelineExecutionId: 'run-1', artifactRevisions: [{ name: 'SourceRef', revisionId: manifest.gitCommit }] };
+const actions = ['Source', 'BuildCandidate', 'VerifyStaging', 'ApproveProduction'].map(stageName => ({ stageName, actionName: stageName === 'ApproveProduction' ? 'ApproveGreenCreation' : 'other', status: 'Succeeded', actionExecutionId: 'approved-action' }));
+const staging = { schemaVersion: 1, kind: 'staging-verification', passed: true, pipelineExecutionId: 'run-1', gitCommit: manifest.gitCommit, releaseId: manifest.releaseId, backendSha256: manifest.backend.sha256, functionName: 'kongportfolio-stg', functionVersion: '3', checks: contracts.map(contract => ({ name: contract.label, status: 'passed' })) };
+assert.equal(requireApprovedContext(execution, actions, manifest, staging, 'run-1'), 'approved-action');
+assert.throws(() => requireApprovedContext(execution, actions.filter(action => action.stageName !== 'ApproveProduction'), manifest, staging, 'run-1'), /Required stage/);
+assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...staging, pipelineExecutionId: 'other-run' }, 'run-1'));
+assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...staging, releaseId: 'different' }, 'run-1'));
+assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...staging, checks: [] }, 'run-1'));
+console.log('Green guard checks passed: wrong target, existing traffic shift, changed live alias, missing approval and cross-run/candidate reports rejected. No AWS calls.');

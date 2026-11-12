@@ -1,0 +1,33 @@
+# S3-05 — STG verification and production approval 1
+
+Completed 2026-11-12: approved 8 creates / 2 updates applied. Execution `1222a3dd-3302-4943-b992-8f9f2d2c087e`, source `4d12091dd8ce6899949c1653d0855c781129abf5`, has Source/BuildCandidate/VerifyStaging succeeded and Approval 1 **pending/InProgress**. STG version 3 passed all seven checks; report downloaded by exact S3 version and checked against Lambda CodeSha256/exported variables. Release `f784feab86d0ef506f6d6678e58c8cff43210343bf882c22e29d7182dc11c10a`. Initial waiter failure corrected to configuration-only function-updated without expanding IAM. Final plan No changes; production live remains version 2, no weights, HTTPS health UP. No approval performed. Commands/failure/recovery: root log section 7.
+
+Current flow: Source → BuildCandidate → VerifyStaging → ApproveProduction, with one immutable candidate flowing through the run. It stops for a human after STG checks; no production Green or traffic change in this Story. Approval 2 remains mandatory after later Green validation and before CodeDeploy routing. Enabling resources was not approval of production promotion. The currently waiting pipeline version has no action after gate 1 yet.
+
+## Minimal STG scope
+
+Isolated Java 21 Lambda `kongportfolio-stg`, 1 GB / 28 seconds, reserved concurrency one (not provisioned), no public endpoint, logs seven days, log-only execution role. A new CodeBuild verifier receives SourceRef as PrimarySource and Candidate as a secondary artifact. It verifies the full manifest/source SHA, uploads the exact backend ZIP with optimistic RevisionId, then invokes an immutable published version. If the same checksum/configuration is already published, reuse that version instead of rebuilding it. Checks: health, ja/zh/en profile, placeholder POST, genuine 404 and 405, successful-response no-store. Frontend file/version checks are included, but there is no separate STG website, API Gateway or browser E2E claim.
+
+STG build role may update/publish/invoke only the STG function. It cannot alter function configuration, production functions, routing, IAM or approval decisions. Existing CI/candidate-build roles retain their boundaries. Pipeline role gains only permission to start/read the new verifier project. Source credentials still use the existing repository-scoped connection.
+
+Terraform owns STG function configuration; pipeline owns function code after bootstrap. `ignore_changes` covers filename/source_code_hash deliberately, not runtime/role/environment. A verified local bootstrap ZIP and manifest checksum are required for creation and subsequent plans. Preserve those ignored inputs/files; another workstation must restore verified inputs before planning. Current bootstrap is the already downloaded and checksum-verified candidate `f6c634...`, not a synthetic test fixture.
+
+## Artifact and approval
+
+VerifyStaging publishes StagingReport with source commit, releaseId, backend checksum, Lambda code checksum, immutable version and individual check results. Raw invocation payloads/responses stay in ephemeral ignored workspace; report has no profile body. Gate CustomData shows exported releaseId/STG version plus Source commit. Review the report in the same execution before approval. Build roles have no PutApprovalResult permission. Do not put live approval tokens in logs.
+
+This Story's gate is the first production approval boundary; nothing production-changing follows it yet. Validation should leave it pending for the owner, not automatically approve it. Default approval expiry is seven days. QUEUED execution means a pending approval holds later runs in queue; explicitly review/reject/stop stale runs before another practice run. Candidate artifacts expire after 30 days; approval/promotion must retain the exact reviewed artifact in the later release Story.
+
+## Plan, cost and checks
+
+Applied reviewed plan: **8 creates / 2 updates / 0 deletes**. New: Lambda, verifier project, two log groups, two roles, two inline policies. Updates: existing pipeline stages and its verifier StartBuild permission. STG defaults off on a new checkout; this machine now persists enable_staging and verified bootstrap inputs in ignored tfvars. Restore intended local inputs on another machine before planning. No new website/CDN/API Gateway/ALB/NAT, no production modification.
+
+Extra STG example: 20 runs × (2 CodeBuild minutes × $0.005 + 2 pipeline action minutes × $0.002) = about $0.28 before allowances, plus small Lambda requests/duration, logs/S3/tax; previous candidate stages are separate. Actual verification time is unmeasured. No Lambda idle compute fee or provisioned concurrency is configured; reserved concurrency itself has no extra fee. Manual approval action is not billed per minute. Existing account allowances are shared, so no promise of zero cost. Verifier timeout ten minutes, queue five, concurrency one, zero auto retries.
+
+Checks: ten mocked Terraform plans; Node production-target/immutable/checksum/runtime/HTTP/cache tests; real existing CI and candidate build; real STG code update, version-qualified invokes, multi-artifact report and exported approval variables. The mock bootstrap text fixture is never deployed. Direct invocation still does not verify browser/CloudFront/API Gateway behavior in STG.
+
+Published `17f55f9e7ee60d92bf57d25e829b027ede919198`: both existing AWS CI builds and GitHub statuses pass, with frontend 40 tests/build and backend 9+3 tests/ZIP smoke. Final verification notes are committed locally for the next publish. Bootstrap hash is checked during planning; rehash the file against its verified manifest immediately before applying a saved plan as well.
+
+Preparation commands and all file/Git/request operations: [root operation log](../AWS_EXECUTION_LOG.md), sections 6–7. Do not reapply the original saved create plans. Current pending review: [AWS pipeline](https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1). Downloaded report remains under `.local/staging-review-1222a3dd/report.json`. Green and approval 2 are not part of this waiting execution.
+
+References: [multiple CodeBuild inputs](https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html), [manual approvals](https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html), [Lambda optimistic code updates](https://docs.aws.amazon.com/lambda/latest/api/API_UpdateFunctionCode.html), [reserved concurrency](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html), [pipeline pricing](https://aws.amazon.com/codepipeline/pricing/).

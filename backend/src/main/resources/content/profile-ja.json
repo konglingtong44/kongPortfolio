@@ -21,37 +21,67 @@
       "kind": "personal",
       "title": "kongPortfolio",
       "period": "2026.11 —",
-      "role": "個人開発 / 開発中",
-      "description": "自分の経験と技術への関心を伝える、三言語の個人ブログ。React・TypeScript と Spring Boot をつなぎ、ローカルで動くところから育てています。",
-      "outcome": "現在：三言語プロフィール API、言語切り替え・保存、テストを実装。次は記事機能、その先に AWS デプロイと AWS ネイティブ CI/CD を予定。",
+      "role": "設計・実装・AWS 基盤構築・運用",
+      "description": "React / TypeScript と Java 21 / Spring Boot で継続開発している Web サイト。Terraform による AWS 基盤構築と、CI/CD・ブルーグリーン／カナリアデプロイを実装。",
+      "outcome": "AWS で公開・継続開発中。Lambda の 10% カナリア切り替えから全量公開、手動停止時の自動ロールバックを検証済み。次は Amazon Bedrock を使った Q&A の接続を予定しており、現在は準備中の応答のみ。",
       "tags": [
-        "React",
-        "TypeScript",
-        "Spring Boot",
-        "Docker / Compose"
+        "React / TypeScript",
+        "Java / Spring Boot",
+        "Terraform",
+        "AWS CI/CD"
       ],
-      "team": "個人開発",
+      "team": "1 名",
       "responsibilities": [
-        "React / TypeScript / Vite と Java 21 / Spring Boot API を実装。",
-        "ファイルベースの三言語コンテンツ、言語保存、正規表現可視化、テストとローカル Compose 構成を整備。",
-        "AWS デプロイ、AWS CI/CD、Bedrock 接続は後続計画。"
+        "フロントエンドは React / TypeScript / Vite、バックエンド API は Java 21 / Spring Boot で実装。日本語・中国語・英語の切り替えと正規表現ツールを提供。",
+        "Terraform で AWS 基盤を構築。フロントエンドは非公開 S3 + CloudFront、バックエンドは API Gateway HTTP API + Lambda で公開。",
+        "CodeConnections / CodePipeline / CodeBuild でソース取得、テスト、ビルド、ステージング検証から本番公開までを構築。本番リリースには二段階の手動承認を設定。",
+        "CodeDeploy で Lambda のブルーグリーンデプロイを実装。新バージョンに 10% のトラフィックを流し、5 分後に全量へ切り替えるカナリア方式と、手動停止時の自動ロールバックを検証。",
+        "フロントエンドは S3 にリリース単位で保存し、検証後に CloudFront の配信先を切り替えるバージョン管理付き公開を実装。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "フロントエンド",
           "items": [
             "React",
             "TypeScript",
-            "Vite",
+            "Vite"
+          ],
+          "description": ""
+        },
+        {
+          "title": "バックエンド",
+          "items": [
             "Java 21",
             "Spring Boot"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "AWS 実行・配信基盤",
           "items": [
-            "Docker / Compose",
+            "S3",
+            "CloudFront",
+            "API Gateway HTTP API",
+            "Lambda",
+            "IAM",
+            "CloudWatch"
+          ],
+          "description": ""
+        },
+        {
+          "title": "IaC・CI/CD",
+          "items": [
+            "Terraform",
+            "CodeConnections",
+            "CodePipeline",
+            "CodeBuild",
+            "CodeDeploy"
+          ],
+          "description": ""
+        },
+        {
+          "title": "テスト",
+          "items": [
             "Vitest",
             "JUnit"
           ],
@@ -105,52 +135,64 @@
       "period": "2025.07 — 2026.07",
       "role": "PMO / 技術開発",
       "team": "6 名（PMO）",
-      "description": "四半期リリース、日常運用課題、業務効率化と後続施策の検証を支援。要件・仕様調整から技術調査、Java 実装支援、AWS 環境確認、PoC まで担当。",
-      "outcome": "四半期ごとの大型リリース準備を支援。日常運用の調査・改修と業務ツールによる効率化を進め、PoC の実現性・課題を後続施策の検討につなげた。",
+      "description": "四半期ごとの大型リリースに向けた要件・仕様・対象範囲の調整を担当。技術調査と Java 開発支援、日常運用の改善、AWS 環境確認・リリース支援、技術検証・PoC を通じて、顧客と開発チームの対応を推進。",
+      "outcome": "顧客・開発チームとの対応方針、優先順位、スケジュールの調整を通じて、課題解消と四半期リリース準備を推進。業務支援ツールによる効率化を行い、検証結果と技術課題を後続施策の検討につなげた。",
       "responsibilities": [
-        "顧客要件・改修範囲・業務影響・システム間依存関係を整理し、優先順位とリリース日程を調整。",
-        "画面・バッチ・既存 VB / Java / C# ロジックを調査し、Java の実装方針検討とコード修正を支援。",
-        "ログ・データから不具合原因を切り分け、問い合わせ対応と業務支援ツールの作成・改修を実施。",
-        "S3・EFS・RDS の構成と環境差異、パイプライン・デプロイ手順・リリース設定を確認。RDS は参照・構成確認の範囲。",
-        "Athena によるログ・データ確認を行い、運用課題の調査を支援。",
-        "AI コールセンター関連の調査、簡易 Java 検証コード、AWS 検証環境の準備と PoC を支援。",
-        "JMeter・Distributed Load Testing on AWS 等を比較し、テスト観点・検証手順と技術課題を整理。"
+        "四半期リリース推進・要件調整：四半期ごとの大型リリースに向け、顧客要件の整理、仕様確認、対象範囲の調整を担当。改修に伴う業務影響・システム影響、他システムとの依存関係を整理し、関係者との合意形成を支援。顧客および開発チームと対応方針・優先順位・スケジュールを調整し、課題解消とリリース準備を推進。",
+        "技術調査・開発支援：画面・バッチ処理・業務ロジックを調査し、改修範囲と影響範囲を整理。顧客要件と既存システムの制約を踏まえ、開発チームと実現方式・実装方針を検討。Java による実装支援やコードレベルでの修正対応など、課題に応じた技術支援を実施。",
+        "日常運用対応・業務改善：日常運用で発生する問い合わせや不具合について、仕様確認、ログ・データ調査、原因切り分けを実施。他システムに依存する作業や継続課題を整理し、関係部署と連携して対応を推進。日常業務の手順や手作業を見直し、業務支援ツールの作成・改修による効率化を実施。",
+        "AWS 環境確認・リリース支援：AWS 環境の構成確認（S3、EFS、RDS 等）、環境差異の整理およびリリース時の設定確認を実施。リリースパイプライン、デプロイ手順を確認し、自動化対応を支援。Athena を用いたログ・データ確認を通じて、不具合調査や運用課題の解決を支援。",
+        "技術検証・PoC 支援：AI コールセンター関連技術や AWS サービスを調査し、要件への適用可能性を検討。自動化テスト、負荷テストに関するツール調査および PoC を支援。検証結果や技術課題を整理し、顧客・開発チームとの方針検討および後続施策の推進を支援。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "JSP",
-            "React",
-            "VB / C# （既存資産の調査）"
+            "React"
           ],
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
+          "items": [
+            "RDS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "AWS",
           "items": [
             "S3",
             "EFS",
-            "RDS （参照・構成確認）",
             "Lambda",
             "CloudWatch",
             "IAM",
-            "Athena"
+            "Athena",
+            "EC2",
+            "VPC"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "テストツール",
           "items": [
-            "Git",
-            "Backlog",
-            "Confluence",
             "JMeter",
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
-            "Selenium （PoC）"
+            "Selenium"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "CI/CD"
           ],
           "description": ""
         }
@@ -159,22 +201,24 @@
         "Java",
         "JSP",
         "React",
-        "VB / C# (legacy analysis)",
+        "RDS",
         "S3",
         "EFS",
-        "RDS (inspection / configuration)",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
-        "Git",
-        "Backlog",
-        "Confluence",
+        "EC2",
+        "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium (PoC)"
+        "Selenium",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "CI/CD"
       ]
     },
     {
@@ -187,50 +231,42 @@
       "outcome": "更新後もツールを継続利用できるよう対応。MSI 化と Intune 自動配布によって導入手順の標準化に貢献。",
       "responsibilities": [
         "Java・VBScript 等の既存資産と構成を調査し、Salesforce 側の要件、影響範囲と改修方針を整理。",
-        "Java Swing の既存機能を改修・再実装し、旧環境に依存する処理を見直し。",
+        "Java の既存機能を改修・再実装し、旧環境に依存する処理を見直し。",
         "システム更新に伴う通信暗号化対応を実装。",
         "C# ラッパーで起動方式を見直し、MSI 形式でパッケージ化。Intune の自動インストールに対応。",
         "動作確認・テストと利用部門との調整を行い、改善要望に対応。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語",
           "items": [
-            "Java Swing",
+            "Java",
             "C#",
             "VBScript"
           ],
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "その他",
           "items": [
-            "RDS",
-            "Apigee"
-          ],
-          "description": ""
-        },
-        {
-          "title": "ツール・実行環境",
-          "items": [
-            "MSI",
+            "JMeter",
             "Intune",
+            "MSI (Windows Installer)",
             "Visual Studio",
-            "JMeter"
+            "Salesforce"
           ],
           "description": ""
         }
       ],
       "tags": [
-        "Java Swing",
+        "Java",
         "C#",
         "VBScript",
-        "RDS",
-        "Apigee",
-        "MSI",
+        "JMeter",
         "Intune",
+        "MSI (Windows Installer)",
         "Visual Studio",
-        "JMeter"
+        "Salesforce"
       ]
     },
     {
@@ -245,14 +281,14 @@
         "要件整理、基本・詳細設計書の作成、Java / Spring / Vue による画面と業務ロジックを実装。",
         "顧客情報の入力・更新・検証、商品追加時の申込処理、手数料・保険料の試算機能を開発。",
         "内部管理の一覧・活動カレンダー・経費関連画面や、他システムへの定期データ連携を設計・実装。",
-        "Lambda・S3・API Gateway を使う機能を実装し、既存機能のクラウド対応と移行を支援。",
+        "AWS を使う機能を実装し、既存機能のクラウド対応と移行を支援。",
         "Apigee の API 管理・認証・アクセス制御と権限設計、テスト環境の疎通確認に対応。",
         "単体・結合・性能テスト、DB / API 応答の改善、本番リリース資材の準備と作業を担当。",
-        "Vue 2 → 3、Tableau 埋め込み API v2 → v3 に対応。内部管理開発では進捗・課題共有、実装レビューとチーム調整も担当。"
+        "Vue 2 → 3 に対応。内部管理開発では進捗・課題共有、実装レビューとチーム調整も担当。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "Spring",
@@ -263,26 +299,32 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
-            "DB2",
-            "AWS Lambda",
-            "S3",
-            "API Gateway",
-            "Apigee"
+            "DB2"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "AWS",
+          "items": [
+            "AWS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "その他",
           "items": [
             "Git",
             "Bitbucket",
+            "majorFlow",
             "Artifactory",
             "Tableau",
             "TWS",
             "Postman",
+            "Apigee",
             "JMeter",
+            "Jasper",
             "WebSphere"
           ],
           "description": ""
@@ -295,41 +337,38 @@
         "C#",
         "VBScript",
         "DB2",
-        "AWS Lambda",
-        "S3",
-        "API Gateway",
-        "Apigee",
+        "AWS",
         "Git",
         "Bitbucket",
+        "majorFlow",
         "Artifactory",
         "Tableau",
         "TWS",
         "Postman",
+        "Apigee",
         "JMeter",
+        "Jasper",
         "WebSphere"
       ]
     },
     {
       "kind": "work",
-      "title": "通信業務システムの開発・基盤更改",
-      "period": "2019.05 — 2023.05",
+      "title": "通信システム開発・基盤更改・チーム推進",
+      "period": "2018.06 — 2023.05",
       "role": "PG / SE / サブリーダー",
-      "team": "1–15 名",
-      "description": "通信系 Web・バッチ・API と複数システムの移行・再構築。要件定義から開発、基盤設定、テスト、顧客調整、本番リリースまで担当。",
-      "outcome": "主要 API・小規模 Web を単独で商用化。アプリと基盤の両面から新環境への切替を支援し、共通 API 方式をチームとして 30 以上のサービスへ展開。",
+      "team": "担当チーム 1–15 名",
+      "description": "2018 年の大学卒業後から同一の通信系顧客先に長期参画。小規模 Web・主要 API のゼロからの単独開発、大規模移行、基盤更改、資料・ソースコードが不足する状況での緊急調査まで担当。PG・SE・サブリーダーとして、実装から顧客調整・チーム管理まで対応。",
+      "outcome": "主要 API・小規模 Web システムを単独で立ち上げ、要件定義から本番リリースまで完遂。アプリ改修と基盤設定・検証の両面で新環境への切替を支援し、共通 API 経由のアクセス方式をチームとして 30 以上のサービスへ展開。サブリーダーとして、数十の関連案件を含む大規模移行で担当チームの進捗・課題管理、技術支援、顧客調整を行い、開発・移行作業を推進。",
       "responsibilities": [
-        "主要 API と小規模 Web システムを、要件定義から設計・実装・テスト・本番リリースまで単独で担当。",
-        "機器情報の登録・照会・更新・削除、抽出・分析と CSV 出力 / 一括更新を開発。",
-        "ログ出力、データ集計、CSV 解析・変換の共通ライブラリや業務支援ツールを設計・実装。",
-        "Shell / スケジューラで定期分析・自動出力を構築し、VB6 等の既存仕様を調査して改修へ反映。",
-        "Tomcat → WildFly のアプリ改修、WildFly・Nginx・Tomcat の設定、関連機器との接続を検証。",
-        "Linux / Windows の環境整備、ログ確認、Jenkins の設定・動作確認と移行時の動作確認を担当。",
-        "セキュリティ要件に合わせ、DB 直接接続から共通 API 経由へアクセス方式を変更。",
-        "単体・結合・性能テストとチューニングを実施。サブリーダーとして進捗・課題管理、作業指示、技術支援・成果物レビューと顧客調整を担当。"
+        "ゼロからの Web・API 開発（PG／SE）：一部の主要 API・小規模 Web システムを、要件定義、設計、実装、テスト、本番リリースまで単独で担当。Web・バッチの業務機能、情報照会、データ抽出・CSV 出力、共通ライブラリや業務支援ツールを開発。顧客との仕様確認・追加要件の調整、単体・結合・性能テスト、不具合修正、性能改善とリリース資材の準備・切替確認まで対応。",
+        "複数システムの移行・基盤更改（SE）：複数サーバー上のシステムを対象に影響調査と対応整理、既存機能の改修を担当。Tomcat → WildFly 移行に伴うアプリ改修、WildFly・Nginx・Tomcat の設定・動作確認、関連機器・システムとの接続性検証を実施。Jenkins の設定・検証、DB 直接接続から共通 API 経由への変更も推進。",
+        "資料不足・ソースコード不在での緊急対応：仕様書が不十分、またはソースコードを参照できない状況でも、ログ・設定・実際の動作など得られる情報を照合して既存処理と影響を調査。技術的な不明点と対応方針を整理し、顧客・関係者との確認を進めながら障害対応と改修を支援。",
+        "チーム管理・大規模案件推進（サブリーダー）：数十の関連案件を含む大規模なシステム移行に参画。担当チーム（案件により 1–15 名）の進捗・課題・対応状況を把握し、優先順位とスケジュールを調整。メンバーへの作業指示、技術支援、成果物レビュー、顧客・関連チームとの調整を通じて課題解消とリリース準備を推進。",
+        "初期の開発・DB 移行経験：2018 年の参画当初から Oracle → Hadoop 移行に伴う Shell 定期タスクの影響調査・改修・テスト、成果物連携を担当。情報照会・上流システムへのデータ送信機能の開発と詳細設計・単体テストを経験し、開発担当から設計・基盤対応・チーム推進へ担当領域を拡大。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "Spring",
@@ -337,144 +376,12 @@
             "CSS",
             "JavaScript",
             "jQuery",
-            "Shell",
-            "Perl",
-            "VB6 （既存資産の調査）"
-          ],
-          "description": ""
-        },
-        {
-          "title": "クラウド・DB・基盤",
-          "items": [
-            "Oracle",
-            "SQL Server",
-            "Tomcat",
-            "WildFly",
-            "Nginx"
-          ],
-          "description": ""
-        },
-        {
-          "title": "ツール・実行環境",
-          "items": [
-            "Git",
-            "SVN",
-            "Jenkins",
-            "JMeter",
-            "SoapUI",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Java",
-        "Spring",
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "jQuery",
-        "Shell",
-        "Perl",
-        "VB6 (legacy analysis)",
-        "Oracle",
-        "SQL Server",
-        "Tomcat",
-        "WildFly",
-        "Nginx",
-        "Git",
-        "SVN",
-        "Jenkins",
-        "JMeter",
-        "SoapUI",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "通信サービスの情報照会機能開発",
-      "period": "2018.12 — 2019.04",
-      "role": "PG",
-      "team": "7 名以上",
-      "description": "通信業務システムで顧客情報の取得・照会機能を開発・テスト。",
-      "outcome": "担当した開発・テストを完了し、情報照会機能の安定稼働を支援。",
-      "responsibilities": [
-        "既存仕様に沿って照会機能と情報抽出・CSV 整形 / 出力処理を開発。",
-        "上流システムへの送信機能を実装。",
-        "詳細設計、テストケース補充、単体テスト・動作確認を担当。",
-        "不具合を調査・修正し、担当機能の開発・テストを完了。"
-      ],
-      "environment": [
-        {
-          "title": "言語・アプリ",
-          "items": [
-            "Java",
-            "Spring",
-            "HTML5",
-            "CSS",
-            "JavaScript",
-            "jQuery"
-          ],
-          "description": ""
-        },
-        {
-          "title": "クラウド・DB・基盤",
-          "items": [
-            "Oracle",
-            "Tomcat"
-          ],
-          "description": ""
-        },
-        {
-          "title": "ツール・実行環境",
-          "items": [
-            "SVN",
-            "Linux",
-            "Windows"
-          ],
-          "description": ""
-        }
-      ],
-      "tags": [
-        "Java",
-        "Spring",
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "jQuery",
-        "Oracle",
-        "Tomcat",
-        "SVN",
-        "Linux",
-        "Windows"
-      ]
-    },
-    {
-      "kind": "work",
-      "title": "Oracle → Hadoop 移行に伴うタスク改修",
-      "period": "2018.06 — 2018.12",
-      "role": "PG",
-      "team": "30 名以上",
-      "description": "通信系システムの DB 移行。数百機能に影響する対応のうち、担当する定期タスクの改修・テストと成果物連携を担当。",
-      "outcome": "担当機能の移行対応を完了し、プロジェクト全体の DB 移行作業に貢献。",
-      "responsibilities": [
-        "Oracle → Hadoop 移行が既存タスクに与える影響を調査。",
-        "定期実行する Shell タスクを改修し、ソースと成果物を管理。",
-        "単体テストのケースを補充して実施し、結果を確認。",
-        "移行に伴う不具合対応と担当成果物の連携を実施。"
-      ],
-      "environment": [
-        {
-          "title": "言語・アプリ",
-          "items": [
             "Shell"
           ],
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
             "Oracle",
             "Hadoop"
@@ -482,22 +389,50 @@
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "ミドルウェア・プラットフォーム",
+          "items": [
+            "Tomcat",
+            "WildFly",
+            "Nginx"
+          ],
+          "description": ""
+        },
+        {
+          "title": "テストツール",
+          "items": [
+            "JMeter",
+            "SoapUI"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
           "items": [
             "SVN",
-            "Linux",
-            "Windows"
+            "LoadStar",
+            "Jenkins"
           ],
           "description": ""
         }
       ],
       "tags": [
+        "Java",
+        "Spring",
+        "HTML5",
+        "CSS",
+        "JavaScript",
+        "jQuery",
         "Shell",
         "Oracle",
         "Hadoop",
+        "Tomcat",
+        "WildFly",
+        "Nginx",
+        "JMeter",
+        "SoapUI",
         "SVN",
-        "Linux",
-        "Windows"
+        "LoadStar",
+        "Jenkins"
       ]
     }
   ],
@@ -510,7 +445,7 @@
     {
       "period": "2025.07 — 2026.07",
       "title": "コールセンター業務システムの開発・運用推進",
-      "description": "四半期リリース、日常運用課題、業務効率化と後続施策の検証を支援。要件・仕様調整から技術調査、Java 実装支援、AWS 環境確認、PoC まで担当。"
+      "description": "四半期ごとの大型リリースに向けた要件・仕様・対象範囲の調整を担当。技術調査と Java 開発支援、日常運用の改善、AWS 環境確認・リリース支援、技術検証・PoC を通じて、顧客と開発チームの対応を推進。"
     },
     {
       "period": "2025.01 — 2025.06",
@@ -523,19 +458,9 @@
       "description": "保険業務・社内管理システムの開発、改修と AWS 移行。クラウド移行と内部管理の複数システムに参画し、設計から本番リリースまで担当。"
     },
     {
-      "period": "2019.05 — 2023.05",
-      "title": "通信業務システムの開発・基盤更改",
-      "description": "通信系 Web・バッチ・API と複数システムの移行・再構築。要件定義から開発、基盤設定、テスト、顧客調整、本番リリースまで担当。"
-    },
-    {
-      "period": "2018.12 — 2019.04",
-      "title": "通信サービスの情報照会機能開発",
-      "description": "通信業務システムで顧客情報の取得・照会機能を開発・テスト。"
-    },
-    {
-      "period": "2018.06 — 2018.12",
-      "title": "Oracle → Hadoop 移行に伴うタスク改修",
-      "description": "通信系システムの DB 移行。数百機能に影響する対応のうち、担当する定期タスクの改修・テストと成果物連携を担当。"
+      "period": "2018.06 — 2023.05",
+      "title": "通信システム開発・基盤更改・チーム推進",
+      "description": "2018 年の大学卒業後から同一の通信系顧客先に長期参画。小規模 Web・主要 API のゼロからの単独開発、大規模移行、基盤更改、資料・ソースコードが不足する状況での緊急調査まで担当。PG・SE・サブリーダーとして、実装から顧客調整・チーム管理まで対応。"
     },
     {
       "period": "2014.09 — 2018.06",

@@ -26,6 +26,12 @@ node .githooks/check-staged-paths.mjs --all
 gitleaks git --redact --no-banner .
 gitleaks dir --redact --no-banner .
 node scripts/test-hooks.mjs
+node scripts/test-cloudfront-routing.mjs
+node scripts/test-pipeline-candidate.mjs
+node scripts/test-staging-contract.mjs
+node scripts/test-green-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
 
 # Always report a stable CodeBuild status, even for unrelated changes.
 # Unknown/missing diff base runs checks rather than guessing that nothing changed.
@@ -33,7 +39,7 @@ run_checks=true
 base="${CI_BASE_SHA:-${CODEBUILD_WEBHOOK_PREV_COMMIT:-}}"
 if [[ "$component" != all && "$base" =~ ^[0-9a-f]{40}$ && ! "$base" =~ ^0+$ ]] && git cat-file -e "$base^{commit}" 2>/dev/null; then
   git diff --name-only "$base" "$sha" > .local/ci-changed-paths
-  shared='^(codebuild/|scripts/|\.githooks/|compose\.yaml$|\.gitignore$|\.gitattributes$|\.gitleaks\.toml$|AGENTS\.md$)'
+  shared='^(infra/|codebuild/|scripts/|\.githooks/|compose\.yaml$|\.gitignore$|\.gitattributes$|\.gitleaks\.toml$|AGENTS\.md$)'
   if ! grep -Eq "$shared|^$component/" .local/ci-changed-paths; then run_checks=false; fi
 fi
 
@@ -45,7 +51,9 @@ if [[ "$run_checks" == true ]]; then
     cp ".local/artifacts/$sha/frontend.tar.gz" ".local/artifacts/$sha/manifest.json" ".local/artifacts/$sha/SHA256SUMS" .local/ci-results/frontend/
   fi
   if [[ "$component" == all || "$component" == backend ]]; then
-    mvn -B -ntp -f backend/pom.xml verify
+    mvn -B -ntp -f backend/pom.xml clean verify
+    mvn -B -ntp -f backend/pom.xml -Plambda clean verify
+    node scripts/test-lambda-package.mjs
   fi
 fi
 printf '{"commit":"%s","component":"%s","applicationChecksRan":%s}\n' "$sha" "$component" "$run_checks" > .local/ci-results/result.json

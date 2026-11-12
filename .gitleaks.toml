@@ -3,5 +3,5 @@ title = "kongPortfolio secret scanning"
 useDefault = true
 
 [[allowlists]]
-description = "Generated dependencies and build output only"
-paths = ['''(^|/)(node_modules|target|dist|coverage|\.git|\.local)/''']
+description = "Generated dependencies, Terraform provider cache and build output only"
+paths = ['''(^|/)(node_modules|target|dist|coverage|\.git|\.local|\.terraform)/''']

@@ -1,0 +1,21 @@
+version: 0.2
+env:
+  shell: bash
+  variables:
+    CI: "true"
+  exported-variables:
+    - VERIFIED_RELEASE
+    - VERIFIED_VERSION
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+  build:
+    commands:
+      - node scripts/verify-staging.mjs
+      - export VERIFIED_RELEASE=$(node -p "JSON.parse(require('fs').readFileSync('.local/staging-verification/report.json')).releaseId")
+      - export VERIFIED_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('.local/staging-verification/report.json')).functionVersion")
+artifacts:
+  base-directory: .local/staging-verification
+  files:
+    - report.json

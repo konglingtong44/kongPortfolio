@@ -1,0 +1,7 @@
+# Save as backend.hcl, fill ACCOUNT_ID, and pass to terraform init -backend-config.
+bucket              = "kongportfolio-tfstate-<ACCOUNT_ID>-ap-northeast-1"
+key                 = "portfolio/prod/terraform.tfstate"
+region              = "ap-northeast-1"
+encrypt             = true
+use_lockfile        = true
+allowed_account_ids = ["<ACCOUNT_ID>"]

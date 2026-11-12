@@ -1,0 +1,5 @@
+# Activate only AFTER the bucket has been created and verified.
+# Copy to backend.tf, then run init -migrate-state (see ../README.md).
+terraform {
+  backend "s3" {}
+}

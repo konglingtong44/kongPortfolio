@@ -1,0 +1,16 @@
+version: 0.2
+env:
+  shell: bash
+  variables:
+    CI: "true"
+phases:
+  install:
+    runtime-versions:
+      nodejs: 24
+  build:
+    commands:
+      - node scripts/deploy-production.mjs
+artifacts:
+  base-directory: .local/deployment-verification
+  files:
+    - report.json

@@ -13,11 +13,6 @@ phases:
   build:
     commands:
       - bash scripts/ci.sh "$CI_COMPONENT"
-artifacts:
-  base-directory: .local/ci-results
-  files:
-    - '**/*'
-cache:
-  paths:
-    - '/root/.m2/repository/**/*'
-    - '/root/.npm/**/*'
+# Initial CI projects use NO_ARTIFACTS and no persistent cache. Generated
+# verification bundles stay in the ephemeral workspace; release packaging
+# and artifact storage belong to the later deployment pipeline.
