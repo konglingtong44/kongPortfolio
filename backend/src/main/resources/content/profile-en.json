@@ -22,8 +22,8 @@
       "title": "kongPortfolio",
       "period": "2026.11 —",
       "role": "Personal project / In progress",
-      "description": "A trilingual personal blog about my experience and technical interests. Built with React, TypeScript and Spring Boot, starting with a working local increment.",
-      "outcome": "Implemented: trilingual profile API, saved language selection and automated tests. Next: article features, followed by AWS deployment and AWS-native CI/CD.",
+      "description": "My personal website, with an introduction, past work and personal projects. I made it so people interested in working with me can learn about my background and the technologies I’ve used.",
+      "outcome": "Hosted on AWS, with CI/CD for testing and releases. I plan to add Bedrock Q&A about my background and projects.",
       "tags": [
         "React",
         "TypeScript",
@@ -32,9 +32,9 @@
       ],
       "team": "Personal project",
       "responsibilities": [
-        "Build the React / TypeScript / Vite frontend and Java 21 / Spring Boot API.",
-        "Maintain file-based trilingual content, saved locale, regex visualization, automated tests and local Compose configuration.",
-        "AWS deployment, AWS CI/CD and Bedrock integration remain planned."
+        "Built the pages with React / TypeScript / Vite and the API with Java 21 / Spring Boot.",
+        "Deployed with S3 / CloudFront and API Gateway / Lambda. Also built a tool for trying regular expressions.",
+        "Set up CodePipeline / CodeBuild for automated tests, builds and releases, with gradual traffic shifts through CodeDeploy and two manual production approvals."
       ],
       "environment": [
         {

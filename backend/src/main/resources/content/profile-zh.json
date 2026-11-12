@@ -22,8 +22,8 @@
       "title": "kongPortfolio",
       "period": "2026.11 —",
       "role": "个人开发 / 进行中",
-      "description": "展示我的经历和技术兴趣的三语个人博客。使用 React、TypeScript 与 Spring Boot，从本地可运行的版本开始，逐步完善。",
-      "outcome": "已实现：三语介绍 API、语言切换与保存、自动测试。接下来完善文章功能，再进行 AWS 部署和 AWS 原生 CI/CD。",
+      "description": "我的个人网站，介绍自己，也整理了过去的工作和个人作品。希望有工作交流或合作意向的人，可以在这里了解我的经历和用过的技术。",
+      "outcome": "已部署到 AWS，通过 CI/CD 完成测试和发布。后续计划接入 Bedrock，回答关于个人经历和作品的问题。",
       "tags": [
         "React",
         "TypeScript",
@@ -32,9 +32,9 @@
       ],
       "team": "个人开发",
       "responsibilities": [
-        "实现 React / TypeScript / Vite 前端与 Java 21 / Spring Boot API。",
-        "维护文件式三语内容、语言保存、正则可视化、自动测试和本地 Compose 配置。",
-        "AWS 部署、AWS CI/CD 与 Bedrock 接入仍为后续计划。"
+        "使用 React / TypeScript / Vite 开发页面，Java 21 / Spring Boot 开发 API。",
+        "通过 S3 / CloudFront 和 API Gateway / Lambda 部署，也制作了可以试用正则表达式的小工具。",
+        "使用 CodePipeline / CodeBuild 自动测试、构建和发布，CodeDeploy 分阶段切流；生产发布保留两道手动审批。"
       ],
       "environment": [
         {

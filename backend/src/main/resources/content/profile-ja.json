@@ -22,8 +22,8 @@
       "title": "kongPortfolio",
       "period": "2026.11 —",
       "role": "個人開発 / 開発中",
-      "description": "自分の経験と技術への関心を伝える、三言語の個人ブログ。React・TypeScript と Spring Boot をつなぎ、ローカルで動くところから育てています。",
-      "outcome": "現在：三言語プロフィール API、言語切り替え・保存、テストを実装。次は記事機能、その先に AWS デプロイと AWS ネイティブ CI/CD を予定。",
+      "description": "自己紹介と、これまでの仕事や個人制作をまとめた個人サイトです。仕事の相談などで、経歴や使ってきた技術を知ってもらうために作りました。",
+      "outcome": "AWS で公開し、CI/CD でテストからリリースまでを実行。今後は Bedrock を使ったプロフィールや制作物についての Q&A を追加する予定です。",
       "tags": [
         "React",
         "TypeScript",
@@ -32,9 +32,9 @@
       ],
       "team": "個人開発",
       "responsibilities": [
-        "React / TypeScript / Vite と Java 21 / Spring Boot API を実装。",
-        "ファイルベースの三言語コンテンツ、言語保存、正規表現可視化、テストとローカル Compose 構成を整備。",
-        "AWS デプロイ、AWS CI/CD、Bedrock 接続は後続計画。"
+        "React / TypeScript / Vite で画面、Java 21 / Spring Boot で API を実装。",
+        "S3 / CloudFront と API Gateway / Lambda で公開。正規表現を試せるツールも作成。",
+        "CodePipeline / CodeBuild でテスト・ビルド・公開を自動化し、CodeDeploy で段階的に切り替え。本番リリースには二段階の手動承認を設定。"
       ],
       "environment": [
         {
