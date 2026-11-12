@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — Fresh Green verified, waiting real traffic approval (2026-11-12)
+
+User completed approval 1 for f2ed11c5 / ff77d62. Green build 1010d2da succeeded, production published Green v4 passed seven contracts; same release as STG5 (6af4a796…). Downloaded exact GreenReport version and verified outer SHA, source/execution/STG/release/code, approval 1 identity, actual Green SHA and gate 2 exported variables. Live still Blue v2 with unchanged RevisionId/no weights, health UP; production Terraform plan No changes after publication. CodeDeploy deployments empty; ApproveTrafficShift InProgress. This gate now explicitly authorizes real CodeDeploy 10%/5min traffic shift then 100% and recovery; first Blue baseline acceptance and real rollout/rollback remain unverified until user gate 2 approval. Full audit root log section14.
+
 ## S3-07 — CodeDeploy infrastructure applied (2026-11-12, validating to gate 1)
 
 Reached fresh human gate 1: Candidate and STG succeeded for ff77d62; STG v5 passed seven contracts. Downloaded exact versioned report; outer CodeBuild SHA, execution/source/release/backend SHA, immutable Lambda and approval exports match. Release 6af4a796faf697721d69148c95d9e81cd96abc2a0bf15e29b09de1eddc3d5910. Execution f2ed11c5 InProgress at ApproveProduction, no agent approval; no CodeDeploy deployments yet. Production live v2/no weights, health UP; error alarm now OK. Real canary/rollback remain pending both human gates.

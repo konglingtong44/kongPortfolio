@@ -1038,3 +1038,49 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 整体 **InProgress**/pipeline version4、第一道 ApproveProduction / ApproveGreenCreation **InProgress**；生产仍2/无权重，list-deployments 仍空，health UP；新告警经过评估后现在 OK（不是已验证触发）。STG 更新后 CICD plan No changes，日志 `.local/deployment-staging-final-plan.log`。没有代理审批或调用 create-deployment。用户需在控制台核对 f2ed11c5/STG5 后“审阅→批准→提交”；第一道只发布/验证 Green，第二道才授权真实切流与必要恢复。
 
 用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；运行 diff/path/Gitleaks 检查，仅本地提交 `docs: record CodeDeploy infrastructure and fresh approval gate`，最后 git status --short。没有为文档反复推送/启动新候选；下次获授权继续时推送，当前固定源码与制品不变。日志记录了本地输入修改、文件读取/编辑、Git、扫描、Terraform、AWS CLI、HTTP、等待和报告请求全部操作类型；不含凭证/审批 token 或私有响应原文。
+
+## 14. 本次人工审批 1 后的 Green 验证（2026-11-12）
+
+### 14.1 审批状态、构建与版本
+
+用户说“ok 批准了”。先 `git status --short`（干净）与 `Get-Content AWS_EXECUTION_LOG.md -Tail 5` 读前次结论，再检查真实 AWS；没有从聊天代为审批。全部 CLI 使用 `$env:AWS_PROFILE='kong-dev'`、`$aws='D:\software\AWSCLI\aws.exe'`、`--region ap-northeast-1`。命令：
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-green --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:1010d2da-6bf2-4f78-a9f5-adae4df8829c --region ap-northeast-1 --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-green --log-stream-name 1010d2da-6bf2-4f78-a9f5-adae4df8829c --region ap-northeast-1 --query 'events[].message' --output json
+```
+
+第一道 ApproveGreenCreation **Succeeded**，审阅 action ID **f45a34ea-c336-45e6-8597-968798a58699**。初始 Green BUILD/导出值为空属运行中状态，约20秒短等待后再次查询，Green **SUCCEEDED**，固定源码 ff77d627f3a5182bac6872375dcd828199e1e57a。日志确认七项 health、profile-ja/zh/en、Bedrock placeholder、404、405 全在生产不可变 **版本4** 通过。CodeBuild 执行 verify-green.mjs 的 CLI 序列同10.1（本次 STG qualifier5/生产 qualifier4）；原 Candidate ZIP 发布，没有重新打包。没有创建新构建/新流水线。
+
+元数据 `.local/deployment-green-build.json`、阶段详情 `.local/deployment-green-actions.json`、UTF8 云日志 `.local/deployment-green-build.log`，只在忽略目录；日志读取使用 PYTHONUTF8=1、控制台 UTF8，Select-String 只展示检查摘要。
+
+### 14.2 版本化 GreenReport 与生产独立复核
+
+```powershell
+New-Item -ItemType Directory -Path .local/deployment-green-review-f2ed11c5 -Force
+# key 来自本次 VerifyGreen action outputArtifacts。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/2eAgyv2 --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/2eAgyv2 --version-id RyT.1S9TNge69H0qxQDOeTJShpNfyIC3 --region ap-northeast-1 .local/deployment-green-review-f2ed11c5/report.zip --output json
+Get-FileHash -LiteralPath .local/deployment-green-review-f2ed11c5/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 只允许唯一 report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 4 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+& $aws deploy list-deployments --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query deployments --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+报告外层 SHA **5a486ffd4a71151827e99ce6efd6e819fba86a55090aa6d5d2522f2749385b7a** 匹配 CodeBuild artifacts.sha256sum。逐项校验 schema/kind/passed/liveTrafficUnchanged、functionName、Blue2/Green4/STG5、七项全部通过、与已审 STG 的 execution/source/release/backend SHA 相同；approval1ActionId 与 AWS 成功 action ID 相同。Release **6af4a796faf697721d69148c95d9e81cd96abc2a0bf15e29b09de1eddc3d5910**，backend SHA **09a30e2ad79cf7a0ca85054fc43d378da860f64063b0486461239de6a9d7aa6e** 等于真实 qualifier4 CodeSha256 解码值。Green/Blue/Release 导出变量与报告相同；live 版本和 RevisionId 与报告快照相同、无权重。
+
+本地 ZIP/report/object/review JSON 仅在 `.local/deployment-green-review-f2ed11c5/`，没有上传响应原文。当前 deploy list-deployments 空、公开 health UP。生产代码发布后 Terraform **No changes**（`.local/deployment-green-production-plan.log`），管理交接未引入回滚代码或误切流。没有运行应用/容器测试，没有改应用源码；这里实际验证的是 AWS Green 运行与证据。
+
+### 14.3 第二道人工审批待执行
+
+再次 `get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --query 'pipelineExecution.{status:status,version:pipelineVersion}'` 显示整体 **InProgress**/version4；最新 actions 为 **ApproveTrafficShift InProgress**。`get-pipeline --query 'pipeline.stages[?name==`ApproveTrafficShift`].actions[].{name:name,approvalText:configuration.CustomData}'` 只读核对审批文字明确授权 production traffic shift and rollback、10%/5min→100%、首次 Blue baseline。未请求 token、未 put-approval-result、未 create-deployment/UpdateAlias。
+
+向用户说明本次不同于旧六阶段验证：第二道批准会实际执行 CodeDeploy，不再只是结束流水线；应核对执行 f2ed11c5、Blue2/Green4、release6af4a796… 后“ApproveTrafficShift → ApproveBlueGreenDeployment → 审阅 → 批准 → 提交”。基线接受、真实权重、告警触发和回滚演练仍未验收，不因配置/模拟测试通过而宣称成功。
+
+apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，仅提交三份文档 `git commit -m 'docs: record fresh Green verification before real traffic approval'` 并 git status --short。本地保留文档提交，不推送触发额外 CI，等待用户第二道手动审批；已固定源码/制品没有改变。
