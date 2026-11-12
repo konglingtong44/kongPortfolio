@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-06 — Production Green preparation (2026-11-12, awaiting approval)
+
+Old execution 1222a3dd is now Succeeded after the user's manual approval; it contained no Green action. Prepared opt-in production version publication and seven direct-invoke checks between two human gates. Fresh source/execution needs a fresh approval 1. Actual CICD plan: 4 create / 2 update / 0 delete; disabled plan and production ownership-handoff plan: No changes. Production code and alias release fields explicitly move to pipeline/later CodeDeploy ownership to avoid accidental Terraform routing. No Green apply, production version publication or traffic shift yet. CodeDeploy/rollback/frontend promotion remain later increments. See docs/green-approval.md and root log section 8 for commands, tests and cloud gaps.
+
 ## S3-05 — STG and first approval verified (2026-11-12, completed to human gate)
 
 Approved 8 creates / 2 updates applied; verified bootstrap checksum before apply. Initial STG code update succeeded but v2 waiter required GetFunction; changed to configuration-only waiter without IAM expansion. Execution 1222a3dd-3302-4943-b992-8f9f2d2c087e at 4d12091 has Source/BuildCandidate/VerifyStaging succeeded, Approval 1 InProgress (pending), never approved by agent. STG version 3 passed seven real Lambda contracts and static candidate integrity. Downloaded versioned StagingReport; source/release/code/version agree with published function and approval exported variables. Release f784feab86d0ef506f6d6678e58c8cff43210343bf882c22e29d7182dc11c10a. Final plan No changes, production live v2/no weights/HTTPS health UP. Direct invoke only, no STG browser/API Gateway E2E. No production Green/approval 2/CodeDeploy yet. Full non-AWS/AWS audit in root log section 7. Story complete; pause for human review and next deployment increment.

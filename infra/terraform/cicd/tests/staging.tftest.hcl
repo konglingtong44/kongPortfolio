@@ -5,6 +5,7 @@ variables {
   enable_ci_webhooks        = false
   enable_candidate_pipeline = true
   enable_staging            = false
+  enable_green              = false
 }
 run "staging_default_off" {
   command = plan

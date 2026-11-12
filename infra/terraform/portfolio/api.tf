@@ -48,6 +48,9 @@ resource "aws_lambda_function" "api" {
   }
   depends_on = [aws_iam_role_policy.logs]
   lifecycle {
+    # The release pipeline owns code after the reviewed Green handoff.
+    # Terraform still owns runtime, execution role, memory and environment.
+    ignore_changes = [filename, source_code_hash]
     precondition {
       condition     = filesha256(local.zip_path) == local.release.backend.sha256 && can(regex("^[0-9a-f]{64}$", local.release.releaseId)) && local.release.schemaVersion == 1 && local.release.kind == "first-release-candidate"
       error_message = "The release manifest or Lambda ZIP is invalid; regenerate the plan."
@@ -55,12 +58,15 @@ resource "aws_lambda_function" "api" {
   }
 }
 
-# Terraform owns this alias for the initial release only. The CI/CD Story must
-# explicitly transfer version/weight ownership before CodeDeploy starts using it.
+# Release ownership boundary: only the later, twice-approved CodeDeploy stage
+# may change live's version/weights. Publishing Green must not move this alias.
 resource "aws_lambda_alias" "live" {
   name             = "live"
   function_name    = aws_lambda_function.api.function_name
   function_version = aws_lambda_function.api.version
+  lifecycle {
+    ignore_changes = [function_version, routing_config]
+  }
 }
 
 resource "aws_apigatewayv2_api" "api" {

@@ -649,3 +649,75 @@ git status --porcelain
 ```
 
 原始成功元数据、状态摘要和本地下载报告都留在忽略的 .local，没有加入 Git。文档推送仅触发现有 CI，不启动新候选执行、不操作审批。最终 CI 查询沿用 list-builds-for-project / batch-get-builds 和 GitHub statuses GET，记录到 `.local/staging-final-doc-ci.json`；不为等待审批而反复运行新的发布流程。
+
+## 8. S3-06：Green 与第二道审批准备（2026-11-12，尚未 apply）
+
+### 8.1 用户审批与本次验收
+
+用户说“批准ok 继续吧”后，用 `aws codepipeline get-pipeline-execution` 和 `list-action-executions --filter pipelineExecutionId=1222a3dd-3302-4943-b992-8f9f2d2c087e` 只读核对：旧执行 Succeeded，ApproveGreenCreation 已由用户在 UI 完成，摘要 Reviewed STG report: 7 checks passed, Lambda version 3。旧定义没有 Green 步骤，因此没有发布生产 Green。新源码/执行需重新通过本次 STG 和人工审批 1，不复用旧审批。
+
+本次验收：准备可审阅的 Terraform、版本验证脚本、第二道审批和实际计划；创建前暂停请用户批准费用与管理边界。尚未调用 apply、update-function-code、update-alias 或 put-approval-result。
+
+### 8.2 本地读取、编辑与资料请求
+
+通过 PowerShell `Get-Content`、`rg`、`git diff/status` 查看 AGENTS.md、现有 candidate/STG/生产 Terraform、buildspec、脚本、测试、PROJECT_PLAN.md、根日志及忽略目录中的既有报告/计划日志。后续恢复上下文再次读取相关文件尾部和计划摘要；未把本机私有输入加入 Git。一次尝试读取不存在的 `codebuild/frontend.yml` 返回路径不存在，未创建该文件。
+
+使用 apply_patch 编辑：
+
+- `infra/terraform/cicd/green.tf`：默认关闭 Green，创建受限 CodeBuild/角色/policy/日志组。
+- `candidate-pipeline.tf`：增加 Green 构建启动权限、三输入制品验证阶段、第二道 Manual gate；审批文字明确本 Story 不切流。
+- `infra/terraform/portfolio/api.tf`：明确交接代码和别名发布字段，ignore_changes 防止后续 plan/apply 覆盖流水线代码或误切流；配置继续由 Terraform 管理。
+- `codebuild/green.yml`、`scripts/green-contract.mjs`、`verify-green.mjs`、`test-green-contract.mjs`，以及 ci.sh：核对同次 Source/STG/审批、候选 SHA、生产角色/配置；发布/复用不可变版本；七项直接调用；前后 live 版本/RevisionId/权重一致才写 GreenReport。
+- `tests/green.tftest.hcl` 加三项计划测试；四个既有测试文件显式关闭 Green，避免本地 opt-in 污染测试。
+- 新建 `docs/green-approval.md`、更新 PROJECT_PLAN.md 和本日志，区分准备完成与真实云验证。
+
+只读浏览 AWS 主文档：Lambda API_GetAlias、CodePipeline API_ListActionExecutions、Lambda 权限参考与细粒度访问示例，以及 CodeBuild/CodePipeline pricing。错误的 Service Authorization URL `list_awslambda.html` 重定向到目录；搜索后用 [AWS 官方权限示例](https://repost.aws/knowledge-center/granular-access-lambda) 和 [权限参考](https://docs.amazonaws.cn/en_us/service-authorization/latest/reference/list_lambda.html) 确认 GetAlias 对函数资源授权，将最初的 alias ARN 改为唯一生产函数 ARN（只读，不增加路由权限）。费用参考：https://aws.amazon.com/codebuild/pricing/ 、https://aws.amazon.com/codepipeline/pricing/ 。GET 请求未修改外部服务。
+
+### 8.3 校验与真实账号计划
+
+命令在仓库根目录运行；`$tf='D:\software\Terraform\terraform.exe'`、`$aws='D:\software\AWSCLI\aws.exe'`、`$env:AWS_PROFILE='kong-dev'`。环境加载使用 `scripts/tools.ps1`。关键命令：
+
+```powershell
+node scripts/test-green-contract.mjs
+node --check scripts/verify-green.mjs
+node --check scripts/green-contract.mjs
+& D:\software\Git\bin\bash.exe -n scripts/ci.sh
+& $tf '-chdir=infra/terraform/cicd' fmt -recursive
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test -no-color
+& $tf '-chdir=infra/terraform/portfolio' fmt -check
+& $tf '-chdir=infra/terraform/portfolio' validate
+& $tf '-chdir=infra/terraform/portfolio' test -no-color
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -var=enable_green=true -out=green.tfplan -no-color
+& $tf '-chdir=infra/terraform/cicd' show -json green.tfplan
+& $tf '-chdir=infra/terraform/cicd' plan -input=false -detailed-exitcode -no-color
+& $tf '-chdir=infra/terraform/portfolio' plan -input=false -detailed-exitcode -no-color
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+git diff --check
+git status --short
+```
+
+初次 Green HCL 测试 condition 的跨行 `&&` 语法失败，合为单行后重跑通过；CICD 13 个 mocked plan、生产域名 3 个测试通过，Node 拒绝错误目标、已有权重、live 变化、缺审批、跨执行/跨候选报告等检查通过。mock 不等于真实 Green 运行。
+
+实际 CICD plan 为 **4 add / 2 change / 0 destroy**；默认关闭 Green 与生产交接 plan 均 No changes。私有计划在 `infra/terraform/cicd/green.tfplan`，日志 `.local/green-plan.log`、`green-disabled-plan.log`、`green-production-handoff-plan.log`。GetAlias 读取再次确认 live 版本 2、无权重；旧 pipeline execution Succeeded。修正 GetAlias 权限后会重新生成实际计划。没有执行创建。
+
+新增阶段费用示例：20 次/月 × 2 分钟 ×（CodeBuild small $0.005 + V2 action $0.002）≈ $0.28/月，未扣账号共享免费额度，未含 Lambda/存储/日志/税和已有 CI/STG；这不是全站总费或封顶。构建最多十分钟、并发一、不重试。后续创建需明确批准。
+
+最终再次 fmt/validate/test，CICD 13/13 通过；Node/shell 语法和 Green guards 通过。PowerShell 的未加引号 `-out=green.tfplan` 被错误传参，Terraform 报 Too many command line arguments，未创建资源；将 native 参数逐个加单引号后重跑成功，最终仍 4 create / 2 update / 0 delete。show-json 逐项确认新增 Green log group/project/role/policy，更新 candidate pipeline 与其 inline policy。另一次读取猜测路径 `scripts/check-private-paths.mjs` 失败，实际私有路径检查入口是 `.githooks/check-staged-paths.mjs`，以 ci.sh 中路径为准。Git 提示 LF→CRLF 规范化，不是检查失败。
+
+### 8.4 源码扫描、提交与现有 CI
+
+准备以以下命令扫描、提交推送（不启动候选发布；推送只触发现有两个 CI 项目），随后按源码 SHA 读取构建/状态以确认实际结果：
+
+```powershell
+node .githooks/check-staged-paths.mjs --all
+gitleaks dir --redact --no-banner .
+git add -- AWS_EXECUTION_LOG.md PROJECT_PLAN.md docs/green-approval.md infra/terraform/cicd infra/terraform/portfolio/api.tf scripts/ci.sh scripts/green-contract.mjs scripts/test-green-contract.mjs scripts/verify-green.mjs codebuild/green.yml
+git diff --cached --check
+git commit -m 'feat: prepare approval-gated production Green verification'
+git push
+git rev-parse HEAD
+git status --short
+```
+
+所有 Terraform tfvars、state、plan、.local 内容保持忽略；两条 fail-closed Gitleaks hooks 保留。真实 Green 运行权限、多制品、报告和第二道审批尚未验证；本次不把本地 guard/mock 测试称为蓝绿切流验证。

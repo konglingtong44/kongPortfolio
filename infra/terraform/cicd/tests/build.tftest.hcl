@@ -6,6 +6,7 @@ variables {
   enable_ci_webhooks        = false
   enable_candidate_pipeline = false
   enable_staging            = false
+  enable_green              = false
 }
 
 run "default_creates_no_build_capacity" {

@@ -197,6 +197,8 @@ resource "aws_iam_role_policy" "candidate_pipeline" {
       }
       ], var.enable_staging ? [{
         Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.staging_project_arn
+        }] : [], var.enable_green ? [{
+        Effect = "Allow", Action = ["codebuild:StartBuild", "codebuild:BatchGetBuilds"], Resource = local.green_project_arn
     }] : [])
   })
 }
@@ -279,7 +281,47 @@ resource "aws_codepipeline" "candidate" {
         provider = "Manual"
         version  = "1"
         configuration = {
-          CustomData = "Approval 1: review StagingReport for release #{StagingVars.VERIFIED_RELEASE}, STG version #{StagingVars.VERIFIED_VERSION}, commit #{SourceVars.CommitId}. This Story stops here; no production change follows yet."
+          CustomData = var.enable_green ? "Approval 1: review StagingReport for release #{StagingVars.VERIFIED_RELEASE}, STG version #{StagingVars.VERIFIED_VERSION}, commit #{SourceVars.CommitId}. Approval permits publishing/testing production Green; live traffic remains unchanged until approval 2 and a later deployment stage." : "Approval 1: review StagingReport for release #{StagingVars.VERIFIED_RELEASE}, STG version #{StagingVars.VERIFIED_VERSION}, commit #{SourceVars.CommitId}. This Story stops here; no production change follows yet."
+        }
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_green ? [1] : []
+    content {
+      name = "VerifyGreen"
+      action {
+        name             = "PublishAndVerifyGreen"
+        category         = "Build"
+        owner            = "AWS"
+        provider         = "CodeBuild"
+        version          = "1"
+        input_artifacts  = ["SourceRef", "Candidate", "StagingReport"]
+        output_artifacts = ["GreenReport"]
+        namespace        = "GreenVars"
+        configuration = {
+          ProjectName   = aws_codebuild_project.green[0].name
+          PrimarySource = "SourceRef"
+          EnvironmentVariables = jsonencode([
+            { name = "GREEN_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
+            { name = "GREEN_PIPELINE_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" }
+          ])
+        }
+      }
+    }
+  }
+  dynamic "stage" {
+    for_each = var.enable_green ? [1] : []
+    content {
+      name = "ApproveTrafficShift"
+      action {
+        name     = "ApproveBlueGreenDeployment"
+        category = "Approval"
+        owner    = "AWS"
+        provider = "Manual"
+        version  = "1"
+        configuration = {
+          CustomData = "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
         }
       }
     }
