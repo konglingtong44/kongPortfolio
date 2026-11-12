@@ -1745,3 +1745,57 @@ GetPipelineExecution确认ReleaseMode=deploy。报告外层SHA **d1d3784977f3982
 没有新网站上传、CloudFront更新/发布或生产切流；Green只发布数字版本并直接测试。当前第二道审批待用户完成，明确新执行5d55596a/**deploy、Blue7→Green8**；批准后后端10%/五分钟→100%，成功后运行修复后的React上传/CloudFront测试/发布。不是rollback_drill，也不是已完成前端上线。
 
 apply_patch更新根日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks校验，仅本地提交 `docs: record fixed full-stack Green and second approval gate`、git status --short。不额外推送/构建、不代批、不重打包候选，没有TF/IAM/资源变更。真实前端LIVE发布与发布后回退仍待验收。
+
+## 26. 继续发布前的SSO认证恢复（2026-11-12）
+
+继续跟踪execution `5d55596a-4238-4240-bfbf-3e8ae47ee264` 前，执行 `git status --short`、AWS `codepipeline list-action-executions`、`lambda get-alias`、两个CodeBuild项目的 `list-builds-for-project`；AWS查询均因SSO token过期而失败，未取得新审批/发布状态，也没有发起部署。随后执行以下登录命令，由AWS CLI打开本机浏览器，输出仅保留成功提示，认证链接、验证码及凭证不写入日志：
+
+```powershell
+& 'D:\software\AWSCLI\aws.exe' sso login --profile kong-dev |
+  ForEach-Object { if ($_ -match 'Successfully logged') { Write-Output $_ } }
+```
+
+登录进程等待用户认证期间，再次用 `sts get-caller-identity --query '{Account:Account}' --output json` 确认，仍报Token has expired and refresh failed。读取本日志尾部与 `git status --short` 确认上次记录停在第25节、工作区干净；通过终端会话轮询确认原登录进程仍在等待。已请求用户完成已打开的SSO页面，不启动重复登录，不代替用户批准生产门禁。使用PowerShell Add-Content追加本节，并执行 `git diff --check`；本次未修改Terraform、应用代码或AWS资源。后续状态必须在认证恢复后重新查询，不能把聊天回复当作AWS审批结果。
+
+### 26.1 登录恢复后的实际发布状态
+
+等待约45秒并轮询原登录会话，CLI返回Successfully logged；未记录认证链接或凭证。用户随后也确认已登录。执行以下只读CLI并保存原件到ignored `.local/frontend-fixed-final-*`，没有重启流水线/构建、没有代理审批、没有新增资源：
+
+```powershell
+$env:AWS_PROFILE='kong-dev'
+$aws='D:\software\AWSCLI\aws.exe'
+& $aws sts get-caller-identity --query '{Account:Account}' --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=5d55596a-4238-4240-bfbf-3e8ae47ee264 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-deploy:9e63b3c8-11e1-4015-bf54-03fb30b57acc kongportfolio-frontend-release:1b295d27-0ed3-4a14-b8d9-6fcd7376fc1c --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 5d55596a-4238-4240-bfbf-3e8ae47ee264 --region ap-northeast-1 --output json
+& $aws deploy get-deployment --deployment-id d-BIHP8K2EM --region ap-northeast-1 --output json
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 8 --region ap-northeast-1 --output json
+# 两个stage分别取代码和元数据，文件保存.local，不更新函数。
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage LIVE .local/frontend-fixed-router-LIVE.js --output json
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage DEVELOPMENT .local/frontend-fixed-router-DEVELOPMENT.js --output json
+& $aws cloudwatch describe-alarms --alarm-names kongportfolio-prod-live-errors --region ap-northeast-1 --query 'MetricAlarms[].{Name:AlarmName,State:StateValue}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/version.json'
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+实际八阶段全部Succeeded。第二道审批action **c4decca6-87e8-4055-acd1-ca3e21ff7bf9**；backend build **9e63b3c8-11e1-4015-bf54-03fb30b57acc** 和frontend build **1b295d27-0ed3-4a14-b8d9-6fcd7376fc1c** 均Succeeded。模式deploy、源码7a2e1b897848328d112d44e45802849ad52bbd5c。CodeDeploy baseline **d-OZGC0W2EM**，实际canary **d-BIHP8K2EM Succeeded**，报告18条观测含7→8权重0.1以及最终8/空权重；真实GetAlias为8、无额外权重。报警OK。前端公开releaseId为 **242f8cb4af0a0ff5fed61f8ae9984f2189c8c912af102e9db531afeb1bd7e481**、gitCommit匹配、sourceDirty=false，healthUP。
+
+### 26.2 精确制品、公开HTTP与Terraform验收
+
+从本次actions中分别读取DeployProduction/PublishFrontend/BuildCandidate outputArtifacts的bucket/key，对每个执行 `aws s3api head-object --bucket <本次bucket> --key <本次key> --region ap-northeast-1 --output json`，再 `s3api get-object` 带该对象VersionId下载到.local。每条命令均检查退出码。PowerShell Get-FileHash SHA256对比CodeBuild artifacts.sha256sum；.NET ZipFile.OpenRead读取报告且要求唯一report.json，候选ZIP仅读取manifest.json、不解压执行。report/object/zip原件保存 `.local/frontend-fixed-final-review/{DeployProduction,PublishFrontend}/`，候选原件 `.local/frontend-fixed-final-candidate.zip`、manifest `.local/frontend-fixed-final-manifest.json`。额外 `codebuild batch-get-builds` 读取候选7a6ca25a-0bdb-4856-ba86-e4388b902dbe的artifacts.sha256sum。
+
+三个外层SHA均一致：后端报告 **cb3797aa1e87ff54a6958d65dae7d043cda80049a0b874b126472aece0d32527**；前端报告 **c16b4f9a1a810c6621aa1a8d71a96bbfbdc9dd8bf965ff57d85f0a29f02ab477**；候选 **5e4f41e85d7e2c239fe7eb486e100353f8f9a54c0fc55f13aae64b961cc8da29**。
+
+读取docs/frontend-publication.md、PROJECT_PLAN.md、scripts/staging-contract.mjs、scripts/frontend-release.mjs、scripts/tools.ps1、.githooks/pre-commit，复用现有契约/路由逻辑。用PowerShell here-string在ignored `.local/review-fixed-frontend.mjs` 创建独立验收脚本，执行 `node .local/review-fixed-frontend.mjs`：核对execution Succeeded/eight actions/mode、两报告与候选execution/source/release/passed、Blue7/Green8/outcome及实际canary配置/成功、Lambda8不可变代码SHA与manifest backend SHA、LIVE/DEV代码严格匹配模板与报告routerSHA **7061cc1ceeb8e84c9a57cc87d9ad3694d75280bbf808e7309b26418d3f194a13**。通过公开HTTPS逐个GET清单中6个静态文件并核对SHA；GET /version.json、/、/review/deep-link，确认clean版本和HTML SHA；对health、日/中/英profile、POST bedrock、404与405执行7项契约并检查成功API no-store。全部通过，摘要 `.local/frontend-fixed-final-public-review.json`。仅记录断言和状态，不记录用户请求内容。没有进行浏览器视觉/容器构建验收。
+
+```powershell
+& 'D:\software\Terraform\terraform.exe' '-chdir=infra/terraform/portfolio' plan -input=false -no-color -detailed-exitcode
+& 'D:\software\Terraform\terraform.exe' '-chdir=infra/terraform/cicd' plan -input=false -no-color -detailed-exitcode
+```
+
+两次plan退出码0，均 **No changes**，输出分别保存.local/frontend-fixed-final-{portfolio,cicd}-plan.log；仅plan没有apply。说明此次流水线拥有的代码/路由切换不会被当前Terraform配置倒退。等待终端会话完成后才确认结果。
+
+### 26.3 文档整理与本地版本记录
+
+用PowerShell Set-Content将docs/frontend-publication.md整理为简短的当前验收状态/机制/边界，ReadAllText/WriteAllText在PROJECT_PLAN.md顶部加入已完成增量；本日志通过Add-Content追加，保留所有历史。此前重复“待审批”的长历史归并到本日志，没有删除部署代码。将执行git diff --check、暂存路径校验、Gitleaks工作区扫描和提交钩子的staged扫描，仅本地提交 `docs: verify successful full-stack AWS publication`，不push，不为文档触发CI。后续若检查失败会另行补记。前端LIVE发布后的真实回退、报警故障触发路径和实际Bedrock模型仍未验收，留待下一个小Story。

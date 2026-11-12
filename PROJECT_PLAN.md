@@ -1,5 +1,10 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Full-stack publication verified (2026-11-12)
+
+Execution5d55596a at7a2e1b8/deploy succeeded across all eight stages after both user approval gates. Backend7→8: actual10% canary, CodeDeploy d-BIHP8K2EM Succeeded, live8/no weights. Frontend LIVE/DEV now242f8cb4…; public version clean/source matched. Exact versioned report ZIP SHA, actual Lambda hash/router hash, all6 public asset hashes, root/deep-link and7 API contracts independently pass. AlarmOK; production/CICD plansNo changes. No resource creation or new deployment this turn; SSO restored, log26 records all local/CLI/HTTP/document checks. Frontend post-publication recovery and real Bedrock remain separate increments. Pause for review.
+
+
 ## S3-08 — Fixed-source Green8 verified; gate2 pending (2026-11-12)
 
 User completed gate1 for5d55596a/7a2e1b8/deploy; Green70d33467 Succeeded, immutableGreen8/STG9 same release242f8cb4…, seven checks pass. Exact report outerSHA/source/approval/STG/code/exports verified against actual Lambda. Live remainsBlue7/unchangedRevisionId/no weights, old frontend a594e36…/healthUP. ApproveTrafficShift waiting; gate2 authorizes normal backend canary/full then corrected frontend publication. No new resources or frontend LIVE update; root log25.

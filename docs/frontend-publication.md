@@ -1,37 +1,19 @@
-# S3-08：前端自动发布（资源已创建，待人工审批）
+# S3-08：前后端自动发布已验收
 
-**当前：修复执行5d55596a已到第二道审批。** Green**版本8**七项验证成功，与STG9同一候选；报告/实际代码/同次审批/模式与Gate2变量已独立核对。线上仍Blue**版本7**、原RevisionId/无权重，旧前端保持可用、healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment核对 **deploy、Blue7/Green8** 后批准：后端正常灰度成功后发布修复后的React静态包。下面是旧执行历史；前端新LIVE发布/发布后恢复仍待实际验证，日志25节。
+2026-11-12，执行 `5d55596a-4238-4240-bfbf-3e8ae47ee264` 八阶段全部成功，两道生产审批均由用户完成。固定源码 `7a2e1b897848328d112d44e45802849ad52bbd5c`，模式 deploy。
 
-**当前：修复后的新执行5d55596a…停在第一道审批。** 源码7a2e1b8的AWS前后端CI/GitHub检查均成功；Candidate/STG成功、STG**版本9**七项通过，版本化报告与实际代码哈希和导出变量已独立核对。Release242f8cb4…。请选新执行**5d55596a-4238-4240-bfbf-3e8ae47ee264 / deploy / STG9**，批准ApproveProduction→ApproveGreenCreation；先只验证Green，第二道后才正常前后端发布。线上后端7/旧前端保持可用，下面为旧执行历史和范围，日志第24节。
+- 后端：Blue7 → Green8，CodeDeploy `d-BIHP8K2EM` 实际观测10%灰度，约五分钟后完成；live=8，无额外权重，报警OK。
+- 前端：从 a594e36… 切到 `242f8cb4af0a0ff5fed61f8ae9984f2189c8c912af102e9db531afeb1bd7e481`。公开 version.json 的 sourceDirty=false、源码匹配。
+- 独立验收：版本化报告外层SHA与CodeBuild一致；同次执行/源码/发布ID匹配；实际Lambda代码哈希、CloudFront LIVE/DEVELOPMENT模板及路由哈希匹配；6个公开静态文件SHA、首页/深链接、7项API契约通过。生产和CI/CD Terraform plan均No changes。
 
-**最新：后端版本7上线成功，前端在发布LIVE前停止并保留旧指向。** AWS TestFunction输出包装在request里，原代码读顶层uri导致校验失败；现已按真实响应修复并补回归/负例测试，实际样例回放通过。旧执行2a56d7b1整体Failed，前端失败报告recovery.restoredOld=true，LIVE/DEV实际均为旧发布a594e36…。六个新静态文件已条件上传、校验保留；没有新增权限或资源。修复需新执行/两道新审批，不复用旧审批。下面是阶段历史；云端新LIVE发布及发布后回退仍未验收，日志24节。
+访问：https://konglingtong44.com ，发布标识：https://konglingtong44.com/version.json 。这轮没有进行浏览器视觉或容器构建验收。
 
-**当前停在第二道审批。** 执行2a56d7b1/mode deploy第一道已通过，Green**版本7**七项验证成功，与STG8同候选；版本化报告、同次审批、实际代码和Gate2变量已独立核对。线上仍Blue**版本5**、原RevisionId/无权重，前端仍旧a594e36…，healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment确认 **deploy、Blue5/Green7** 后批准：后端10%/五分钟→100%成功后，才发布同候选React前端。不是rollback_drill；真实前端上传/发布/恢复仍待执行，日志第23节。下面为阶段历史与范围。
+发布流程：Source → BuildCandidate → VerifyStaging → ApproveProduction → VerifyGreen → ApproveTrafficShift → DeployProduction → PublishFrontend。前端只在同一候选的后端成功后发布；rollback_drill模式跳过前端。
 
-当前：用户已明确批准，实际apply4新增/2更新/0删除、后续No changes。八阶段pipeline version6、独立发布项目和受限IAM已读取核对。新执行 `2a56d7b1-840e-45b0-8ac4-7b37872cbb4f` 固定源码c073e19，ReleaseMode=deploy；先验收到第一道审批。当前静态发布仍a594e36…、后端live5。下面为准备范围与历史，真实前端发布/回退仍待验证。
+静态文件通过If-None-Match条件写入S3 `releases/<releaseId>/`，校验摘要/MIME/cache与公开HTTPS后，测试CloudFront DEVELOPMENT，再发布LIVE路由。HTML/version使用重新校验，资产使用不可变缓存；保留旧发布，无删除/覆盖权限，不需要全站缓存失效。此方式是版本化发布与指向切换；前端流量没有执行双环境渐进灰度。
 
-已到第一道人工审批：Candidate/STG成功，STG**版本8**七项通过；版本化报告/实际代码SHA/审批变量已独立核对。Release `0dfbd04490393ec56e8c0c554d032167676f068a8fca0d71ce282a5e874b09b2`。请核对新执行**2a56d7b1…/mode deploy/STG8**，在ApproveProduction→ApproveGreenCreation手动批准；此步只发布/验证Green，第二道后才真实切流和前端发布。线上前后端保持不变，日志第22节。
+Terraform管理运行环境、分发配置/关联及IAM；流水线管理Lambda代码、CodeDeploy别名版本/权重和CloudFront函数代码中的发布指向。对应ignore_changes避免Terraform倒退已发布版本，两道人审保持不变。
 
-目标：同次Candidate的React静态包，经两道人审和后端成功切流后自动上线到现有S3/CloudFront。它是版本化自动发布及指向回退，不是CloudFront双环境灰度；后者另一个增量。
+前次执行2a56d7b1的TestFunction响应解析失败，实际恢复旧DEVELOPMENT，LIVE未切换。已按AWS真实request包装修复，并通过本次云端测试/发布。完整历史和命令见根AWS_EXECUTION_LOG.md第21–26节。
 
-流程：新增第八阶段PublishFrontend，消费SourceRef/Candidate/STG/Green/DeploymentReport五输入。核对同次源码、两道人审、后端成功报告及实际live数字版本/SHA。rollback_drill模式明确跳过前端，不上传或切换。
-
-1. 用带If-None-Match的条件PUT写`releases/<releaseId>/`；拒绝覆盖，已有对象只能在checksum/MIME/cache元数据完全一致时复用。只上传清单列出的文件，无删除旧发布权限。
-2. HEAD校验S3摘要/元数据，再通过公开HTTPS验证所有不可变文件的SHA。
-3. 读取原CloudFront LIVE/DEVELOPMENT代码、配置与ETag。只接受现有模板的发布ID变更；有未发布/并发改动则停止。更新DEVELOPMENT并运行AWS TestFunction路由测试后，才PublishFunction切换LIVE。
-4. 验证公开version.json、首页/深链接HTML、API health；新资源前缀避免覆盖旧缓存，不依赖全站失效。传播期有界等待。
-5. 失败时尝试恢复旧路由指向/开发态，保留旧对象；未知并发修改不会被覆盖。恢复成功也仍报告本次发布失败。
-
-Terraform实际计划：**4新增**（独立CodeBuild/角色/policy/七天日志）、**2更新**（pipeline及启动权限）、0删除。默认enable_frontend_release=false时No changes。十五分钟构建、并发一、无重试。角色无DeleteObject、UpdateDistribution、UpdateAlias或审批权；只写指定站点releases前缀，条件写由IAM限制，CloudFront权限限现有SPA函数。
-
-需明确管理交接：Terraform继续管理CloudFront函数runtime、分发配置和关联；流水线管理函数code中的前端发布指向，`ignore_changes=[code]`防止Terraform恢复bootstrap前端。生产实际plan No changes；尚未上传/切换新前端。当前旧发布a594e36…的sourceDirty=true是首次上线历史；本次只接受新的clean pipeline candidate。
-
-边界：前端回退只恢复前端指向，已成功发布的后端不自动倒退，API须兼容旧前端。网络失联/强制终止不能保证脚本清理，需按FrontendReport的旧发布ID和AWS ETag核对恢复。真实上传/条件IAM/AWS TestFunction/全球传播/前端回退仍待云端验收；本地模拟不是浏览器视觉或真实回退演练。
-
-验证：19项CICD mocked plans、3项生产域名测试、Node审批/报告/文件metadata/路径/顺序/并发/失败恢复/演练跳过测试通过；真实LIVE/DEV旧代码和配置匹配模板。所有操作见根日志21节。
-
-源码b00264a已推送，现有AWS frontend/backend CI与GitHub statuses全success（前端40 tests/build，后端9+3 tests/ZIP smoke，前端发布逻辑测试在AWS Linux通过）。本机额外Vite发布前缀构建确认HTML/CSS/JS及public图片路径正确；不是浏览器视觉验证。新发布资源和实际云流程尚未创建/运行。
-
-费用例子：新增阶段每月20次、每次3分钟，按CodeBuild $0.005和V2 action $0.002每分钟估算约 **$0.42/月**，另计S3存储、请求、CloudFront和日志，未扣共享免费额度，不是全站总费或上限。旧发布保留，清理另行处理。[CodeBuild](https://aws.amazon.com/codebuild/pricing/)、[CodePipeline](https://aws.amazon.com/codepipeline/pricing/)。
-
-AWS依据：[条件写](https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes-enforce.html)、[UpdateFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_UpdateFunction.html)、[TestFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_TestFunction.html)、[PublishFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_PublishFunction.html)。创建需用户明确批准；实际前后端发布仍重新经过两道人审，不复用旧执行审批。
+边界：前端LIVE发布后的真实故障回退仍未演练。恢复脚本只回退前端，成功后端不自动倒退，API须兼容旧前端；网络失联/强制终止可能需要人工按ETag/旧发布ID恢复。后端停止触发的自动回滚已验证，报警/应用故障触发路径尚未分别演练。Bedrock当前仍为PREPARING占位。
