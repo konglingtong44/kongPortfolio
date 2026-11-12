@@ -1,5 +1,7 @@
 # 项目操作记录与复习路线（本地、Git、请求与 AWS）
 
+文档整理（2026-11-13）：项目用途、启动、当前 AWS 架构和日常 CI/CD 已集中到 [README](README.md)。已按用户要求移除 PROJECT_PLAN、SPRINT_1_CODEX_PROMPT，以及 docs 下的 serverless-plan、aws-learning-index、aws-preflight、custom-domain、verification 七份文档。下文出现的旧文件名和 git 命令保留为当时操作历史；学习步骤见 [AWS 学习手册](AWS_LEARNING_GUIDE.md)。
+
 这是人工整理的全项目操作记录，不是完整终端录屏。范围包括文件读取/修改、Git、本地构建和测试、公开文档/API 请求、AWS CLI、Terraform、电脑操作，以及失败、修复和验证结果；不只记录 AWS。前面已完成部分按执行记录重建；后续逐步补记。命令以仓库根目录 `D:\study\kongPortfolio` 为起点，注明不同工作目录。`<...>` 是占位符，不能直接复制执行。含 `apply`、`push`、`start-build` 的命令会产生实际变更或费用，不要为了复习重复运行。
 
 登录码、SSO 缓存、持有人资料、密钥不写入本文件。原始构建日志及结果放在被 Git 忽略的 `.local/`，不提交。`terraform.tfvars`、`backend.hcl`、计划文件和 State 也不提交。

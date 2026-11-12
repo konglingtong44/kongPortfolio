@@ -1,6 +1,6 @@
 # S2-04 — 首次 Serverless 部署
 
-当前网站：https://konglingtong44.com 。2026-11-11 完成首次部署，2026-11-12 完成 [域名接入](../../../docs/custom-domain.md)。原 CloudFront 地址仍可用。初次创建命令、修复和验证见 [上线记录](DEPLOYMENT.md)。
+当前网站：https://konglingtong44.com 。2026-11-11 完成首次部署，2026-11-12 完成 [域名接入](../../../README.md#aws-运行架构)。原 CloudFront 地址仍可用。初次创建命令、修复和验证见 [上线记录](DEPLOYMENT.md)。
 
 当前维护只需运行 `terraform -chdir=infra/terraform/portfolio plan` 检查差异。下方 23-create 计划和 apply 包装属于本次首次创建的历史步骤，**不要重新执行旧 first.tfplan**；后续发布在新 Story 中生成新计划。新机器需保留/取回对应候选 ZIP、manifest 和前端文件，不能把重新构建的不同文件冒充原发布包。
 

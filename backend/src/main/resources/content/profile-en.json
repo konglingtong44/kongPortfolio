@@ -21,37 +21,67 @@
       "kind": "personal",
       "title": "kongPortfolio",
       "period": "2026.11 —",
-      "role": "Personal project / In progress",
-      "description": "My personal website, with an introduction, past work and personal projects. I made it so people interested in working with me can learn about my background and the technologies I’ve used.",
-      "outcome": "Hosted on AWS, with CI/CD for testing and releases. I plan to add Bedrock Q&A about my background and projects.",
+      "role": "Design, development, AWS infrastructure & operations",
+      "description": "An evolving website built with React / TypeScript and Java 21 / Spring Boot. AWS infrastructure is managed with Terraform, with CI/CD, blue/green deployment and canary releases implemented.",
+      "outcome": "Live on AWS and under continued development. Verified Lambda releases from 10% canary traffic to full traffic, plus automatic rollback after a controlled stop. Amazon Bedrock Q&A integration is planned next; the endpoint currently returns a preparation status.",
       "tags": [
-        "React",
-        "TypeScript",
-        "Spring Boot",
-        "Docker / Compose"
+        "React / TypeScript",
+        "Java / Spring Boot",
+        "Terraform",
+        "AWS CI/CD"
       ],
-      "team": "Personal project",
+      "team": "1 developer",
       "responsibilities": [
-        "Built the pages with React / TypeScript / Vite and the API with Java 21 / Spring Boot.",
-        "Deployed with S3 / CloudFront and API Gateway / Lambda. Also built a tool for trying regular expressions.",
-        "Set up CodePipeline / CodeBuild for automated tests, builds and releases, with gradual traffic shifts through CodeDeploy and two manual production approvals."
+        "Built the frontend with React / TypeScript / Vite and the backend API with Java 21 / Spring Boot, including Japanese, Chinese and English language selection and a regular expression tool.",
+        "Provisioned AWS infrastructure with Terraform: private S3 + CloudFront for the frontend and API Gateway HTTP API + Lambda for the backend.",
+        "Connected source retrieval, tests, builds, staging verification and production releases with CodeConnections / CodePipeline / CodeBuild, retaining two manual production approval gates.",
+        "Implemented Lambda blue/green deployment with CodeDeploy, shifting 10% of traffic for five minutes before full rollout. Verified canary traffic shifts and automatic rollback after a controlled stop.",
+        "Implemented versioned frontend releases in S3, switching the CloudFront release pointer after verification."
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Frontend",
           "items": [
             "React",
             "TypeScript",
-            "Vite",
+            "Vite"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Backend",
+          "items": [
             "Java 21",
             "Spring Boot"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "AWS runtime & delivery",
           "items": [
-            "Docker / Compose",
+            "S3",
+            "CloudFront",
+            "API Gateway HTTP API",
+            "Lambda",
+            "IAM",
+            "CloudWatch"
+          ],
+          "description": ""
+        },
+        {
+          "title": "IaC & CI/CD",
+          "items": [
+            "Terraform",
+            "CodeConnections",
+            "CodePipeline",
+            "CodeBuild",
+            "CodeDeploy"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Testing",
+          "items": [
             "Vitest",
             "JUnit"
           ],
@@ -118,7 +148,7 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "JSP",
@@ -128,29 +158,44 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
-            "S3",
-            "EFS",
-            "RDS (inspection / configuration)",
-            "Lambda",
-            "CloudWatch",
-            "IAM",
-            "Athena"
+            "RDS (inspection / configuration)"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "AWS",
           "items": [
-            "Git",
-            "Backlog",
-            "Confluence",
+            "EC2",
+            "S3",
+            "EFS",
+            "Lambda",
+            "CloudWatch",
+            "IAM",
+            "Athena",
+            "VPC"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Testing tools",
+          "items": [
             "JMeter",
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
             "Selenium (PoC)"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "CI/CD"
           ],
           "description": ""
         }
@@ -160,21 +205,24 @@
         "JSP",
         "React",
         "VB / C# (legacy analysis)",
+        "RDS (inspection / configuration)",
+        "EC2",
         "S3",
         "EFS",
-        "RDS (inspection / configuration)",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
-        "Git",
-        "Backlog",
-        "Confluence",
+        "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium (PoC)"
+        "Selenium (PoC)",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "CI/CD"
       ]
     },
     {
@@ -194,7 +242,7 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java Swing",
             "C#",
@@ -203,20 +251,33 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
-            "RDS",
+            "RDS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Middleware & platforms",
+          "items": [
+            "Salesforce",
             "Apigee"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Testing tools",
           "items": [
-            "MSI",
-            "Intune",
-            "Visual Studio",
             "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
+          "items": [
+            "Intune",
+            "MSI (Windows Installer)",
+            "Visual Studio"
           ],
           "description": ""
         }
@@ -226,11 +287,12 @@
         "C#",
         "VBScript",
         "RDS",
+        "Salesforce",
         "Apigee",
-        "MSI",
+        "JMeter",
         "Intune",
-        "Visual Studio",
-        "JMeter"
+        "MSI (Windows Installer)",
+        "Visual Studio"
       ]
     },
     {
@@ -252,7 +314,7 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "Spring",
@@ -263,27 +325,47 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
-            "DB2",
-            "AWS Lambda",
-            "S3",
-            "API Gateway",
-            "Apigee"
+            "DB2"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "AWS",
+          "items": [
+            "AWS Lambda",
+            "S3",
+            "API Gateway"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Middleware & platforms",
+          "items": [
+            "Apigee",
+            "WebSphere"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Testing tools",
+          "items": [
+            "Postman",
+            "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
           "items": [
             "Git",
             "Bitbucket",
+            "majorFlow",
+            "Jasper",
             "Artifactory",
             "Tableau",
-            "TWS",
-            "Postman",
-            "JMeter",
-            "WebSphere"
+            "TWS"
           ],
           "description": ""
         }
@@ -299,14 +381,16 @@
         "S3",
         "API Gateway",
         "Apigee",
-        "Git",
-        "Bitbucket",
-        "Artifactory",
-        "Tableau",
-        "TWS",
+        "WebSphere",
         "Postman",
         "JMeter",
-        "WebSphere"
+        "Git",
+        "Bitbucket",
+        "majorFlow",
+        "Jasper",
+        "Artifactory",
+        "Tableau",
+        "TWS"
       ]
     },
     {
@@ -329,7 +413,7 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "Spring",
@@ -344,10 +428,16 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
             "Oracle",
-            "SQL Server",
+            "SQL Server"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Middleware & platforms",
+          "items": [
             "Tomcat",
             "WildFly",
             "Nginx"
@@ -355,13 +445,20 @@
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Testing tools",
+          "items": [
+            "JMeter",
+            "SoapUI"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Development & operations tools",
           "items": [
             "Git",
             "SVN",
+            "LoadStar",
             "Jenkins",
-            "JMeter",
-            "SoapUI",
             "Linux",
             "Windows"
           ],
@@ -383,11 +480,12 @@
         "Tomcat",
         "WildFly",
         "Nginx",
-        "Git",
-        "SVN",
-        "Jenkins",
         "JMeter",
         "SoapUI",
+        "Git",
+        "SVN",
+        "LoadStar",
+        "Jenkins",
         "Linux",
         "Windows"
       ]
@@ -408,7 +506,7 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Java",
             "Spring",
@@ -420,15 +518,21 @@
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
-            "Oracle",
+            "Oracle"
+          ],
+          "description": ""
+        },
+        {
+          "title": "Middleware & platforms",
+          "items": [
             "Tomcat"
           ],
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Development & operations tools",
           "items": [
             "SVN",
             "Linux",
@@ -467,14 +571,14 @@
       ],
       "environment": [
         {
-          "title": "Languages & applications",
+          "title": "Languages & frameworks",
           "items": [
             "Shell"
           ],
           "description": ""
         },
         {
-          "title": "Cloud, data & platforms",
+          "title": "Databases",
           "items": [
             "Oracle",
             "Hadoop"
@@ -482,9 +586,10 @@
           "description": ""
         },
         {
-          "title": "Tools & runtime",
+          "title": "Development & operations tools",
           "items": [
             "SVN",
+            "LoadStar",
             "Linux",
             "Windows"
           ],
@@ -496,6 +601,7 @@
         "Oracle",
         "Hadoop",
         "SVN",
+        "LoadStar",
         "Linux",
         "Windows"
       ]

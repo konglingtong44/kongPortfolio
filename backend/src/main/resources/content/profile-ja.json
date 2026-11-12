@@ -21,37 +21,67 @@
       "kind": "personal",
       "title": "kongPortfolio",
       "period": "2026.11 —",
-      "role": "個人開発 / 開発中",
-      "description": "自己紹介と、これまでの仕事や個人制作をまとめた個人サイトです。仕事の相談などで、経歴や使ってきた技術を知ってもらうために作りました。",
-      "outcome": "AWS で公開し、CI/CD でテストからリリースまでを実行。今後は Bedrock を使ったプロフィールや制作物についての Q&A を追加する予定です。",
+      "role": "設計・実装・AWS 基盤構築・運用",
+      "description": "React / TypeScript と Java 21 / Spring Boot で継続開発している Web サイト。Terraform による AWS 基盤構築と、CI/CD・ブルーグリーン／カナリアデプロイを実装。",
+      "outcome": "AWS で公開・継続開発中。Lambda の 10% カナリア切り替えから全量公開、手動停止時の自動ロールバックを検証済み。次は Amazon Bedrock を使った Q&A の接続を予定しており、現在は準備中の応答のみ。",
       "tags": [
-        "React",
-        "TypeScript",
-        "Spring Boot",
-        "Docker / Compose"
+        "React / TypeScript",
+        "Java / Spring Boot",
+        "Terraform",
+        "AWS CI/CD"
       ],
-      "team": "個人開発",
+      "team": "1 名",
       "responsibilities": [
-        "React / TypeScript / Vite で画面、Java 21 / Spring Boot で API を実装。",
-        "S3 / CloudFront と API Gateway / Lambda で公開。正規表現を試せるツールも作成。",
-        "CodePipeline / CodeBuild でテスト・ビルド・公開を自動化し、CodeDeploy で段階的に切り替え。本番リリースには二段階の手動承認を設定。"
+        "フロントエンドは React / TypeScript / Vite、バックエンド API は Java 21 / Spring Boot で実装。日本語・中国語・英語の切り替えと正規表現ツールを提供。",
+        "Terraform で AWS 基盤を構築。フロントエンドは非公開 S3 + CloudFront、バックエンドは API Gateway HTTP API + Lambda で公開。",
+        "CodeConnections / CodePipeline / CodeBuild でソース取得、テスト、ビルド、ステージング検証から本番公開までを構築。本番リリースには二段階の手動承認を設定。",
+        "CodeDeploy で Lambda のブルーグリーンデプロイを実装。新バージョンに 10% のトラフィックを流し、5 分後に全量へ切り替えるカナリア方式と、手動停止時の自動ロールバックを検証。",
+        "フロントエンドは S3 にリリース単位で保存し、検証後に CloudFront の配信先を切り替えるバージョン管理付き公開を実装。"
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "フロントエンド",
           "items": [
             "React",
             "TypeScript",
-            "Vite",
+            "Vite"
+          ],
+          "description": ""
+        },
+        {
+          "title": "バックエンド",
+          "items": [
             "Java 21",
             "Spring Boot"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "AWS 実行・配信基盤",
           "items": [
-            "Docker / Compose",
+            "S3",
+            "CloudFront",
+            "API Gateway HTTP API",
+            "Lambda",
+            "IAM",
+            "CloudWatch"
+          ],
+          "description": ""
+        },
+        {
+          "title": "IaC・CI/CD",
+          "items": [
+            "Terraform",
+            "CodeConnections",
+            "CodePipeline",
+            "CodeBuild",
+            "CodeDeploy"
+          ],
+          "description": ""
+        },
+        {
+          "title": "テスト",
+          "items": [
             "Vitest",
             "JUnit"
           ],
@@ -118,7 +148,7 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "JSP",
@@ -128,29 +158,44 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
-            "S3",
-            "EFS",
-            "RDS （参照・構成確認）",
-            "Lambda",
-            "CloudWatch",
-            "IAM",
-            "Athena"
+            "RDS （参照・構成確認）"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "AWS",
           "items": [
-            "Git",
-            "Backlog",
-            "Confluence",
+            "EC2",
+            "S3",
+            "EFS",
+            "Lambda",
+            "CloudWatch",
+            "IAM",
+            "Athena",
+            "VPC"
+          ],
+          "description": ""
+        },
+        {
+          "title": "テストツール",
+          "items": [
             "JMeter",
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
             "Selenium （PoC）"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "CI/CD"
           ],
           "description": ""
         }
@@ -159,22 +204,25 @@
         "Java",
         "JSP",
         "React",
-        "VB / C# (legacy analysis)",
+        "VB / C# （既存資産の調査）",
+        "RDS （参照・構成確認）",
+        "EC2",
         "S3",
         "EFS",
-        "RDS (inspection / configuration)",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
-        "Git",
-        "Backlog",
-        "Confluence",
+        "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium (PoC)"
+        "Selenium （PoC）",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "CI/CD"
       ]
     },
     {
@@ -194,7 +242,7 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java Swing",
             "C#",
@@ -203,20 +251,33 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
-            "RDS",
+            "RDS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "ミドルウェア・プラットフォーム",
+          "items": [
+            "Salesforce",
             "Apigee"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "テストツール",
           "items": [
-            "MSI",
-            "Intune",
-            "Visual Studio",
             "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
+          "items": [
+            "Intune",
+            "MSI (Windows Installer)",
+            "Visual Studio"
           ],
           "description": ""
         }
@@ -226,11 +287,12 @@
         "C#",
         "VBScript",
         "RDS",
+        "Salesforce",
         "Apigee",
-        "MSI",
+        "JMeter",
         "Intune",
-        "Visual Studio",
-        "JMeter"
+        "MSI (Windows Installer)",
+        "Visual Studio"
       ]
     },
     {
@@ -252,7 +314,7 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "Spring",
@@ -263,27 +325,47 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
-            "DB2",
-            "AWS Lambda",
-            "S3",
-            "API Gateway",
-            "Apigee"
+            "DB2"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "AWS",
+          "items": [
+            "AWS Lambda",
+            "S3",
+            "API Gateway"
+          ],
+          "description": ""
+        },
+        {
+          "title": "ミドルウェア・プラットフォーム",
+          "items": [
+            "Apigee",
+            "WebSphere"
+          ],
+          "description": ""
+        },
+        {
+          "title": "テストツール",
+          "items": [
+            "Postman",
+            "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
           "items": [
             "Git",
             "Bitbucket",
+            "majorFlow",
+            "Jasper",
             "Artifactory",
             "Tableau",
-            "TWS",
-            "Postman",
-            "JMeter",
-            "WebSphere"
+            "TWS"
           ],
           "description": ""
         }
@@ -299,14 +381,16 @@
         "S3",
         "API Gateway",
         "Apigee",
-        "Git",
-        "Bitbucket",
-        "Artifactory",
-        "Tableau",
-        "TWS",
+        "WebSphere",
         "Postman",
         "JMeter",
-        "WebSphere"
+        "Git",
+        "Bitbucket",
+        "majorFlow",
+        "Jasper",
+        "Artifactory",
+        "Tableau",
+        "TWS"
       ]
     },
     {
@@ -329,7 +413,7 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "Spring",
@@ -344,10 +428,16 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
             "Oracle",
-            "SQL Server",
+            "SQL Server"
+          ],
+          "description": ""
+        },
+        {
+          "title": "ミドルウェア・プラットフォーム",
+          "items": [
             "Tomcat",
             "WildFly",
             "Nginx"
@@ -355,13 +445,20 @@
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "テストツール",
+          "items": [
+            "JMeter",
+            "SoapUI"
+          ],
+          "description": ""
+        },
+        {
+          "title": "開発・運用ツール",
           "items": [
             "Git",
             "SVN",
+            "LoadStar",
             "Jenkins",
-            "JMeter",
-            "SoapUI",
             "Linux",
             "Windows"
           ],
@@ -377,17 +474,18 @@
         "jQuery",
         "Shell",
         "Perl",
-        "VB6 (legacy analysis)",
+        "VB6 （既存資産の調査）",
         "Oracle",
         "SQL Server",
         "Tomcat",
         "WildFly",
         "Nginx",
-        "Git",
-        "SVN",
-        "Jenkins",
         "JMeter",
         "SoapUI",
+        "Git",
+        "SVN",
+        "LoadStar",
+        "Jenkins",
         "Linux",
         "Windows"
       ]
@@ -408,7 +506,7 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Java",
             "Spring",
@@ -420,15 +518,21 @@
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
-            "Oracle",
+            "Oracle"
+          ],
+          "description": ""
+        },
+        {
+          "title": "ミドルウェア・プラットフォーム",
+          "items": [
             "Tomcat"
           ],
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "開発・運用ツール",
           "items": [
             "SVN",
             "Linux",
@@ -467,14 +571,14 @@
       ],
       "environment": [
         {
-          "title": "言語・アプリ",
+          "title": "言語・フレームワーク",
           "items": [
             "Shell"
           ],
           "description": ""
         },
         {
-          "title": "クラウド・DB・基盤",
+          "title": "データベース",
           "items": [
             "Oracle",
             "Hadoop"
@@ -482,9 +586,10 @@
           "description": ""
         },
         {
-          "title": "ツール・実行環境",
+          "title": "開発・運用ツール",
           "items": [
             "SVN",
+            "LoadStar",
             "Linux",
             "Windows"
           ],
@@ -496,6 +601,7 @@
         "Oracle",
         "Hadoop",
         "SVN",
+        "LoadStar",
         "Linux",
         "Windows"
       ]

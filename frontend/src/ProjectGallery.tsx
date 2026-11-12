@@ -10,6 +10,7 @@ import { scrollToChapter, useChapterWheel } from './useChapterWheel';
 type Project = Profile['projects'][number];
 type Event = Profile['timeline'][number];
 const homeLabel = { ja: '自己紹介へ', zh: '返回简介', en: 'Back to intro' };
+const thisProjectLabel = { ja: '本プロジェクト', zh: '本项目', en: 'This project' };
 export type JourneyEntry = { title: string; period: string; description: string; project?: Project; event?: Event };
 const galleryCopy = {
   ja: { title: '経験とプロジェクト', hint: 'スクロールで一つずつ · 時間軸を選ぶと詳細へ', previous: '前のプロジェクト', next: '次のプロジェクト', open: 'プロジェクトを開く', label: '経験とプロジェクト一覧', career: 'これまでの経験', overview: '経歴・担当内容', skills: '技術スタックへ', timeline: '経歴の時間軸', team: '役割・チーム規模', tasks: '担当したこと', environment: '使用技術・環境', outcome: '成果・現在の状況' },
@@ -34,7 +35,10 @@ export function journeyEntries(projects: Profile['projects'], timeline: Profile[
 }
 export function ProjectGallery({ projects, timeline = [], locale }: { projects: Profile['projects']; timeline?: Profile['timeline']; locale: Locale }) {
   const t = copy[locale], m = modulesCopy[locale], g = galleryCopy[locale];
-  const ordered = journeyEntries(projects, timeline);
+  const ordered = journeyEntries(projects, timeline).map(entry =>
+    entry.project?.kind === 'personal' && entry.title === 'kongPortfolio'
+      ? { ...entry, period: thisProjectLabel[locale] }
+      : entry);
   const root = useRef<HTMLElement>(null), viewport = useRef<HTMLDivElement>(null), track = useRef<HTMLOListElement>(null);
   const [current, setCurrent] = useState(0), [fraction, setFraction] = useState(0), [selected, setSelected] = useState<number | null>(null);
   const target = useRef(0), settling = useRef(0), pendingOpen = useRef<number | null>(null), timer = useRef<number | undefined>(undefined);

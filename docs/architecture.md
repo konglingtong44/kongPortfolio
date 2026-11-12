@@ -1,6 +1,6 @@
 # 架构与边界
 
-当前目标已由用户改为 Lambda + HTTP API，见 [当前 Serverless 路线](serverless-plan.md)。下文保留原 ECS/ALB 设计作历史参考，不作为当前执行计划；本地部分仍适用。State 已创建、AWS 预检已完成，不能再按下文旧 Phase 1 状态判断现状。
+当前目标已由用户改为 Lambda + HTTP API，见 [当前 Serverless 路线](../README.md#aws-运行架构)。下文保留原 ECS/ALB 设计作历史参考，不作为当前执行计划；本地部分仍适用。State 已创建、AWS 预检已完成，不能再按下文旧 Phase 1 状态判断现状。
 
 状态：本地已实现；AWS 全部 Planned。Phase 1 不创建资源，不改变 5173/8080/3000 端口。
 

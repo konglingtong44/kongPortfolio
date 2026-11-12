@@ -1,6 +1,6 @@
 # 全 AWS CI/CD 与 GitHub Flow
 
-当前目标见 [Serverless 路线](serverless-plan.md)：后端为 Lambda ZIP + CodeDeploy 别名切流，两道审批保留；CodeBuild 检查脚本已加入默认 HTTP / Lambda / ZIP 冒烟三项。下文原 ECS task definition、ECR、pause hook 与角色设计属于历史参考，不能用于当前 Lambda 发布。PR 权限隔离、固定 SHA、扫描和构建一次原则仍适用；云端流水线未创建。
+当前目标见 [Serverless 路线](../README.md#aws-运行架构)：后端为 Lambda ZIP + CodeDeploy 别名切流，两道审批保留；CodeBuild 检查脚本已加入默认 HTTP / Lambda / ZIP 冒烟三项。下文原 ECS task definition、ECR、pause hook 与角色设计属于历史参考，不能用于当前 Lambda 发布。PR 权限隔离、固定 SHA、扫描和构建一次原则仍适用；云端流水线未创建。
 
 最新决定：GitHub 仅保存代码/PR，**不使用 GitHub Actions（包括托管 runner）**。测试、构建、发布、两次审批均由 AWS 执行。以下 AWS 资源/触发器/保护规则全部 Planned；Phase 1 只准备代码和本地验证。
 

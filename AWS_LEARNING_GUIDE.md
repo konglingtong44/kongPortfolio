@@ -363,7 +363,7 @@ publish脚本先核SHA，再head-object/put-object上传manifest列出的6个公
 
 **鼠标查看：** Route53→Registered domains看注册和NS；Hosted zones看记录；ACM切us-east-1看证书；CloudFront看域名与证书。
 
-**实际结果：** 5新增/1修改，网站https://konglingtong44.com上线，TLS/DNS/HTTP验收通过。注册与DNS两部分细节见[域名记录](docs/custom-domain.md)。
+**实际结果：** 5新增/1修改，网站https://konglingtong44.com上线，TLS/DNS/HTTP验收通过。注册与DNS两部分细节见[域名记录](README.md#aws-运行架构)。
 
 ## 第12步：建立AWS与GitHub的连接
 

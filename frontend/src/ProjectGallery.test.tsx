@@ -26,6 +26,24 @@ it('sorts and merges matching career periods without losing their context', () =
   expect(projects[0].title).toBe('Older project');
 });
 
+it('labels this website without a date in the rail, card and detail while preserving order', () => {
+  const website = { ...projects[1], title: 'kongPortfolio' };
+  for (const [locale, label, open] of [
+    ['ja', '本プロジェクト', 'プロジェクトを開く'],
+    ['zh', '本项目', '打开项目'],
+    ['en', 'This project', 'Open project'],
+  ] as const) {
+    const { container, unmount } = render(<ProjectGallery projects={[projects[0], website]} locale={locale}/>);
+    expect(container.querySelector('.rail-period')).toHaveTextContent(label);
+    expect(container.querySelector('.ticket-top')).toHaveTextContent(label);
+    expect(container).not.toHaveTextContent('2026.11');
+    fireEvent.click(screen.getByRole('button', { name: `${open}: kongPortfolio` }));
+    expect(screen.getByRole('dialog')).toHaveTextContent(label);
+    expect(screen.getByRole('dialog')).not.toHaveTextContent('2026.11');
+    unmount();
+  }
+});
+
 it('opens project and career details, supports keyboard and restores focus', () => {
   render(<ProjectGallery projects={projects} timeline={timeline} locale="en"/>);
   expect(within(screen.getByRole('list', { name: 'Experience and projects' })).getAllByRole('article')).toHaveLength(4);

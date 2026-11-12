@@ -21,37 +21,67 @@
       "kind": "personal",
       "title": "kongPortfolio",
       "period": "2026.11 —",
-      "role": "个人开发 / 进行中",
-      "description": "我的个人网站，介绍自己，也整理了过去的工作和个人作品。希望有工作交流或合作意向的人，可以在这里了解我的经历和用过的技术。",
-      "outcome": "已部署到 AWS，通过 CI/CD 完成测试和发布。后续计划接入 Bedrock，回答关于个人经历和作品的问题。",
+      "role": "设计、开发、AWS 基础设施构建与运维",
+      "description": "持续开发中的网站，前端使用 React / TypeScript，后端使用 Java 21 / Spring Boot。通过 Terraform 构建 AWS 基础设施，已实现 CI/CD、蓝绿部署与金丝雀发布。",
+      "outcome": "已在 AWS 上线并持续迭代。已验证 Lambda 从 10% 金丝雀流量切换到全量，以及受控停止时的自动回滚。下一步计划接入 Amazon Bedrock 问答，目前接口仅返回准备中状态。",
       "tags": [
-        "React",
-        "TypeScript",
-        "Spring Boot",
-        "Docker / Compose"
+        "React / TypeScript",
+        "Java / Spring Boot",
+        "Terraform",
+        "AWS CI/CD"
       ],
-      "team": "个人开发",
+      "team": "1 人",
       "responsibilities": [
-        "使用 React / TypeScript / Vite 开发页面，Java 21 / Spring Boot 开发 API。",
-        "通过 S3 / CloudFront 和 API Gateway / Lambda 部署，也制作了可以试用正则表达式的小工具。",
-        "使用 CodePipeline / CodeBuild 自动测试、构建和发布，CodeDeploy 分阶段切流；生产发布保留两道手动审批。"
+        "使用 React / TypeScript / Vite 开发前端，Java 21 / Spring Boot 开发后端 API，实现日、中、英语言切换及正则表达式工具。",
+        "使用 Terraform 构建 AWS 基础设施：前端为私有 S3 + CloudFront，后端为 API Gateway HTTP API + Lambda。",
+        "使用 CodeConnections / CodePipeline / CodeBuild 串联源码获取、测试、构建、预发布验证及生产发布，保留两道生产手动审批。",
+        "使用 CodeDeploy 实现 Lambda 蓝绿部署，以 10% 流量运行 5 分钟后切至全量；已验证金丝雀切流及受控停止时的自动回滚。",
+        "前端按发布版本保存到 S3，验证后切换 CloudFront 发布指向，实现版本化发布。"
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "前端",
           "items": [
             "React",
             "TypeScript",
-            "Vite",
+            "Vite"
+          ],
+          "description": ""
+        },
+        {
+          "title": "后端",
+          "items": [
             "Java 21",
             "Spring Boot"
           ],
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "AWS 运行与分发环境",
           "items": [
-            "Docker / Compose",
+            "S3",
+            "CloudFront",
+            "API Gateway HTTP API",
+            "Lambda",
+            "IAM",
+            "CloudWatch"
+          ],
+          "description": ""
+        },
+        {
+          "title": "IaC 与 CI/CD",
+          "items": [
+            "Terraform",
+            "CodeConnections",
+            "CodePipeline",
+            "CodeBuild",
+            "CodeDeploy"
+          ],
+          "description": ""
+        },
+        {
+          "title": "测试",
+          "items": [
             "Vitest",
             "JUnit"
           ],
@@ -118,7 +148,7 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Java",
             "JSP",
@@ -128,29 +158,44 @@
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
-            "S3",
-            "EFS",
-            "RDS （查询与构成确认）",
-            "Lambda",
-            "CloudWatch",
-            "IAM",
-            "Athena"
+            "RDS （查询与构成确认）"
           ],
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "AWS",
           "items": [
-            "Git",
-            "Backlog",
-            "Confluence",
+            "EC2",
+            "S3",
+            "EFS",
+            "Lambda",
+            "CloudWatch",
+            "IAM",
+            "Athena",
+            "VPC"
+          ],
+          "description": ""
+        },
+        {
+          "title": "测试工具",
+          "items": [
             "JMeter",
             "Distributed Load Testing on AWS",
             "Postman",
             "SoapUI",
             "Selenium （PoC）"
+          ],
+          "description": ""
+        },
+        {
+          "title": "开发与运维工具",
+          "items": [
+            "Git",
+            "Backlog",
+            "Confluence",
+            "CI/CD"
           ],
           "description": ""
         }
@@ -159,22 +204,25 @@
         "Java",
         "JSP",
         "React",
-        "VB / C# (legacy analysis)",
+        "VB / C# （旧代码分析）",
+        "RDS （查询与构成确认）",
+        "EC2",
         "S3",
         "EFS",
-        "RDS (inspection / configuration)",
         "Lambda",
         "CloudWatch",
         "IAM",
         "Athena",
-        "Git",
-        "Backlog",
-        "Confluence",
+        "VPC",
         "JMeter",
         "Distributed Load Testing on AWS",
         "Postman",
         "SoapUI",
-        "Selenium (PoC)"
+        "Selenium （PoC）",
+        "Git",
+        "Backlog",
+        "Confluence",
+        "CI/CD"
       ]
     },
     {
@@ -194,7 +242,7 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Java Swing",
             "C#",
@@ -203,20 +251,33 @@
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
-            "RDS",
+            "RDS"
+          ],
+          "description": ""
+        },
+        {
+          "title": "中间件与平台",
+          "items": [
+            "Salesforce",
             "Apigee"
           ],
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "测试工具",
           "items": [
-            "MSI",
-            "Intune",
-            "Visual Studio",
             "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "开发与运维工具",
+          "items": [
+            "Intune",
+            "MSI (Windows Installer)",
+            "Visual Studio"
           ],
           "description": ""
         }
@@ -226,11 +287,12 @@
         "C#",
         "VBScript",
         "RDS",
+        "Salesforce",
         "Apigee",
-        "MSI",
+        "JMeter",
         "Intune",
-        "Visual Studio",
-        "JMeter"
+        "MSI (Windows Installer)",
+        "Visual Studio"
       ]
     },
     {
@@ -252,7 +314,7 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Java",
             "Spring",
@@ -263,27 +325,47 @@
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
-            "DB2",
-            "AWS Lambda",
-            "S3",
-            "API Gateway",
-            "Apigee"
+            "DB2"
           ],
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "AWS",
+          "items": [
+            "AWS Lambda",
+            "S3",
+            "API Gateway"
+          ],
+          "description": ""
+        },
+        {
+          "title": "中间件与平台",
+          "items": [
+            "Apigee",
+            "WebSphere"
+          ],
+          "description": ""
+        },
+        {
+          "title": "测试工具",
+          "items": [
+            "Postman",
+            "JMeter"
+          ],
+          "description": ""
+        },
+        {
+          "title": "开发与运维工具",
           "items": [
             "Git",
             "Bitbucket",
+            "majorFlow",
+            "Jasper",
             "Artifactory",
             "Tableau",
-            "TWS",
-            "Postman",
-            "JMeter",
-            "WebSphere"
+            "TWS"
           ],
           "description": ""
         }
@@ -299,14 +381,16 @@
         "S3",
         "API Gateway",
         "Apigee",
-        "Git",
-        "Bitbucket",
-        "Artifactory",
-        "Tableau",
-        "TWS",
+        "WebSphere",
         "Postman",
         "JMeter",
-        "WebSphere"
+        "Git",
+        "Bitbucket",
+        "majorFlow",
+        "Jasper",
+        "Artifactory",
+        "Tableau",
+        "TWS"
       ]
     },
     {
@@ -329,7 +413,7 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Java",
             "Spring",
@@ -344,10 +428,16 @@
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
             "Oracle",
-            "SQL Server",
+            "SQL Server"
+          ],
+          "description": ""
+        },
+        {
+          "title": "中间件与平台",
+          "items": [
             "Tomcat",
             "WildFly",
             "Nginx"
@@ -355,13 +445,20 @@
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "测试工具",
+          "items": [
+            "JMeter",
+            "SoapUI"
+          ],
+          "description": ""
+        },
+        {
+          "title": "开发与运维工具",
           "items": [
             "Git",
             "SVN",
+            "LoadStar",
             "Jenkins",
-            "JMeter",
-            "SoapUI",
             "Linux",
             "Windows"
           ],
@@ -377,17 +474,18 @@
         "jQuery",
         "Shell",
         "Perl",
-        "VB6 (legacy analysis)",
+        "VB6 （旧代码分析）",
         "Oracle",
         "SQL Server",
         "Tomcat",
         "WildFly",
         "Nginx",
-        "Git",
-        "SVN",
-        "Jenkins",
         "JMeter",
         "SoapUI",
+        "Git",
+        "SVN",
+        "LoadStar",
+        "Jenkins",
         "Linux",
         "Windows"
       ]
@@ -408,7 +506,7 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Java",
             "Spring",
@@ -420,15 +518,21 @@
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
-            "Oracle",
+            "Oracle"
+          ],
+          "description": ""
+        },
+        {
+          "title": "中间件与平台",
+          "items": [
             "Tomcat"
           ],
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "开发与运维工具",
           "items": [
             "SVN",
             "Linux",
@@ -467,14 +571,14 @@
       ],
       "environment": [
         {
-          "title": "语言与应用",
+          "title": "语言与框架",
           "items": [
             "Shell"
           ],
           "description": ""
         },
         {
-          "title": "云、数据库与平台",
+          "title": "数据库",
           "items": [
             "Oracle",
             "Hadoop"
@@ -482,9 +586,10 @@
           "description": ""
         },
         {
-          "title": "工具与运行环境",
+          "title": "开发与运维工具",
           "items": [
             "SVN",
+            "LoadStar",
             "Linux",
             "Windows"
           ],
@@ -496,6 +601,7 @@
         "Oracle",
         "Hadoop",
         "SVN",
+        "LoadStar",
         "Linux",
         "Windows"
       ]
