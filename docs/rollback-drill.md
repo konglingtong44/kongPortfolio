@@ -1,5 +1,7 @@
 # S3-07R：受控停止与自动回滚演练
 
+**当前停在第二道人审。** 新执行96861976第一道已通过，Green**版本6**七项验证成功；与STG7同一候选，报告/实际代码/审批变量/模式已独立核对。线上仍Blue**版本5**、原RevisionId/无权重、healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment核对 **mode rollback_drill、Blue5、Green6** 后手动批准：这次会在真实10%时主动停止，验证自动恢复Blue5，不是常规全量发布。真实自动回滚仍待此步执行，下面为准备阶段历史；日志第19节。
+
 当前：准备代码8ad190b的AWS前后端CI均成功；Terraform实际只更新pipeline1处，0新增/0删除，后续No changes。新执行 `96861976-0f9e-4a0c-b49e-9c75c0c1762b` 固定该源码，已从AWS读回ReleaseMode=rollback_drill，先验证到第一道人工审批。线上仍稳定版本5，尚未做真实回滚。
 
 已到第一道审批：Candidate与STG成功、STG版本7七项通过。版本化报告外层SHA、同次执行/源码/候选哈希、实际Lambda和审批导出变量已独立核对；release `13d4d232f880fb581fcd890881eaf13be39ff19d02693f7059901a1b40ebf506`。整体InProgress/version5/mode rollback_drill，ApproveProduction等待人工，线上live5/无权重。请核对新执行96861976/STG7，批准ApproveGreenCreation；此步只发布/验证Green，真正停止与回滚在第二道人审之后。

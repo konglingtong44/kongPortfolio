@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07R — Drill Green verified; waiting gate2 (2026-11-12)
+
+User completed gate1 for96861976 / ReleaseMode rollback_drill. Green builda562a361 at8ad190b Succeeded; Green6/STG7 same release13d4d232…, seven contracts pass. Downloaded exact report version and matched outer SHA, same-run approval/STG/code identity, immutable qualifier6 SHA and approval exports. Live remainsBlue5/unchangedRevisionId/no weights/healthUP. ApproveTrafficShift InProgress; no drill deployment yet. Next user approval explicitly permits stop-at-10% and verify automatic restoration toBlue5, not full promotion. Real rollback still unverified; root log19.
+
 ## S3-07R — Controlled rollback drill preparation (2026-11-12)
 
 Reached gate1: execution96861976/v5/ReleaseMode rollback_drill has Source/Candidate/STG Succeeded, STGv7 seven contracts pass. Exact StagingReport object version/outer SHA/source/release/backend code and approval exports independently match actual Lambda. Release13d4d232…. Live remains5/no weights/healthUP; no stop or rollback performed yet. Await both fresh human gates. Root log18.5.

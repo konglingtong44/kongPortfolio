@@ -1360,3 +1360,36 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 整体InProgress/version5/ReleaseMode rollback_drill，**ApproveProduction InProgress**；没有运行Green/部署/停止/回滚。live仍5/无权重，公开healthUP。给用户第一道审批链接，明确新96861976/STG7，第一道只验证Green；第二道显示演练模式并授权实际10%后的停止/自动回滚，最终目标恢复演练前Blue。
 
 更新本日志/PROJECT_PLAN.md/docs/rollback-drill.md，diff/path/Gitleaks检查后仅本地提交 `docs: record rollback drill configuration and first approval evidence`、git status --short，不为文档推送触发重复CI。没有改React/Java、没有新增资源或IAM权限、没有代替用户提交任一人工审批。当前只验收到第一道人审，真实自动回滚仍待下一阶段。
+
+## 19. 回滚演练第一道人审后的Green验证（2026-11-12）
+
+用户回复ok后先核对AWS；git status --short干净。设置kong-dev profile、Tokyo region，只读查询：list-action-executions（pipeline kongportfolio-candidate，filter execution96861976-0f9e-4a0c-b49e-9c75c0c1762b，stage/status/external/error摘要）、GetAlias(version/weights)、list-builds-for-project(kongportfolio-green，DESCENDING/max-items1)，随后batch-get-builds。
+
+第一道人审 **Succeeded**，action ID **5d529f28-4e3d-4a88-953d-063b8740343a**；Green构建 **a562a361-a36a-4473-912f-433eafcd198b**，源码8ad190ba366b6967793675098f5df1fab26fd324。初始BUILD/导出空值，约20秒短等待后构建SUCCEEDED；action状态有短暂传播延迟，随后再只读查询已到ApproveTrafficShift。没有重复start-build或start-pipeline。
+
+### 19.1 报告、模式、实际代码与线上快照复核
+
+```powershell
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 96861976-0f9e-4a0c-b49e-9c75c0c1762b --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=96861976-0f9e-4a0c-b49e-9c75c0c1762b --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:a562a361-a36a-4473-912f-433eafcd198b --region ap-northeast-1 --output json
+New-Item -ItemType Directory -Path .local/rollback-drill-green-review-96861976 -Force
+# 读取本次VerifyGreen outputArtifacts中的bucket/key。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/Ej4gzS9 --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/Ej4gzS9 --version-id nfCEkVO2XklH1GlnAbITLZiRb1Y9Bs.7 --region ap-northeast-1 .local/rollback-drill-green-review-96861976/report.zip --output json
+Get-FileHash -LiteralPath .local/rollback-drill-green-review-96861976/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 6 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+GetPipelineExecution确认本次ReleaseMode.resolvedValue=**rollback_drill**。报告外层SHA **8bf99a0cb089e2bc5f05210074bd9a22245859ff8b6d8f4c2a0aa3fbdb381598** 匹配CodeBuild artifacts.sha256sum。schema/kind/passed/liveTrafficUnchanged、function/七项全通过、Blue5/Green6/STG7正确；execution/source/release/backend SHA与已审STG一致；approval1ActionId与AWS成功action ID匹配。Release **13d4d232f880fb581fcd890881eaf13be39ff19d02693f7059901a1b40ebf506**，backend SHA **3d765d2a17cc880a99349c47b2355b1cc771b0ea34a20ccb647e5c7140e299b3** 等于真实Green qualifier6 CodeSha256解码值。三项Gate2导出变量与报告相符；live仍5、RevisionId与报告快照相同、无权重，healthUP。
+
+元数据 `.local/rollback-drill-green-build.json`、actions `.local/rollback-drill-green-actions.json`，下载原件/report/object/review JSON仅在上述ignored目录。Green使用原verify-green脚本CLI序列，STG7/Green6数字版本七项直接调用，无真实Bedrock请求。没有修改生产配置、流量、告警状态或新增资源。
+
+### 19.2 停在第二道人审
+
+ApproveTrafficShift **InProgress**，部署演练尚未执行。向用户明确执行96861976、模式rollback_drill、Blue5/Green6，第二道批准后观察10%即停止、验证CodeDeploy自动回滚并恢复Blue5；不是常规五分钟后全量发布。自动回滚ID、恢复成功与公开API均待实际验收，不把Green通过称为回滚通过。
+
+apply_patch更新本日志、PROJECT_PLAN.md、docs/rollback-drill.md；diff/path/Gitleaks检查后仅本地 `git commit -m 'docs: record rollback drill Green and second approval evidence'`、git status --short。不推送文档触发额外CI，不代理审批，不直接CreateDeployment/UpdateAlias，不重新构建已批准候选。
