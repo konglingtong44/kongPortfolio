@@ -5,6 +5,11 @@ import { digest, safePath } from './verify-pipeline-candidate.mjs';
 
 const template = readFileSync(new URL('../infra/terraform/portfolio/spa.js.tftpl', import.meta.url), 'utf8');
 export const normalizeCode = code => code.replace(/\r\n/g, '\n').trimEnd();
+export function verifyRouterTest(result, expectedUri) {
+  assert.ok(!result.FunctionErrorMessage,result.FunctionErrorMessage);
+  // CloudFront wraps a returned request in {request: ...} in TestFunction output.
+  assert.equal(JSON.parse(result.FunctionOutput).request?.uri,expectedUri);
+}
 export function routeCode(releaseId) {
   assert.match(releaseId, /^[a-f0-9]{64}$/);
   return template.replaceAll('${release_id}', releaseId);

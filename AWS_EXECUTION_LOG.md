@@ -1644,3 +1644,41 @@ GetPipelineExecution确认mode **deploy**，不是回滚演练。外层SHA **18f
 当前停第二道 **ApproveTrafficShift / ApproveBlueGreenDeployment**。向用户明确本次正常发布 **mode deploy、Blue5→Green7**；第二道批准会先10%/五分钟→100%后端切流，成功后才上传/验证同候选React并切换CloudFront指向，失败按已审恢复逻辑处理。不是前次stop-at10%的rollback_drill。当前前端发布阶段未执行，不称前端自动上线已验收。
 
 用apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md；diff/path/Gitleaks检查，仅本地提交 `docs: record full-stack release Green and second approval gate`、git status --short。没有推送/额外构建/代理审批/CreateDeployment/CloudFront更新或静态上传，固定源码/制品不变。
+
+## 24. 正常后端灰度与React前端实际发布（2026-11-12）
+
+用户回复ok后，先git status --short（干净）、只读AWS核对。kong-dev/Tokyo，list-action-executions过滤execution2a56d7b1、GetAlias(version/weights)、deploy list-deployments(app kongportfolio/group production)、CodeBuild list-builds-for-project(kongportfolio-deploy，DESCENDING/max-items1)。第二道审批 **Succeeded**，用户action ID **3dc7dde5-cea4-47f5-9051-ad423371a883**；DeployProduction InProgress，初始live5/无权重。
+
+batch-get-builds取得部署构建 **b1e6162a-dcfb-4ba1-bcaf-b9e57470d616**，BUILD、固定源码c073e196b7740c9555cb800e8e49911dc282b65c；完整元数据`.local/frontend-release-backend-build.json`。逐个get-deployment过滤本次description，保存`.local/frontend-release-deployments.json`，本次Blue5-only基线 **d-7BY21K2EM Succeeded**，LambdaAllAtOnce，创建15:08:23.940 JST，无错误/回滚。公开HTTPS healthUP。没有本机代理审批或手动发起部署；发布由已审批的同次控制器执行，前端须等后端成功才会运行。
+
+### 24.1 后端10%灰度观察
+
+约40秒短等待后，deploy list/get显示主canary **d-42C5RN2EM InProgress**，配置LambdaCanary10Percent5Minutes，创建15:08:49.506 JST；GetAlias独立读到Blue5/Green7权重0.1，告警OK、healthUP，无错误或rollbackInfo。
+
+再等约40秒，读取该部署/GetAlias/describe-alarms/HTTPS health，用DateTimeOffset计算elapsedSeconds、记录时间/状态/版本/权重/告警/health/error/rollback，ConvertTo-Json -Compress→Add-Content保存`.local/frontend-release-canary-observations.jsonl`。15:11:54.452 JST/已185秒，仍5+7权重10%、告警OK/healthUP，无错误或回滚；这是已实际观察，不将“配置10%”替代真实权重证据。
+
+### 24.2 后端成功，前端开发态测试响应解析失败
+
+约35秒后重复get-deployment/GetAlias/actions：主canary **d-42C5RN2EM Succeeded**，完成15:13:51.930 JST，live **7/无权重**，无错误/rollbackInfo。部署构建b1e6162a最终SUCCEEDED；前端构建 **3363d605-c043-4e17-bb04-dc3d631b0f85** 已启动、源码c073e19。
+
+batch-get-builds/get-log-events保存`.local/frontend-release-live-build.json`、`frontend-release-live-build.log`，初始BUILD无错误。约20秒短等待后，公开/version仍旧a594e36…；只读 `s3api list-objects-v2 --bucket kongportfolio-site-561798268037-ap-northeast-1 --prefix releases/0dfbd04490393ec56e8c0c554d032167676f068a8fca0d71ce282a5e874b09b2/` 显示6文件（HTML/version/favicon/CSS/JS/PNG，约2.4MB）。GetFunction读取DEV/LIVE副本到`.local/frontend-release-observed-*.js`，normalize/routeRelease仍旧指向，未切换。
+
+随后构建 **FAILED**：`JSON.parse(test.FunctionOutput).uri` 得到undefined，期望新release/index.html。阶段已完成条件上传/HEAD元数据与checksum/公开全部文件SHA验证、更新DEVELOPMENT并调用AWS TestFunction，解析校验在发布LIVE前失败。失败构建按框架恢复旧DEVELOPMENT，LIVE旧指向没有改变；不能称整条发布成功。后端版本7成功保留，前端恢复不会回滚后端。
+
+### 24.3 真实TestFunction形状复现、恢复与修复
+
+```powershell
+& $aws cloudfront describe-function --name kongportfolio-prod-spa --stage DEVELOPMENT --output json
+# PowerShell生成合成GET /事件(.local/frontend-test-event.json)，viewer IP=127.0.0.1/host公开域名，无真实用户数据。
+& $aws cloudfront test-function --name kongportfolio-prod-spa --stage DEVELOPMENT --if-match '<刚读回ETag>' --event-object fileb://.local/frontend-test-event.json --output json
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage LIVE .local/frontend-after-failure-live.js --output json
+& $aws cloudfront get-function --name kongportfolio-prod-spa --stage DEVELOPMENT .local/frontend-after-failure-dev.js --output json
+```
+
+实际FunctionErrorMessage为空，FunctionOutput是 **{"request":{"uri":"/releases/<id>/index.html",...}}**，不是顶层uri；样例存`.local/frontend-test-actual-response.json`。这是测试响应格式解析错误，不是路由执行报错。本机TestFunction仅测试当前开发态，不更新/发布函数或流量。实际LIVE/DEV副本校验相等且仍旧a594e36…，确认前端保持旧发布。
+
+读取失败构建artifacts返回key **kongportfolio-candid/FrontendRe/3kKnLo8**，SHA **b706683675597159500257b2d94633e77e57566c3e5e603d1c81a2e739599423**；head/get精确对象版本、Get-FileHash与CodeBuild SHA匹配，ZipFile限唯一report.json，保存`.local/frontend-release-failure-review-2a56d7b1/`。断言kind frontend-publication、execution正确、passed=false、oldRelease=a594e36…、newRelease=0dfbd044…、**recovery.restoredOld=true**。AWS整体pipeline Failed，live仍7/无权重。该路径验证的是发布前开发态恢复，未验证新LIVE前端上线后的回退。
+
+apply_patch新增纯函数verifyRouterTest，严格检查FunctionErrorMessage及JSON.FunctionOutput.request.uri；runner改用该解析。test-frontend-release.mjs新增真实wrapper fixture、执行错误、错误形状/错误URI负例；运行Node前端/后端发布测试、node --check，再用node --input-type=module回放真实AWS样例，全部通过。没有绕过检查、放宽路由、修改IAM或重新创建资源。
+
+修改三脚本与失败记录文档后扫描/提交推送 `fix: parse wrapped CloudFront TestFunction request output`，再启动固定修复源码的新执行并重新经两道人工审批；不暗中替换旧SourceRef/已批准制品，不复用旧审批。没有新Terraform资源或权限变更，旧前端和新后端保持可用；尚未宣称自动前端上线已验收。

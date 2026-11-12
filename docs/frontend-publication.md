@@ -1,5 +1,7 @@
 # S3-08：前端自动发布（资源已创建，待人工审批）
 
+**最新：后端版本7上线成功，前端在发布LIVE前停止并保留旧指向。** AWS TestFunction输出包装在request里，原代码读顶层uri导致校验失败；现已按真实响应修复并补回归/负例测试，实际样例回放通过。旧执行2a56d7b1整体Failed，前端失败报告recovery.restoredOld=true，LIVE/DEV实际均为旧发布a594e36…。六个新静态文件已条件上传、校验保留；没有新增权限或资源。修复需新执行/两道新审批，不复用旧审批。下面是阶段历史；云端新LIVE发布及发布后回退仍未验收，日志24节。
+
 **当前停在第二道审批。** 执行2a56d7b1/mode deploy第一道已通过，Green**版本7**七项验证成功，与STG8同候选；版本化报告、同次审批、实际代码和Gate2变量已独立核对。线上仍Blue**版本5**、原RevisionId/无权重，前端仍旧a594e36…，healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment确认 **deploy、Blue5/Green7** 后批准：后端10%/五分钟→100%成功后，才发布同候选React前端。不是rollback_drill；真实前端上传/发布/恢复仍待执行，日志第23节。下面为阶段历史与范围。
 
 当前：用户已明确批准，实际apply4新增/2更新/0删除、后续No changes。八阶段pipeline version6、独立发布项目和受限IAM已读取核对。新执行 `2a56d7b1-840e-45b0-8ac4-7b37872cbb4f` 固定源码c073e19，ReleaseMode=deploy；先验收到第一道审批。当前静态发布仍a594e36…、后端live5。下面为准备范围与历史，真实前端发布/回退仍待验证。

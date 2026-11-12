@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Backend7 succeeded; CloudFront test parser fix (2026-11-12)
+
+2a56d7b1 backend canary d-42C5RN2EM Succeeded/live7/no weights. Frontend3363d605 uploaded and publicly verified six immutable files but failed before LIVE publish: AWS TestFunction wraps output in request, original code read top-level uri. Actual old LIVE/DEV restored/unchanged, failed report passed=false/recovery.restoredOld=true; whole pipeline Failed. Fixed strict parser to request.uri, added real-response and negative tests plus AWS sample replay, pass; no IAM/TF expansion. Fresh fixed-source execution requires both new gates. Root log24 includes failure and recovery evidence.
+
 ## S3-08 — Green verified; full-stack gate2 pending (2026-11-12)
 
 User completed gate1 for2a56d7b1/c073e19/deploy. Green buildfde496b6 Succeeded; immutable Green7/STG8 same release0dfbd044…, seven checks pass. Versioned report/outer SHA/approval identity/source/code/exports independently matched actual Lambda; live remainsBlue5/unchangedRevisionId/no weights, old frontend a594e36…, healthUP. ApproveTrafficShift InProgress; gate2 authorizes normal backend10%/5min/full then same-candidate React S3/CloudFront publication/recovery. No frontend upload or pointer change yet; cloud publication/recovery still unverified. Root log23.

@@ -4,7 +4,7 @@ import { mkdirSync,readFileSync,writeFileSync } from 'node:fs';
 import { join,resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { digest,verifyCandidate } from './verify-pipeline-candidate.mjs';
-import { frontendContext,publishFrontend } from './frontend-release.mjs';
+import { frontendContext,publishFrontend,verifyRouterTest } from './frontend-release.mjs';
 
 const account=process.env.FRONTEND_ACCOUNT_ID, executionId=process.env.FRONTEND_EXECUTION_ID, mode=process.env.FRONTEND_RELEASE_MODE;
 assert.match(account||'',/^\d{12}$/); assert.match(executionId||'',/^[a-f0-9-]{36}$/);
@@ -65,7 +65,7 @@ const io={
   for(const [method,uri,expected]of cases){
    const path=join(out,'test-event.json');writeFileSync(path,JSON.stringify({version:'1.0',context:{eventType:'viewer-request'},viewer:{ip:'127.0.0.1'},request:{method,uri,querystring:{},headers:{host:{value:'konglingtong44.com'}},cookies:{}}}));
    const test=aws(['cloudfront','test-function','--name',fn,'--stage','DEVELOPMENT','--if-match',etag,'--event-object',`fileb://${path}`]).TestResult;
-   assert.ok(!test.FunctionErrorMessage,test.FunctionErrorMessage);assert.equal(JSON.parse(test.FunctionOutput).uri,expected);
+   verifyRouterTest(test,expected);
   }
  },
  publish:etag=>aws(['cloudfront','publish-function','--name',fn,'--if-match',etag]),

@@ -1,10 +1,14 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { frontendContext,frontendObjects,publishFrontend,routeCode,routeRelease } from './frontend-release.mjs';
+import { frontendContext,frontendObjects,publishFrontend,routeCode,routeRelease,verifyRouterTest } from './frontend-release.mjs';
 const old='a'.repeat(64),next='b'.repeat(64);
 const file=(path,type)=>({path,contentType:type,cacheControl:['index.html','version.json'].includes(path)?'no-cache,max-age=0,must-revalidate':'public,max-age=31536000,immutable',sha256:'c'.repeat(64)});
 const manifest={gitCommit:'d'.repeat(40),releaseId:next,backend:{sha256:'e'.repeat(64)},frontend:[file('index.html','text/html; charset=utf-8'),file('version.json','application/json'),file('assets/a.js','text/javascript')]};
 assert.equal(routeRelease(routeCode(old)),old);
+verifyRouterTest({FunctionErrorMessage:'',FunctionOutput:JSON.stringify({request:{method:'GET',uri:'/releases/'+old+'/index.html'}})},'/releases/'+old+'/index.html');
+assert.throws(()=>verifyRouterTest({FunctionErrorMessage:'runtime error',FunctionOutput:'{}'},'/'),/runtime error/);
+assert.throws(()=>verifyRouterTest({FunctionOutput:JSON.stringify({uri:'/'})},'/'));
+assert.throws(()=>verifyRouterTest({FunctionOutput:JSON.stringify({request:{uri:'/wrong'}})},'/'));
 assert.throws(()=>routeRelease(routeCode(old).replace("uri === '/api'","uri === '/unexpected'")),/differs/);
 assert.throws(()=>frontendObjects({...manifest,releaseId:'../../bad'}));
 assert.throws(()=>frontendObjects({...manifest,frontend:[file('../bad.js','text/javascript')]}));
