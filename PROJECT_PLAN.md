@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Fixed-source Green8 verified; gate2 pending (2026-11-12)
+
+User completed gate1 for5d55596a/7a2e1b8/deploy; Green70d33467 Succeeded, immutableGreen8/STG9 same release242f8cb4…, seven checks pass. Exact report outerSHA/source/approval/STG/code/exports verified against actual Lambda. Live remainsBlue7/unchangedRevisionId/no weights, old frontend a594e36…/healthUP. ApproveTrafficShift waiting; gate2 authorizes normal backend canary/full then corrected frontend publication. No new resources or frontend LIVE update; root log25.
+
 ## S3-08 — CloudFront response fix verified; fresh gate1 (2026-11-12)
 
 Source7a2e1b8 published, both AWS CI and GitHub statuses success. New execution5d55596a/v6/deploy Candidate7a6ca25a and STGf9e341e0 succeeded; STG9 seven checks pass. Versioned report outer SHA/source/release/backend immutable code and approval exports independently match. Release242f8cb4…. Waiting new ApproveProduction; old2a56d7b1 remainsFailed with healthy backend7/old frontend retained. No new TF/IAM resources or new frontend LIVE publication; require both fresh human gates, no old approval reuse. Root log24 includes failed first attempt, actual AWS wrapper fixture and recovery evidence.

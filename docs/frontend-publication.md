@@ -1,5 +1,7 @@
 # S3-08：前端自动发布（资源已创建，待人工审批）
 
+**当前：修复执行5d55596a已到第二道审批。** Green**版本8**七项验证成功，与STG9同一候选；报告/实际代码/同次审批/模式与Gate2变量已独立核对。线上仍Blue**版本7**、原RevisionId/无权重，旧前端保持可用、healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment核对 **deploy、Blue7/Green8** 后批准：后端正常灰度成功后发布修复后的React静态包。下面是旧执行历史；前端新LIVE发布/发布后恢复仍待实际验证，日志25节。
+
 **当前：修复后的新执行5d55596a…停在第一道审批。** 源码7a2e1b8的AWS前后端CI/GitHub检查均成功；Candidate/STG成功、STG**版本9**七项通过，版本化报告与实际代码哈希和导出变量已独立核对。Release242f8cb4…。请选新执行**5d55596a-4238-4240-bfbf-3e8ae47ee264 / deploy / STG9**，批准ApproveProduction→ApproveGreenCreation；先只验证Green，第二道后才正常前后端发布。线上后端7/旧前端保持可用，下面为旧执行历史和范围，日志第24节。
 
 **最新：后端版本7上线成功，前端在发布LIVE前停止并保留旧指向。** AWS TestFunction输出包装在request里，原代码读顶层uri导致校验失败；现已按真实响应修复并补回归/负例测试，实际样例回放通过。旧执行2a56d7b1整体Failed，前端失败报告recovery.restoredOld=true，LIVE/DEV实际均为旧发布a594e36…。六个新静态文件已条件上传、校验保留；没有新增权限或资源。修复需新执行/两道新审批，不复用旧审批。下面是阶段历史；云端新LIVE发布及发布后回退仍未验收，日志24节。

@@ -1718,3 +1718,30 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 整体InProgress/version6/ReleaseMode deploy，停在新第一道人审；线上后端7/无权重、旧前端a594e36…保留且healthUP（前面已独立读回）。没有新网站上传/函数修改/生产切流。提醒用户选**新5d55596a/STG9**，不要重试旧失败执行2a56d7b1；第一道只验证Green，第二道才正常后端/前端发布。
 
 apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks检查，仅本地提交 `docs: record CloudFront parser fix and fresh approval evidence`、git status --short。不为文档触发额外CI/发布，没有新增TF/IAM/费用资源、没有代理审批或暗换原制品。前端LIVE新版本发布与发布后恢复仍未验收。
+
+## 25. 修复后Green8验证与第二道人审（2026-11-12）
+
+用户回复ok后先git status --short（干净），kong-dev/Tokyo查询新execution5d55596a的list-action-executions、GetAlias和最新Green构建。第一道审批 **Succeeded**，action ID **054d8f46-5303-4731-a5cf-d8227900a35a**。Green构建 **70d33467-1b3d-46a5-afa5-57b993103e9a** 初始BUILD/导出空值，约20秒短等待后batch-get-builds与actions刷新：**SUCCEEDED**、固定源码7a2e1b897848328d112d44e45802849ad52bbd5c；ApproveTrafficShift InProgress。元数据`.local/frontend-fixed-green-build.json`、actions`.local/frontend-fixed-green-actions.json`。
+
+### 25.1 同次证据、实际版本和前端现状
+
+```powershell
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 5d55596a-4238-4240-bfbf-3e8ae47ee264 --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:70d33467-1b3d-46a5-afa5-57b993103e9a --region ap-northeast-1 --output json
+New-Item -ItemType Directory -Path .local/frontend-fixed-green-review-5d55596a -Force
+# key从本次VerifyGreen outputArtifacts读取。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/UUXxHaW --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/UUXxHaW --version-id uHJTd4UdKLLOVs1gsUJ9_b6FYnIQbzl4 --region ap-northeast-1 .local/frontend-fixed-green-review-5d55596a/report.zip --output json
+Get-FileHash -LiteralPath .local/frontend-fixed-green-review-5d55596a/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限制唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 8 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://konglingtong44.com/version.json'
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+GetPipelineExecution确认ReleaseMode=deploy。报告外层SHA **d1d3784977f3982ad2ca1de0624a9d84e89c555af48ad152e697da9c72eb3368** 匹配CodeBuild artifacts.sha256sum；schema/kind/passed/liveTrafficUnchanged、function、Blue7/Green8/STG9及七项正确；execution/source/release/backend SHA与已审STG一致，approval1ActionId匹配AWS成功action。Release **242f8cb4af0a0ff5fed61f8ae9984f2189c8c912af102e9db531afeb1bd7e481**、backend SHA **779731b31559e37896c04bd6bc9076fe237cb7ad5ccc3163bd24f7ac6d598552** 等于实际Green8 CodeSha256。三项Gate2导出变量相符；live仍7、RevisionId与报告原快照一致、无权重，前端仍a594e36…/sourceDirty=true、healthUP。原件/report/object/review仅留上述ignored目录。
+
+没有新网站上传、CloudFront更新/发布或生产切流；Green只发布数字版本并直接测试。当前第二道审批待用户完成，明确新执行5d55596a/**deploy、Blue7→Green8**；批准后后端10%/五分钟→100%，成功后运行修复后的React上传/CloudFront测试/发布。不是rollback_drill，也不是已完成前端上线。
+
+apply_patch更新根日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks校验，仅本地提交 `docs: record fixed full-stack Green and second approval gate`、git status --short。不额外推送/构建、不代批、不重打包候选，没有TF/IAM/资源变更。真实前端LIVE发布与发布后回退仍待验收。
