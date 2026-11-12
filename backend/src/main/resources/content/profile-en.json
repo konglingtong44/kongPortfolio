@@ -1,7 +1,7 @@
 {
   "name": "Kong / 孔 令通",
   "role": "Software engineer",
-  "introduction": "Hi, I’m Kong. I have around eight years of experience across Java/Spring, Vue/React, Linux, middleware, AWS migration and CI/CD in telecom, insurance and securities. I’ve independently delivered small web systems and APIs from requirements to release, using waterfall and agile approaches. My roles include PG, SE, sub-lead and PMO. I’ve earned PMP and AWS SAP, and I’m learning Amazon Bedrock, LangChain and LangGraph.",
+  "introduction": "I have around eight years of experience across Java/Spring, Vue/React, Linux, middleware, AWS migration and CI/CD in telecom, insurance and securities. I’ve independently delivered small web systems and APIs from requirements to release, using waterfall and agile approaches. My roles include PG, SE, sub-lead and PMO. I’ve earned PMP and AWS SAP, and I’m learning Amazon Bedrock, LangChain and LangGraph.",
   "focus": [
     {
       "title": "Build it. See it through.",
@@ -470,7 +470,7 @@
   ],
   "skills": [
     {
-      "title": "Backend & scripting",
+      "title": "Backend languages & runtimes",
       "items": [
         "Java",
         "C#",
@@ -482,7 +482,7 @@
       "description": "Java-centered business applications, batch jobs and tools; legacy VB6 assets are investigated for migration."
     },
     {
-      "title": "Java frameworks & persistence",
+      "title": "Java frameworks & libraries",
       "items": [
         "Spring Boot",
         "Spring MVC",
@@ -492,7 +492,7 @@
         "Hibernate",
         "Java Swing"
       ],
-      "description": "Listed in the XLS skills matrix and work details, spanning web frameworks, persistence and existing Swing tools."
+      "description": "Used for web applications, persistence layers and maintenance of existing Swing tools."
     },
     {
       "title": "Frontend",
@@ -507,7 +507,7 @@
         "JSP",
         "Bootstrap"
       ],
-      "description": "Vue implementation and 2 → 3 migration, screen logic and existing web changes. React appears in work materials and this website."
+      "description": "Vue UI development, Vue 2-to-3 migration and existing web application changes. React is used at work and on this site."
     },
     {
       "title": "Databases & data platforms",
@@ -522,7 +522,7 @@
         "MongoDB",
         "Hadoop"
       ],
-      "description": "From the PDF technology inventory and Oracle-to-Hadoop migration. Scope and depth vary across products."
+      "description": "Databases and data platforms encountered at work, including an Oracle-to-Hadoop migration. Responsibilities vary by product."
     },
     {
       "title": "AWS services",
@@ -561,7 +561,7 @@
         "MSI",
         "Intune"
       ],
-      "description": "Jenkins configuration, release procedure checks and MSI/Intune distribution. This website’s AWS CI/CD is not deployed."
+      "description": "Jenkins configuration, release procedure checks and MSI/Intune distribution. This website implements AWS CI/CD and Lambda canary deployment."
     },
     {
       "title": "Testing & performance",
@@ -582,7 +582,7 @@
         "Grafana",
         "Athena"
       ],
-      "description": "From the PDF monitoring inventory, including Athena log/data inspection and incident investigation."
+      "description": "Monitoring and log analysis tools encountered at work. Athena was used for log/data checks and incident investigation."
     },
     {
       "title": "Version control & collaboration",
@@ -604,7 +604,7 @@
         "macOS",
         "Linux"
       ],
-      "description": "From the PDF environment inventory, with Linux/Windows environment preparation, configuration checks and log investigation."
+      "description": "Operating systems used for development and verification, including Linux/Windows server setup, configuration checks and log investigation."
     },
     {
       "title": "AI assistance & technical research",
@@ -628,13 +628,13 @@
     }
   ],
   "note": {
-    "date": "2026-11-11",
-    "title": "Growing a trilingual blog, starting locally.",
-    "summary": "Building kongPortfolio with React and Spring Boot. The first small increment and what comes next.",
+    "date": "2026-11-13",
+    "title": "Development notes for this site",
+    "summary": "What is implemented and what comes next.",
     "paragraphs": [
-      "The first increment is a profile page in Japanese, Chinese and English. It uses browser preferences on the first visit and remembers a manually selected language.",
-      "React / TypeScript handles the interface; a Spring Boot API serves the content. There is no database initially: the backend reads public localized JSON. A Vite proxy connects the local frontend and API.",
-      "Working local increments come first. Article lists and detail pages precede the first AWS deployment, followed by CodePipeline / CodeBuild / ECR and then blue/green deployment."
+      "Profile content is stored in Japanese, Chinese and English JSON files and served by Spring Boot. The current amount of content does not require a database. React / TypeScript handles the UI; Vite is used for local development and builds.",
+      "The site is deployed with S3, CloudFront, API Gateway and Lambda. AWS CI/CD retains two manual approvals. Lambda promotion from 10% to full traffic and stop-triggered automatic rollback have been verified. The kongPortfolio project card explains the architecture and verification scope.",
+      "Amazon Bedrock Q&A is next. The current API only returns a preparation status and calls no model. Application-failure, alarm-triggered and post-publication frontend recovery still need separate live-environment checks."
     ]
   }
 }

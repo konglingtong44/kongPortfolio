@@ -10,14 +10,14 @@ export const copy = {
     strengths: '仕事で大切にしていること', skills: '使ってきた技術', qualifications: '資格の取得歴',
     projectsKicker: '02 / SELECTED PROJECTS', projectsTitle: 'つくったもの。変えてきたこと。',
     projectsIntro: '個人で育てるプロジェクトと、仕事で向き合ってきた技術的な課題。',
-    personal: '個人プロジェクト', work: '仕事のケーススタディ', contribution: '担当したこと・成果', detail: '担当と成果を読む',
+    personal: '個人プロジェクト', work: '業務プロジェクト', contribution: '担当したこと・成果', detail: '担当と成果を読む',
     journeyKicker: '03 / MY JOURNEY', journeyTitle: 'ここまでの道のり。',
     journeyIntro: '開発、移行、運用、チーム支援。その経験は、次につくるものにつながっている。',
     notesKicker: '04 / ENGINEERING NOTES', notesTitle: 'つくりながら、考えたこと。', noteType: '開発ノート',
     noteRead: 'この手記を読む', noteContext: 'このブログの開発記録',
     loading: 'コンテンツを読み込んでいます…', error: 'コンテンツを読み込めませんでした。しばらくしてから、もう一度お試しください。', retry: '再読み込み',
     footer: '経験をつなぎ、次のものづくりへ。', backTop: 'ページの先頭へ', skip: '本文へスキップ',
-    title: 'Kong — コードと、その先の話。', description: 'Kong（孔 令通）の個人ブログ。Java・AWS の開発経験、個人プロジェクト、技術の探求を記録。',
+    title: 'Kong — コードと、その先の話。', description: 'Kong（孔 令通）のポートフォリオ。Java・AWS を中心とした業務経験、個人プロジェクト、開発メモを紹介します。',
   },
   zh: {
     about: '关于我', projects: '项目', journey: '时间线', notes: '技术手记', language: '显示语言',
@@ -36,7 +36,7 @@ export const copy = {
     noteRead: '展开阅读这篇手记', noteContext: '这个博客的开发记录',
     loading: '正在加载内容…', error: '暂时无法加载内容，请稍后重试。', retry: '重新加载',
     footer: '把经历连接起来，继续创造。', backTop: '回到顶部', skip: '跳转到正文',
-    title: 'Kong — 代码，以及代码之外。', description: 'Kong（孔令通）的个人博客：Java 与 AWS 实践、个人项目、职业经历和技术探索。',
+    title: 'Kong — 代码，以及代码之外。', description: 'Kong（孔令通）的个人作品集：Java 与 AWS 开发经历、个人项目和开发记录。',
   },
   en: {
     about: 'About', projects: 'Projects', journey: 'Journey', notes: 'Notes', language: 'Display language',
@@ -55,6 +55,6 @@ export const copy = {
     noteRead: 'Read this note', noteContext: 'Building this blog',
     loading: 'Loading content…', error: 'Content could not be loaded. Please try again shortly.', retry: 'Try again',
     footer: 'Connecting experience. Building what’s next.', backTop: 'Back to top', skip: 'Skip to content',
-    title: 'Kong — Code, and what comes after.', description: 'Kong’s personal blog: Java and AWS experience, personal projects, an engineering journey and technical notes.',
+    title: 'Kong — Code, and what comes after.', description: 'Kong’s portfolio: Java and AWS development experience, personal projects and development notes.',
   },
 } as const;

@@ -6,15 +6,15 @@ import { Modal } from './Modal';
 afterEach(() => vi.unstubAllGlobals());
 
 it.each([
-  ['ja', 'もう少し、お待ちください。', 'わかりました'],
-  ['zh', '正在准备中', '知道了'],
-  ['en', 'Something is growing here.', 'Got it'],
+  ['ja', 'Q&A は準備中です', 'わかりました'],
+  ['zh', '问答功能准备中', '知道了'],
+  ['en', 'Q&A is not available yet', 'Got it'],
 ] as const)('calls Java before showing the localized pixel popup in %s', async (locale, title, confirm) => {
   let finish: (value: Response) => void = () => {};
   const fetchMock = vi.fn(() => new Promise<Response>(resolve => { finish = resolve; }));
   vi.stubGlobal('fetch', fetchMock);
   render(<Modal title="About" kicker="Kong" closeLabel="Close about" onClose={() => {}}><BedrockEntry locale={locale}/></Modal>);
-  const button = screen.getByRole('button', { name: 'test' });
+  const button = screen.getByRole('button', { name: locale === 'ja' ? '準備状況を確認' : locale === 'zh' ? '查看准备状态' : 'Check availability' });
   button.focus(); fireEvent.click(button);
   expect(button).toBeDisabled();
   fireEvent.click(button);
@@ -38,21 +38,21 @@ it.each(['network', 'http', 'invalid'])('shows an error instead of success for a
   fetchMock.mockResolvedValue({ ok: true, json: async () => ({ status: 'PREPARING' }) });
   vi.stubGlobal('fetch', fetchMock);
   render(<BedrockEntry locale="en"/>);
-  fireEvent.click(screen.getByRole('button', { name: 'test' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Check availability' }));
   const error = await screen.findByRole('dialog', { name: 'Could not connect.' });
-  expect(screen.queryByText('Amazon Bedrock chat is being prepared. Please check back soon.')).not.toBeInTheDocument();
+  expect(screen.queryByText('Amazon Bedrock Q&A is not connected. The current API only reports preparation status and calls no model.')).not.toBeInTheDocument();
   fireEvent.click(within(error).getByRole('button', { name: 'Got it' }));
-  await waitFor(() => expect(screen.getByRole('button', { name: 'test' })).toBeEnabled());
-  fireEvent.click(screen.getByRole('button', { name: 'test' }));
-  expect(await screen.findByRole('dialog', { name: 'Something is growing here.' })).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Check availability' })).toBeEnabled());
+  fireEvent.click(screen.getByRole('button', { name: 'Check availability' }));
+  expect(await screen.findByRole('dialog', { name: 'Q&A is not available yet' })).toBeInTheDocument();
 });
 
 it('keeps the about popup open when the result popup is cancelled', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ status: 'PREPARING' }) }));
   const closeAbout = vi.fn();
   render(<Modal title="About" kicker="Kong" closeLabel="Close about" onClose={closeAbout}><BedrockEntry locale="en"/></Modal>);
-  fireEvent.click(screen.getByRole('button', { name: 'test' }));
-  const popup = await screen.findByRole('dialog', { name: 'Something is growing here.' });
+  fireEvent.click(screen.getByRole('button', { name: 'Check availability' }));
+  const popup = await screen.findByRole('dialog', { name: 'Q&A is not available yet' });
   fireEvent(popup, new Event('cancel', { bubbles: true }));
   expect(closeAbout).not.toHaveBeenCalled();
   expect(screen.getByRole('dialog', { name: 'About' })).toHaveAttribute('open');

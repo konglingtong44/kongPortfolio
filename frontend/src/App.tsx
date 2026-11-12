@@ -20,7 +20,7 @@ function FloatingModule({ id, locale, profile, onClose }: { id: ModuleId; locale
   return <Modal title={t[id]} kicker={`Kong / ${modules.find(m => m.id === id)?.number}`} closeLabel={t.close} onClose={onClose}>
     {id === 'regex' && <RegexLab locale={locale}/>}
     {id === 'about' && <div className="bedrock-placeholder"><div className="about-pixel"><PixelMark variant={3}/></div><BedrockEntry locale={locale}/><h3>{t.noChat}</h3><p>{t.bedrock}</p>{profile && <p className="about-preview">{profile.name} / {profile.role}</p>}</div>}
-    {id === 'system' && <div className="system-content"><span className="status-chip">{t.status}</span><h3>{t.architecture}</h3><p>{t.localText}</p><div className="flow local-flow">{['Browser', 'React + Vite', 'Spring Boot', 'JSON'].map((name, i) => <div key={name}><span>0{i + 1}</span><strong>{name}</strong>{i < 3 && <b aria-hidden="true">→</b>}</div>)}</div><span className="status-chip planned">{t.futureStatus}</span><h3>{t.delivery}</h3><p>{t.futureText}</p><ol className="pipeline">{['GitHub', 'AWS CodeConnections', 'CodePipeline', 'CodeBuild', 'Amazon ECR', t.bluegreen].map((name, i) => <li key={name}><span>{String(i + 1).padStart(2, '0')}</span>{name}</li>)}</ol>{profile && <details className="development-note"><summary>{t.notes} ↗</summary><h4>{profile.note.title}</h4>{profile.note.paragraphs.map(p => <p key={p}>{p}</p>)}</details>}</div>}
+    {id === 'notes' && profile && <article className="project-detail development-note"><p className="eyebrow">{profile.note.date}</p>{profile.note.paragraphs.map(p => <p key={p}>{p}</p>)}</article>}
   </Modal>;
 }
 export default function App() {
@@ -32,7 +32,21 @@ export default function App() {
   const profile = state.status === 'ready' && state.locale === locale ? state.profile : null;
   const status = state.locale === locale ? state.status : 'loading';
   const home = useRef<HTMLElement>(null);
+  const initialAnchor = useRef(window.location.hash);
   useChapterWheel(home, () => scrollToChapter('projects'), !!profile, 'intro');
+  useEffect(() => {
+    if (!profile || !initialAnchor.current) return;
+    const hash = initialAnchor.current;
+    initialAnchor.current = '';
+    if (window.location.hash !== hash) return;
+    let id: string;
+    try { id = decodeURIComponent(hash.slice(1)); } catch { return; }
+    const target = document.getElementById(id);
+    if (!target) return;
+    // Position deep links after the asynchronous chapters have entered the layout.
+    const frame = window.requestAnimationFrame(() => target.scrollIntoView({ block: 'start', behavior: 'instant' }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [profile]);
   useEffect(() => {
     document.documentElement.lang = locale === 'zh' ? 'zh-CN' : locale;
     document.title = `kongPortfolio — ${m.intro}`;
@@ -68,7 +82,7 @@ export default function App() {
       <div className="content-status" aria-live="polite" aria-busy={status === 'loading'}>{status === 'loading' && <p role="status">{t.loading}</p>}{status === 'error' && <div role="alert"><p>{t.error}</p><button className="primary-button" onClick={() => setAttempt(a => a + 1)}>{t.retry} ↻</button></div>}</div>
       {profile && <ProjectGallery key={locale} projects={profile.projects} timeline={profile.timeline} locale={locale}/>}
       {profile && <SkillsBento profile={profile} locale={locale}/>}
-      <section className="lab-section" id="lab"><div className="section-heading"><p className="eyebrow">04 / {m.tools}</p><h2>{m.labTitle}</h2><p>{m.labIntro}</p></div><div className="module-grid">{modules.map(module => <button className={`module-card module-${module.id}`} key={module.id} onClick={() => setActive(module.id)}><span className="module-number">{module.number} / {module.id.toUpperCase()}</span><span className="module-glyph" aria-hidden="true">{module.id === 'regex' ? <span>.*</span> : <PixelMark variant={module.id === 'about' ? 3 : 0}/>}</span><h3>{m[module.id]}</h3><p>{m[`${module.id}Sub`]}</p><span className="module-open">{module.id === 'about' ? m.pending : m.open}<b>↗</b></span></button>)}</div><p className="lab-footnote">{m.more}</p></section>
+      <section className="lab-section" id="lab"><div className="section-heading"><p className="eyebrow">04 / {m.tools}</p><h2>{m.labTitle}</h2><p>{m.labIntro}</p></div><div className="module-grid">{modules.map(module => <button className={`module-card module-${module.id}`} key={module.id} disabled={module.id === 'notes' && !profile} onClick={() => setActive(module.id)}><span className="module-number">{module.number} / {module.id.toUpperCase()}</span><span className="module-glyph" aria-hidden="true">{module.id === 'regex' ? <span>.*</span> : <PixelMark variant={module.id === 'about' ? 3 : 0}/>}</span><h3>{m[module.id]}</h3><p>{m[`${module.id}Sub`]}</p><span className="module-open">{module.id === 'about' ? m.pending : m.open}<b>↗</b></span></button>)}</div></section>
     </main>
     <footer><a className="wordmark" href="#home">kong<span>Portfolio</span><i/></a><p>Java · React · Spring Boot</p><a href="#home">{m.back} ↑</a></footer>
     {active && <FloatingModule id={active} locale={locale} profile={profile} onClose={() => setActive(null)}/>}

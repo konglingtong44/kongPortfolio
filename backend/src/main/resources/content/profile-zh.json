@@ -1,7 +1,7 @@
 {
   "name": "Kong / 孔令通",
   "role": "软件工程师",
-  "introduction": "你好，我是 Kong，有约 8 年通信、保险和证券领域经验，涉及 Java／Spring、Vue／React 开发、Linux 与中间件配置、AWS 迁移及 CI/CD。独立交付过从需求到发布的小型 Web 系统和 API，熟悉瀑布式及敏捷开发，担任过 PG、SE、副组长和 PMO，取得过 PMP、AWS SAP。目前正在学习 Amazon Bedrock、LangChain 和 LangGraph。",
+  "introduction": "有约 8 年通信、保险和证券领域经验，涉及 Java／Spring、Vue／React 开发、Linux 与中间件配置、AWS 迁移及 CI/CD。独立交付过从需求到发布的小型 Web 系统和 API，熟悉瀑布式及敏捷开发，担任过 PG、SE、副组长和 PMO，取得过 PMP、AWS SAP。目前正在学习 Amazon Bedrock、LangChain 和 LangGraph。",
   "focus": [
     {
       "title": "把东西做完，也把它上线。",
@@ -470,7 +470,7 @@
   ],
   "skills": [
     {
-      "title": "后端与脚本语言",
+      "title": "后端语言与运行环境",
       "items": [
         "Java",
         "C#",
@@ -482,7 +482,7 @@
       "description": "以 Java 为主开发业务应用、批处理和工具；VB6 等旧资产主要用于分析和迁移。"
     },
     {
-      "title": "Java 框架与持久层",
+      "title": "Java 框架与类库",
       "items": [
         "Spring Boot",
         "Spring MVC",
@@ -492,7 +492,7 @@
         "Hibernate",
         "Java Swing"
       ],
-      "description": "依据 XLS 技术经验表和项目明细整理，覆盖 Web 应用、持久层及既有 Swing 工具。"
+      "description": "用于 Web 应用、持久层开发及既有 Swing 工具的维护。"
     },
     {
       "title": "前端技术",
@@ -507,7 +507,7 @@
         "JSP",
         "Bootstrap"
       ],
-      "description": "包含 Vue 实现与 2 → 3 升级、画面逻辑及既有 Web 改造；React 见项目资料与本站实践。"
+      "description": "参与 Vue 页面开发、Vue 2 → 3 升级和既有 Web 改造；在工作和本网站中使用 React。"
     },
     {
       "title": "数据库与数据平台",
@@ -522,7 +522,7 @@
         "MongoDB",
         "Hadoop"
       ],
-      "description": "依据 PDF 技术列表和 Oracle → Hadoop 迁移经历整理，各产品的参与范围和深度不同。"
+      "description": "工作中接触过的数据库与数据平台，也参与过 Oracle → Hadoop 迁移。各产品的负责范围不同。"
     },
     {
       "title": "AWS 服务",
@@ -561,7 +561,7 @@
         "MSI",
         "Intune"
       ],
-      "description": "包含 Jenkins 配置、发布步骤确认、MSI / Intune 分发；本站的 AWS CI/CD 尚未建设。"
+      "description": "包含 Jenkins 配置、发布步骤确认、MSI / Intune 分发；本站已实现 AWS CI/CD 与 Lambda 金丝雀发布。"
     },
     {
       "title": "测试与性能验证",
@@ -582,7 +582,7 @@
         "Grafana",
         "Athena"
       ],
-      "description": "依据 PDF 监控工具列表；实际工作包含 Athena 日志、数据检查及故障调查。"
+      "description": "工作中接触过的监控与日志分析工具；使用 Athena 检查日志、数据并调查故障。"
     },
     {
       "title": "版本管理与项目协作",
@@ -604,7 +604,7 @@
         "macOS",
         "Linux"
       ],
-      "description": "依据 PDF 开发环境列表；工作中还承担 Linux / Windows 服务器环境准备、配置确认和日志调查。"
+      "description": "开发与验证时使用的操作系统，也负责过 Linux／Windows 服务器环境准备、配置确认与日志调查。"
     },
     {
       "title": "AI 辅助与技术调查",
@@ -628,13 +628,13 @@
     }
   ],
   "note": {
-    "date": "2026-11-11",
-    "title": "从本地开始，构建一个三语博客。",
-    "summary": "用 React 和 Spring Boot 构建 kongPortfolio。记录第一个小增量，以及接下来的开发方向。",
+    "date": "2026-11-13",
+    "title": "本网站的开发记录",
+    "summary": "已经实现的功能与接下来的工作。",
     "paragraphs": [
-      "第一个实现，是日语、中文和英文的个人介绍页。首次访问根据浏览器语言决定显示内容，手动切换后记住选择。",
-      "前端使用 React / TypeScript，内容由 Spring Boot API 提供。初期不使用数据库，后端读取三语公开内容 JSON；本地通过 Vite 代理连接 API。",
-      "先积累本地可运行的小增量。完善文章列表和详情后，进行首次 AWS 部署，再接入 CodePipeline / CodeBuild / ECR，之后实现蓝绿部署。"
+      "个人资料保存在日、中、英三份 JSON 中。当前内容量不需要数据库，由 Spring Boot API 读取。页面使用 React / TypeScript，本地开发与构建使用 Vite。",
+      "网站已通过 S3、CloudFront、API Gateway 和 Lambda 发布。AWS CI/CD 保留两道人工审批，已验证 Lambda 10% → 全量切流与停止请求触发的自动回滚。具体架构和验证范围可从 kongPortfolio 项目卡片查看。",
+      "接下来计划接入 Amazon Bedrock 问答。当前 API 仅返回准备中，不调用模型。应用失败、告警触发回滚和前端上线后故障恢复，仍需分别进行真实环境验证。"
     ]
   }
 }

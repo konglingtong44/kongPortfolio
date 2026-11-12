@@ -40,14 +40,35 @@ it('shows an error for an unavailable backend and recovers after retry', async (
   render(<App />);
   expect(await screen.findByRole('alert')).toHaveTextContent('could not be loaded');
   expect(screen.queryByText(profile.introduction)).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /03 \/ NOTES/ })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
   expect(await screen.findByText(profile.introduction)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /03 \/ NOTES/ })).toBeEnabled();
 });
 
 it('rejects malformed API data', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(ok({ name: 'Kong' } as typeof profile)));
   render(<App />);
   expect(await screen.findByRole('alert')).toBeInTheDocument();
+});
+
+it('positions an initial chapter deep link after the asynchronous profile is loaded', async () => {
+  const previousScroll = Element.prototype.scrollIntoView;
+  const scroll = vi.fn();
+  Element.prototype.scrollIntoView = scroll;
+  vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => { callback(0); return 1; });
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(ok()));
+  window.history.replaceState(null, '', '#lab');
+  const view = render(<App/>);
+  try {
+    await screen.findByText(profile.introduction);
+    expect(scroll).toHaveBeenCalledWith({ block: 'start', behavior: 'instant' });
+    expect(scroll.mock.contexts[0]).toBe(document.getElementById('lab'));
+  } finally {
+    view.unmount();
+    Element.prototype.scrollIntoView = previousScroll;
+    window.history.replaceState(null, '', '/');
+  }
 });
 
 it('ignores a late response from the previously selected language', async () => {
@@ -74,10 +95,8 @@ it('opens a dedicated project card with its contribution, and retains developmen
   expect(screen.getByText('The team rolled out changes to 30+ services.')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
   expect(projectButton).toHaveFocus();
-  fireEvent.click(screen.getByRole('button', { name: /03 \/ SYSTEM/ }));
-  const noteSummary = screen.getByText(/Development notes/);
-  fireEvent.click(noteSummary);
-  expect(noteSummary.closest('details')).toHaveAttribute('open');
+  fireEvent.click(screen.getByRole('button', { name: /03 \/ NOTES/ }));
+  expect(screen.getByRole('dialog', { name: 'Development notes' })).toHaveAttribute('open');
   expect(screen.getByText('A real development note.')).toBeVisible();
   for (const anchor of document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
     expect(document.getElementById(anchor.hash.slice(1))).not.toBeNull();
@@ -93,16 +112,16 @@ it('opens each module, restores focus and handles the side navigation', async ()
   expect(nav).toHaveAttribute('aria-expanded', 'true');
   fireEvent.keyDown(nav, { key: 'Escape' });
   expect(nav).toHaveAttribute('aria-expanded', 'false');
-  for (const [module, heading] of [['REGEX', 'See the expression.'], ['ABOUT', 'A little more about me.'], ['SYSTEM', 'Behind this website.']]) {
+  for (const [module, heading] of [['REGEX', 'See the expression.'], ['ABOUT', 'A little more about me.'], ['NOTES', 'Development notes']]) {
     const button = screen.getByRole('button', { name: new RegExp(module) });
     button.focus(); fireEvent.click(button);
     expect(screen.getByRole('dialog', { name: heading })).toHaveAttribute('open');
     if (module === 'REGEX') expect(screen.getByLabelText(/Regular expression/)).toHaveValue('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
     if (module === 'ABOUT') {
       expect(screen.getByText(/not connected yet/)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'test' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Check availability' })).toBeInTheDocument();
     }
-    if (module === 'SYSTEM') expect(screen.getByText('AWS CodeConnections')).toBeInTheDocument();
+    if (module === 'NOTES') expect(screen.getByText('A real development note.')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(button).toHaveFocus();
@@ -124,9 +143,8 @@ it('places the merged chapter before the bento toolkit and shows qualifications 
   const gallery = document.getElementById('projects')!;
   const skills = document.getElementById('skills')!;
   expect(gallery.compareDocumentPosition(skills) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(within(skills).getAllByRole('article')).toHaveLength(profile.skills.length + 1);
+  expect(within(skills).getAllByRole('article')).toHaveLength(profile.skills.length);
   expect(screen.getByText('Qualifications earned').closest('details')).toHaveAttribute('open');
   expect(screen.getByText('AWS Solutions Architect – Professional')).toBeVisible();
-  expect(within(skills).getByText('Spring Boot')).toBeInTheDocument();
-  expect(within(skills).getByText('Vitest')).toBeInTheDocument();
+  expect(within(skills).queryByText('This website?s technology')).not.toBeInTheDocument();
 });

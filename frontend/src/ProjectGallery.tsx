@@ -6,6 +6,8 @@ import { modulesCopy } from './modules';
 import { Modal } from './Modal';
 import { PixelGarden, PixelMark } from './PixelGarden';
 import { scrollToChapter, useChapterWheel } from './useChapterWheel';
+import { ArchitectureExplorer, ArchitectureThumbnail } from './ArchitectureExplorer';
+import { architectureCopy, tr } from './architectureData';
 
 type Project = Profile['projects'][number];
 type Event = Profile['timeline'][number];
@@ -76,6 +78,7 @@ export function ProjectGallery({ projects, timeline = [], locale }: { projects: 
     else goTo(target.current + direction);
   }, ordered.length > 0);
   const entry = selected === null ? null : ordered[selected];
+  const isPortfolio = (item: JourneyEntry) => item.project?.kind === 'personal' && item.title === 'kongPortfolio';
   function syncScroll(schedule = true) {
     if (!viewport.current || !track.current) return;
     const first = track.current.children[0] as HTMLElement | undefined;
@@ -110,18 +113,18 @@ export function ProjectGallery({ projects, timeline = [], locale }: { projects: 
           }}><span className="rail-period">{item.period}</span><span className="rail-title">{item.title}</span></button></li>)}
         </ol></nav>
         <div className="gallery-viewport" ref={viewport} onScroll={() => syncScroll()} onScrollEnd={finishScroll} onPointerDown={cancelPending}><ol className="project-track" ref={track} aria-label={g.label}>
-          {ordered.map((item, i) => <li className="project-item" key={`${item.title}-${item.period}`}><article><button className="project-ticket" aria-label={`${g.open}: ${item.title}`} onClick={() => { cancelPending(); setSelected(i); }} onFocus={() => { if (target.current !== i) goTo(i); }} onKeyDown={event => {
+          {ordered.map((item, i) => <li className="project-item" key={`${item.title}-${item.period}`}><article><button className="project-ticket" aria-label={`${g.open}: ${item.title}`} aria-haspopup="dialog" onClick={() => { cancelPending(); setSelected(i); }} onFocus={() => { if (target.current !== i) goTo(i); }} onKeyDown={event => {
             if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); goTo(i + (event.key === 'ArrowRight' ? 1 : -1), true); }
             if (event.key === 'Home' || event.key === 'End') { event.preventDefault(); goTo(event.key === 'Home' ? 0 : ordered.length - 1, true); }
           }}>
             <div className="ticket-top"><span>{item.period}</span><span>{String(i + 1).padStart(2, '0')}</span></div>
-            <div className={`ticket-art ticket-art-${i % 4}`}>{item.project?.kind === 'personal' ? <PixelGarden compact/> : <PixelMark variant={i}/>}</div>
-            <div className="ticket-copy"><span className="eyebrow">{item.project ? item.project.kind === 'personal' ? t.personal : t.work : g.career}</span><h3>{item.title}</h3><p className="ticket-description">{item.description}</p><p>{item.project?.tags.slice(0, 4).join(' / ') ?? item.period}</p></div><span className="ticket-open">{g.open}<b aria-hidden="true">↗</b></span>
+            <div className={`ticket-art ticket-art-${i % 4}`}>{isPortfolio(item) ? <ArchitectureThumbnail locale={locale}/> : item.project?.kind === 'personal' ? <PixelGarden compact/> : <PixelMark variant={i}/>}</div>
+            <div className="ticket-copy"><span className="eyebrow">{item.project ? item.project.kind === 'personal' ? t.personal : t.work : g.career}</span><h3>{item.title}</h3><p className="ticket-description">{item.description}</p><p>{item.project?.tags.slice(0, 4).join(' / ') ?? item.period}</p></div><span className="ticket-open">{isPortfolio(item) ? tr(architectureCopy.bubble, locale) : g.open}<b aria-hidden="true">↗</b></span>
           </button></article></li>)}
         </ol></div>
       </div>
       {ordered.length > 0 && <div className="gallery-controls wrap"><span className="gallery-page" aria-live="polite">{String(current + 1).padStart(2, '0')} <span>/ {String(ordered.length).padStart(2, '0')}</span></span><a className="gallery-next-chapter pixel-chapter-button" href="#skills" onClick={event => { event.preventDefault(); cancelPending(); scrollToChapter('skills'); }}><span>03</span>{g.skills}<b aria-hidden="true">↓</b></a><div><button aria-label={g.previous} disabled={current === 0} onClick={() => goTo(current - 1)}>←</button><button aria-label={g.next} disabled={current === ordered.length - 1} onClick={() => goTo(current + 1)}>→</button></div></div>}
     </div>
-    {entry && <Modal title={entry.title} kicker={`${g.title} / ${entry.period}`} closeLabel={m.close} onClose={() => setSelected(null)}><div className="project-detail"><span className="status-chip">{entry.project ? entry.project.kind === 'personal' ? t.personal : t.work : g.career}</span>{entry.project && <><h3>{g.team}</h3><p className="project-role">{entry.project.role}{entry.project.team && ` / ${entry.project.team}`}</p></>}<p>{entry.description}</p>{entry.project?.responsibilities?.length ? <><h3>{g.tasks}</h3><ol className="responsibility-list">{entry.project.responsibilities.map(task => <li key={task}>{task}</li>)}</ol></> : entry.event && entry.project && <><h3>{g.overview}</h3><p>{entry.event.description}</p></>}{entry.project && <>{entry.project.environment?.length ? <div className="project-environment"><h3>{g.environment}</h3>{entry.project.environment.map(group => <section key={group.title}><h4>{group.title}</h4><ul className="tags">{group.items.map(skill => <li key={skill}>{skill}</li>)}</ul></section>)}</div> : <ul className="tags">{entry.project.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>}<h3>{g.outcome}</h3><p>{entry.project.outcome}</p></>}</div></Modal>}
+    {entry && <Modal className={isPortfolio(entry) ? 'architecture-dialog' : ''} title={isPortfolio(entry) ? tr(architectureCopy.title, locale) : entry.title} kicker={`${g.title} / ${entry.period}`} closeLabel={m.close} onClose={() => setSelected(null)}>{isPortfolio(entry) ? <ArchitectureExplorer locale={locale}/> : <div className="project-detail"><span className="status-chip">{entry.project ? entry.project.kind === 'personal' ? t.personal : t.work : g.career}</span>{entry.project && <><h3>{g.team}</h3><p className="project-role">{entry.project.role}{entry.project.team && ` / ${entry.project.team}`}</p></>}<p>{entry.description}</p>{entry.project?.responsibilities?.length ? <><h3>{g.tasks}</h3><ol className="responsibility-list">{entry.project.responsibilities.map(task => <li key={task}>{task}</li>)}</ol></> : entry.event && entry.project && <><h3>{g.overview}</h3><p>{entry.event.description}</p></>}{entry.project && <>{entry.project.environment?.length ? <div className="project-environment"><h3>{g.environment}</h3>{entry.project.environment.map(group => <section key={group.title}><h4>{group.title}</h4><ul className="tags">{group.items.map(skill => <li key={skill}>{skill}</li>)}</ul></section>)}</div> : <ul className="tags">{entry.project.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>}<h3>{g.outcome}</h3><p>{entry.project.outcome}</p></>}</div>}</Modal>}
   </section>;
 }

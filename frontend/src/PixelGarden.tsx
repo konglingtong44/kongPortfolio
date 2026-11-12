@@ -1,6 +1,6 @@
-// Original generated scene inspired by Stardew Valley. See DESIGN_NOTES.md for the prompt.
+// Original discovery garden scene, generated without game references. See DESIGN_NOTES.md for the prompt.
 export function PixelGarden({ compact = false }: { compact?: boolean }) {
-  return <img className={`pixel-garden ${compact ? 'compact' : ''}`} src={`${import.meta.env.BASE_URL}images/valley-farm.png`} alt="" aria-hidden="true" width={1536} height={1024} loading={compact ? 'lazy' : 'eager'} fetchPriority={compact ? 'auto' : 'high'}/>;
+  return <img className={`pixel-garden ${compact ? 'compact' : ''}`} src={`${import.meta.env.BASE_URL}images/discovery-garden.png`} alt="" aria-hidden="true" width={1536} height={1024} loading={compact ? 'lazy' : 'eager'} fetchPriority={compact ? 'auto' : 'high'}/>;
 }
 export function PixelMark({ variant = 0 }: { variant?: number }) {
   return <svg className="pixel-mark" viewBox="0 0 64 64" shapeRendering="crispEdges" aria-hidden="true">
