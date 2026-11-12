@@ -27,3 +27,5 @@ AWS 依据：[Lambda 部署配置](https://docs.aws.amazon.com/codedeploy/latest
 费用示例（仅新增部署阶段）：20 次/月 × 8 分钟 ×（CodeBuild $0.005 + V2 action $0.002）+ 1 个标准告警约 $0.10 ≈ **$1.22/月**，另有少量 S3/日志/API 调用，未扣账号共享免费额度。不是全站总费或账单上限，实际按东京费率、时长与账号额度结算。[CodeBuild](https://aws.amazon.com/codebuild/pricing/)、[CodePipeline](https://aws.amazon.com/codepipeline/pricing/)、[CloudWatch](https://aws.amazon.com/cloudwatch/pricing/)。
 
 批准创建后将启动固定新 SHA 的执行，重新由用户完成两道审批；第二道审批文字明确授权真实切流及恢复。旧执行 c02bc4e6 已结束，它的审批不会被拿来触发这次部署。
+
+源码 `0add5d0` 已推送；现有 AWS frontend/backend CI 与 GitHub statuses 全 success。前端 40 tests/build、后端 9+3 tests/ZIP smoke，部署纯逻辑测试也在 AWS Linux 通过。运行时 IAM、首次 baseline、真实 CodeDeploy/HTTP/回滚验收仍待批准后执行。

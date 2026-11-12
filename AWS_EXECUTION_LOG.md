@@ -927,3 +927,37 @@ git status --short
 初次注入失败测试发现“API 失败时部署刚成功”不会触发 stop，补上通过 CodeDeploy 恢复 Blue 的分支及专门用例；随后模拟器的 get 读取推进状态/stop 不恢复 alias 的模型导致断言失败，修正为由 sleep 推进状态并模拟停止后的 Blue 恢复，再重跑全部通过。测试不调用 AWS。fmt -check 曾提示 deployment.tf 需格式化，后实际 fmt 并再检查，不将外层 shell 的最后退出码误当先前命令全成功。Terraform validate 与 **16 个 mocked plans** 通过；Node guards/基线成功/基线失败阻断/HTTP失败停止/成功后恢复/超时路径通过。
 
 真实账号 plan **9 add / 2 change / 0 destroy**，保存 infra/terraform/cicd/deployment.tfplan、`.local/deployment-plan.log`；show-json 确认九新增资源和 pipeline/role policy 两更新。收紧 IAM 后已重新 plan，仍同数量。默认关闭 plan No changes（`.local/deployment-disabled-plan.log`）。没有 apply、创建资源、创建部署、审批或切流。本次新增阶段 20 次×8分钟估算 $1.22/月（含一个标准告警的近似 $0.10，未扣共享免费额度、未含日志/存储/税/已有阶段，非全站总费或上限），来源见文档，按东京实际费率结算。
+
+### 12.4 源码发布与 AWS CI 证据
+
+在第三个 mocked plan 加入明确的 IAM 边界断言（构建无别名/代码更新/审批权、GetDeployment 仅生产组），再次 fmt 与 16 个计划测试通过。扫描、提交与推送命令：
+
+```powershell
+. ./scripts/tools.ps1
+node .githooks/check-staged-paths.mjs --all
+gitleaks dir --redact --no-banner .
+git diff --check
+git add -- AWS_EXECUTION_LOG.md PROJECT_PLAN.md docs/codedeploy-next-story.md infra/terraform/cicd/candidate-pipeline.tf infra/terraform/cicd/deployment.tf infra/terraform/cicd/tests/deployment.tftest.hcl infra/terraform/cicd/terraform.tfvars.example codebuild/deployment.yml scripts/ci.sh scripts/deployment-contract.mjs scripts/deploy-production.mjs scripts/test-deployment.mjs
+git diff --cached --check
+git commit -m 'feat: prepare twice-approved CodeDeploy canary and recovery'
+git push
+git rev-parse HEAD
+git status --short
+```
+
+dir、commit 暂存区、push 全历史 Gitleaks 无泄露。源码提交 **0add5d0732acdb0d658961a7c4c10a0f97f73d83**，推送同时包含先前三个本地文档记录提交，不改变已完成旧流水线的源码。未合并 main。推送仅触发现有 CI，没有 start-pipeline-execution。
+
+用 `aws codebuild list-builds-for-project --project-name kongportfolio-ci-frontend --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json` 及 backend 项目同命令取 ID；随后 batch-get-builds 按 resolvedSourceVersion 核对，不把旧结果当本次。初始 queued，中间前端通过/后端构建，约 45 秒与 30 秒短等待后两项均 SUCCEEDED：
+
+```powershell
+& $aws codebuild batch-get-builds --ids kongportfolio-ci-frontend:5cd586bd-20c7-4ee5-b25a-d1ed127de2c5 kongportfolio-ci-backend:6fd38b19-334a-43e4-9c75-e94ae6bff8b1 --region ap-northeast-1 --query 'builds[].{id:id,status:buildStatus,phase:currentPhase,sha:resolvedSourceVersion}' --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-ci-frontend --log-stream-name 5cd586bd-20c7-4ee5-b25a-d1ed127de2c5 --region ap-northeast-1 --query 'events[].message' --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-ci-backend --log-stream-name 6fd38b19-334a-43e4-9c75-e94ae6bff8b1 --region ap-northeast-1 --query 'events[].message' --output json
+Invoke-RestMethod -Uri 'https://api.github.com/repos/konglingtong44/kongPortfolio/commits/0add5d0732acdb0d658961a7c4c10a0f97f73d83/status' -Headers @{Accept='application/vnd.github+json';'User-Agent'='kongPortfolio-verification'}
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+git check-ignore infra/terraform/cicd/deployment.tfplan infra/terraform/cicd/terraform.tfvars .local/deployment-source-ci.json
+```
+
+两个 CI 的 SHA 同为 0add5d0，均 applicationChecksRan=true，部署纯逻辑测试在 AWS Linux 上通过；前端 40 tests/build、后端 9 HTTP + 3 Lambda tests/ZIP smoke 成功；GitHub combined/ci/frontend/ci/backend 都 success。云日志和元数据保存 `.local/deployment-source-ci.json`、`deployment-frontend-ci.log`、`deployment-backend-ci.log`，没有加入 Git。公开状态 API 为只读 GET。生产 live 仍2/无权重，私有 plan/tfvars/.local 均被忽略。
+
+最终补入本日志、PROJECT_PLAN.md 和下一 Story 文档；再做 diff/path/Gitleaks 检查，仅本地提交 `docs: record CodeDeploy preparation CI and approval scope`，不为文档再推送触发重复 CI。等待用户明确批准 **9 新增/2 更新及首次新执行验证**；之后两道流水线人工审批仍必须重新由用户完成，第二道批准才授权实际生产切流和必要恢复。真实基线/切流/告警/回滚演练未验证。

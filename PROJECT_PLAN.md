@@ -2,6 +2,8 @@
 
 ## S3-07 — CodeDeploy preparation (2026-11-12, awaiting paid-resource approval)
 
+Source 0add5d0 published; both existing AWS CI builds and GitHub statuses success, applicationChecksRan=true. Frontend 40 tests/build; backend 9+3 tests/ZIP smoke; injected deployment guards run on AWS Linux. No deployment resources or traffic changes applied. Final evidence recorded locally pending explicit 9-create/2-update approval.
+
 Prepared opt-in seven-stage pipeline: deployment follows both same-run human gates, verifies candidate/STG/Green/report/live snapshot, seeds a verified Blue baseline before first canary, observes 10% for five minutes then full Green, checks public health/profile and requests CodeDeploy rollback on failures. CodeBuild has no direct alias/code-write/approval rights. Actual plan 9 create / 2 update / 0 delete; default disabled plan No changes. Terraform 16 mocked plans and injected Node success/failure/timeout/recovery guards pass. No apply/create-deployment/traffic shift; actual IAM/baseline acceptance/alarm/rollback remain cloud gaps. docs/codedeploy-next-story.md; audit root log section 12.
 
 ## S3-06 — Completed after human approval 2 (2026-11-12)
