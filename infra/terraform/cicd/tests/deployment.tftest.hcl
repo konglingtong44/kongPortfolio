@@ -48,6 +48,10 @@ run "two_gates_precede_bounded_canary" {
     error_message = "Real deployment must follow both human gates."
   }
   assert {
+    condition     = one(aws_codepipeline.candidate[0].variable).name == "ReleaseMode" && one(aws_codepipeline.candidate[0].variable).default_value == "deploy" && strcontains(aws_codepipeline.candidate[0].stage[5].action[0].configuration.CustomData, "#{variables.ReleaseMode}") && strcontains(aws_codepipeline.candidate[0].stage[6].action[0].configuration.EnvironmentVariables, "DEPLOY_RELEASE_MODE")
+    error_message = "Drill mode must be explicit, visible in approval 2 and passed to controller; normal deploy remains default."
+  }
+  assert {
     condition     = aws_codedeploy_deployment_group.production[0].deployment_config_name == "CodeDeployDefault.LambdaCanary10Percent5Minutes" && aws_codedeploy_deployment_group.production[0].auto_rollback_configuration[0].enabled && !aws_codedeploy_deployment_group.production[0].alarm_configuration[0].ignore_poll_alarm_failure
     error_message = "Canary requires automatic rollback and fail-closed alarm polling."
   }

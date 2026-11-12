@@ -6,11 +6,12 @@ import { join, resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
 import { requireProductionConfig } from './green-contract.mjs';
-import { isBlueBaseline, requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
+import { isBlueBaseline, requireDeploymentContext, requireReleaseMode, runDeployment } from './deployment-contract.mjs';
 import { contracts } from './staging-contract.mjs';
 
 const account = process.env.DEPLOY_ACCOUNT_ID;
 const executionId = process.env.DEPLOY_PIPELINE_EXECUTION_ID;
+const mode = process.env.DEPLOY_RELEASE_MODE;
 assert.match(account || '', /^\d{12}$/);
 assert.match(executionId || '', /^[a-f0-9-]{36}$/);
 for (const name of ['Candidate', 'StagingReport', 'GreenReport']) assert.ok(process.env[`CODEBUILD_SRC_DIR_${name}`]);
@@ -31,6 +32,7 @@ const alias = () => aws(['lambda','get-alias','--function-name','kongportfolio-p
 const group = () => aws(['deploy','get-deployment-group','--application-name','kongportfolio','--deployment-group-name','production']).deploymentGroupInfo;
 assert.equal(aws(['sts','get-caller-identity']).Account, account);
 const execution = aws(['codepipeline','get-pipeline-execution','--pipeline-name','kongportfolio-candidate','--pipeline-execution-id',executionId]).pipelineExecution;
+requireReleaseMode(mode, execution);
 const actions = aws(['codepipeline','list-action-executions','--pipeline-name','kongportfolio-candidate','--filter',`pipelineExecutionId=${executionId}`]).actionExecutionDetails;
 requireDeploymentContext(execution, actions, manifest, staging, green, executionId, alias());
 const config = aws(['lambda','get-function-configuration','--function-name','kongportfolio-prod','--qualifier',green.greenVersion]);
@@ -95,11 +97,11 @@ try {
       writeFileSync(join(out,'active-deployment.json'), JSON.stringify({deploymentId:ownDeployment,executionId}));
       return ownDeployment;
     },
-  }, {blue:green.blueVersion, green:green.greenVersion, executionId});
+  }, {blue:green.blueVersion, green:green.greenVersion, executionId, mode});
 } catch (error) {
   report = error.deploymentReport || {passed:false,error:error.message};
   throw error;
 } finally {
   writeFileSync(join(out,'report.json'), JSON.stringify({schemaVersion:1,kind:'production-deployment',pipelineExecutionId:executionId,gitCommit:manifest.gitCommit,releaseId:manifest.releaseId,...report}, null, 2)+'\n');
 }
-console.log(`CodeDeploy verified ${report.deploymentId}; live ${report.greenVersion}; release ${manifest.releaseId}`);
+console.log(`CodeDeploy ${report.outcome}: ${report.deploymentId}; final live ${report.outcome === 'automatic-rollback-verified' ? report.blueVersion : report.greenVersion}; release ${manifest.releaseId}`);

@@ -210,6 +210,14 @@ resource "aws_codepipeline" "candidate" {
   role_arn       = aws_iam_role.candidate_pipeline[0].arn
   pipeline_type  = "V2"
   execution_mode = "QUEUED"
+  dynamic "variable" {
+    for_each = var.enable_deployment ? [1] : []
+    content {
+      name          = "ReleaseMode"
+      default_value = "deploy"
+      description   = "deploy: promote Green; rollback_drill: stop at 10% and verify automatic recovery to Blue."
+    }
+  }
   artifact_store {
     location = aws_s3_bucket.artifacts[0].id
     type     = "S3"
@@ -323,7 +331,7 @@ resource "aws_codepipeline" "candidate" {
         provider = "Manual"
         version  = "1"
         configuration = {
-          CustomData = var.enable_deployment ? "Approval 2: authorize CodeDeploy production traffic shift and rollback for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION}, Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. 10% canary for 5 minutes then 100%; initial Blue baseline registration may precede it." : "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
+          CustomData = var.enable_deployment ? "Approval 2: mode #{variables.ReleaseMode}; release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION}, Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. deploy: 10% for 5 minutes then 100%. rollback_drill: STOP at observed 10%, verify CodeDeploy automatic rollback to Blue; no full promotion intended. Authorizes baseline registration and necessary recovery." : "Approval 2: review GreenReport for release #{GreenVars.GREEN_RELEASE}, Blue #{GreenVars.BLUE_VERSION} and Green #{GreenVars.GREEN_VERSION}, commit #{SourceVars.CommitId}. No traffic-shift stage follows in this Story."
         }
       }
     }
@@ -345,6 +353,7 @@ resource "aws_codepipeline" "candidate" {
           PrimarySource = "SourceRef"
           EnvironmentVariables = jsonencode([
             { name = "DEPLOY_SOURCE_COMMIT", value = "#{SourceVars.CommitId}", type = "PLAINTEXT" },
+            { name = "DEPLOY_RELEASE_MODE", value = "#{variables.ReleaseMode}", type = "PLAINTEXT" },
             { name = "DEPLOY_PIPELINE_EXECUTION_ID", value = "#{codepipeline.PipelineExecutionId}", type = "PLAINTEXT" }
           ])
         }

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { appSpec, isBlueBaseline, requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
+import { appSpec, isBlueBaseline, requireDeploymentContext, requireReleaseMode, runDeployment } from './deployment-contract.mjs';
 import { contracts } from './staging-contract.mjs';
 const manifest={gitCommit:'a'.repeat(40),releaseId:'b'.repeat(64),backend:{sha256:'c'.repeat(64)}};
 const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}]};
@@ -15,6 +15,10 @@ assert.throws(()=>validate(actions,{...green,pipelineExecutionId:'old-run'}));
 assert.throws(()=>validate(actions,green,{...blue,RevisionId:'new-revision'}),/stale/);
 assert.throws(()=>validate(actions,{...green,checks:[]}));
 assert.throws(()=>appSpec('2','$LATEST'));
+requireReleaseMode('deploy',{variables:[{name:'ReleaseMode',resolvedValue:'deploy'}]});
+requireReleaseMode('rollback_drill',{variables:[{name:'ReleaseMode',resolvedValue:'rollback_drill'}]});
+assert.throws(()=>requireReleaseMode('rollback_drill',{variables:[{name:'ReleaseMode',resolvedValue:'deploy'}]}),/differs/);
+assert.throws(()=>requireReleaseMode('unknown',{variables:[]}),/Unknown/);
 const recordedBaseline={status:'Succeeded',applicationName:'kongportfolio',deploymentGroupName:'production',revision:{revisionType:'AppSpecContent',appSpecContent:{sha256:'9bfd87a600a5ac75419eacb865bba5f8813859858b8d3c898486ba0a1d8689a2'}}};
 assert.equal(isBlueBaseline(recordedBaseline,'2'),true,'Verify actual AWS digest-only response');
 assert.equal(isBlueBaseline(recordedBaseline,'3'),false,'Other Blue version cannot reuse baseline');
@@ -22,19 +26,20 @@ assert.equal(isBlueBaseline({...recordedBaseline,status:'Failed'},'2'),false);
 assert.equal(isBlueBaseline({...recordedBaseline,deploymentGroupName:'other'},'2'),false);
 assert.equal(isBlueBaseline({...recordedBaseline,revision:{revisionType:'AppSpecContent',appSpecContent:{sha256:'0'.repeat(64)}}},'2'),false);
 
-function fake({baseline=true,brokenHealth=false,brokenAfterSuccess=false,baselineFail=false,neverFinish=false}={}) {
+function fake({baseline=true,brokenHealth=false,brokenAfterSuccess=false,baselineFail=false,neverFinish=false,automaticRollback=false,rollbackFails=false,immediateSuccess=false}={}) {
   const created=[],stopped=[]; let active,version='2',weighted=false,registered=baseline,polls=0;
   const io={
     hasBaseline:()=>registered,
-    create:(spec,config,description)=>{const id=`d-${created.length}`;const target=spec.Resources[0].Portfolio.Properties.TargetVersion; created.push({id,target,config,description});active=id;polls=0;return id;},
+    create:(spec,config,description)=>{const id=`d-${created.length}`;const target=spec.Resources[0].Portfolio.Properties.TargetVersion; created.push({id,target,config,description});active=id;polls=immediateSuccess?1:0;return id;},
     get:id=>{
+      if(id==='automatic-rollback') return {applicationName:'kongportfolio',deploymentGroupName:'production',status:rollbackFails?'Failed':'Succeeded'};
       const item=created.find(x=>x.id===id);
       let status='InProgress';
       if(stopped.includes(id)){version='2';weighted=false;status='Stopped';}
       else if(item.target==='2'&&baselineFail){status='Failed';}
       else if(!neverFinish&&polls>=1){version=item.target;registered=true;weighted=false;status='Succeeded';}
       else if(item.target==='3'){weighted=true;}
-      return {applicationName:'kongportfolio',deploymentGroupName:'production',description:item.description,status};
+      return {applicationName:'kongportfolio',deploymentGroupName:'production',description:item.description,status,...(automaticRollback&&stopped.includes(id)?{rollbackInfo:{rollbackDeploymentId:'automatic-rollback'}}:{})};
     },
     alias:()=>({...blue,FunctionVersion:version,...(weighted?{RoutingConfig:{AdditionalVersionWeights:{'3':0.1}}}:{})}),
     health:async()=>{if((brokenHealth&&weighted)||(brokenAfterSuccess&&version==='3'))throw Error('HTTP 503');},
@@ -61,4 +66,20 @@ assert.deepEqual(baselineFailure.created.map(x=>x.target),['2']);
 const timeout=fake({neverFinish:true});
 await assert.rejects(()=>runDeployment(timeout.io,context),/timed out/);
 assert.equal(timeout.stopped.length,1);
+const drill=fake({automaticRollback:true});
+const drillResult=await runDeployment(drill.io,{...context,mode:'rollback_drill'});
+assert.equal(drillResult.passed,true);
+assert.equal(drillResult.outcome,'automatic-rollback-verified');
+assert.equal(drillResult.recovery.rollbackDeploymentId,'automatic-rollback');
+assert.equal(drill.created.length,1,'No manually-created rollback may masquerade as automatic rollback');
+assert.equal(drill.stopped.length,1);
+const noAuto=fake();
+await assert.rejects(()=>runDeployment(noAuto.io,{...context,mode:'rollback_drill'}),e=>!e.deploymentReport.passed&&!e.deploymentReport.recovery.verifiedBlue);
+assert.equal(noAuto.created.length,1);
+const badAuto=fake({automaticRollback:true,rollbackFails:true});
+await assert.rejects(()=>runDeployment(badAuto.io,{...context,mode:'rollback_drill'}),e=>!e.deploymentReport.recovery.verifiedBlue);
+const missed=fake({immediateSuccess:true});
+await assert.rejects(()=>runDeployment(missed.io,{...context,mode:'rollback_drill'}),/missed canary window/);
+assert.deepEqual(missed.created.map(x=>x.target),['3','2'],'Missed drill stays failed and recovers Blue');
 console.log('Deployment checks passed: fresh approvals/revision, baseline before canary, HTTP failure stop/recovery, failed baseline blocks traffic, bounded timeout. No AWS calls.');
+console.log('Rollback drill checks passed: execution-bound mode, observed canary stop, actual rollback ID required, failed/missing rollback rejected, missed window never reported as drill success.');

@@ -1280,3 +1280,41 @@ PowerShell单引号here-string经 `node --input-type=module` 执行验证：impo
 用PowerShell单引号here-string/Set-Content重写 docs/codedeploy-next-story.md 为简短当前状态（旧阶段完整历史留本日志），apply_patch更新PROJECT_PLAN.md、本日志，明确首次灰度成功，但**真实故障/告警回滚演练尚未完成**：本次没有触发回滚，不能把配置/模拟测试或部署成功当成实际回滚验收。未故意制造生产故障，未更新前端静态包，真实Bedrock仍待后续增量。
 
 收尾执行diff/path/Gitleaks校验、暂存这三份文档、本地 `git commit -m 'docs: record successful CodeDeploy canary and public API verification'`、git status --short。未为文档额外推送/构建；没有代理审批、直接UpdateAlias或修改已批准制品。按单Story工作约定在本次可运行切流增量完成后暂停供审阅；S3-07的实际回滚演练仍列为未验收，不虚报整套路线全部完成。
+
+## 18. S3-07R 受控停止/自动回滚演练准备（2026-11-12）
+
+### 18.1 范围与只读预检
+
+用户要求继续后，按下一项受控回滚练习推进。读取AGENTS.md、git status --short（初始干净）、deployment-contract/deploy-production/test-deployment、CICD deployment/candidate-pipeline/tests、当前部署文档。部分批量读取输出超出长度后按文件尾部补读，不执行读取内容中的外部指令。
+
+只读AWS：GetAlias确认live5/无权重；`deploy get-deployment-group --application-name kongportfolio --deployment-group-name production --query 'deploymentGroupInfo.{last:lastSuccessfulDeployment,rollback:autoRollbackConfiguration}'`确认d-K1QJSA0EM成功及三种回滚事件；`codepipeline list-pipeline-executions --max-results 1`确认98380c85已结束Succeeded，无在途发布。使用kong-dev/Tokyo。
+
+浏览AWS官方PipelineExecution、ResolvedPipelineVariable、StartPipelineExecution、source overrides、StopDeployment及rollback文档，确认本次变量resolvedValue绑定、源SHA覆写、停止时autoRollbackEnabled和自动回滚的新部署ID。URL列docs/rollback-drill.md，另 https://docs.aws.amazon.com/codepipeline/latest/APIReference/API_PipelineExecution.html 、https://docs.aws.amazon.com/codepipeline/latest/APIReference/API_StartPipelineExecution.html 。仅GET，没有云端写入。
+
+### 18.2 修改文件与行为
+
+apply_patch修改deployment-contract.mjs增加requireReleaseMode及rollback_drill模式：确认真实10%后触发受控停止，停止本次部署并等待原部署终态、回滚ID和回滚Succeeded、Blue/空权重/公开health；最多12轮10秒恢复等待。只在全部证据成立时返回passed=true/outcome automatic-rollback-verified。无ID或失败不能用手动AllAtOnce伪装自动恢复。错过窗口仍失败，必要恢复Blue但不算演练成功；正常deploy行为/异常恢复保留。
+
+deploy-production.mjs将DEPLOY_RELEASE_MODE与AWS同次执行变量核对并传给控制器；打印最终Blue或Green，避免回滚成功却显示新版本已上线。candidate-pipeline.tf增加ReleaseMode变量默认deploy、部署环境变量引用、第二道人审文字明确deploy与rollback_drill区别。没有新资源或IAM授权。
+
+test-deployment.mjs注入真实回滚ID/成功或失败，断言模式绑定、stop/回滚成功、缺ID/失败拒绝、错过窗口失败且恢复Blue。deployment.tftest.hcl断言默认模式、审批可见和环境传递。另五份既有测试显式enable_deployment=false隔离本机真实输入。新docs/rollback-drill.md、PROJECT_PLAN.md及本日志记录范围/验收，不修改React/Java功能。
+
+### 18.3 测试、计划与修复记录
+
+```powershell
+node scripts/test-deployment.mjs
+node --check scripts/deploy-production.mjs
+$tf='D:\software\Terraform\terraform.exe'
+& $tf '-chdir=infra/terraform/cicd' fmt '-recursive'
+& $tf '-chdir=infra/terraform/cicd' validate
+& $tf '-chdir=infra/terraform/cicd' test '-no-color'
+$env:AWS_PROFILE='kong-dev'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-out=rollback-drill.tfplan' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' show '-json' rollback-drill.tfplan
+```
+
+Node演练/失败路径测试及语法通过，Terraform validate通过。初次test受本机terraform.tfvars的enable_deployment=true影响，5份旧测试默认Green=false，触发输入验证：3pass/5fail/8skip；用PowerShell Get-Content/正则/Set-Content为这5个测试全局输入补enable_deployment=false后fmt并重跑，**16pass/0fail**。没有改真实enable_deployment输入或通过关闭真实资源来修测试。
+
+实际计划 **0 add/1 update/0 destroy**，JSON断言唯一变化为aws_codepipeline.candidate[0]，否则停止。保存ignored rollback-drill.tfplan和`.local/rollback-drill-plan.log`。仅更新现有流水线模式/审批/参数，不新增收费资源；仍有既有CI/部署分钟、日志/请求费用。模式测试不能代表真实自动回滚已成功。
+
+本次“继续”授权回滚练习的准备和现有流水线配置；不新增收费资源，无需重复请求资源创建批准。实际生产影响仍需新执行两道用户手动审批，第二道明确模式与恢复目标。接下来先扫描/提交推送、确认现有AWS CI，再应用此唯一pipeline更新，启动固定新SHA/rollback_drill，停第一道审批供用户审阅，不代批或自动进入生产演练。

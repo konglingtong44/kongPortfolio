@@ -44,13 +44,19 @@ export function verifyRouting(alias, blue, green) {
     assert.ok(Math.abs(weight - 0.1) < 0.0001, 'Unexpected canary weight');
   }
 }
+export function requireReleaseMode(mode, execution) {
+  assert.ok(['deploy', 'rollback_drill'].includes(mode), 'Unknown release mode');
+  assert.equal(execution.variables?.find(v => v.name === 'ReleaseMode')?.resolvedValue, mode, 'Release mode differs from approved pipeline execution');
+}
 
 // Injected effects allow failure/timeout/recovery behavior to be verified without AWS writes.
-export async function runDeployment(io, { blue, green, executionId }) {
+export async function runDeployment(io, { blue, green, executionId, mode = 'deploy' }) {
+  assert.ok(['deploy', 'rollback_drill'].includes(mode));
   const description = `kongportfolio:${executionId}`;
   const terminal = new Set(['Succeeded', 'Failed', 'Stopped']);
   let activeId, baselineId, canaryId;
   const observations = [];
+  let drillTriggered = false;
   async function wait(id, target, maxPolls) {
     for (let n = 0; n < maxPolls; n++) {
       const d = io.get(id);
@@ -62,6 +68,13 @@ export async function runDeployment(io, { blue, green, executionId }) {
       verifyRouting(alias, blue, green);
       await io.health();
       observations.push({ status: d.status, version: alias.FunctionVersion, weights: alias.RoutingConfig?.AdditionalVersionWeights || {} });
+      if (mode === 'rollback_drill' && target === green) {
+        if (d.status === 'Succeeded') throw new Error('Drill missed canary window; restore Blue without claiming drill success');
+        if (alias.FunctionVersion === blue && Math.abs((alias.RoutingConfig?.AdditionalVersionWeights?.[green] || 0) - 0.1) < 0.0001) {
+          drillTriggered = true;
+          throw new Error('Controlled rollback drill: observed 10% canary, request stop');
+        }
+      }
       if (d.status === 'Succeeded') {
         assert.equal(alias.FunctionVersion, target);
         assert.equal(Object.keys(alias.RoutingConfig?.AdditionalVersionWeights || {}).length, 0);
@@ -83,7 +96,7 @@ export async function runDeployment(io, { blue, green, executionId }) {
     assert.equal(liveSnapshot(before).version, blue);
     canaryId = activeId = io.create(appSpec(blue, green), 'CodeDeployDefault.LambdaCanary10Percent5Minutes', description);
     await wait(canaryId, green, 24);
-    return { passed: true, baselineId, deploymentId: canaryId, blueVersion: blue, greenVersion: green, observations };
+    return { passed: true, mode, outcome: 'deployed', baselineId, deploymentId: canaryId, blueVersion: blue, greenVersion: green, observations };
   } catch (error) {
     const recovery = { requested: false, verifiedBlue: false };
     if (activeId) {
@@ -94,20 +107,26 @@ export async function runDeployment(io, { blue, green, executionId }) {
         assert.equal(state.description, description);
         if (!terminal.has(state.status)) { io.stop(activeId); recovery.requested = true; }
         // CodeDeploy controls rollback; never repair the alias directly from CodeBuild.
-        for (let n = 0; n < 6; n++) {
+        for (let n = 0; n < (drillTriggered ? 12 : 6); n++) {
           const alias = io.alias();
           if (alias.FunctionVersion === blue && !Object.keys(alias.RoutingConfig?.AdditionalVersionWeights || {}).length) {
             const rollbackId = io.get(activeId).rollbackInfo?.rollbackDeploymentId;
             if (rollbackId) recovery.rollbackDeploymentId = rollbackId;
             const originalTerminal = terminal.has(io.get(activeId).status);
-            const rollbackDone = !rollbackId || io.get(rollbackId).status === 'Succeeded';
+            let rollbackDone = !drillTriggered && !rollbackId;
+            if (rollbackId) {
+              const rollback = io.get(rollbackId);
+              assert.equal(rollback.applicationName, 'kongportfolio');
+              assert.equal(rollback.deploymentGroupName, 'production');
+              rollbackDone = rollback.status === 'Succeeded';
+            }
             if (originalTerminal && rollbackDone) { await io.health(); recovery.verifiedBlue = true; break; }
           }
           await io.sleep(10_000);
         }
         // A public HTTP failure can be found just after CodeDeploy reports success.
         // Restore Blue through CodeDeploy (never UpdateAlias), only from the known stable Green.
-        if (!recovery.verifiedBlue && !io.get(activeId).rollbackInfo?.rollbackDeploymentId && terminal.has(io.get(activeId).status)) {
+        if (!drillTriggered && !recovery.verifiedBlue && !io.get(activeId).rollbackInfo?.rollbackDeploymentId && terminal.has(io.get(activeId).status)) {
           const live = io.alias();
           if (liveSnapshot(live).version === green) {
             const restoreId = io.create(appSpec(green, blue), 'CodeDeployDefault.LambdaAllAtOnce', description);
@@ -125,7 +144,10 @@ export async function runDeployment(io, { blue, green, executionId }) {
         }
       } catch (recoveryError) { recovery.error = recoveryError.message; }
     }
-    error.deploymentReport = { passed: false, baselineId, deploymentId: canaryId, recovery, observations, error: error.message };
+    if (drillTriggered && recovery.requested && recovery.verifiedBlue && recovery.rollbackDeploymentId) {
+      return { passed: true, mode, outcome: 'automatic-rollback-verified', baselineId, deploymentId: canaryId, blueVersion: blue, greenVersion: green, recovery, observations };
+    }
+    error.deploymentReport = { passed: false, mode, baselineId, deploymentId: canaryId, recovery, observations, error: error.message };
     throw error;
   }
 }

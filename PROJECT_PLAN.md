@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07R — Controlled rollback drill preparation (2026-11-12)
+
+Prepared explicit execution-bound ReleaseMode (deploy default / rollback_drill). Drill stops only after observed 10% canary, requires AWS automatic rollback ID/Succeeded plus restored Blue/no weights/public health to pass; missing/failed rollback cannot be replaced by a manual deployment and called success. Both human gates retained, gate2 exposes mode. Actual plan 0 add / 1 pipeline update / 0 delete, no IAM expansion; existing resources reused. Node negative/failure/stop drill tests and 16 Terraform mocked plans pass. Cloud rollback and alarm-trigger testing remain unverified; this increment tests stop-on-request path, not induced application failure or alarm state. docs/rollback-drill.md, root log18.
+
 ## S3-07 — First real canary succeeded (2026-11-12; rollback drill pending)
 
 User completed both approvals for 98380c85 / c0a0a2c. Controller 0a1ce867 and CodeDeploy d-K1QJSA0EM Succeeded; whole pipeline Succeeded. Independently observed live Blue2 with Green5 weight0.1, then live5/no weights. Downloaded exact DeploymentReport object version; outer SHA, approved source/release/versions/deployment ID and 15 observations (including canary/final success) match AWS. Actual live5 code equals approved Green SHA. Seven public HTTPS contracts pass; alarm OK, no rollback triggered. Production and CICD post-cutover plans No changes. Baseline fix validated in real run, no duplicate baseline created. Real failure/alarm rollback drill remains unverified; no frontend promotion/real Bedrock. Audit root log section17; concise current state docs/codedeploy-next-story.md. Pause for review of this runnable cutover increment.
