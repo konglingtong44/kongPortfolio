@@ -18,6 +18,8 @@ Terraform实际计划：**4新增**（独立CodeBuild/角色/policy/七天日志
 
 验证：19项CICD mocked plans、3项生产域名测试、Node审批/报告/文件metadata/路径/顺序/并发/失败恢复/演练跳过测试通过；真实LIVE/DEV旧代码和配置匹配模板。所有操作见根日志21节。
 
+源码b00264a已推送，现有AWS frontend/backend CI与GitHub statuses全success（前端40 tests/build，后端9+3 tests/ZIP smoke，前端发布逻辑测试在AWS Linux通过）。本机额外Vite发布前缀构建确认HTML/CSS/JS及public图片路径正确；不是浏览器视觉验证。新发布资源和实际云流程尚未创建/运行。
+
 费用例子：新增阶段每月20次、每次3分钟，按CodeBuild $0.005和V2 action $0.002每分钟估算约 **$0.42/月**，另计S3存储、请求、CloudFront和日志，未扣共享免费额度，不是全站总费或上限。旧发布保留，清理另行处理。[CodeBuild](https://aws.amazon.com/codebuild/pricing/)、[CodePipeline](https://aws.amazon.com/codepipeline/pricing/)。
 
 AWS依据：[条件写](https://docs.aws.amazon.com/AmazonS3/latest/userguide/conditional-writes-enforce.html)、[UpdateFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_UpdateFunction.html)、[TestFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_TestFunction.html)、[PublishFunction](https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_PublishFunction.html)。创建需用户明确批准；实际前后端发布仍重新经过两道人审，不复用旧执行审批。

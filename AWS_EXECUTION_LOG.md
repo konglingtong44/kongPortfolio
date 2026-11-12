@@ -1509,3 +1509,41 @@ Node上下文/路径/MIME/cache/旧模板/上传顺序/演练跳过/开发态失
 真实启用计划 **4 add/2 change/0 destroy**，JSON断言数量、无delete；新增frontend CodeBuild/role/policy/log，更新candidate pipeline及其启动policy。保存ignored frontend-release.tfplan和`.local/frontend-release-plan.log`。默认关闭No changes（frontend-release-disabled-plan.log）；生产代码所有权交接No changes（frontend-router-handoff-plan.log），均.local。未apply、上传、更新/发布CloudFront函数或启动新候选。
 
 预计新增阶段20次/月×3分钟×(small $0.005+V2 $0.002)约$0.42/月，外加S3/CloudFront请求、版本存储和日志，未扣共享免费额度，非全站总价或封顶；旧版本保留，清理另行审批。价格参考官方链接见文档。创建四资源和CloudFront代码管理交接必须明确批准；实际前后端发布仍由新执行两道人审后进行。
+
+### 21.4 源码发布、AWS CI及前缀构建复核
+
+补齐发布/恢复后的LIVE代码快照断言：公共HTTP检查通过后还需控制面代码等于本次模板；恢复后LIVE/DEV都须等于旧代码，避免只凭单一边缘结果报告成功。对应并发测试通过。清理未用import，没有业务修改。
+
+```powershell
+. ./scripts/tools.ps1
+node scripts/test-frontend-release.mjs
+node scripts/test-deployment.mjs
+node scripts/test-cloudfront-routing.mjs
+node --check scripts/publish-frontend.mjs
+& D:\software\Git\bin\bash.exe -n scripts/ci.sh
+node .githooks/check-staged-paths.mjs --all
+gitleaks dir --redact --no-banner .
+git diff --check
+# git add仅本次20个脚本/TF/测试/buildspec/文档文件；私有输入/plan/.local不暂存。
+git diff --cached --check
+git commit -m 'feat: prepare approved immutable frontend publication and recovery'
+git push
+git rev-parse HEAD
+git status --short
+```
+
+提交 **b00264affd26de31c47f349676cd9979791370f4**，扫描dir/暂存/push全历史无泄露，工作区干净，未合并main。推送包含先前本地文档记录，但未启动新候选执行或部署（DetectChanges=false），enable_frontend_release仍未开启。
+
+分别list-builds-for-project取现有CI的最新ID，再batch-get-builds按SHA核对，约40秒短等待后前后端均SUCCEEDED：frontend **21269231-e76d-4ab0-8dce-542b75ff7cca**；backend **07721e9d-78ca-4a11-ae0b-64390d558db2**。get-log-events对应CI日志组/stream保存 `.local/frontend-release-frontend-ci.log`、`frontend-release-backend-ci.log`，确认frontend release纯逻辑测试在AWS Linux通过、前端40 tests/build、后端9+3 tests/ZIP smoke，applicationChecksRan=true。只读GET GitHub commit b00264a `/status`：combined/ci/frontend/ci/backend全success；元数据 `.local/frontend-release-source-ci.json`。
+
+额外只读rg查frontend/src中的/images/、/assets/、BASE_URL/import.meta.env：PixelGarden使用BASE_URL，styles.css含根图片url。初次整行CSS输出太长，随后用rg -n -o只输出匹配片段。为验证Vite会将该public图片转为发布前缀，在frontend工作目录执行：
+
+```powershell
+# 先Test-Path本机node_modules/vite/bin/vite.js存在。
+node node_modules/vite/bin/vite.js build --base=/releases/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/ --outDir=../.local/frontend-prefix-verification
+# here-string经node --input-type=module：读取输出HTML/CSS/JS，断言HTML assets前缀、CSS images/valley-farm.png前缀、JS BASE_URL前缀，拒绝旧根图片url。
+```
+
+构建及上述断言通过；Vite提示outDir在项目根外不会清空，这是使用新ignored目录的预期提示，没有使用emptyOutDir删除目录或改源文件。它不替代浏览器视觉验收。未修改已通过CI的代码。
+
+最终用apply_patch补入本日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks检查后仅本地提交 `docs: record frontend publication preparation and CI evidence`，git status --short。未为文档重复推送/启动CI。等待明确批准 **4新增/2更新及首次新执行验证**，同时批准CloudFront函数code发布指向管理交接；实际更新前后端仍有两道新的人工审批。真实条件上传/AWS TestFunction/传播/前端回退未验收，不能宣称已上线自动前端发布。
