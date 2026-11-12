@@ -1393,3 +1393,63 @@ GetPipelineExecution确认本次ReleaseMode.resolvedValue=**rollback_drill**。�
 ApproveTrafficShift **InProgress**，部署演练尚未执行。向用户明确执行96861976、模式rollback_drill、Blue5/Green6，第二道批准后观察10%即停止、验证CodeDeploy自动回滚并恢复Blue5；不是常规五分钟后全量发布。自动回滚ID、恢复成功与公开API均待实际验收，不把Green通过称为回滚通过。
 
 apply_patch更新本日志、PROJECT_PLAN.md、docs/rollback-drill.md；diff/path/Gitleaks检查后仅本地 `git commit -m 'docs: record rollback drill Green and second approval evidence'`、git status --short。不推送文档触发额外CI，不代理审批，不直接CreateDeployment/UpdateAlias，不重新构建已批准候选。
+
+## 20. 受控停止与自动回滚真实演练（2026-11-12）
+
+用户回复ok后先核对AWS；git status --short干净。使用kong-dev/Tokyo，执行list-action-executions（execution96861976，stage/status/external/error摘要）、deploy list-deployments（app kongportfolio/group production）、CodeBuild list-builds-for-project(kongportfolio-deploy，DESCENDING/max-items1)、GetAlias(version/weights)。第二道ApproveTrafficShift **Succeeded**，用户审阅 ID **8c09ca5c-e22d-466c-bdcc-a5a7c16436f6**；DeployProduction InProgress，初始live5/无权重。
+
+`codebuild batch-get-builds --ids kongportfolio-deploy:8a900c73-0933-494a-90cc-7926500deb82 --region ap-northeast-1 --output json` 返回源码8ad190ba366b6967793675098f5df1fab26fd324、BUILD正在执行deploy-production.mjs。元数据 `.local/rollback-drill-live-build.json`；get-log-events(日志组/aws/codebuild/kongportfolio-deploy、stream8a900c73-0933-494a-90cc-7926500deb82、query events[].message)保存 `.local/rollback-drill-live-build.log`，UTF8环境/控制台设置，只展示运行摘要。
+
+GetPipelineExecution再次确认ReleaseMode.resolvedValue=rollback_drill、整体InProgress。只由经两道审批的控制器执行演练；本机没有代理审批、直接更新别名、重启流水线或手动制造生产错误。
+
+### 20.1 实际停止和AWS自动回滚
+
+约20秒短等待后，deploy list-deployments逐个get-deployment，过滤本次description或带rollbackInfo的记录，保存 `.local/rollback-drill-deployments.json`。观察到：
+
+- 本次Blue5→Blue5基线 **d-CRSIZL0EM Succeeded**；正常的上一版发布revision不是精确Blue5-only哈希，所以控制器先创建可信基线。
+- 灰度 **d-2OPWFF0EM Stopped**，配置LambdaCanary10Percent5Minutes，error=MANUAL_STOP/abort request，这是演练受控停止而非应用故障。
+- 原灰度rollbackInfo.rollbackDeploymentId=**d-M40WD11EM**；AWS该回滚部署 **Succeeded**，反向rollbackTriggeringDeploymentId=d-2OPWFF0EM。
+- 实际GetAlias **live5/无权重**。第一次查询时构建仍在完成恢复验证，未把流量已恢复提前称为整条流水线成功。
+
+刷新batch-get-builds/actions/get-log-events，CodeBuild **8a900c73-0933-494a-90cc-7926500deb82 SUCCEEDED**、源码8ad190b，DeployProduction Succeeded，云日志显示 `CodeDeploy automatic-rollback-verified: d-2OPWFF0EM; final live 5`。新元数据 `.local/rollback-drill-live-build.json`、actions `.local/rollback-drill-final-actions.json`；healthUP。没有本机stop/create-deployment/UpdateAlias；停止与自动恢复来自已审控制器和CodeDeploy。
+
+### 20.2 版本化演练报告与自动回滚关联独立复核
+
+```powershell
+New-Item -ItemType Directory -Path .local/rollback-drill-final-review-96861976 -Force
+# key从本次DeployProduction.outputArtifacts取得。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Deployment/kTYEbQo --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/Deployment/kTYEbQo --version-id JuhaOcqjwDh0ti5OqgjT6MOjWt64w4En --region ap-northeast-1 .local/rollback-drill-final-review-96861976/report.zip --output json
+Get-FileHash -LiteralPath .local/rollback-drill-final-review-96861976/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限唯一report.json，读取后释放流。
+& $aws deploy get-deployment --deployment-id d-2OPWFF0EM --region ap-northeast-1 --output json
+& $aws deploy get-deployment --deployment-id d-M40WD11EM --region ap-northeast-1 --output json
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 5 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 96861976-0f9e-4a0c-b49e-9c75c0c1762b --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion,variables:variables}' --output json
+```
+
+报告外层SHA **12afd95fc2ce6568adb1f80082fd21f0e8bf245570f89b47ff91b98deb8ad2b3** 匹配CodeBuild artifacts.sha256sum。断言schema/kind/passed=true、mode=rollback_drill、outcome=automatic-rollback-verified、execution/source/release匹配已审Green、Blue5/Green6及原部署ID正确，recovery.requested/verifiedBlue=true、rollbackDeploymentId=d-M40WD11EM。四次观察包含基线Created/Succeeded、canary Created及 **Blue5+Green6权重0.1**。最终恢复证据存recovery，不假称canary为Succeeded。
+
+独立匹配AWS原部署Stopped及其回滚ID、回滚Succeeded及反向触发ID、固定app/group。实际数字版本5 CodeSha256与原稳定上线时的已审报告相同；GetAlias确认live5/空权重。完整回滚元数据 `.local/rollback-drill-success-deployment.json`，下载原件/report/object/review仅在上述ignored目录。整体pipeline **Succeeded**/version5/mode rollback_drill；这是演练成功，不是Green6被全量推广。
+
+### 20.3 附加核验假设纠正及恢复后的公开API
+
+额外本地核验曾直接调用isBlueBaseline，要求**AWS生成的自动回滚revision摘要**与手写Blue5-only基线摘要完全一致，断言失败，HTTP检查尚未发出；这是核验脚本对AWS返回形状的额外假设，不是部署控制器或线上失败。只读get-deployment比较：手写基线摘要274253aa…、自动回滚摘要69c59c67…不同，API不返回原content，不能声称两份文本相同。
+
+继续 `deploy list-deployment-targets --deployment-id d-M40WD11EM` 返回kongportfolio-prod:live，再 `get-deployment-target --deployment-id d-M40WD11EM --target-id kongportfolio-prod:live`，留存 `.local/rollback-drill-success-target.json`：目标与生命周期均Succeeded。该历史lambdaFunctionInfo还显示原current5/target6/targetVersionWeight1，不用于推断实时路由；以实际Lambda GetAlias/live5与不可变版本代码匹配作为当前恢复证据。没有放宽部署控制器的基线校验或修改权限/生产状态，也没有把这条附加断言悄悄说成通过。
+
+重新运行本地PowerShell单引号here-string → `node --input-type=module`：断言实际回滚target的deploymentId/targetId/status，随后循环现有staging-contract.mjs的七项contracts，固定HTTPS域名fetch、redirect=error/30秒超时、status/marker/no-store断言、间隔1200ms。GET health、GET profile?lang=ja/zh/en、POST Bedrock占位、GET不存在API=404、POST profile=405，**七项全部通过**。只保存结果摘要 `.local/rollback-drill-final-public-api.json`，没有响应原文/真实Bedrock调用。最后describe-alarms=**OK**、GetAlias=**5/无权重**。
+
+```powershell
+& $tf '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+两套实际plan均 **No changes**，`.local/rollback-drill-final-production-plan.log`、`rollback-drill-final-cicd-plan.log`。没有再次apply。恢复后公开HTTP验证不是原生浏览器/视觉/容器构建验证。
+
+### 20.4 收尾与覆盖范围
+
+受控stop-on-request→CodeDeploy自动回滚的真实路径已验收；没有制造应用故障或改告警状态，因此**应用故障/CloudWatch告警触发路径未单独演练**。未从本机/构建直接UpdateAlias，未手工另建恢复部署伪造自动回滚，未发布坏代码。线上最终保持演练前稳定版本5。
+
+用PowerShell单引号here-string/Set-Content将docs/rollback-drill.md整理为简短实际结果，apply_patch更新docs/codedeploy-next-story.md、PROJECT_PLAN.md和本日志，保留全部历史于根日志。运行diff/path/Gitleaks检查，暂存四文档、本地提交 `docs: record successful automatic rollback drill and recovery evidence`，最后git status --short。文档不额外推送触发CI；应用源码/制品没有改变。完成本次单Story供审阅，下一增量为前端自动发布；真实Bedrock仍后续。

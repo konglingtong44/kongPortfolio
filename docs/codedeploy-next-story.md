@@ -1,4 +1,4 @@
-# S3-07：首次 CodeDeploy 灰度成功，回滚演练待验收
+# S3-07：CodeDeploy 灰度与受控自动回滚已验证
 
 2026-11-12 已完成真实后端切流：执行 `98380c85-fbbc-4b50-9416-7f10ddccdc0c`、源码 `c0a0a2ce2e8f1018e30b968fa6e40e5969792a75`，两道审批均由用户在 AWS 完成，整条流水线 Succeeded。
 
@@ -16,6 +16,6 @@
 
 只由CodeDeploy服务角色改生产别名。发布控制器核对同次源码、候选/STG/Green证据、两道成功审批及live快照，观察实际权重与公开API；异常请求CodeDeploy停止/恢复，构建不能直接UpdateAlias或自行审批。旧审批不授权新制品。
 
-尚未验收：真实故障/告警触发及自动回滚演练。当前没有故意制造生产故障，也未发生自然故障，因此只验证了恢复代码/模拟路径与配置，不能称实际回滚通过。前端CloudFront推广/蓝绿、真实Bedrock仍属后续增量；本次未更新前端静态包，Bedrock仍为PREPARING占位，没有真实模型调用。浏览器视觉/容器构建未在本次重新验证。
+后续受控停止→自动回滚已真实通过：[演练结果](rollback-drill.md)。灰度Green6在10%停止，AWS自动回滚成功，线上恢复Blue5；未单独演练应用故障/CloudWatch告警触发路径。前端CloudFront推广/蓝绿、真实Bedrock仍属后续增量；未更新前端静态包，Bedrock仍为PREPARING占位，没有真实模型调用。浏览器视觉/容器构建未在本次重新验证。
 
 本地最终证据：`.local/deployment-final-review-98380c85/report.json`、`review.json`、`.local/deployment-final-public-api.json`；忽略目录不提交Git。查看：[AWS流水线](https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1)。

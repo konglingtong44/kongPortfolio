@@ -1,21 +1,23 @@
-# S3-07R：受控停止与自动回滚演练
+# S3-07R：受控停止与自动回滚演练已通过
 
-**当前停在第二道人审。** 新执行96861976第一道已通过，Green**版本6**七项验证成功；与STG7同一候选，报告/实际代码/审批变量/模式已独立核对。线上仍Blue**版本5**、原RevisionId/无权重、healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment核对 **mode rollback_drill、Blue5、Green6** 后手动批准：这次会在真实10%时主动停止，验证自动恢复Blue5，不是常规全量发布。真实自动回滚仍待此步执行，下面为准备阶段历史；日志第19节。
+2026-11-12，执行 `96861976-0f9e-4a0c-b49e-9c75c0c1762b`、源码 `8ad190ba366b6967793675098f5df1fab26fd324`、模式 `rollback_drill`。两道人审由用户完成，整个演练流水线 Succeeded。
 
-当前：准备代码8ad190b的AWS前后端CI均成功；Terraform实际只更新pipeline1处，0新增/0删除，后续No changes。新执行 `96861976-0f9e-4a0c-b49e-9c75c0c1762b` 固定该源码，已从AWS读回ReleaseMode=rollback_drill，先验证到第一道人工审批。线上仍稳定版本5，尚未做真实回滚。
+| 证据 | 实际结果 |
+|---|---|
+| 演练前稳定版本 | Blue5 |
+| 健康候选 | Green6，与STG7同一制品 |
+| Blue-only基线 | d-CRSIZL0EM Succeeded |
+| 灰度 | d-2OPWFF0EM，控制器观察到Blue5 + Green6权重10% |
+| 受控停止 | 原灰度Stopped/MANUAL_STOP，符合演练预期 |
+| 自动回滚 | d-M40WD11EM Succeeded，AWS双向rollback关联指向原灰度 |
+| 最终线上 | live=5，无附加权重，数字版本代码SHA与演练前稳定版相同 |
+| 公开HTTPS | health、三语言profile、Bedrock占位、404/405七项通过 |
+| Terraform/告警 | 两套plan No changes；告警OK |
 
-已到第一道审批：Candidate与STG成功、STG版本7七项通过。版本化报告外层SHA、同次执行/源码/候选哈希、实际Lambda和审批导出变量已独立核对；release `13d4d232f880fb581fcd890881eaf13be39ff19d02693f7059901a1b40ebf506`。整体InProgress/version5/mode rollback_drill，ApproveProduction等待人工，线上live5/无权重。请核对新执行96861976/STG7，批准ApproveGreenCreation；此步只发布/验证Green，真正停止与回滚在第二道人审之后。
+独立下载DeploymentReport，外层SHA与CodeBuild一致；mode/outcome/源码/执行/release/Blue5/Green6及回滚ID与实际AWS一致。报告明确 `outcome=automatic-rollback-verified`，不是新版本全量发布。原canary停止与演练流水线成功是不同层面的预期状态。
 
-目标：沿现有 AWS 流水线发布健康候选，在观察到10%权重后主动停止，验证 CodeDeploy 自动恢复本次 Blue。最终继续使用演练前的稳定版本；不发布坏代码、不修改生产告警状态，不宣称覆盖告警触发路径。
+实现：默认 `ReleaseMode=deploy`，仅显式`rollback_drill`才受控停止。模式绑定GetPipelineExecution.resolvedValue并在第二道人审显示；观测真实10%后调用StopDeployment(autoRollbackEnabled=true)，必须读到自动回滚ID/Succeeded、恢复Blue/无权重/公开API才通过。没有手工追加部署伪装自动回滚，没有从本机或构建直接UpdateAlias。
 
-执行参数 `ReleaseMode=rollback_drill`，默认正常发布仍 `deploy`。模式在第二道人工审批中显示，并与 GetPipelineExecution 返回的 resolvedValue 核对；未知/不一致模式拒绝执行。两道审批仍由用户在 AWS 完成，旧审批不复用。
+覆盖范围：已验证stop-on-request→自动回滚真实路径；未故意发布坏代码或改告警状态，因此应用故障/CloudWatch告警触发路径未单独演练。网络失联/强制终止仍需从CodeDeploy ID核对恢复。后续可按需要补告警演练，不把本次结果扩大为所有故障场景覆盖。
 
-流程：Candidate → STG → 人审1 → Green验证 → 人审2（明确演练模式）→ Blue-only基线 → 10%canary → `StopDeployment(autoRollbackEnabled=true)` → 独立自动回滚部署。
-
-成功必须同时满足：观察到10%权重；请求停止本次部署；原部署终态；AWS返回 rollbackDeploymentId；该回滚部署属于相同app/group且 Succeeded；live恢复Blue/无权重；公开health/profile通过。报告明确 `mode=rollback_drill`、`outcome=automatic-rollback-verified`。原canary通常为Stopped，流水线演练任务可以成功；不把原canary误称为正常发布成功。
-
-缺回滚ID、回滚失败、健康检查失败或错过灰度窗口，均不报告演练成功。错过窗口时可按正常恢复逻辑将Green恢复Blue，但仍判演练失败；演练停止后不靠额外手工部署伪造“自动回滚”证据。网络失联/强制终止仍需从真实CodeDeploy ID核对和恢复。
-
-范围：只更新已有pipeline，0新增/0删除，不扩IAM权限。复用现有CodeBuild/CodeDeploy/Lambda/告警，按已有分钟、请求和日志计费；没有新增常驻资源。候选与Green仍需新执行两道人审。应用正常CI及16项Terraform模拟计划、Node演练成功/缺ID/失败/错过窗口/模式不一致测试；真实停止/自动回滚尚待审批后验证。
-
-参考：[StopDeployment](https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_StopDeployment.html)、[自动回滚](https://docs.aws.amazon.com/codedeploy/latest/userguide/deployments-rollback-and-redeploy.html)、[执行变量](https://docs.aws.amazon.com/codepipeline/latest/APIReference/API_ResolvedPipelineVariable.html)。全部操作记录根日志第18节。
+没有新增资源或IAM权限，仅更新过现有pipeline1处。完整命令、失败的附加核验假设及纠正、AWS证据在根日志第18—20节。最终报告仅存忽略目录 `.local/rollback-drill-final-review-96861976/`，公开检查摘要 `.local/rollback-drill-final-public-api.json`。下一增量是前端S3/CloudFront自动发布；真实Bedrock仍为后续工作。

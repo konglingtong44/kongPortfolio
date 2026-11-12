@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07R — Controlled stop and automatic rollback verified (2026-11-12)
+
+User completed both gates for96861976/8ad190b/rollback_drill. Blue5-only baseline d-CRSIZL0EM Succeeded; canary d-2OPWFF0EM observed Green6 at10%, then Stopped/MANUAL_STOP as intended. AWS automatic rollback d-M40WD11EM Succeeded with bidirectional triggering-deployment links; actual live5/no weights and immutable stable code unchanged. Report outer SHA/source/mode/outcome/observations/recovery IDs independently matched AWS. Controller8a900c73 and whole pipeline Succeeded. Seven restored public HTTPS contracts pass, alarmOK, production/CICD plans No changes. This verifies stop-on-request automatic rollback, not independently app-failure/alarm-trigger scenarios. No bad code, alarm-state manipulation, extra manual recovery or direct alias update. Root log20, concise docs/rollback-drill.md; pause for review before frontend publishing increment.
+
 ## S3-07R — Drill Green verified; waiting gate2 (2026-11-12)
 
 User completed gate1 for96861976 / ReleaseMode rollback_drill. Green builda562a361 at8ad190b Succeeded; Green6/STG7 same release13d4d232…, seven contracts pass. Downloaded exact report version and matched outer SHA, same-run approval/STG/code identity, immutable qualifier6 SHA and approval exports. Live remainsBlue5/unchangedRevisionId/no weights/healthUP. ApproveTrafficShift InProgress; no drill deployment yet. Next user approval explicitly permits stop-at-10% and verify automatic restoration toBlue5, not full promotion. Real rollback still unverified; root log19.
