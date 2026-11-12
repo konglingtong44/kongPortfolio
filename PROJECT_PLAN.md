@@ -2,6 +2,10 @@
 
 ## S3-06 — Production Green preparation (2026-11-12, awaiting approval)
 
+User subsequently approved: 4 creates / 2 updates / 0 deletes applied, post-apply plan No changes. Actual six-stage pipeline version 3 has both Manual gates; Green role lacks routing/config/approval operations. New pinned-source execution c02bc4e6 at 776e24f started, waiting for fresh STG and human gate 1. No production Green version or traffic update yet.
+
+Cloud verification now at human gate 1: Candidate and STG succeeded, STG published version 4 passed all seven contracts. Downloaded exact report object version; CodeBuild outer SHA, source/execution/release/backend SHA, immutable Lambda code and approval exports match. Release 07ad6c1f23a3abdeb6332719ba846aa81f101db71a786a8681827b797eaa3d5b. Overall execution InProgress at ApproveProduction; Green/approval 2 not run. Production live remains v2/no weights, health UP; post-STG CICD plan No changes. Await user UI approval; never approved by agent.
+
 Source 18cf862 published; both existing AWS CI builds and GitHub statuses success, frontend 40 tests/build, backend 9+3 tests/ZIP smoke. CICD 13 mocked plans, production 3 domain plans and Green guards passed. Final documentation evidence committed locally; no extra documentation-only CI push.
 
 Old execution 1222a3dd is now Succeeded after the user's manual approval; it contained no Green action. Prepared opt-in production version publication and seven direct-invoke checks between two human gates. Fresh source/execution needs a fresh approval 1. Actual CICD plan: 4 create / 2 update / 0 delete; disabled plan and production ownership-handoff plan: No changes. Production code and alias release fields explicitly move to pipeline/later CodeDeploy ownership to avoid accidental Terraform routing. No Green apply, production version publication or traffic shift yet. CodeDeploy/rollback/frontend promotion remain later increments. See docs/green-approval.md and root log section 8 for commands, tests and cloud gaps.

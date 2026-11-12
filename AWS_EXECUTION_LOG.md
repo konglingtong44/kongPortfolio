@@ -738,3 +738,77 @@ Invoke-RestMethod -Uri 'https://api.github.com/repos/konglingtong44/kongPortfoli
 查询中间状态 frontend SUCCEEDED/backend BUILD 时继续等待，没有新 start-build；两次短等待约 45/30 秒。最终两个构建均 SUCCEEDED，resolvedSourceVersion 都等于 18cf862；GitHub combined、ci/frontend、ci/backend 全 success。云端日志确认 Green guard 运行、frontend 40 tests/build、backend 9 HTTP + 3 Lambda tests/ZIP smoke，二者 applicationChecksRan=true。本地结果 `.local/green-source-ci.json`、`green-frontend-ci.log`、`green-backend-ci.log`，只存忽略目录。未执行真实 Green 项目或启动新候选流水线。
 
 最后将本验证结果补入 PROJECT_PLAN.md、docs/green-approval.md 和本日志，执行 `git diff --check`、路径检查、Gitleaks，再仅本地提交 `docs: record Green preparation CI evidence`；不为文档再次推送触发一对 CI。下一次授权执行时一起推送。等待 4 新增/2 更新、生产代码与别名发布字段管理交接的明确批准；批准后仍保留新执行两道人工 gate。
+
+## 9. 已批准 Green 基础设施与新执行（2026-11-12）
+
+用户对 4 新增/2 更新、代码/别名发布字段管理交接回复 ok，并确认两道发布审批由用户手动执行，随后说“行 继续”。本次执行已批准的创建与首次流水线验证，到新执行的人工审批 1 停止，不代替用户审批。
+
+### 9.1 执行前核对与发布准备
+
+读取 AGENTS.md、根日志尾部、docs/green-approval.md、本机忽略的 CICD 输入；运行 `git status --short`、`git log -2 --oneline`、`git rev-parse HEAD`，工作区原本干净，文档提交为 `776e24f566bfff160fcc27b7d5b17ea48cd33f53`，应用/脚本仍为已经 CI 验证的 18cf862 内容。`Select-String` 只读确认候选流水线 DetectChanges=false、两道 Manual gate。
+
+```powershell
+$env:AWS_PROFILE='kong-dev'
+& D:\software\AWSCLI\aws.exe sts get-caller-identity --query Account --output text
+Get-FileHash -LiteralPath .local/candidate-verification-e7b0712d/unpacked/backend.zip -Algorithm SHA256
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-detailed-exitcode' '-no-color'
+# 本机 ignored terraform.tfvars 追加 enable_green = true；没有提交该输入文件。
+git check-ignore infra/terraform/cicd/terraform.tfvars infra/terraform/cicd/green.tfplan
+. ./scripts/tools.ps1
+git push
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' plan '-input=false' '-out=green.tfplan' '-no-color'
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' show '-json' green.tfplan
+```
+
+STS 账号 561798268037 正确；bootstrap ZIP SHA 88e27021494b7f63c38af9b11cd332be5c7849bba4e75d81a9162fef9e22a4c8 与既有输入一致。生产管理交接 plan No changes，日志 `.local/green-approved-production-plan.log`。776e24f 已通过 push hook 全历史 Gitleaks 扫描并推送；没有合并 main。CICD 新计划 `.local/green-approved-plan.log`，解析 JSON 拒绝删除或偏离 4 create/2 update 的计划。后续仅 apply 这个已核对计划。
+
+### 9.2 已执行创建与新流水线启动
+
+```powershell
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' apply '-input=false' '-no-color' green.tfplan
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+$aws='D:\software\AWSCLI\aws.exe'
+& $aws codepipeline get-pipeline --name kongportfolio-candidate --region ap-northeast-1 --query 'pipeline.{version:version,type:pipelineType,mode:executionMode,stages:stages[].{name:name,actions:actions[].{name:name,provider:actionTypeId.provider}}}' --output json
+& $aws codepipeline list-pipeline-executions --pipeline-name kongportfolio-candidate --max-results 3 --region ap-northeast-1 --query 'pipelineExecutionSummaries[].{id:pipelineExecutionId,status:status}' --output json
+& $aws codebuild batch-get-projects --names kongportfolio-green --region ap-northeast-1 --query 'projects[].{name:name,role:serviceRole,timeout:timeoutInMinutes,concurrency:concurrentBuildLimit,buildspec:source.buildspec}' --output json
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=776e24f566bfff160fcc27b7d5b17ea48cd33f53' --region ap-northeast-1 --output json
+```
+
+Apply 成功：**4 added / 2 changed / 0 destroyed**，日志 `.local/green-apply.log`；后续 plan No changes（`.local/green-post-apply-plan.log`）。实际 pipeline version=3、V2 QUEUED，六阶段且两个人工 gate 顺序正确；实际 Green 项目角色/十分钟超时/并发一/buildspec 匹配。列执行确认更新配置没有自动启动新流水线，随后仅一次手动启动固定 SHA，返回 ID 保存 `.local/green-pipeline-execution.json`。SourceRef 仍是完整 clone reference，之后 Candidate/STG/Green 使用同次执行制品；不在审批后重新打包。
+
+新 execution `c02bc4e6-079b-4a53-835b-84c6877bb2d6`，Source 已 Succeeded 且 revision 是 776e24f；候选构建 `kongportfolio-candidate:115e7a7c-6553-4528-b17a-20515d1a0e2a`。运行期间只读 `list-action-executions --filter pipelineExecutionId=<本次ID>`，保存 `.local/green-run-actions.json`，没有请求审批 token。用 `list-builds-for-project --project-name kongportfolio-candidate --sort-order DESCENDING --max-items 1` 和 `batch-get-builds --ids <构建ID>` 对照实际阶段及 resolvedSourceVersion。一次约 40 秒短等待没有启动额外构建。
+
+`aws iam get-role-policy --role-name kongportfolio-green-build --policy-name publish-and-verify-green-without-routing --query PolicyDocument --output json` 只读保存 `.local/green-deployed-role-policy.json`；解析确认没有 UpdateAlias/CreateAlias/UpdateFunctionConfiguration/PutApprovalResult。`aws lambda get-alias --function-name kongportfolio-prod --name live --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}'` 确认为 2/无权重；`Invoke-RestMethod https://konglingtong44.com/api/health` 返回 UP。更新本日志、PROJECT_PLAN.md、docs/green-approval.md 记录已 apply 与云验证缺口。
+
+### 9.3 Candidate/STG 真实结果与独立报告检查
+
+继续用同次 execution 的 list-action-executions 查询，每次保存忽略的 `.local/green-run-actions.json`；约 35 秒、25 秒短等待后 Candidate 与 VerifyStaging 均 Succeeded，ApproveProduction / ApproveGreenCreation 为 InProgress。没有自动或 CLI 审批。
+
+`aws codebuild batch-get-builds --ids kongportfolio-candidate:115e7a7c-6553-4528-b17a-20515d1a0e2a` 返回 SUCCEEDED，匹配源码 776e24f；元数据 `.local/green-candidate-build.json`。`logs get-log-events --log-group-name /aws/codebuild/kongportfolio-candidate --log-stream-name 115e7a7c-6553-4528-b17a-20515d1a0e2a --query 'events[].message' --output json` 保存 `.local/green-candidate-build.log`，过滤摘要确认 ci.sh all、9+3 后端测试和候选完整验证，applicationChecksRan=true/sourceDirty=false。构建包含前端测试/打包及 ZIP-only JVM smoke；没有构建 Docker 镜像。
+
+STG 构建 `kongportfolio-stg:e092253b-dac7-4163-95d6-4fb793b1be3d`，batch-get-builds 返回 SUCCEEDED，源码同为 776e24f，保存 `.local/green-staging-build.json`。CodeBuild 内部运行既有 `scripts/verify-staging.mjs`：STS → get-function-configuration → list-versions-by-function → update-function-code（RevisionId、原 Candidate/backend.zip、publish）→ configuration-only function-updated waiter → get-function-configuration --qualifier 4 → 七次 lambda invoke --qualifier 4 → 校验并写 StagingReport。具体通用 CLI 参数见 7.3 节，本次不是旧版本 3。七项 health、ja/zh/en、Bedrock placeholder、404、405 全通过；没有真实模型调用。
+
+本次 releaseId **07ad6c1f23a3abdeb6332719ba846aa81f101db71a786a8681827b797eaa3d5b**，backend SHA **ece55eafae91e22c4a92c3e57355151752063dc34e1bc87e939b0ff81fd5634f**，STG version **4**。候选 key `kongportfolio-candid/Candidate/5Wy5cVH`，报告 key `kongportfolio-candid/StagingRep/5uGIvGp`。审批导出 VERIFIED_RELEASE/VERIFIED_VERSION 与独立报告相符。
+
+独立报告操作（本机仅只读 AWS）：
+
+```powershell
+New-Item -ItemType Directory -Path .local/green-staging-review-c02bc4e6 -Force
+# 从本次 action outputArtifacts 读取 bucket/key，不猜测路径。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/5uGIvGp --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/5uGIvGp --version-id cSoQs7djby6lU00NOI5z2oMyA1m_8MIk --region ap-northeast-1 .local/green-staging-review-c02bc4e6/report.zip --output json
+Get-FileHash -LiteralPath .local/green-staging-review-c02bc4e6/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 只接受唯一 report.json，读取内容后立即释放 stream/zip。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 4 --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id c02bc4e6-079b-4a53-835b-84c6877bb2d6 --region ap-northeast-1 --query 'pipelineExecution.{id:pipelineExecutionId,status:status,version:pipelineVersion}' --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& D:\software\Terraform\terraform.exe '-chdir=infra/terraform/cicd' plan '-input=false' '-detailed-exitcode' '-no-color'
+```
+
+报告外层 SHA `a748b8366c3ae7157e97c28e9d7c40ad19af4228107c0bae418c72a39a90b91c` 匹配 CodeBuild artifacts.sha256sum，报告 execution/source/release/七项结果正确，Lambda 实际 CodeSha256 解码后匹配 backend SHA。本地保留 report.zip/report.json/review.json/object.json，仅在 `.local/green-staging-review-c02bc4e6/`。STG 更新后 Terraform plan 仍 No changes，证明未回滚到 bootstrap（`.local/green-staging-ownership-plan.log`）。
+
+整体 execution **InProgress**、version 3，停在人工 gate 1；生产 live 仍 **2 / 无权重**。Green 项目已创建但没有运行，没有发布生产新版本、没有调用 put-approval-result 或任何 update-alias。提供控制台链接：https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1 ，用户核对新执行/STG4 后点击 ApproveGreenCreation 的“审阅 → 批准 → 提交”。批准后才运行 Green，之后停第二道审批。
+
+### 9.4 文档和 Git 收尾
+
+用 apply_patch 更新本日志、PROJECT_PLAN.md、docs/green-approval.md，随后运行 `git diff --check`、`node .githooks/check-staged-paths.mjs --all`、`gitleaks dir --redact --no-banner .`，仅提交这三个文档：`git commit -m 'docs: record Green infrastructure and fresh STG approval gate'`。文档留本地，不为本次等待审批再触发额外 CI；下次获授权继续时推送。既有已固定候选源码和制品不变。日志覆盖本地读取/输入修改/文档编辑、Git/扫描、AWS 写入/读取、公开 HTTP 和等待，不保存凭证、审批 token 或私有响应原文。
