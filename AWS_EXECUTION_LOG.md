@@ -1100,3 +1100,43 @@ git status --short
 结果：第二道 ApproveTrafficShift 仍 **InProgress**，第一道/Green 及之前阶段均 Succeeded，CodeDeploy deployments 与 deploy CodeBuild builds 均空，live仍2/无权重。这是等待用户第二道手动审批，并非构建失败或已切流。将控制台链接、f2ed11c5、Blue2/Green4 和真实10%/五分钟→100%后果明确告知用户。
 
 只编辑本日志；执行 `git diff --check`、路径检查、Gitleaks，暂存日志并本地 `git commit -m 'docs: record pending manual traffic approval status'`、`git status --short`。没有云端写入/构建/推送/审批，也未改候选或部署代码。
+
+## 15. 第二道人工审批后的 CodeDeploy 实际执行（2026-11-12）
+
+用户回复“审批完了”，首先核对 AWS 而非代理审批。git status --short 干净。所有 CLI 使用 kong-dev profile / ap-northeast-1；当前执行 f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466。
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466 --region ap-northeast-1 --query 'actionExecutionDetails[].{stage:stageName,status:status,external:output.executionResult.externalExecutionId,error:output.executionResult.errorDetails.message}' --output json
+& $aws deploy list-deployments --application-name kongportfolio --deployment-group-name production --region ap-northeast-1 --query deployments --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-deploy --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-deploy:e67ebb2b-d5e2-4fb3-8f27-2a5ff64fefbe --region ap-northeast-1 --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-deploy --log-stream-name e67ebb2b-d5e2-4fb3-8f27-2a5ff64fefbe --region ap-northeast-1 --query 'events[].message' --output json
+```
+
+第二道 ApproveTrafficShift Succeeded，用户审阅 ID **247a947b-d0c8-4d36-acb6-f53775245758**；DeployProduction InProgress。部署 CodeBuild **e67ebb2b-d5e2-4fb3-8f27-2a5ff64fefbe** 的源码为固定 ff77d627f3a5182bac6872375dcd828199e1e57a，BUILD 已执行 node scripts/deploy-production.mjs。初始 deploy list 空、live2/无权重。元数据 `.local/deployment-live-build.json`、UTF8 日志 `.local/deployment-live-build.log`（通过 PYTHONUTF8/控制台 UTF8），没有保存审批 token。没有人工另启动构建/流水线或创建部署，发布由已审批流水线继续。
+
+### 15.1 Blue 基线实际成功，后续校验因 AWS 返回形状停止
+
+约20秒短等待后再次 `deploy list-deployments`，对每个 ID `deploy get-deployment --deployment-id <ID> --query 'deploymentInfo.{id:deploymentId,status:status,config:deploymentConfigName,description:description,error:errorInformation,rollback:rollbackInfo}'`。基线 **d-0XJZB7ZDM Succeeded**，配置 LambdaAllAtOnce，描述准确绑定本次执行；CodeBuild 却 FAILED。刷新 get-log-events 并 Select-String 提取错误：`Initial Blue baseline was not recorded; refuse canary`。不是切流失败：没有创建主 canary，live2/无权重且公开 health UP。
+
+读取 `deploy get-deployment --deployment-id d-0XJZB7ZDM --query 'deploymentInfo.{status:status,app:applicationName,group:deploymentGroupName,revision:revision}'` 与 `get-deployment-group --query deploymentGroupInfo.lastSuccessfulDeployment`：AWS 已记录本组 lastSuccessfulDeployment，但 GetDeployment.revision.appSpecContent **仅返回 sha256，不返回原 content**。原代码尝试解析 content，保守返回 false，因此阻断切流。没有 IAM 错误或权限扩张需求；首次 Blue→Blue 的服务接受已在真实 AWS 验证。
+
+再次 batch-get-builds / list-action-executions 保存 `.local/deployment-live-build.json`、`.local/deployment-failed-actions.json`：DeployProduction Failed。失败构建仍上传报告到 `kongportfolio-candid/Deployment/t7XD7tc`，CodeBuild 外层 SHA 0faf8e3db426ea932943ab8afab2c776fb4f7752c44d2dd3ee8e0f3d7bca97b4（仅从元数据记录，没有下载报告）；不能将失败流水线称为成功。
+
+### 15.2 精确哈希校验修复与本地复现
+
+使用 apply_patch 修改 scripts/deployment-contract.mjs 新增 isBlueBaseline：核对 Succeeded、固定 app/group、AppSpecContent 类型和**由固定函数/live/Blue→Blue 生成的完整 JSON SHA256**。修改 deploy-production.mjs 使用该纯函数，避免读取不存在的 content。修复允许正确哈希的已记录基线，错误版本/组/状态/哈希仍拒绝，不跳过首次保护、不新增权限。
+
+test-deployment.mjs 新增真实返回形状 fixture（只有哈希）、错误Blue/失败状态/错误组/篡改哈希的断言。命令：
+
+```powershell
+node scripts/test-deployment.mjs
+node --check scripts/deploy-production.mjs
+& $aws deploy get-deployment --deployment-id d-0XJZB7ZDM --region ap-northeast-1 --output json > .local/deployment-blue-baseline.json
+node --input-type=module -e "import {readFileSync} from 'node:fs'; import {isBlueBaseline} from './scripts/deployment-contract.mjs'; if(!isBlueBaseline(JSON.parse(readFileSync('.local/deployment-blue-baseline.json','utf8').replace(/^\uFEFF/,'' )).deploymentInfo,'2')) process.exit(1); console.log('Actual recorded Blue baseline digest verified');"
+```
+
+全部测试通过；实际 AWS 基线哈希 **9bfd87a600a5ac75419eacb865bba5f8813859858b8d3c898486ba0a1d8689a2** 与本地 Blue2→Blue2 AppSpec 哈希一致。只读取生产状态，没有切换或恢复别名；线上没有偏离 Blue，因此不需要回滚。
+
+将修复和失败记录写入 PROJECT_PLAN.md、docs/codedeploy-next-story.md、本日志，扫描/diff/path 检查后提交推送 `fix: verify CodeDeploy baseline using returned AppSpec digest`。随后启动固定新 SHA 的候选流水线，重新验证全部 Candidate/STG 并停第一道人工审批；旧审批绑定旧执行，绝不拿来批准新候选或把原 pipeline 运行代码暗中替换。没有新资源或 Terraform/IAM 变更。

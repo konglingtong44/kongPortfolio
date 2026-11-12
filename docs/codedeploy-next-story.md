@@ -1,5 +1,7 @@
 # S3-07：CodeDeploy 真实切流（基础设施已创建，待人工审批）
 
+**最新运行结果：首次 Blue2→Blue2 基线 `d-0XJZB7ZDM` 已成功，后续校验停止，尚未切流。** GetDeployment 返回 AppSpec 哈希、不含 content；原代码按 content 校验而拒绝继续。现改为严格匹配完整 Blue-only AppSpec SHA256 和成功状态/app/group/type，真实返回 fixture 与负例测试通过。旧执行 f2ed11c5 的 DeployProduction Failed，线上仍2/无权重、health UP。修复源码须启动新执行并重新人工审批两次，不重用旧审批。下文“待第二道审批”是旧执行阶段历史；真实 canary/回滚仍待验证。
+
 **当前停在第二道审批。** 用户已完成本次第一道审批；Green 生产**版本4**七项检查通过，独立核对报告及实际代码成功，线上仍 Blue**版本2**、原 RevisionId/无权重、health UP。执行 `f2ed11c5…` 的 **ApproveTrafficShift / ApproveBlueGreenDeployment** 等待用户。此次审批后将真实执行 CodeDeploy：首次 Blue 基线注册成功后，10%/五分钟→100%；失败恢复逻辑启用但真实运行仍待验收。生产 Terraform plan No changes，CodeDeploy 当前尚无部署。下文为准备/阶段历史。
 
 最新：2026-11-12 用户已批准，实际 apply **9 新增/2 更新/0 删除**；后续 plan No changes。七阶段 pipeline version4 与告警/回滚配置已从 AWS 核对；新执行 `f2ed11c5-c7bc-49ca-a44f-1f9fb5a10466` 固定源码 `ff77d627f3a5182bac6872375dcd828199e1e57a`。当前先验收到人工审批 1；尚未执行 CodeDeploy 发布，生产仍 live2。下文“待批准创建”为准备阶段历史，不代表还需重复批准这次已授权资源。

@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — First Blue baseline succeeded; digest response fix (2026-11-12)
+
+User completed gate 2 for f2ed11c5. Real CodeDeploy Blue2→Blue2 baseline d-0XJZB7ZDM Succeeded, but build e67ebb2b failed closed before creating canary: GetDeployment omits AppSpec content and returns only SHA256, so the original parser rejected its valid baseline. Live remains v2/no weights, health UP. Fixed baseline verification to compare exact generated Blue-only AppSpec hash plus succeeded/app/group/type; added digest-only actual-response fixture and negative tests, all pass. No Terraform/IAM changes. Start fresh pinned-source execution and require both new human gates; old execution remains Failed, actual canary/rollback unverified. Audit section15.
+
 ## S3-07 — Fresh Green verified, waiting real traffic approval (2026-11-12)
 
 User completed approval 1 for f2ed11c5 / ff77d62. Green build 1010d2da succeeded, production published Green v4 passed seven contracts; same release as STG5 (6af4a796…). Downloaded exact GreenReport version and verified outer SHA, source/execution/STG/release/code, approval 1 identity, actual Green SHA and gate 2 exported variables. Live still Blue v2 with unchanged RevisionId/no weights, health UP; production Terraform plan No changes after publication. CodeDeploy deployments empty; ApproveTrafficShift InProgress. This gate now explicitly authorizes real CodeDeploy 10%/5min traffic shift then 100% and recovery; first Blue baseline acceptance and real rollout/rollback remain unverified until user gate 2 approval. Full audit root log section14.

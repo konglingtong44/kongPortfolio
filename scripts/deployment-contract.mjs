@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { contracts } from './staging-contract.mjs';
 import { liveSnapshot, requireApprovedContext } from './green-contract.mjs';
 
@@ -25,6 +26,13 @@ export function appSpec(blue, target) {
   return { version: 0.0, Resources: [{ Portfolio: { Type: 'AWS::Lambda::Function', Properties: {
     Name: 'kongportfolio-prod', Alias: 'live', CurrentVersion: blue, TargetVersion: target,
   } } }] };
+}
+export function isBlueBaseline(deployment, blue) {
+  const expected = createHash('sha256').update(JSON.stringify(appSpec(blue, blue))).digest('hex');
+  // GetDeployment returns the AppSpec digest, but omits its original content.
+  return deployment.status === 'Succeeded' && deployment.applicationName === 'kongportfolio'
+    && deployment.deploymentGroupName === 'production' && deployment.revision?.revisionType === 'AppSpecContent'
+    && deployment.revision.appSpecContent?.sha256 === expected;
 }
 export function verifyRouting(alias, blue, green) {
   assert.equal(alias.Name, 'live');

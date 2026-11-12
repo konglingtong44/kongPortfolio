@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
 import { requireProductionConfig } from './green-contract.mjs';
-import { requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
+import { isBlueBaseline, requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
 import { contracts } from './staging-contract.mjs';
 
 const account = process.env.DEPLOY_ACCOUNT_ID;
@@ -81,11 +81,7 @@ try {
       const id = group().lastSuccessfulDeployment?.deploymentId;
       if (!id) return false;
       const d = aws(['deploy','get-deployment','--deployment-id',id]).deploymentInfo;
-      if (d.status !== 'Succeeded' || d.applicationName !== 'kongportfolio' || d.deploymentGroupName !== 'production') return false;
-      try {
-        const resources = JSON.parse(d.revision.appSpecContent.content).Resources;
-        return resources.length === 1 && Object.values(resources[0]).some(r => r.Type === 'AWS::Lambda::Function' && r.Properties.Name === 'kongportfolio-prod' && r.Properties.Alias === 'live' && r.Properties.TargetVersion === green.blueVersion);
-      } catch { return false; }
+      return isBlueBaseline(d, green.blueVersion);
     },
     get: id => aws(['deploy','get-deployment','--deployment-id',id]).deploymentInfo,
     stop: id => aws(['deploy','stop-deployment','--deployment-id',id,'--auto-rollback-enabled']),

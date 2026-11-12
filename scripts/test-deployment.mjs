@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { appSpec, requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
+import { appSpec, isBlueBaseline, requireDeploymentContext, runDeployment } from './deployment-contract.mjs';
 import { contracts } from './staging-contract.mjs';
 const manifest={gitCommit:'a'.repeat(40),releaseId:'b'.repeat(64),backend:{sha256:'c'.repeat(64)}};
 const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}]};
@@ -15,6 +15,12 @@ assert.throws(()=>validate(actions,{...green,pipelineExecutionId:'old-run'}));
 assert.throws(()=>validate(actions,green,{...blue,RevisionId:'new-revision'}),/stale/);
 assert.throws(()=>validate(actions,{...green,checks:[]}));
 assert.throws(()=>appSpec('2','$LATEST'));
+const recordedBaseline={status:'Succeeded',applicationName:'kongportfolio',deploymentGroupName:'production',revision:{revisionType:'AppSpecContent',appSpecContent:{sha256:'9bfd87a600a5ac75419eacb865bba5f8813859858b8d3c898486ba0a1d8689a2'}}};
+assert.equal(isBlueBaseline(recordedBaseline,'2'),true,'Verify actual AWS digest-only response');
+assert.equal(isBlueBaseline(recordedBaseline,'3'),false,'Other Blue version cannot reuse baseline');
+assert.equal(isBlueBaseline({...recordedBaseline,status:'Failed'},'2'),false);
+assert.equal(isBlueBaseline({...recordedBaseline,deploymentGroupName:'other'},'2'),false);
+assert.equal(isBlueBaseline({...recordedBaseline,revision:{revisionType:'AppSpecContent',appSpecContent:{sha256:'0'.repeat(64)}}},'2'),false);
 
 function fake({baseline=true,brokenHealth=false,brokenAfterSuccess=false,baselineFail=false,neverFinish=false}={}) {
   const created=[],stopped=[]; let active,version='2',weighted=false,registered=baseline,polls=0;
