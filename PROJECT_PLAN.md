@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — Fixed execution Green verified; gate 2 pending (2026-11-12)
+
+User completed gate 1 for 98380c85. Green build a9b6d691 at c0a0a2c Succeeded; production Green v5 passed seven contracts, STG v6 same release a578af2e…. Downloaded versioned report; outer SHA, same-run approval/artifact identity, immutable Green code, exports and unchanged Blue v2 alias/RevisionId/weights all verified. Health UP. ApproveTrafficShift InProgress: user must approve Blue2→Green5 actual CodeDeploy canary; no agent approval. Existing baseline digest fix has actual metadata verification; real canary/rollback remain unverified. Audit section16.
+
 ## S3-07 — Baseline digest fix verified; fresh gate 1 (2026-11-12)
 
 Fix c0a0a2c published; both AWS CI and GitHub statuses success. New execution 98380c85 Candidate 98206404 and STG 4ad476f1 succeeded at same SHA; STG v6 passed seven contracts. Downloaded exact StagingReport object version; outer SHA/code/source/execution/approval exports match actual Lambda. Release a578af2edc0269822612dce35ff921efbc4595f33552999bdf5c40a57da13fe8. Waiting new ApproveProduction/ApproveGreenCreation, no reuse of old approvals. Live still v2/no weights/health UP. Existing Blue baseline d-0XJZB7ZDM remains succeeded; actual canary/rollback pending. Root log section15 includes failed prior run and fix.

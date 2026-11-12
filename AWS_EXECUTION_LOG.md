@@ -1177,3 +1177,46 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 外层 SHA **40ed5fd088d93475faff6f98eb66750aafe6506bd17b2d6d8a1c7c6eb751fc10** 与 CodeBuild artifacts.sha256sum 一致；report kind/passed/execution/source/function/version/七项全通过一致，导出 VERIFIED_RELEASE/VERIFIED_VERSION 匹配。Release **a578af2edc0269822612dce35ff921efbc4595f33552999bdf5c40a57da13fe8**，backend SHA **991f27a2e68eb94e81a30ecfc2d7d5ee3452738304565cb49a72abc1afcd9799** 与实际 qualifier6 CodeSha256 匹配。ZIP/report/object/review JSON 仅留忽略的上述目录。生产 live2/无权重、health UP。
 
 更新 PROJECT_PLAN.md、docs/codedeploy-next-story.md、本日志，运行 diff/path/Gitleaks 校验，暂存三文档、本地提交 `docs: record baseline fix and fresh staging approval evidence`，最后 git status --short。不为文档再启动 CI 或候选。最终向用户明确旧执行失败原因/未切流、修复已验证、新98380c85/STG6需重新第一道手动审批。首次真实 canary/自动回滚仍没有验收，不称部署已成功。
+
+### 15.5 继续请求后的审批复查
+
+用户说“ok 继续”后，运行 git status --short（干净），设置 kong-dev profile，执行 `codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=98380c85-fbbc-4b50-9416-7f10ddccdc0c`（只查询 stage/status/external/error）；GetAlias 查询 version/weights；`codebuild list-builds-for-project --project-name kongportfolio-green --sort-order DESCENDING --max-items 1 --query ids`，均 region ap-northeast-1 / JSON。
+
+AWS 实际显示新执行第一道 **ApproveProduction InProgress**，Source/Candidate/STG 已 Succeeded；live仍2/无权重。最新 Green ID仍旧执行1010d2da，不是新执行的新验证结果。没有将聊天里的“继续”当成 AWS 审批完成，没有启动重复执行或代批。向用户再次给出控制台链接并明确选新98380c85/STG6的 ApproveProduction→ApproveGreenCreation，点击审阅/批准/提交，之后才能继续 Green。
+
+仅 apply_patch 更新本日志，git diff --check 检查格式；本地日志待后续一起提交，本次没有 Git 发布、云写入或新资源操作。
+
+## 16. 修复后新执行的 Green 验证（2026-11-12）
+
+用户再次要求“ok 继续”。以 kong-dev / Tokyo 只读检查真实 AWS，未代理人工审批。`git status --short` 只有上一轮待提交的本日志修改，保留并一起记录，没有覆盖文件。
+
+```powershell
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=98380c85-fbbc-4b50-9416-7f10ddccdc0c --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+& $aws codebuild list-builds-for-project --project-name kongportfolio-green --sort-order DESCENDING --max-items 1 --region ap-northeast-1 --query ids --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:a9b6d691-7231-49e0-a620-fa754784d368 --region ap-northeast-1 --output json
+```
+
+本次第一道审批现在 **Succeeded**，审阅 ID **a08b5b97-17d6-4d12-88bd-7d027ac3e9e7**。Green 构建 a9b6d691-7231-49e0-a620-fa754784d368 初始 BUILD/导出空值，约20秒短等待后再次 actions/batch-get-builds，最终 **SUCCEEDED**，源码 c0a0a2ce2e8f1018e30b968fa6e40e5969792a75；新生产不可变 **版本5** 七项通过。读取日志 `logs get-log-events --log-group-name /aws/codebuild/kongportfolio-green --log-stream-name a9b6d691-7231-49e0-a620-fa754784d368 --query 'events[].message'`，UTF8 设置和 Select-String 提取七项摘要；脚本 CLI 顺序同10.1，本次 STG qualifier6/Green qualifier5。没有重打包或新建构建，沿同次审批候选运行。
+
+元数据 `.local/deployment-fixed-green-build.json`、actions `.local/deployment-fixed-green-actions.json`、云日志 `.local/deployment-fixed-green-build.log`，只在忽略目录。
+
+### 16.1 独立证据核对
+
+```powershell
+New-Item -ItemType Directory -Path .local/deployment-fixed-green-review-98380c85 -Force
+# 从本次 action outputArtifacts 获取 key。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/IYoCq9A --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/IYoCq9A --version-id pGD5MzBLeiq_iCwYmGn5bwZ_je5lsojv --region ap-northeast-1 .local/deployment-fixed-green-review-98380c85/report.zip --output json
+Get-FileHash -LiteralPath .local/deployment-fixed-green-review-98380c85/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 限唯一 report.json，读取并释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 5 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+报告外层 SHA **d559c29da7e51df55b17e3b4542ce4d4c15c86ae28be6edb2d0d76b8d4964549** 与 CodeBuild artifacts.sha256sum 相同；kind/passed/liveTrafficUnchanged、function、Blue2/Green5/STG6、七项全通过正确；execution/source/release/backend SHA 与已审 STG 一致，approval1ActionId 与 AWS 成功 action ID 一致。Release **a578af2edc0269822612dce35ff921efbc4595f33552999bdf5c40a57da13fe8**；backend SHA **991f27a2e68eb94e81a30ecfc2d7d5ee3452738304565cb49a72abc1afcd9799** 等于实际 Green5 CodeSha256 解码值；第二道审批导出 GREEN_RELEASE/GREEN_VERSION/BLUE_VERSION 与报告一致。live 仍2、RevisionId 与报告快照相同、无权重，公开 health UP。
+
+原件/report/object/review JSON 只留上述 .local 目录，不进入 Git。当前 **ApproveTrafficShift InProgress**，DeployProduction 未执行；旧基线已成功，修复匹配真实digest，但首次 canary/回滚仍未验证。向用户提供新执行98380c85的第二道审批链接，明确 **Blue2/Green5**，批准会真实10%/五分钟→100%，第一道不再重复。
+
+apply_patch 更新本日志、PROJECT_PLAN.md、docs/codedeploy-next-story.md；diff/path/Gitleaks 校验后仅本地 `git commit -m 'docs: record fixed Green verification and pending canary approval'`，包含之前15.5未提交日志，最后 git status --short。不修改源码/制品，不推送触发额外CI，不代批、不直接调用部署或UpdateAlias。
