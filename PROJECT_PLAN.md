@@ -2,6 +2,8 @@
 
 ## S3-06 — Production Green preparation (2026-11-12, awaiting approval)
 
+Source 18cf862 published; both existing AWS CI builds and GitHub statuses success, frontend 40 tests/build, backend 9+3 tests/ZIP smoke. CICD 13 mocked plans, production 3 domain plans and Green guards passed. Final documentation evidence committed locally; no extra documentation-only CI push.
+
 Old execution 1222a3dd is now Succeeded after the user's manual approval; it contained no Green action. Prepared opt-in production version publication and seven direct-invoke checks between two human gates. Fresh source/execution needs a fresh approval 1. Actual CICD plan: 4 create / 2 update / 0 delete; disabled plan and production ownership-handoff plan: No changes. Production code and alias release fields explicitly move to pipeline/later CodeDeploy ownership to avoid accidental Terraform routing. No Green apply, production version publication or traffic shift yet. CodeDeploy/rollback/frontend promotion remain later increments. See docs/green-approval.md and root log section 8 for commands, tests and cloud gaps.
 
 ## S3-05 — STG and first approval verified (2026-11-12, completed to human gate)

@@ -721,3 +721,20 @@ git status --short
 ```
 
 所有 Terraform tfvars、state、plan、.local 内容保持忽略；两条 fail-closed Gitleaks hooks 保留。真实 Green 运行权限、多制品、报告和第二道审批尚未验证；本次不把本地 guard/mock 测试称为蓝绿切流验证。
+
+已实际完成上述扫描/提交/推送：源码 `18cf8625a8bf767cb85731aee75057f918246422`；Gitleaks dir、commit 暂存区与 push 全历史均无泄露，提交后工作区干净。最终 plan 正确的 PowerShell 写法：`& $tf '-chdir=infra/terraform/cicd' plan '-input=false' '-var=enable_green=true' '-out=green.tfplan' '-no-color'`。
+
+推送后只读验证命令：
+
+```powershell
+& $aws codebuild list-builds-for-project --project-name kongportfolio-ci-frontend --sort-order DESCENDING --region ap-northeast-1 --max-items 2 --query ids --output json
+# backend 项目同样查询，按 resolvedSourceVersion 匹配新提交。
+& $aws codebuild batch-get-builds --ids kongportfolio-ci-frontend:0f4abb7b-3238-4194-9f54-e2b094430db4 kongportfolio-ci-backend:427e8b05-56b0-4752-a6e6-6dd0cc7c4489 --region ap-northeast-1 --query 'builds[].{id:id,status:buildStatus,sha:resolvedSourceVersion,phase:currentPhase}' --output json
+& $aws logs get-log-events --log-group-name /aws/codebuild/kongportfolio-ci-frontend --log-stream-name 0f4abb7b-3238-4194-9f54-e2b094430db4 --region ap-northeast-1 --query 'events[].message' --output json
+# backend 日志组及 stream 换为对应构建。
+Invoke-RestMethod -Uri 'https://api.github.com/repos/konglingtong44/kongPortfolio/commits/18cf8625a8bf767cb85731aee75057f918246422/status' -Headers @{Accept='application/vnd.github+json';'User-Agent'='kongPortfolio-verification'}
+```
+
+查询中间状态 frontend SUCCEEDED/backend BUILD 时继续等待，没有新 start-build；两次短等待约 45/30 秒。最终两个构建均 SUCCEEDED，resolvedSourceVersion 都等于 18cf862；GitHub combined、ci/frontend、ci/backend 全 success。云端日志确认 Green guard 运行、frontend 40 tests/build、backend 9 HTTP + 3 Lambda tests/ZIP smoke，二者 applicationChecksRan=true。本地结果 `.local/green-source-ci.json`、`green-frontend-ci.log`、`green-backend-ci.log`，只存忽略目录。未执行真实 Green 项目或启动新候选流水线。
+
+最后将本验证结果补入 PROJECT_PLAN.md、docs/green-approval.md 和本日志，执行 `git diff --check`、路径检查、Gitleaks，再仅本地提交 `docs: record Green preparation CI evidence`；不为文档再次推送触发一对 CI。下一次授权执行时一起推送。等待 4 新增/2 更新、生产代码与别名发布字段管理交接的明确批准；批准后仍保留新执行两道人工 gate。

@@ -16,3 +16,5 @@
 费用例子：新增 Green 阶段每月运行 20 次、每次按 2 分钟计，按 CodeBuild small 每分钟 $0.005、V2 action 每分钟 $0.002 估算，约 $0.28/月，另加少量 Lambda 调用、版本存储、S3 和日志。这只是新增阶段的计算示例，不是全站账单或上限；免费额度按账号共享，不保证剩余额度。来源：[CodeBuild](https://aws.amazon.com/codebuild/pricing/)、[CodePipeline](https://aws.amazon.com/codepipeline/pricing/)。
 
 验证：Terraform mocked plans 及 Node 失败路径测试；实际账号计划。真实 Green CodeBuild、多输入制品、IAM、生产版本调用、第二道审批仍待批准创建后验证。所有操作见根目录 `AWS_EXECUTION_LOG.md` 第 8 节。
+
+源码 `18cf862` 的现有 AWS CI 两项及 GitHub statuses 均成功：前端 40 tests/build；后端 9 HTTP + 3 Lambda tests/ZIP smoke。CICD 13 个 mocked plans、生产 3 个域名测试、Green guards 与语法检查通过。尚未运行 Green 云资源。
