@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — CloudFront response fix verified; fresh gate1 (2026-11-12)
+
+Source7a2e1b8 published, both AWS CI and GitHub statuses success. New execution5d55596a/v6/deploy Candidate7a6ca25a and STGf9e341e0 succeeded; STG9 seven checks pass. Versioned report outer SHA/source/release/backend immutable code and approval exports independently match. Release242f8cb4…. Waiting new ApproveProduction; old2a56d7b1 remainsFailed with healthy backend7/old frontend retained. No new TF/IAM resources or new frontend LIVE publication; require both fresh human gates, no old approval reuse. Root log24 includes failed first attempt, actual AWS wrapper fixture and recovery evidence.
+
 ## S3-08 — Backend7 succeeded; CloudFront test parser fix (2026-11-12)
 
 2a56d7b1 backend canary d-42C5RN2EM Succeeded/live7/no weights. Frontend3363d605 uploaded and publicly verified six immutable files but failed before LIVE publish: AWS TestFunction wraps output in request, original code read top-level uri. Actual old LIVE/DEV restored/unchanged, failed report passed=false/recovery.restoredOld=true; whole pipeline Failed. Fixed strict parser to request.uri, added real-response and negative tests plus AWS sample replay, pass; no IAM/TF expansion. Fresh fixed-source execution requires both new gates. Root log24 includes failure and recovery evidence.

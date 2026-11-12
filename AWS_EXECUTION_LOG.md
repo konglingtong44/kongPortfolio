@@ -1682,3 +1682,39 @@ batch-get-builds/get-log-events保存`.local/frontend-release-live-build.json`�
 apply_patch新增纯函数verifyRouterTest，严格检查FunctionErrorMessage及JSON.FunctionOutput.request.uri；runner改用该解析。test-frontend-release.mjs新增真实wrapper fixture、执行错误、错误形状/错误URI负例；运行Node前端/后端发布测试、node --check，再用node --input-type=module回放真实AWS样例，全部通过。没有绕过检查、放宽路由、修改IAM或重新创建资源。
 
 修改三脚本与失败记录文档后扫描/提交推送 `fix: parse wrapped CloudFront TestFunction request output`，再启动固定修复源码的新执行并重新经两道人工审批；不暗中替换旧SourceRef/已批准制品，不复用旧审批。没有新Terraform资源或权限变更，旧前端和新后端保持可用；尚未宣称自动前端上线已验收。
+
+### 24.4 修复提交、CI与新执行
+
+执行`. ./scripts/tools.ps1`、Node前端发布测试、path检查、Gitleaks dir、git diff --check；暂存三个脚本+本日志/PROJECT_PLAN/前端文档，cached diff检查后commit/push、rev-parse/status。固定修复SHA **7a2e1b897848328d112d44e45802849ad52bbd5c**，dir/暂存/push全历史扫描无泄露，未合并main。随后：
+
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=7a2e1b897848328d112d44e45802849ad52bbd5c' --variables 'name=ReleaseMode,value=deploy' --region ap-northeast-1 --output json
+```
+
+只启动一次新执行 **5d55596a-4238-4240-bfbf-3e8ae47ee264**，保存`.local/frontend-fixed-execution.json`，当前待新候选/STG与第一道人审。
+
+分别list-builds-for-project/batch-get-builds确认修复源码两项CI均SUCCEEDED：frontend **28a6b7db-b532-431e-bd11-023a8c82cd45**、backend **08189062-ce3a-4003-8c48-0a2e7ab5786c**；元数据`.local/frontend-fix-ci.json`。get-log-events取对应CI组/stream，保存`frontend-fix-frontend-ci.log`、`frontend-fix-backend-ci.log`，确认frontend-release回归测试AWS Linux通过、前端40 tests/build、后端9+3 tests/ZIP smoke，applicationChecksRan=true。只读GET GitHub commit7a2e1b8 `/status`，combined与两个context均success；未手动重启CI。
+
+失败恢复后生产根再执行 `terraform -chdir=infra/terraform/portfolio plan -input=false -detailed-exitcode -no-color`，**No changes**（`.local/frontend-failure-production-plan.log`），未apply。没有因为DEV恢复元数据变化覆盖当前路由，代码管理交接仍符合预期。
+
+### 24.5 修复执行到新第一道人审
+
+两次约40秒短等待，list-action-executions按新execution5d55596a过滤更新`.local/frontend-fixed-actions.json`；Source/Candidate/STG均Succeeded，ApproveProduction InProgress。Candidate **7a6ca25a-0bdb-4856-ba86-e4388b902dbe**、STG **f9e341e0-c091-4272-a70b-456a8311a667** 均SUCCEEDED/源码7a2e1b897848328d112d44e45802849ad52bbd5c，batch-get-builds元数据`.local/frontend-fixed-candidate-stg.json`。Candidate完整ci.sh all/打包通过；STG用同次ZIP发布并直接验证数字**版本9**七项通过。
+
+```powershell
+New-Item -ItemType Directory -Path .local/frontend-fixed-stg-review-5d55596a -Force
+# key来自本次VerifyStaging outputArtifacts。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/aGgYC1C --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/aGgYC1C --version-id s75SxZtzaK0irwW5ny2DKLcWS5QSs2Xm --region ap-northeast-1 .local/frontend-fixed-stg-review-5d55596a/report.zip --output json
+Get-FileHash -LiteralPath .local/frontend-fixed-stg-review-5d55596a/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 9 --region ap-northeast-1 --output json
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 5d55596a-4238-4240-bfbf-3e8ae47ee264 --region ap-northeast-1 --query 'pipelineExecution.{status:status,version:pipelineVersion,variables:variables}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+外层SHA **19d74c78e76da87fe93cdbe9e8fe700d29d455ed54b6646b8e2c7421ec7fd48a** 匹配CodeBuild artifacts.sha256sum；schema/kind/passed/execution/source/function/version/七项正确、Gate1导出变量相符。Release **242f8cb4af0a0ff5fed61f8ae9984f2189c8c912af102e9db531afeb1bd7e481**，backend SHA **779731b31559e37896c04bd6bc9076fe237cb7ad5ccc3163bd24f7ac6d598552** 等于实际STG9 CodeSha256解码值。原件/report/object/review仅留上述ignored目录。
+
+整体InProgress/version6/ReleaseMode deploy，停在新第一道人审；线上后端7/无权重、旧前端a594e36…保留且healthUP（前面已独立读回）。没有新网站上传/函数修改/生产切流。提醒用户选**新5d55596a/STG9**，不要重试旧失败执行2a56d7b1；第一道只验证Green，第二道才正常后端/前端发布。
+
+apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md，diff/path/Gitleaks检查，仅本地提交 `docs: record CloudFront parser fix and fresh approval evidence`、git status --short。不为文档触发额外CI/发布，没有新增TF/IAM/费用资源、没有代理审批或暗换原制品。前端LIVE新版本发布与发布后恢复仍未验收。
