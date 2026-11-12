@@ -1,5 +1,7 @@
 # S3-08：前端自动发布（资源已创建，待人工审批）
 
+**当前停在第二道审批。** 执行2a56d7b1/mode deploy第一道已通过，Green**版本7**七项验证成功，与STG8同候选；版本化报告、同次审批、实际代码和Gate2变量已独立核对。线上仍Blue**版本5**、原RevisionId/无权重，前端仍旧a594e36…，healthUP。请在ApproveTrafficShift→ApproveBlueGreenDeployment确认 **deploy、Blue5/Green7** 后批准：后端10%/五分钟→100%成功后，才发布同候选React前端。不是rollback_drill；真实前端上传/发布/恢复仍待执行，日志第23节。下面为阶段历史与范围。
+
 当前：用户已明确批准，实际apply4新增/2更新/0删除、后续No changes。八阶段pipeline version6、独立发布项目和受限IAM已读取核对。新执行 `2a56d7b1-840e-45b0-8ac4-7b37872cbb4f` 固定源码c073e19，ReleaseMode=deploy；先验收到第一道审批。当前静态发布仍a594e36…、后端live5。下面为准备范围与历史，真实前端发布/回退仍待验证。
 
 已到第一道人工审批：Candidate/STG成功，STG**版本8**七项通过；版本化报告/实际代码SHA/审批变量已独立核对。Release `0dfbd04490393ec56e8c0c554d032167676f068a8fca0d71ce282a5e874b09b2`。请核对新执行**2a56d7b1…/mode deploy/STG8**，在ApproveProduction→ApproveGreenCreation手动批准；此步只发布/验证Green，第二道后才真实切流和前端发布。线上前后端保持不变，日志第22节。

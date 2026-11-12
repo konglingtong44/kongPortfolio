@@ -1612,3 +1612,35 @@ Invoke-RestMethod 'https://konglingtong44.com/api/health'
 当前Source/BuildCandidate/VerifyStaging Succeeded，**ApproveProduction / ApproveGreenCreation InProgress**，整体仍InProgress；未自行审批。生产live仍5/无权重、旧前端/version仍a594e36…/sourceDirty=true、healthUP。新前端资源虽已创建，尚无网站上传、CloudFront代码更新或发布。第一道批准只发布/验证Green；第二道才授权正常后端切流及同候选前端发布与必要恢复，明确区别前次rollback_drill。
 
 apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md；运行diff/path/Gitleaks检查，暂存三文档、本地提交 `docs: record frontend publication infrastructure and first approval gate`，git status --short。不为文档推送额外CI，不改固定源码/制品，不启动重复执行或代理审批。真实前端上传/IAM/TestFunction/传播/恢复仍待后续阶段验收。
+
+## 23. 前端发布执行的Green验证与第二道人审（2026-11-12）
+
+用户回复ok后，先git status --short（干净），再用kong-dev/Tokyo查询本次execution2a56d7b1的list-action-executions、GetAlias(version/weights)、list-builds-for-project(kongportfolio-green，DESCENDING/max-items1)。第一道审批 **Succeeded**，用户action ID **4df159ca-c99a-410e-8694-b2099516c546**；Green BUILD期间live仍5/无权重。batch-get-builds获取 **fde496b6-5fa5-4ea8-9482-4ca1784b17bf**，固定源码c073e196b7740c9555cb800e8e49911dc282b65c。约20秒短等待后刷新：构建/VerifyGreen Succeeded，**ApproveTrafficShift InProgress**。
+
+### 23.1 独立复核同次GreenReport
+
+```powershell
+& $aws codepipeline get-pipeline-execution --pipeline-name kongportfolio-candidate --pipeline-execution-id 2a56d7b1-840e-45b0-8ac4-7b37872cbb4f --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=2a56d7b1-840e-45b0-8ac4-7b37872cbb4f --region ap-northeast-1 --output json
+& $aws codebuild batch-get-builds --ids kongportfolio-green:fde496b6-5fa5-4ea8-9482-4ca1784b17bf --region ap-northeast-1 --output json
+New-Item -ItemType Directory -Path .local/frontend-release-green-review-2a56d7b1 -Force
+# key来自本次VerifyGreen outputArtifacts。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/SiDyjMA --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/GreenRepor/SiDyjMA --version-id fWUSeIqu3pJUL8tK81Q_XyiOUOvES9w4 --region ap-northeast-1 .local/frontend-release-green-review-2a56d7b1/report.zip --output json
+Get-FileHash -LiteralPath .local/frontend-release-green-review-2a56d7b1/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead限制唯一report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-prod --qualifier 7 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --output json
+Invoke-RestMethod 'https://konglingtong44.com/version.json'
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+GetPipelineExecution确认mode **deploy**，不是回滚演练。外层SHA **18f6039c518f9c25e87af4147d405b74b511c905973019a80361c2b4cd251b1e** 等于CodeBuild artifacts.sha256sum；schema/kind/passed/liveTrafficUnchanged/function、Blue5/Green7/STG8、七项全通过正确；execution/source/release/backend SHA与已审STG一致，approval1ActionId匹配AWS成功actionID。Release **0dfbd04490393ec56e8c0c554d032167676f068a8fca0d71ce282a5e874b09b2**，backend SHA **e596fcd3bfb1b108dc7b3c823ed7bb3b06aaa4adca1bf67ab4831658c0f63bd2** 等于实际Green7 CodeSha256解码值。三项Gate2导出变量与报告一致；live版本5/RevisionId与报告原快照相同、无权重。公开前端仍旧a594e36…/sourceDirty=true、healthUP。
+
+元数据 `.local/frontend-release-green-build.json`、actions `.local/frontend-release-green-actions.json`，ZIP/report/object/review仅在上述ignored目录，不提交原件。Green沿既有verify-green脚本发布并直接验证数字版本7；没有重新打包或触发真实Bedrock，没有手动改流量。
+
+### 23.2 待正常前后端发布审批
+
+当前停第二道 **ApproveTrafficShift / ApproveBlueGreenDeployment**。向用户明确本次正常发布 **mode deploy、Blue5→Green7**；第二道批准会先10%/五分钟→100%后端切流，成功后才上传/验证同候选React并切换CloudFront指向，失败按已审恢复逻辑处理。不是前次stop-at10%的rollback_drill。当前前端发布阶段未执行，不称前端自动上线已验收。
+
+用apply_patch更新本日志、PROJECT_PLAN.md、docs/frontend-publication.md；diff/path/Gitleaks检查，仅本地提交 `docs: record full-stack release Green and second approval gate`、git status --short。没有推送/额外构建/代理审批/CreateDeployment/CloudFront更新或静态上传，固定源码/制品不变。

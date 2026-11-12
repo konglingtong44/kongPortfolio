@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-08 — Green verified; full-stack gate2 pending (2026-11-12)
+
+User completed gate1 for2a56d7b1/c073e19/deploy. Green buildfde496b6 Succeeded; immutable Green7/STG8 same release0dfbd044…, seven checks pass. Versioned report/outer SHA/approval identity/source/code/exports independently matched actual Lambda; live remainsBlue5/unchangedRevisionId/no weights, old frontend a594e36…, healthUP. ApproveTrafficShift InProgress; gate2 authorizes normal backend10%/5min/full then same-candidate React S3/CloudFront publication/recovery. No frontend upload or pointer change yet; cloud publication/recovery still unverified. Root log23.
+
 ## S3-08 — Frontend publication infrastructure applied (2026-11-12)
 
 Reached gate1: execution2a56d7b1/v6/deploy, Source/Candidate/STG succeeded atc073e19; STGv8 seven checks pass. Downloaded exact StagingReport version and matched outer CodeBuild SHA/source/release/backend code/approval exports against immutable Lambda. Release0dfbd044…. ApproveProduction waiting user, live backend5/no weights, old frontend a594e36…/healthUP. No site upload/router publication yet. Gate2 now authorizes backend promotion then same-candidate frontend publication/recovery. Root log22.3.
