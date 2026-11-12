@@ -1,5 +1,9 @@
 # S1-01T — timeline and resume reconciliation
 
+## S3-07 — Baseline digest fix verified; fresh gate 1 (2026-11-12)
+
+Fix c0a0a2c published; both AWS CI and GitHub statuses success. New execution 98380c85 Candidate 98206404 and STG 4ad476f1 succeeded at same SHA; STG v6 passed seven contracts. Downloaded exact StagingReport object version; outer SHA/code/source/execution/approval exports match actual Lambda. Release a578af2edc0269822612dce35ff921efbc4595f33552999bdf5c40a57da13fe8. Waiting new ApproveProduction/ApproveGreenCreation, no reuse of old approvals. Live still v2/no weights/health UP. Existing Blue baseline d-0XJZB7ZDM remains succeeded; actual canary/rollback pending. Root log section15 includes failed prior run and fix.
+
 ## S3-07 — First Blue baseline succeeded; digest response fix (2026-11-12)
 
 User completed gate 2 for f2ed11c5. Real CodeDeploy Blue2→Blue2 baseline d-0XJZB7ZDM Succeeded, but build e67ebb2b failed closed before creating canary: GetDeployment omits AppSpec content and returns only SHA256, so the original parser rejected its valid baseline. Live remains v2/no weights, health UP. Fixed baseline verification to compare exact generated Blue-only AppSpec hash plus succeeded/app/group/type; added digest-only actual-response fixture and negative tests, all pass. No Terraform/IAM changes. Start fresh pinned-source execution and require both new human gates; old execution remains Failed, actual canary/rollback unverified. Audit section15.

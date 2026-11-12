@@ -1140,3 +1140,40 @@ node --input-type=module -e "import {readFileSync} from 'node:fs'; import {isBlu
 全部测试通过；实际 AWS 基线哈希 **9bfd87a600a5ac75419eacb865bba5f8813859858b8d3c898486ba0a1d8689a2** 与本地 Blue2→Blue2 AppSpec 哈希一致。只读取生产状态，没有切换或恢复别名；线上没有偏离 Blue，因此不需要回滚。
 
 将修复和失败记录写入 PROJECT_PLAN.md、docs/codedeploy-next-story.md、本日志，扫描/diff/path 检查后提交推送 `fix: verify CodeDeploy baseline using returned AppSpec digest`。随后启动固定新 SHA 的候选流水线，重新验证全部 Candidate/STG 并停第一道人工审批；旧审批绑定旧执行，绝不拿来批准新候选或把原 pipeline 运行代码暗中替换。没有新资源或 Terraform/IAM 变更。
+
+### 15.3 修复提交与新执行
+
+执行 `. ./scripts/tools.ps1`、Node 失败路径测试、path/diff/Gitleaks 扫描（无泄露），暂存上述六个脚本/文档文件，`git commit -m 'fix: verify CodeDeploy baseline using returned AppSpec digest'`、`git push`、`git rev-parse HEAD`、`git status --short`，固定提交 **c0a0a2ce2e8f1018e30b968fa6e40e5969792a75**。没有 main 合并。
+
+```powershell
+& $aws codepipeline start-pipeline-execution --name kongportfolio-candidate --source-revisions 'actionName=GitHub,revisionType=COMMIT_ID,revisionValue=c0a0a2ce2e8f1018e30b968fa6e40e5969792a75' --region ap-northeast-1 --output json
+& $aws codepipeline list-action-executions --pipeline-name kongportfolio-candidate --filter pipelineExecutionId=98380c85-fbbc-4b50-9416-7f10ddccdc0c --region ap-northeast-1 --output json
+# 分别 list-builds-for-project 取最新 ID，再按 resolvedSourceVersion 核对：
+& $aws codebuild batch-get-builds --ids kongportfolio-ci-frontend:0bb755cf-10d8-4705-a02b-63bf6a350c0c kongportfolio-ci-backend:c0de1fb7-0b31-46ce-865b-66b00bcae76c --region ap-northeast-1 --query 'builds[].{id:id,status:buildStatus,sha:resolvedSourceVersion}' --output json
+```
+
+新执行 **98380c85-fbbc-4b50-9416-7f10ddccdc0c**，Source 已成功读取 c0a0a2c；启动结果 `.local/deployment-fixed-execution.json`、actions `.local/deployment-fixed-actions.json`。候选构建 **98206404-3ece-4dd6-b193-bb784a411858**。推送触发的两项现有 CI 均 SUCCEEDED、源码 c0a0a2c；未手动 start-build。约40秒短等待，没有循环启动额外发布。保持现有资源/角色不变，不调用 UpdateAlias 或代理审批。
+
+### 15.4 新执行到第一道审批的真实复核
+
+随后约35秒及20秒短等待后，用同一 list-action-executions 更新 `.local/deployment-fixed-actions.json`。Candidate **98206404-3ece-4dd6-b193-bb784a411858**、STG **4ad476f1-221a-4cd4-9832-9feb501b92ce** 都 SUCCEEDED，batch-get-builds 核对源码均 c0a0a2ce2e8f1018e30b968fa6e40e5969792a75，保存 `.local/deployment-fixed-candidate-stg.json`。STG 原脚本对同次 ZIP 发布/调用数字 **版本6** 七项通过，Source/BuildCandidate/VerifyStaging Succeeded，**ApproveProduction InProgress**。新执行尚未发布 Green/部署，未使用旧审批。
+
+读取两份 CI get-log-events（frontend stream 0bb755cf-10d8-4705-a02b-63bf6a350c0c；backend stream c0de1fb7-0b31-46ce-865b-66b00bcae76c，日志组对应 /aws/codebuild/kongportfolio-ci-frontend/backend）保存 `.local/deployment-fix-frontend-ci.log`、`deployment-fix-backend-ci.log`，摘要确认修复 guard 测试、applicationChecksRan=true，后端9+3测试/ZIP smoke通过。只读 GET GitHub commit c0a0a2c 的 `/status`，combined、ci/frontend、ci/backend 全 success。没有推送第二个修复或手动重试构建。
+
+版本化报告独立复核：
+
+```powershell
+New-Item -ItemType Directory -Path .local/deployment-fixed-stg-review-98380c85 -Force
+# key 从本次 VerifyStaging.outputArtifacts 取得。
+& $aws s3api head-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/lpu1ngu --region ap-northeast-1 --output json
+& $aws s3api get-object --bucket kongportfolio-artifacts-561798268037-ap-northeast-1 --key kongportfolio-candid/StagingRep/lpu1ngu --version-id vHx.8_T6ctr8eFuagPrNQtp3LvA3CeF0 --region ap-northeast-1 .local/deployment-fixed-stg-review-98380c85/report.zip --output json
+Get-FileHash -LiteralPath .local/deployment-fixed-stg-review-98380c85/report.zip -Algorithm SHA256
+# .NET ZipFile.OpenRead 仅接受唯一 report.json，读取后释放流。
+& $aws lambda get-function-configuration --function-name kongportfolio-stg --qualifier 6 --region ap-northeast-1 --output json
+& $aws lambda get-alias --function-name kongportfolio-prod --name live --region ap-northeast-1 --query '{version:FunctionVersion,weights:RoutingConfig.AdditionalVersionWeights}' --output json
+Invoke-RestMethod 'https://konglingtong44.com/api/health'
+```
+
+外层 SHA **40ed5fd088d93475faff6f98eb66750aafe6506bd17b2d6d8a1c7c6eb751fc10** 与 CodeBuild artifacts.sha256sum 一致；report kind/passed/execution/source/function/version/七项全通过一致，导出 VERIFIED_RELEASE/VERIFIED_VERSION 匹配。Release **a578af2edc0269822612dce35ff921efbc4595f33552999bdf5c40a57da13fe8**，backend SHA **991f27a2e68eb94e81a30ecfc2d7d5ee3452738304565cb49a72abc1afcd9799** 与实际 qualifier6 CodeSha256 匹配。ZIP/report/object/review JSON 仅留忽略的上述目录。生产 live2/无权重、health UP。
+
+更新 PROJECT_PLAN.md、docs/codedeploy-next-story.md、本日志，运行 diff/path/Gitleaks 校验，暂存三文档、本地提交 `docs: record baseline fix and fresh staging approval evidence`，最后 git status --short。不为文档再启动 CI 或候选。最终向用户明确旧执行失败原因/未切流、修复已验证、新98380c85/STG6需重新第一道手动审批。首次真实 canary/自动回滚仍没有验收，不称部署已成功。
