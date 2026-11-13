@@ -56,61 +56,20 @@
 @media (max-width:1200px) and (min-width:801px) { .module-dialog.architecture-dialog { padding-inline: 16px; } }
 @media (hover:none) { .architecture-node:hover > .node-tooltip { visibility: hidden; } }
 
-/* Failure recovery is a separate, controllable story, not a live AWS console. */
-.rollback-lab { padding-top: 30px; }
+/* Recovery uses the same 180 x 90 service tiles, tooltip and route animation. */
+.rollback-lab { padding-top: 26px; }
 .rollback-lab > h3 { margin: 0 0 14px; font-size: 26px; }
-.rollback-intro { font-size: 14px; line-height: 1.9; max-width: 860px; }
-.rollback-simulation { display: inline-block; border: 1px dashed #a36231; padding: 7px 12px; font-size: 11px; background: #ffe6ae; margin: 15px 0 24px; }
-.rollback-scenarios { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
-.rollback-scenarios button { min-height: 64px; padding: 14px; text-align: left; background: #fff5db; color: #63391e; border: 2px solid #b47b42; font: inherit; font-size: 13px; line-height: 1.7; }
-.rollback-scenarios button > span { display: block; font: 10px ui-monospace,monospace; margin-bottom: 6px; color: #8b613c; }
-.rollback-scenarios button[aria-pressed=true] { background: #ffdfa2; box-shadow: inset 0 0 0 2px #fff3cd,3px 3px 0 #a3623144; }
-.rollback-steps { display: flex; padding: 0; margin: 28px 0 22px; list-style: none; gap: 12px; }
-.rollback-steps li { flex: 1; min-width: 0; border-top: 3px solid #d7c5a0; }
-.rollback-steps button { background: none; border: none; color: #8b775e; text-align: left; font: inherit; font-size: 11px; line-height: 1.7; padding: 10px 4px; min-height: 55px; width: 100%; }
-.rollback-steps button span { display: block; font: 10px ui-monospace,monospace; margin-bottom: 5px; }
-.rollback-steps .reached { border-color: #638342; }.rollback-steps .reached button { color: #4d6832; }.rollback-steps button[aria-current=step] { background: #e9efcc; font-weight: 600; }
-.rollback-map-scroll { overflow: auto; border: 2px solid #b47b42; background: #fff7df; background-image: radial-gradient(#b47b4233 1px,transparent 1px); background-size: 18px 18px; scrollbar-color: #a36231 #f5dfae; }
-.rollback-map { position: relative; width: 900px; height: 370px; margin: auto; }
-.rollback-map svg { position: absolute; inset: 0; width: 900px; height: 370px; pointer-events: none; color: #a07849; }
-.rollback-map svg text { fill: #765331; text-anchor: middle; font: 11px ui-monospace,monospace; }
-.rollback-wire { fill: none; stroke: #c4b89e; stroke-width: 2px; }
-.rollback-wire.has-traffic,.rollback-wire.incoming { stroke: #8a704e; stroke-dasharray: 8 6; animation: recovery-traffic 1.2s linear infinite; }
-.rollback-map.broken .new-route { stroke: #b44f38; }.rollback-map.restoring .old-route { stroke: #638342; stroke-width: 4px; }
-.rollback-wire.rollback-command { stroke: #b44f38; stroke-dasharray: 6 6; animation: recovery-traffic .8s linear infinite; }
-.rollback-map .rollback-command,.rollback-map.restoring .rollback-command { stroke: #967591; }
-.rollback-map svg .recovery-control-label { fill: #765573; stroke: #fff7df; stroke-width: 4px; paint-order: stroke; }
-.rollback-tile { position: absolute; width: 190px; height: 90px; padding: 15px; border: 2px solid #b47b42; box-shadow: 3px 3px 0 #a3623133; background: #fff0ca; }
-.rollback-tile strong { display: block; font: 600 12px/1.5 ui-monospace,monospace; }.rollback-tile > span { display: block; font-size: 10px; line-height: 1.6; margin-top: 6px; }.rollback-tile b { position: absolute; top: 63px; right: 12px; font: 600 13px ui-monospace,monospace; }
-.rollback-client { left: 20px; top: 130px; width: 160px; height: 80px; }.rollback-router { left: 280px; top: 130px; width: 180px; height: 80px; }.rollback-router strong { font-size: 11px; }.rollback-old { left: 650px; top: 30px; background: #e4edf0; border-color: #718b9b; }.rollback-new { left: 650px; top: 240px; background: #e9efcc; border-color: #789253; }
-.rollback-new.is-broken { background: #f8dfce; border-color: #b44f38; animation: recovery-failure 1s ease-in-out infinite alternate; }.rollback-map.restoring .rollback-old { background: #e9efcc; border-color: #638342; }.rollback-map.restoring .rollback-new { background: #eee5d4; border-style: dashed; color: #826e55; }
-.rollback-observer { position: absolute; left: 25px; bottom: 26px; max-width: 475px; font: 11px/1.7 ui-monospace,monospace; color: #8b613c; border-left: 3px solid #a36231; padding: 8px 12px; background: #fff0ca; }
-.rollback-narration { display: flex; gap: 20px; min-height: 130px; background: #e9efcc; border: 2px solid #789253; padding: 22px; margin-top: 18px; }
-.rollback-narration > span { white-space: nowrap; font: 11px ui-monospace,monospace; padding-top: 4px; }.rollback-narration h4 { margin: 0 0 10px; font-size: 17px; }.rollback-narration p { font-size: 13px; line-height: 1.9; margin: 0; }
-.rollback-controls { position: sticky; top: 66px; z-index: 4; background: #fff0ca; border-bottom: 1px solid #b47b4266; padding: 10px 0; }
-.rollback-step-1 .rollback-narration,.rollback-step-2 .rollback-narration { background: #f8dfce; border-color: #b44f38; }
-.rollback-boundary { padding: 18px 22px; border-left: 3px solid #b47b42; background: #ffdfa244; margin-top: 24px; }.rollback-boundary h4 { margin: 0 0 9px; font-size: 13px; }.rollback-boundary p { margin: 0; font-size: 12px; line-height: 1.9; }
-.rollback-lab button:focus-visible,.rollback-map-scroll:focus-visible { outline: 3px solid #416b88; outline-offset: 3px; }
-@keyframes recovery-traffic { to { stroke-dashoffset: -28; } }@keyframes recovery-failure { to { box-shadow: 0 0 0 5px #b44f3833; } }
-@media(max-width:600px) { .rollback-scenarios { grid-template-columns: 1fr; gap: 8px; }.rollback-scenarios button { min-height: 48px; padding: 10px 12px; }.rollback-scenarios button > span { display: inline-block; margin: 0 14px 0 0; }.rollback-steps { gap: 5px; }.rollback-steps button { font-size: 10px; }.rollback-narration { padding: 16px; gap: 12px; }.rollback-narration > span { font-size: 9px; } }
-@media(prefers-reduced-motion:reduce) { .rollback-wire,.rollback-tile { animation: none !important; transition: none !important; } }
-
-.rollback-relationship { font-size: 13px; line-height: 1.9; padding: 16px 20px; border-left: 3px solid #789253; background: #e9efcc; margin: 18px 0; }
-.rollback-scenarios { grid-template-columns: repeat(4,minmax(0,1fr)); }
-.recovery-procedures { padding: 22px; margin: 24px 0 16px; border: 2px solid #b47b42; background: #fff7df; }
-.recovery-procedures h4 { font-size: 19px; margin: 0 0 20px; }
-.recovery-procedures ol { padding: 0; margin: 0; list-style: none; display: grid; gap: 17px; }
-.recovery-procedures li { display: grid; grid-template-columns: 150px minmax(0,1fr); align-items: start; gap: 18px; padding-top: 17px; border-top: 1px solid #b47b4233; }
-.recovery-procedures li > span { font-size: 11px; line-height: 1.8; padding: 6px 9px; border: 1px solid #789253; background: #e9efcc; color: #47612f; }
-.recovery-procedures .procedure-manual > span { background: #ffdfa2; border-color: #b47b42; color: #63391e; }
-.recovery-procedures .procedure-check > span { background: #e4edf0; border-color: #718b9b; color: #476175; }
-.recovery-procedures p { margin: 0; font-size: 13px; line-height: 2; overflow-wrap: anywhere; }
-.release-hazards { margin: 36px 0 24px; padding-top: 26px; border-top: 2px solid #b47b42; }
-.release-hazards > h4 { font-size: 23px; margin: 0 0 15px; }
-.release-hazards > p { font-size: 13px; line-height: 1.9; padding: 13px 16px; background: #ffdfa266; }
-.release-hazards > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 20px; }
-.release-hazards article { border: 1px solid #b47b42; background: #fff7df; padding: 20px; }
-.release-hazards h5 { margin: 0 0 14px; font: 600 14px/1.6 ui-monospace,monospace; }
-.release-hazards article p { font-size: 12px; line-height: 1.9; margin: 0; }
-.release-hazards .hazard-response { border-top: 1px solid #78925366; margin-top: 14px; padding-top: 14px; color: #47612f; }
-@media(max-width:800px) { .rollback-scenarios { grid-template-columns: repeat(2,minmax(0,1fr)); }.recovery-procedures li { grid-template-columns: 1fr; gap: 9px; }.recovery-procedures li > span { justify-self: start; }.release-hazards > div { grid-template-columns: 1fr; } }
+.rollback-intro,.recovery-summary { font-size: 14px; line-height: 1.9; max-width: 900px; }
+.recovery-categories { margin: 20px 0 16px; }
+.recovery-cases { padding: 14px 0; border-block: 1px solid #b47b4244; }
+.recovery-outcome { margin-bottom: 14px; }
+.recovery-results { grid-template-columns: 1fr 1fr; }
+.recovery-hazards { border-top: 1px solid #b47b4266; padding: 20px 0; }
+.recovery-hazards summary { cursor: pointer; font-size: 14px; font-weight: 600; }
+.recovery-hazards > p { font-size: 12px; line-height: 1.9; margin: 18px 0 24px; }
+.architecture-wires .wire-inactive { color: #b8ac99; }
+.architecture-wires .wire-inactive > path { stroke-dasharray: 3 8; }
+.recovery-map-label { position: absolute; left: 30px; font-size: 11px; color: #765331; }
+.recovery-map-label.control { top: 25px; }.recovery-map-label.traffic { top: 435px; }
+.recovery-map-note { left: 30px; top: 245px; width: 580px; }
+@media(max-width:800px) { .recovery-results { grid-template-columns: 1fr; } }

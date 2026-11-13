@@ -1,54 +1,54 @@
-import { useEffect, useId, useState } from 'react';
+import { useState } from 'react';
 import type { Locale } from './i18n';
-import { architectureCopy, tr } from './architectureData';
-import { rollbackCopy as c } from './rollbackData';
-import { recoveryScenarios as rollbackScenarios, recoveryGuideCopy as g, releaseHazards } from './recoveryGuide';
+import { architectureCopy, tr, type Text } from './architectureData';
+import { ConnectionMap } from './ConnectionMap';
+import { rollbackCopy } from './rollbackData';
+import { recoveryGuideCopy, releaseHazards } from './recoveryGuide';
+import { recoveryGraph, recoveryGroups } from './recoveryMapData';
+
+const c = {
+  intro: ['復旧の仕組みで 5 つに整理。同じグループ内の条件を選び、01・02 と同じようにノードを調べられます。', '按恢复机制整理为 5 类。选择具体情况后，像 01、02 一样查看节点与连线。', 'Five recovery mechanisms. Select a specific case, then explore its nodes and connections just like 01 and 02.'],
+  choose: ['発生条件', '具体情况', 'Specific case'],
+  before: ['問題が起きた時', '出问题时', 'When the fault occurs'],
+  after: ['対処後の結果', '处理后的结果', 'After handling'],
+  control: ['上段：検知・判断・復旧操作', '上方：检测、判断和恢复操作', 'Above: detection, decisions and recovery actions'],
+  traffic: ['下段：本番リクエストの配信先', '下方：生产请求的流向', 'Below: production request routing'],
+  idle: ['破線：本番リクエストなし', '虚线：无生产流量', 'Dashed: no production traffic'],
+  implementation: ['実装範囲と復旧の条件', '实现范围与恢复条件', 'Implementation scope and recovery conditions'],
+  hazards: ['共有データ・互換性の注意点', '共享数据与兼容性注意事项', 'Shared data and compatibility considerations'],
+} satisfies Record<string, Text>;
 
 export function RollbackLab({ locale }: { locale: Locale }) {
-  const [scenario, setScenario] = useState(0), [step, setStep] = useState(0), [playing, setPlaying] = useState(false);
-  const current = rollbackScenarios[scenario];
-  const marker = useId().replace(/:/g, '');
-  useEffect(() => {
-    if (!playing) return;
-    if (step === 4) { setPlaying(false); return; }
-    const timer = window.setTimeout(() => setStep(value => value + 1), 2400);
-    return () => window.clearTimeout(timer);
-  }, [playing, step, scenario]);
-  function select(index: number) { setPlaying(false); setStep(0); setScenario(index); }
-  function move(index: number) { setPlaying(false); setStep(index); }
-  const restoring = step >= 3, broken = step >= 1 && step <= 2;
-  const green = current.beforeTraffic || restoring ? 0 : current.frontend || current.afterRelease ? 100 : 10;
-  const phases = current.beforeTraffic ? g.blockedPhases : c.phases;
-  return <section className={`rollback-lab rollback-step-${step}`} aria-labelledby="rollback-title">
-    <p className="architecture-eyebrow">FAILURE RECOVERY / INTERACTIVE</p>
-    <h3 id="rollback-title">{tr(c.title, locale)}</h3><p className="rollback-intro">{tr(g.intro, locale)}</p>
-    <p className="rollback-relationship">{tr(g.relationship, locale)}</p>
-    <p className="rollback-simulation">{tr(c.simulation, locale)}</p>
-    <div className="rollback-scenarios" role="group" aria-label={tr(c.title, locale)}>{rollbackScenarios.map((item, index) => <button key={item.id} aria-pressed={scenario === index} onClick={() => select(index)}><span>0{index + 1}</span>{' '}{tr(item.title, locale)}</button>)}</div>
-    <section className="recovery-procedures" aria-labelledby="recovery-procedures-title"><h4 id="recovery-procedures-title">{tr(g.procedures, locale)}</h4><ol>{current.procedures.map((item, index) => <li key={index} className={`procedure-${item.mode}`}><span>{tr(g[item.mode], locale)}</span><p>{tr(item.body, locale)}</p></li>)}</ol></section>
-    <div className="canary-controls rollback-controls"><button onClick={() => { if (step === 4) setStep(0); setPlaying(value => !value); }}>{tr(playing ? c.pause : c.play, locale)} {playing ? 'Ⅱ' : '▷'}</button><button disabled={step === 0} onClick={() => move(step - 1)}>{tr(c.previous, locale)}</button><button disabled={step === 4} onClick={() => move(step + 1)}>{tr(c.next, locale)}</button><button onClick={() => move(0)}>{tr(c.reset, locale)} ↺</button></div>
-    <ol className="rollback-steps" aria-label={tr(c.traffic, locale)}>{phases.map((phase, index) => <li key={index} className={index <= step ? 'reached' : ''}><button aria-current={index === step ? 'step' : undefined} onClick={() => move(index)}><span>0{index + 1}</span>{' '}{tr(phase, locale)}</button></li>)}</ol>
-    <div className="rollback-map-scroll" tabIndex={0} role="region" aria-label={tr(c.traffic, locale)}><div className={`rollback-map ${restoring ? 'restoring' : ''} ${broken ? 'broken' : ''}`}>
-      <svg viewBox="0 0 900 370" aria-hidden="true">
-        <defs><marker id={marker} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1L9 5L1 9" fill="none" stroke="currentColor" strokeWidth="2"/></marker></defs>
-        <path className="rollback-wire incoming" d="M180 170H280" markerEnd={`url(#${marker})`}/>
-        <path className={`rollback-wire old-route ${green < 100 ? 'has-traffic' : ''}`} d="M460 170H535V75H650" markerEnd={`url(#${marker})`}/>
-        <path className={`rollback-wire new-route ${green > 0 ? 'has-traffic' : ''}`} d="M460 170H565V285H650" markerEnd={`url(#${marker})`}/>
-        {step >= 2 && !current.beforeTraffic && <path className="rollback-wire rollback-command" d="M650 320H515V225H370V210" markerEnd={`url(#${marker})`}/>}
-        {step >= 2 && !current.beforeTraffic && <text className="recovery-control-label" x="435" y="246">{tr(g.control, locale)}</text>}
-        <text x="548" y="35">{current.beforeTraffic ? tr(g.unchanged, locale) : restoring ? tr(c.returning, locale) : tr(c.traffic, locale)}</text>
-      </svg>
-      <div className="rollback-tile rollback-client"><strong>Browser / API</strong><span>{tr(c.traffic, locale)}</span></div>
-      <div className="rollback-tile rollback-router"><strong>{current.router}</strong><span>{current.frontend ? `LIVE → ${restoring ? 'previous release' : 'new release'}` : green === 0 ? 'live → Blue · 100%' : green === 100 ? 'live → Green · 100%' : 'live → Blue 90% + Green 10%'}</span></div>
-      <div className="rollback-tile rollback-old"><strong>{current.old}</strong><span>{tr(c.old, locale)}</span><b>{100 - green}%</b></div>
-      <div className={`rollback-tile rollback-new ${broken ? 'is-broken' : ''}`}><strong>{current.fresh}</strong><span>{tr(current.beforeTraffic ? g.offline : restoring ? c.isolated : broken ? c.failed : c.fresh, locale)}</span><b>{green}% {broken ? '×' : ''}</b></div>
-      <span className="rollback-observer">{current.observer}</span>
-    </div></div>
-    {!current.beforeTraffic && <p className="architecture-fineprint">{tr(g.controlNote, locale)}</p>}
-    <div className="rollback-narration" role="status"><span>0{step + 1} / 05</span><div><h4>{tr(phases[step], locale)}</h4><p>{tr(current.steps[step], locale)}</p></div></div>
-    {!current.frontend && !current.beforeTraffic && <p className="architecture-fineprint">{tr(architectureCopy.weightNote, locale)}</p>}
-    <aside className="rollback-boundary"><h4>{tr(c.boundary, locale)}</h4><p>{tr(current.boundary, locale)}</p></aside>
-    <section className="release-hazards"><h4>{tr(g.hazards, locale)}</h4><p>{tr(g.scope, locale)}</p><div>{releaseHazards.map(item => <article key={item.title}><h5>{item.title}</h5><p>{tr(item.risk, locale)}</p><p className="hazard-response">{tr(item.response, locale)}</p></article>)}</div></section>
-    <div className="cost-sources">AWS DOCS ↗ <a href="https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals-approve-or-reject.html" target="_blank" rel="noreferrer">Approval</a><a href="https://docs.aws.amazon.com/codedeploy/latest/userguide/deployments-stop.html" target="_blank" rel="noreferrer">Stop deployment</a><a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/publish-function.html" target="_blank" rel="noreferrer">CloudFront Publish</a></div>
+  const [groupId, setGroupId] = useState(recoveryGroups[0].id);
+  const [routeId, setRouteId] = useState(recoveryGroups[0].routes[0].id);
+  const [selection, setSelection] = useState('failure');
+  const [recovered, setRecovered] = useState(false);
+  const group = recoveryGroups.find(item => item.id === groupId)!;
+  const route = group.routes.find(item => item.id === routeId)!;
+  const { nodes, edges } = recoveryGraph(route, recovered);
+  const selected = nodes.find(node => node.id === selection) ?? nodes[0];
+  function selectRoute(id: string) { setRouteId(id); setSelection('failure'); setRecovered(false); }
+  return <section className="rollback-lab" aria-labelledby="rollback-title">
+    <h3 id="rollback-title">{tr(rollbackCopy.title, locale)}</h3>
+    <p className="rollback-intro">{tr(c.intro, locale)}</p>
+    <div className="architecture-tabs recovery-categories" role="group" aria-label={tr(rollbackCopy.title, locale)}>
+      {recoveryGroups.map((item, index) => <button key={item.id} aria-pressed={item.id === groupId} onClick={() => { setGroupId(item.id); selectRoute(item.routes[0].id); }}>{String(index + 1).padStart(2, '0')} / {tr(item.title, locale)}</button>)}
+    </div>
+    <div className="architecture-tabs recovery-cases" role="group" aria-label={tr(c.choose, locale)}>
+      {group.routes.map(item => <button key={item.id} aria-pressed={item.id === routeId} onClick={() => selectRoute(item.id)}>{tr(item.title, locale)}</button>)}
+    </div>
+    <p className="recovery-summary">{tr(route.summary, locale)}</p>
+    <div className="architecture-map-heading"><p>{tr(architectureCopy.hint, locale)}</p><div className="architecture-legend"><span>━ {tr(c.control, locale)}</span><span>┄ {tr(c.idle, locale)}</span></div></div>
+    <div className="architecture-tabs recovery-outcome" role="group" aria-label={tr(c.traffic, locale)}>
+      <button aria-pressed={!recovered} onClick={() => { setRecovered(false); setSelection('router'); }}>{tr(c.before, locale)}</button>
+      <button aria-pressed={recovered} onClick={() => { setRecovered(true); setSelection('router'); }}>{tr(c.after, locale)}</button>
+    </div>
+    <ConnectionMap key={route.id} nodes={nodes} edges={edges} locale={locale} selected={selected.id} onSelect={setSelection} delivery={false} recovery note={route.tiles.length <= 4 ? tr(recovered ? route.after : route.before, locale) : undefined}/>
+    <div className={`architecture-story ${selected.kind ?? ''}`} id="architecture-node-story"><span className="architecture-story-index">{String(nodes.indexOf(selected) + 1).padStart(2, '0')} / {nodes.length}</span><div><h3>{selected.title}</h3><p>{tr(selected.detail, locale)}</p></div></div>
+    <div className="architecture-foundations recovery-results" aria-live="polite">
+      <article><h3>{tr(recovered ? c.after : c.before, locale)}</h3><p>{tr(recovered ? route.after : route.before, locale)}</p></article>
+      <article><h3>{tr(c.implementation, locale)}</h3><p>{tr(route.boundary, locale)}</p></article>
+    </div>
+    <details className="recovery-hazards"><summary>{tr(c.hazards, locale)}</summary><p>{tr(recoveryGuideCopy.scope, locale)}</p><div className="architecture-foundations">{releaseHazards.map(item => <article key={item.title}><h3>{item.title}</h3><p>{tr(item.risk, locale)}</p><p>{tr(item.response, locale)}</p></article>)}</div></details>
   </section>;
 }

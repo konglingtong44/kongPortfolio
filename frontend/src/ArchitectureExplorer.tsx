@@ -1,8 +1,9 @@
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import type { Locale } from './i18n';
-import { architectureCopy as c, deliveryEdges, deliveryNodes, foundations, runtimeEdges, runtimeNodes, tr, type ArchitectureNode, type Edge } from './architectureData';
+import { architectureCopy as c, deliveryEdges, deliveryNodes, foundations, runtimeEdges, runtimeNodes, tr } from './architectureData';
 import './architecture.css';
 import { RollbackLab } from './RollbackLab';
+import { ConnectionMap } from './ConnectionMap';
 
 export function ArchitectureThumbnail({ locale }: { locale: Locale }) {
   return <span className="architecture-thumbnail" aria-hidden="true">
@@ -15,27 +16,6 @@ export function ArchitectureThumbnail({ locale }: { locale: Locale }) {
   </span>;
 }
 
-function ConnectionMap({ nodes, edges, locale, selected, onSelect, delivery }: { nodes: ArchitectureNode[]; edges: Edge[]; locale: Locale; selected: string; onSelect: (id: string) => void; delivery: boolean }) {
-  const marker = useId().replace(/:/g, '');
-  return <div className="architecture-map-scroll" tabIndex={0} role="region" aria-label={tr(delivery ? c.delivery : c.runtime, locale)}>
-    <div className={`architecture-canvas ${delivery ? 'delivery-canvas' : ''}`}>
-      {!delivery && <div className="aws-boundary"><span>AWS / TOKYO · ap-northeast-1 <small>ACM → us-east-1</small></span></div>}
-      <svg className="architecture-wires" viewBox="0 0 1070 620" aria-hidden="true">
-        <defs><marker id={marker} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="currentColor" strokeWidth="2"/></marker></defs>
-        {edges.map(edge => <g key={`${edge.from}-${edge.to}`} className={`${edge.from === selected || edge.to === selected ? 'wire-active' : ''} ${edge.dashed ? 'wire-planned' : ''}`}>
-          <path d={edge.path} markerEnd={`url(#${marker})`}/>{edge.label && <text x={edge.x} y={edge.y}>{edge.label}</text>}
-        </g>)}
-      </svg>
-      {nodes.map(node => <button key={node.id} className={`architecture-node ${node.kind ?? ''} ${node.id === selected ? 'is-selected' : ''}`} style={{ left: node.x, top: node.y }} aria-pressed={node.id === selected} aria-controls="architecture-node-story" onMouseEnter={() => onSelect(node.id)} onFocus={() => onSelect(node.id)} onClick={() => onSelect(node.id)}>
-        <span className="node-corner" aria-hidden="true">{node.kind === 'gate' ? '◇' : node.kind === 'planned' ? '…' : node.kind === 'alternative' ? '⑂' : '▪'}</span>
-        <strong>{node.title}</strong><span>{tr(node.sub, locale)}</span>
-        {node.kind && node.kind !== 'gate' && <small>{tr(node.kind === 'planned' ? c.planned : c.alternative, locale)}</small>}
-        <span aria-hidden="true" className={`node-tooltip ${node.y >= 275 ? 'tooltip-above' : ''} ${node.x > 760 ? 'tooltip-right' : ''}`}>{tr(node.detail, locale)}</span>
-      </button>)}
-      {delivery && <div className="delivery-map-note"><span>ONE SHA · ONE CANDIDATE</span><p>{tr(['同じ成果物を STG → Green → 本番へ。承認は各実行ごとに 2 回。', '同一制品依次进入 STG → Green → 生产，每次执行都需两道新审批。', 'The same artifacts move through STG → Green → production. Two new approvals for every execution.'], locale)}</p></div>}
-    </div>
-  </div>;
-}
 
 function CanaryDemo({ locale }: { locale: Locale }) {
   const [stage, setStage] = useState(0);

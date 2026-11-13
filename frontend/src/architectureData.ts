@@ -3,7 +3,7 @@ import type { Locale } from './i18n';
 export type Text = readonly [string, string, string];
 export const tr = (text: Text, locale: Locale) => text[locale === 'ja' ? 0 : locale === 'zh' ? 1 : 2];
 export type ArchitectureNode = { id: string; title: string; sub: Text; detail: Text; x: number; y: number; kind?: 'planned' | 'alternative' | 'gate' };
-export type Edge = { from: string; to: string; path: string; label?: string; x?: number; y?: number; dashed?: boolean };
+export type Edge = { from: string; to: string; path: string; label?: string; x?: number; y?: number; dashed?: boolean; inactive?: boolean };
 export const architectureCopy = {
   title: ['このサイトの設計図', '这个网站的架构图', 'The architecture of this site'],
   intro: ['フロントエンドと API の構成、AWS の配信基盤、二段階承認を含むリリース手順をまとめました。', '从 React 页面到 Java API、AWS 托管，再到两道审批的发布流程。沿着连线，看看这个个人项目如何运转。', 'From a React interface to a Java API, AWS hosting and a release with two approval gates. Follow the connections through this personal project.'],
