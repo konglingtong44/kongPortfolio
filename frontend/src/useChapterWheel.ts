@@ -1,13 +1,16 @@
 ﻿import { useEffect, useRef, type RefObject } from 'react';
 
+import { isMobileLayout } from './useMobileLayout';
+
 type Chapter = 'intro' | 'shelf' | 'skills';
 const gesture = { total: 0, lastEvent: -Infinity, lockedUntil: 0, consumed: false, direction: 0 };
-export function scrollToChapter(id: 'home' | 'projects' | 'skills') {
+export function scrollToChapter(id: 'home' | 'projects' | 'skills' | 'lab') {
   const element = document.getElementById(id);
   if (!element) return;
   const top = id === 'home' ? 0 : element.getBoundingClientRect().top + window.scrollY;
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  window.scrollTo({ top, behavior: reduced ? 'instant' : 'smooth' });
+  const distantMobileChapter = isMobileLayout() && Math.abs(top - window.scrollY) > window.innerHeight * 1.5;
+  window.scrollTo({ top, behavior: reduced || distantMobileChapter ? 'instant' : 'smooth' });
 }
 
 // Select by viewport coverage, not a near-exact top coordinate or pointer location.
@@ -32,6 +35,7 @@ export function useChapterWheel(ref: RefObject<HTMLElement | null>, onStep: (dir
   useEffect(() => {
     if (!ref.current || !ready) return;
     function wheel(event: WheelEvent) {
+      if (isMobileLayout()) return;
       if (!window.matchMedia?.('(hover: hover) and (pointer: fine)').matches || event.ctrlKey || event.metaKey || event.altKey || document.querySelector('dialog[open]')) return;
       const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
       if (!delta || mode === 'intro' && delta < 0 || mode === 'skills' && delta > 0) return;

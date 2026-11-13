@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { ArchitectureExplorer } from './ArchitectureExplorer';
 import { ProjectGallery } from './ProjectGallery';
+import { mobileLayoutQuery } from './useMobileLayout';
+
+afterEach(() => vi.unstubAllGlobals());
 
 it('explains planned services on focus and tap in every language', () => {
   for (const locale of ['ja', 'zh', 'en'] as const) {
@@ -58,4 +61,38 @@ it('opens the architecture from the portfolio illustration and restores focus on
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
   expect(entry).toHaveFocus();
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('opens a floating touch explanation, changes it on another node and dismisses it', () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === mobileLayoutQuery, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<ArchitectureExplorer locale="en"/>);
+  const lambda = screen.getByRole('button', { name: /AWS Lambda/ });
+  fireEvent.click(lambda);
+  const bubble = screen.getByRole('tooltip');
+  expect(bubble).toHaveClass('architecture-touch-tooltip');
+  expect(bubble.style.left).not.toBe('');
+  expect(lambda).toHaveAttribute('aria-describedby', bubble.id);
+  expect(bubble.closest('.architecture-map-scroll')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: /Amazon Bedrock/ }));
+  expect(screen.getByRole('tooltip')).toHaveTextContent('PREPARING');
+  fireEvent.pointerDown(document.body);
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  fireEvent.click(lambda);
+  fireEvent.click(lambda);
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  fireEvent.click(lambda);
+  fireEvent.scroll(screen.getByRole('region', { name: '01 / Architecture' }));
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+});
+
+it('keeps a touch explanation inside the open dialog top layer and consumes Escape before closing it', () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === mobileLayoutQuery, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<ProjectGallery locale="en" projects={[{ title: 'kongPortfolio', kind: 'personal', period: '2026.11', role: 'Developer', description: 'Personal website.', tags: ['React'], outcome: 'Deployed.' }]}/>);
+  fireEvent.click(screen.getByRole('button', { name: 'Open project: kongPortfolio' }));
+  const dialog = screen.getByRole('dialog');
+  fireEvent.click(within(dialog).getByRole('button', { name: /AWS Lambda/ }));
+  expect(screen.getByRole('tooltip').parentElement).toBe(dialog);
+  fireEvent.keyDown(document, { key: 'Escape' });
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+  expect(dialog).toHaveAttribute('open');
 });

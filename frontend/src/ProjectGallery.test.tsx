@@ -1,4 +1,4 @@
-﻿import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { journeyEntries, newestProjects, ProjectGallery } from './ProjectGallery';
 import type { Profile } from './profile';
@@ -14,7 +14,7 @@ const timeline: Profile['timeline'] = [
 ];
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 function media(reduced = false) {
-  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('reduce') ? reduced : true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('max-width') ? false : query.includes('reduce') ? reduced : true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
 }
 
 it('sorts and merges matching career periods without losing their context', () => {
@@ -118,4 +118,74 @@ it('cancels a pending timeline open when the user interrupts the row', () => {
   fireEvent.pointerDown(container.querySelector('.gallery-viewport')!);
   act(() => vi.advanceTimersByTime(1000));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('selects projects from the mobile timeline without opening details or capturing vertical wheel input', () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('max-width') || query.includes('reduce'), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(300);
+  vi.spyOn(HTMLElement.prototype, 'offsetLeft', 'get').mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains('project-item') ? Array.from(this.parentElement!.children).indexOf(this) * 300 : 0;
+  });
+  HTMLElement.prototype.scrollTo = vi.fn(function (this: HTMLElement, options: ScrollToOptions | number = {}, _y?: number) { if (typeof options === 'object' && options.left !== undefined) this.scrollLeft = options.left; });
+  const { container } = render(<ProjectGallery projects={projects} locale="en"/>);
+  const navigation = screen.getByRole('navigation', { name: 'Career timeline' });
+  fireEvent.click(within(navigation).getByRole('button', { name: /Middle project/ }));
+  act(() => vi.advanceTimersByTime(1000));
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('02 / 03');
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(fireEvent.wheel(container.querySelector('.gallery-viewport')!, { deltaY: 100, cancelable: true })).toBe(true);
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('02 / 03');
+  expect(within(navigation).getAllByRole('button').every(button => button.tabIndex === 0)).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Open project: Middle project' }));
+  expect(screen.getByRole('dialog', { name: 'Middle project' })).toBeInTheDocument();
+});
+
+it('keeps the selected mobile project centered when the viewport width changes', () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query.includes('max-width') || query.includes('reduce'), addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  let width = 300;
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(() => width);
+  vi.spyOn(HTMLElement.prototype, 'offsetLeft', 'get').mockImplementation(function (this: HTMLElement) {
+    return this.classList.contains('project-item') ? Array.from(this.parentElement!.children).indexOf(this) * width : 0;
+  });
+  const scroll = vi.fn(function (this: HTMLElement, options: ScrollToOptions | number = {}, _y?: number) { if (typeof options === 'object' && options.left !== undefined) this.scrollLeft = options.left; });
+  HTMLElement.prototype.scrollTo = scroll;
+  const { container } = render(<ProjectGallery projects={projects} locale="en"/>);
+  fireEvent.click(screen.getByRole('button', { name: 'Next project' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Next project' }));
+  act(() => vi.advanceTimersByTime(1000));
+  width = 500;
+  fireEvent.scroll(container.querySelector('.gallery-viewport')!);
+  fireEvent.scroll(window);
+  fireEvent(window, new Event('resize'));
+  expect(scroll).toHaveBeenLastCalledWith({ left: 1000, behavior: 'instant' });
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('03 / 03');
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+it('drags the desktop timeline independently and suppresses the click after dragging', () => {
+  media();
+  const { container } = render(<ProjectGallery projects={projects} locale="en"/>);
+  const rail = screen.getByRole('navigation', { name: 'Career timeline' });
+  const track = container.querySelector('.career-rail-track') as HTMLElement;
+  const dispatch = (target: HTMLElement | Window, type: string, y: number) => {
+    fireEvent(target, Object.assign(new Event(type, { bubbles: true, cancelable: true }), { pointerType: 'mouse', pointerId: 7, clientY: y, button: 0 }));
+  };
+  const before = track.style.transform;
+  const entry = within(rail).getByRole('button', { name: /Middle project/ });
+  dispatch(entry, 'pointerdown', 300);
+  dispatch(window, 'pointermove', 140);
+  expect(track.style.transform).not.toBe(before);
+  expect(rail).toHaveClass('is-dragging');
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('01 / 03');
+  dispatch(window, 'pointerup', 140);
+  expect(rail).not.toHaveClass('is-dragging');
+  fireEvent.click(entry);
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('01 / 03');
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  dispatch(entry, 'pointerdown', 140);
+  dispatch(window, 'pointerup', 140);
+  fireEvent.click(entry);
+  expect(container.querySelector('.gallery-page')).toHaveTextContent('02 / 03');
 });

@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import App from './App';
 import { localeKey } from './i18n';
+import { mobileLayoutQuery } from './useMobileLayout';
 
 const profile = {
   name: 'Kong', role: 'Software engineer', introduction: 'A profile from the API.',
@@ -33,6 +34,21 @@ it('renders API content, changes language and remembers the choice on reload', a
   view.unmount(); render(<App />);
   expect(screen.getByRole('button', { name: '中文' })).toHaveAttribute('aria-pressed', 'true');
   await screen.findByText(profile.introduction);
+});
+
+it('lets mobile readers expand the full introduction and resets it on language change', async () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === mobileLayoutQuery, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(ok()));
+  render(<App/>);
+  await screen.findByText(profile.introduction);
+  const more = screen.getByRole('button', { name: 'More about me' });
+  expect(more).toHaveAttribute('aria-expanded', 'false');
+  fireEvent.click(more);
+  expect(screen.getByRole('button', { name: 'Less about me' })).toHaveAttribute('aria-expanded', 'true');
+  expect(document.getElementById('hero-intro')).toHaveClass('is-expanded');
+  expect(document.getElementById('hero-intro')).toHaveTextContent(profile.introduction);
+  fireEvent.click(screen.getByRole('button', { name: '中文' }));
+  expect(await screen.findByRole('button', { name: '完整介绍' })).toHaveAttribute('aria-expanded', 'false');
 });
 
 it('shows an error for an unavailable backend and recovers after retry', async () => {

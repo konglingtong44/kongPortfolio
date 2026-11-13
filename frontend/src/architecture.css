@@ -55,6 +55,13 @@
 .architecture-node:hover > .node-tooltip,.architecture-node:focus-visible > .node-tooltip { opacity: 1; visibility: visible; }
 @media (max-width:1200px) and (min-width:801px) { .module-dialog.architecture-dialog { padding-inline: 16px; } }
 @media (hover:none) { .architecture-node:hover > .node-tooltip { visibility: hidden; } }
+.has-touch-tooltip .architecture-node > .node-tooltip { display: none; }
+.architecture-touch-tooltip {
+  position: fixed; z-index: 20; padding: 14px 16px; background: #fff8e5; color: #63391e;
+  border: 2px solid #a36231; box-shadow: 4px 4px 0 #63391e33;
+  font-size: 12px; line-height: 1.9; font-weight: 400; text-align: left;
+  overflow-y: auto; overflow-wrap: anywhere; touch-action: pan-y pinch-zoom;
+}
 
 /* Recovery uses the same 180 x 90 service tiles, tooltip and route animation. */
 .rollback-lab { padding-top: 26px; }

@@ -9,6 +9,8 @@ import { PixelMark } from './PixelGarden';
 import { ProjectGallery } from './ProjectGallery';
 import { SkillsBento } from './SkillsBento';
 import { IntroTimeline } from './IntroTimeline';
+import { MobileChapterNav } from './MobileChapterNav';
+import { useMobileLayout } from './useMobileLayout';
 import './intro.css';
 import { scrollToChapter, useChapterWheel } from './useChapterWheel';
 
@@ -26,6 +28,8 @@ function FloatingModule({ id, locale, profile, onClose }: { id: ModuleId; locale
 export default function App() {
   const [locale, setLocale] = useState<Locale>(initialLocale);
   const [attempt, setAttempt] = useState(0);
+  const mobile = useMobileLayout();
+  const [bioExpanded, setBioExpanded] = useState(false);
   const [state, setState] = useState<ProfileState>({ status: 'loading', locale });
   const [active, setActive] = useState<ModuleId | null>(null), [menu, setMenu] = useState(false);
   const t = copy[locale], m = modulesCopy[locale];
@@ -33,6 +37,7 @@ export default function App() {
   const status = state.locale === locale ? state.status : 'loading';
   const home = useRef<HTMLElement>(null);
   const initialAnchor = useRef(window.location.hash);
+  useEffect(() => setBioExpanded(false), [locale]);
   useChapterWheel(home, () => scrollToChapter('projects'), !!profile, 'intro');
   useEffect(() => {
     if (!profile || !initialAnchor.current) return;
@@ -76,7 +81,7 @@ export default function App() {
     <main id="main">
       <section id="introduction" ref={home} className="home-section wrap intro-layout" aria-labelledby="hero-title">
         <div className="home-topline"><span className="eyebrow">{m.gardenLabel}</span><span className="home-index">01 — 04</span></div>
-        <div className="home-layout"><div className="home-copy"><p className="greeting">{t.greeting}</p><h1 id="hero-title">kong<span>Portfolio<span className="pixel-period">.</span></span></h1><p className="hero-role">{profile?.role ?? m.role} / Java · Web · Cloud</p><p className="hero-intro">{profile?.introduction ?? t.subtitle}</p><a className="primary-button" href="#projects">{t.cta}<span aria-hidden="true">→</span></a></div><IntroTimeline locale={locale}/></div>
+        <div className="home-layout"><div className="home-copy"><p className="greeting">{t.greeting}</p><h1 id="hero-title">kong<span>Portfolio<span className="pixel-period">.</span></span></h1><p className="hero-role">{profile?.role ?? m.role} / Java · Web · Cloud</p><p id="hero-intro" className={`hero-intro${mobile && bioExpanded ? ' is-expanded' : ''}`}>{profile?.introduction ?? t.subtitle}</p><a className="primary-button" href="#projects">{t.cta}<span aria-hidden="true">→</span></a>{mobile && <button className="mobile-intro-toggle" aria-expanded={bioExpanded} aria-controls="hero-intro" onClick={() => setBioExpanded(value => !value)}>{locale === 'ja' ? bioExpanded ? '紹介を閉じる' : '紹介をもっと読む' : locale === 'zh' ? bioExpanded ? '收起介绍' : '完整介绍' : bioExpanded ? 'Less about me' : 'More about me'}</button>}</div><IntroTimeline locale={locale}/></div>
         <div className="home-bottom"><span>{m.gardenFooter}</span><a href="#projects">{t.journey}<span aria-hidden="true">↓</span></a></div>
       </section>
       <div className="content-status" aria-live="polite" aria-busy={status === 'loading'}>{status === 'loading' && <p role="status">{t.loading}</p>}{status === 'error' && <div role="alert"><p>{t.error}</p><button className="primary-button" onClick={() => setAttempt(a => a + 1)}>{t.retry} ↻</button></div>}</div>
@@ -85,6 +90,7 @@ export default function App() {
       <section className="lab-section" id="lab"><div className="section-heading"><p className="eyebrow">04 / {m.tools}</p><h2>{m.labTitle}</h2><p>{m.labIntro}</p></div><div className="module-grid">{modules.map(module => <button className={`module-card module-${module.id}`} key={module.id} disabled={module.id === 'notes' && !profile} onClick={() => setActive(module.id)}><span className="module-number">{module.number} / {module.id.toUpperCase()}</span><span className="module-glyph" aria-hidden="true">{module.id === 'regex' ? <span>.*</span> : <PixelMark variant={module.id === 'about' ? 3 : 0}/>}</span><h3>{m[module.id]}</h3><p>{m[`${module.id}Sub`]}</p><span className="module-open">{module.id === 'about' ? m.pending : m.open}<b>↗</b></span></button>)}</div></section>
     </main>
     <footer><a className="wordmark" href="#home">kong<span>Portfolio</span><i/></a><p>Java · React · Spring Boot</p><a href="#home">{m.back} ↑</a></footer>
+    <MobileChapterNav locale={locale} ready={!!profile}/>
     {active && <FloatingModule id={active} locale={locale} profile={profile} onClose={() => setActive(null)}/>}
   </>;
 }

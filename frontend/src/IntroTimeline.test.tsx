@@ -1,7 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { expect, it, vi } from 'vitest';
+import { afterEach, expect, it, vi } from 'vitest';
 import { IntroTimeline } from './IntroTimeline';
 import { ProjectGallery } from './ProjectGallery';
+import { mobileLayoutQuery } from './useMobileLayout';
+
+afterEach(() => vi.unstubAllGlobals());
 
 it('shows the supplied education and employment periods with anonymous company labels', () => {
   render(<IntroTimeline locale="zh"/>);
@@ -41,4 +44,17 @@ it('returns from 02 to 01 through its explicit button', () => {
   fireEvent.click(screen.getByRole('link', { name: '01 / Back to intro' }));
   expect(scroll).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
   home.remove(); vi.unstubAllGlobals();
+});
+
+it('collapses the mobile career summary without removing any of the four milestones', () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === mobileLayoutQuery, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  const { container } = render(<IntroTimeline locale="zh"/>);
+  const details = container.querySelector('details')!;
+  expect(details).not.toHaveAttribute('open');
+  expect(container.querySelectorAll('.intro-milestones li')).toHaveLength(4);
+  expect(container.querySelector('.intro-timeline-art')).not.toBeInTheDocument();
+  fireEvent.click(details.querySelector('summary')!);
+  expect(details).toHaveAttribute('open');
+  expect(screen.getByRole('heading', { name: '辽宁师范大学' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'B 社' })).toBeInTheDocument();
 });

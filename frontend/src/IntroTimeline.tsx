@@ -1,5 +1,6 @@
 import type { Locale } from './i18n';
 import { PixelGarden } from './PixelGarden';
+import { useMobileLayout } from './useMobileLayout';
 
 const copy = {
   ja: {
@@ -37,14 +38,19 @@ const periods = [
 
 export function IntroTimeline({ locale }: { locale: Locale }) {
   const t = copy[locale];
-  return <aside className="intro-timeline" aria-labelledby="intro-timeline-title">
-    <div className="intro-timeline-art"><PixelGarden compact/></div>
-    <div className="intro-timeline-content"><div className="intro-timeline-heading"><span aria-hidden="true">01 /</span><h2 id="intro-timeline-title">{t.title}</h2></div>
-      <ol className="intro-milestones">{t.entries.map((entry, index) => <li key={entry.name}>
+  const mobile = useMobileLayout();
+  const milestones = <ol className="intro-milestones">{t.entries.map((entry, index) => <li key={entry.name}>
         <p className="intro-period"><time dateTime={periods[index][0].replace('.', '-')}>{periods[index][0]}</time><span>—</span>{periods[index][1] ? <time dateTime={periods[index][1]!.replace('.', '-')}>{periods[index][1]}</time> : t.present}</p>
         <div className="intro-milestone-title"><h3>{entry.name}</h3><span>{entry.role}</span></div>
         <p className="intro-milestone-detail">{entry.detail}</p>
-      </li>)}</ol>
-    </div>
+      </li>)}</ol>;
+  return <aside className="intro-timeline" aria-labelledby="intro-timeline-title">
+    {mobile ? <details className="intro-career-details">
+      <summary><span aria-hidden="true">01 /</span><h2 id="intro-timeline-title">{t.title}</h2><span className="intro-career-expand" aria-hidden="true">+</span></summary>
+      <div className="intro-timeline-content">{milestones}</div>
+    </details> : <>
+      <div className="intro-timeline-art"><PixelGarden compact/></div>
+      <div className="intro-timeline-content"><div className="intro-timeline-heading"><span aria-hidden="true">01 /</span><h2 id="intro-timeline-title">{t.title}</h2></div>{milestones}</div>
+    </>}
   </aside>;
 }

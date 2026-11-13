@@ -1,4 +1,4 @@
-﻿import { useRef } from 'react';
+import { useRef } from 'react';
 import { act, fireEvent, render } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { activeChapter, useChapterWheel } from './useChapterWheel';
@@ -14,7 +14,7 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(
 let testTime = 0;
 function setup() {
   vi.useFakeTimers(); vi.advanceTimersByTime(testTime += 5000);
-  vi.stubGlobal('matchMedia', () => ({ matches: true }));
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: !query.includes('max-width') }));
   let chapter = 1, offset = 0;
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
     const top = this.id === 'projects' ? (2 - chapter) * 900 + offset : this.id === 'skills' ? (3 - chapter) * 900 : (1 - chapter) * 900;
@@ -72,7 +72,7 @@ it('does not trap scrolling through the lower toolkit, zooming, coarse pointers 
   expect(fireEvent.wheel(document, { deltaY: 100, ctrlKey: true, cancelable: true })).toBe(true);
   vi.stubGlobal('matchMedia', () => ({ matches: false }));
   expect(fireEvent.wheel(document, { deltaY: 100, cancelable: true })).toBe(true);
-  vi.stubGlobal('matchMedia', () => ({ matches: true }));
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: !query.includes('max-width') }));
   const dialog = document.createElement('dialog'); dialog.setAttribute('open', ''); document.body.append(dialog);
   expect(fireEvent.wheel(document, { deltaY: 100, cancelable: true })).toBe(true);
   dialog.remove(); expect(advance).not.toHaveBeenCalled();

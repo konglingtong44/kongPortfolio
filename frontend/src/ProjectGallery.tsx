@@ -8,11 +8,14 @@ import { PixelGarden, PixelMark } from './PixelGarden';
 import { scrollToChapter, useChapterWheel } from './useChapterWheel';
 import { ArchitectureExplorer, ArchitectureThumbnail } from './ArchitectureExplorer';
 import { architectureCopy, tr } from './architectureData';
+import { isMobileLayout, useMobileLayout } from './useMobileLayout';
+import { useTimelineDrag } from './useTimelineDrag';
 
 type Project = Profile['projects'][number];
 type Event = Profile['timeline'][number];
 const homeLabel = { ja: '自己紹介へ', zh: '返回简介', en: 'Back to intro' };
 const thisProjectLabel = { ja: '本プロジェクト', zh: '本项目', en: 'This project' };
+const mobileHint = { ja: '左：上下に経歴 · 右：左右にプロジェクト · 上下で次の章へ', zh: '左侧上下看时间线 · 右侧左右换项目，上下滑动进入其他章节', en: 'Left: scroll timeline · Right: swipe projects · Swipe vertically for chapters' };
 export type JourneyEntry = { title: string; period: string; description: string; project?: Project; event?: Event };
 const galleryCopy = {
   ja: { title: '経験とプロジェクト', hint: 'スクロールで一つずつ · 時間軸を選ぶと詳細へ', previous: '前のプロジェクト', next: '次のプロジェクト', open: 'プロジェクトを開く', label: '経験とプロジェクト一覧', career: 'これまでの経験', overview: '経歴・担当内容', skills: '技術スタックへ', timeline: '経歴の時間軸', team: '役割・チーム規模', tasks: '担当したこと', environment: '使用技術・環境', outcome: '成果・現在の状況' },
@@ -42,7 +45,10 @@ export function ProjectGallery({ projects, timeline = [], locale }: { projects: 
       ? { ...entry, period: thisProjectLabel[locale] }
       : entry);
   const root = useRef<HTMLElement>(null), viewport = useRef<HTMLDivElement>(null), track = useRef<HTMLOListElement>(null);
+  const rail = useRef<HTMLElement>(null), mobile = useMobileLayout();
+  const viewportWidth = useRef(0);
   const [current, setCurrent] = useState(0), [fraction, setFraction] = useState(0), [selected, setSelected] = useState<number | null>(null);
+  const timelineDrag = useTimelineDrag(fraction, current, ordered.length);
   const target = useRef(0), settling = useRef(0), pendingOpen = useRef<number | null>(null), timer = useRef<number | undefined>(undefined);
   const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   function cancelPending() { window.clearTimeout(timer.current); pendingOpen.current = null; }
@@ -81,6 +87,9 @@ export function ProjectGallery({ projects, timeline = [], locale }: { projects: 
   const isPortfolio = (item: JourneyEntry) => item.project?.kind === 'personal' && item.title === 'kongPortfolio';
   function syncScroll(schedule = true) {
     if (!viewport.current || !track.current) return;
+    // Ignore the browser's intermediate scroll adjustment during a mobile resize.
+    // The resize handler re-centers the same project at the new card width.
+    if (isMobileLayout() && viewportWidth.current && viewportWidth.current !== viewport.current.clientWidth) return;
     const first = track.current.children[0] as HTMLElement | undefined;
     const second = track.current.children[1] as HTMLElement | undefined;
     const step = first && second ? second.offsetLeft - first.offsetLeft : viewport.current.clientWidth;
@@ -91,20 +100,41 @@ export function ProjectGallery({ projects, timeline = [], locale }: { projects: 
     if (schedule) { window.clearTimeout(timer.current); timer.current = window.setTimeout(finishScroll, 140); }
   }
   useEffect(() => {
+    viewportWidth.current = viewport.current?.clientWidth ?? 0;
     function restore() {
       // Re-read the actual horizontal position after manual vertical navigation or resize.
       if (performance.now() >= settling.current) syncScroll(false);
     }
     window.addEventListener('scroll', restore, { passive: true });
-    window.addEventListener('resize', restore);
-    return () => { window.removeEventListener('scroll', restore); window.removeEventListener('resize', restore); };
+    let width = viewport.current?.clientWidth;
+    function resize() {
+      if (!isMobileLayout()) { restore(); return; }
+      if (!viewport.current || viewport.current.clientWidth === width) return;
+      width = viewport.current.clientWidth;
+      viewportWidth.current = width;
+      cancelPending();
+      settling.current = 0;
+      viewport.current.scrollTo?.({ left: position(target.current), behavior: 'instant' });
+      setFraction(target.current);
+    }
+    window.addEventListener('resize', resize);
+    return () => { window.removeEventListener('scroll', restore); window.removeEventListener('resize', resize); };
   }, [ordered.length]);
+  useEffect(() => {
+    if (!mobile || !rail.current) return;
+    const item = rail.current.querySelector<HTMLElement>('.rail-entry.active')?.parentElement;
+    if (!item) return;
+    const top = item.offsetTop;
+    if (top < rail.current.scrollTop || top + item.offsetHeight > rail.current.scrollTop + rail.current.clientHeight) {
+      rail.current.scrollTo?.({ top: Math.max(0, top - (rail.current.clientHeight - item.offsetHeight) / 2), behavior: 'auto' });
+    }
+  }, [current, mobile]);
   return <section id="projects" ref={root} className="project-gallery chapter-screen" aria-labelledby="projects-title">
     <div id="journey" className="chapter-anchor"/>
-    <div className="gallery-pin"><div className="gallery-heading wrap"><div><p className="eyebrow">02 / {t.journey} & {t.projects}</p><h2 id="projects-title">{g.title}</h2></div><p>{m.latest}<br/><span>{g.hint}</span></p><a className="gallery-home-button" href="#home" onClick={event => { event.preventDefault(); cancelPending(); scrollToChapter('home'); }}><span aria-hidden="true">↑</span>01 / {homeLabel[locale]}</a></div>
+    <div className="gallery-pin"><div className="gallery-heading wrap"><div><p className="eyebrow">02 / {t.journey} & {t.projects}</p><h2 id="projects-title">{g.title}</h2></div><p>{m.latest}<br/><span className="gallery-hint-desktop">{g.hint}</span><span className="gallery-hint-mobile">{mobileHint[locale]}</span></p><a className="gallery-home-button" href="#home" onClick={event => { event.preventDefault(); cancelPending(); scrollToChapter('home'); }}><span aria-hidden="true">↑</span>01 / {homeLabel[locale]}</a></div>
       <div className="gallery-body">
-        <nav className="career-rail" aria-label={g.timeline}><div className="rail-center" aria-hidden="true"/><ol className="career-rail-track" style={{ transform: `translateY(${-fraction * 112 - 56}px)` }}>
-          {ordered.map((item, i) => <li key={`${item.title}-${item.period}`}><button className={current === i ? 'rail-entry active' : 'rail-entry'} tabIndex={current === i ? 0 : -1} aria-current={current === i ? 'step' : undefined} onClick={() => goTo(i, false, true)} onKeyDown={event => {
+        <nav className={`career-rail ${timelineDrag.dragging ? 'is-dragging' : ''}`} ref={rail} aria-label={g.timeline} onPointerDown={event => { cancelPending(); timelineDrag.onPointerDown(event); }} onClickCapture={timelineDrag.onClickCapture} onDragStart={event => event.preventDefault()}><div className="rail-center" aria-hidden="true"/><ol className="career-rail-track" style={{ transform: `translateY(${-timelineDrag.position * 112 - 56}px)` }}>
+          {ordered.map((item, i) => <li key={`${item.title}-${item.period}`}><button className={current === i ? 'rail-entry active' : 'rail-entry'} tabIndex={mobile || current === i ? 0 : -1} aria-current={current === i ? 'step' : undefined} onClick={() => goTo(i, false, !mobile)} onKeyDown={event => {
             if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
             event.preventDefault();
             const next = event.key === 'Home' ? 0 : event.key === 'End' ? ordered.length - 1 : Math.max(0, Math.min(ordered.length - 1, i + (event.key === 'ArrowDown' ? 1 : -1)));
