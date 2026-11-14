@@ -66,3 +66,5 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+__pycache__/
+infra/terraform/cost-control/controller.zip

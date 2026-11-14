@@ -60,7 +60,15 @@ resource "aws_lambda_function" "staging" {
   reserved_concurrent_executions = 1
   tags                           = { Environment = "stg" }
   environment {
-    variables = { DEBUG = "false", MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp" }
+    variables = merge({ DEBUG = "false", MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp" }, var.enable_staging_bedrock_qa ? {
+      BEDROCK_ENABLED           = "true"
+      BEDROCK_FACTS_BUCKET      = var.staging_bedrock_content.bucket
+      BEDROCK_FACTS_OWNER       = var.staging_bedrock_content.owner
+      BEDROCK_FACTS_VERSION     = var.staging_bedrock_content.version
+      BEDROCK_FACTS_SHA256      = var.staging_bedrock_content.sha256
+      BEDROCK_MAX_OUTPUT_TOKENS = tostring(var.staging_bedrock_max_output_tokens)
+      BEDROCK_TIMEOUT_SECONDS   = "20"
+    } : {})
   }
   lifecycle {
     # Deliberate ownership boundary: Terraform controls config; CI controls code.
@@ -70,7 +78,7 @@ resource "aws_lambda_function" "staging" {
       error_message = "Provide the verified local bootstrap ZIP and its matching manifest SHA256."
     }
   }
-  depends_on = [aws_iam_role_policy.staging_lambda]
+  depends_on = [aws_iam_role_policy.staging_lambda, aws_iam_role_policy.staging_bedrock]
 }
 resource "aws_cloudwatch_log_group" "staging_build" {
   count             = local.staging_count

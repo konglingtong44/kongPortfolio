@@ -24,7 +24,8 @@ class LambdaPackageSmoke {
                 {"GET", "/api/profile", "lang=ja", "ソフトウェアエンジニア"},
                 {"GET", "/api/profile", "lang=zh", "软件工程师"},
                 {"GET", "/api/profile", "lang=en", "Software engineer"},
-                {"POST", "/api/bedrock", "", "PREPARING"}}) {
+                {"POST", "/api/bedrock", "", "PREPARING"},
+                {"GET", "/api/bedrock/questions", "language=zh", "portfolio-scope-v1"}}) {
             var event = Map.of("version", "2.0", "routeKey", "$default", "rawPath", sample[1], "rawQueryString", sample[2],
                 "headers", Map.of("host", "example.execute-api.ap-northeast-1.amazonaws.com", "x-forwarded-proto", "https"),
                 "requestContext", Map.of("stage", "$default", "requestId", "package-smoke",
@@ -43,6 +44,6 @@ class LambdaPackageSmoke {
         }
         var root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         if (root.getAppender("INFO_FILE") != null) throw new AssertionError("Lambda must not use local file logging");
-        System.out.println("Packaged Lambda smoke passed: health, three languages, POST placeholder, console-only logging.");
+        System.out.println("Packaged Lambda smoke passed: health, three languages, question catalog, POST placeholder, console-only logging.");
     }
 }

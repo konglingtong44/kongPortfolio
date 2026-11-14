@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { apiEvent, checkResponse, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, requireStagingTarget, selectVersion } from './staging-contract.mjs';
 
 assert.throws(() => requireStagingTarget('kongportfolio-prod', '123456789012'), /isolated STG/);
 requireStagingTarget('kongportfolio-stg', '123456789012');
@@ -17,4 +17,13 @@ assert.throws(() => checkResponse({ StatusCode: 200, FunctionError: 'Unhandled' 
 assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, statusCode: 500 }, contract), /HTTP contract/);
 assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, headers: {} }, contract), /cache/);
 assert.equal(apiEvent('GET', '/api/profile', 'lang=ja').rawQueryString, 'lang=ja');
+assert.equal(JSON.parse(apiEvent('POST', '/api/bedrock', '', { message: 'hello', language: 'en' }).body).message, 'hello');
+const refused={status:'REFUSED',code:'OUT_OF_SCOPE',answer:'范围提示',modelInvoked:false,policyVersion:'portfolio-scope-v1',usage:{inputTokens:0,outputTokens:0},questions:Array(17).fill({})};
+const wrapped=body=>({statusCode:200,headers:{'cache-control':'no-store'},body:JSON.stringify(body)});
+assert.equal(checkBedrockResponse({StatusCode:200},wrapped(refused),bedrockContracts[0]).modelInvoked,false);
+assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...refused,modelInvoked:true}),bedrockContracts[0]));
+assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...refused,usage:{inputTokens:1,outputTokens:0}}),bedrockContracts[0]));
+const answer={status:'ANSWER',answer:'Java professional experience with approved project details.',modelInvoked:true,truncated:false,policyVersion:'portfolio-scope-v1',usage:{inputTokens:100,outputTokens:20}};
+checkBedrockResponse({StatusCode:200},wrapped(answer),bedrockContracts[3]);
+assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...answer,truncated:true}),bedrockContracts[3]));
 console.log('STG contract checks passed: production target blocked, immutable version selection, checksum/runtime/HTTP/cache failures rejected. No AWS calls.');

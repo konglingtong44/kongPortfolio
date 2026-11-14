@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
-import { apiEvent, checkResponse, contracts, matchingVersion, requireStagingConfig, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, requireStagingConfig, requireStagingTarget, selectVersion } from './staging-contract.mjs';
 
 const region = 'ap-northeast-1';
 const functionName = process.env.STAGING_FUNCTION_NAME;
@@ -41,22 +41,36 @@ requireStagingConfig(deployed, account);
 assert.equal(deployed.Version, version, 'Lambda did not resolve the selected immutable version');
 assert.equal(deployed.CodeSha256, expectedHash, 'Published STG version differs from artifact');
 const checks = [];
-for (const contract of contracts) {
+function invoke(contract) {
   const payload = join(workspace, `${contract.label}-event.json`);
   const response = join(workspace, `${contract.label}-response.json`);
-  writeFileSync(payload, JSON.stringify(apiEvent(contract.method, contract.path, contract.query)));
+  writeFileSync(payload, JSON.stringify(apiEvent(contract.method, contract.path, contract.query, contract.body)));
   const metadata = aws(['lambda', 'invoke', '--function-name', functionName, '--qualifier', version, '--invocation-type', 'RequestResponse', '--cli-binary-format', 'raw-in-base64-out', '--payload', `file://${payload}`, '--cli-read-timeout', '60', response]);
   assert.equal(metadata.ExecutedVersion, version, 'Invocation executed a different Lambda version');
-  checkResponse(metadata, JSON.parse(readFileSync(response, 'utf8')), contract);
+  return { metadata, response: JSON.parse(readFileSync(response, 'utf8')) };
+}
+for (const contract of contracts) {
+  const result = invoke(contract);
+  checkResponse(result.metadata, result.response, contract);
   checks.push({ name: contract.label, status: 'passed', expectedHttpStatus: contract.status });
   console.log(`STG passed: ${contract.label} (published version ${version})`);
+}
+const bedrock = { enabled: deployed.Environment?.Variables?.BEDROCK_ENABLED === 'true', checks: [] };
+if (bedrock.enabled) {
+  for (const contract of bedrockContracts) {
+    const result = invoke(contract);
+    bedrock.checks.push(checkBedrockResponse(result.metadata, result.response, contract));
+    console.log(`STG Bedrock passed: ${contract.label} (version ${version}; response text omitted)`);
+  }
+  bedrock.policyVersion = 'portfolio-scope-v1';
+  bedrock.passed = true;
 }
 const report = {
   schemaVersion: 1, kind: 'staging-verification', passed: true,
   pipelineExecutionId: process.env.STAGING_PIPELINE_EXECUTION_ID,
   gitCommit: manifest.gitCommit, releaseId: manifest.releaseId, backendSha256: manifest.backend.sha256,
   functionName, functionVersion: version, lambdaCodeSha256: deployed.CodeSha256,
-  frontend: 'candidate checksums and version prefix verified; no separate STG browser/HTTP endpoint', checks,
+  frontend: 'candidate checksums and version prefix verified; no separate STG browser/HTTP endpoint', checks, bedrock,
 };
 writeFileSync(join(workspace, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(`STG verified: ${report.releaseId}; awaiting human production approval. No production change.`);

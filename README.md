@@ -4,6 +4,12 @@
 
 在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 尚待接入，目前 `/api/bedrock` 仅返回 `PREPARING`。
 
+2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle及Java真实调用成功，Runtime Converse仍429；[Java有界问答](docs/bedrock-java.md)已在本地实现，默认关闭、尚未部署。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
+
+费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏后的履历资料已导入私有S3并保留旧摘要版本，Java读取／缓存及STG版本权限验证通过；正文不入Git，云端应用发布和问答质量验收待后续。
+
+问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；范围外在Java中返回固定提示，不读取资料、不调用模型。代码本地验证通过，尚未部署新接口或开放线上问答。
+
 ## 环境与本地启动
 
 | 工具 | 要求／用途 |
@@ -88,9 +94,9 @@ flowchart TD
 | Lambda | Java 21、x86_64、1024 MB、超时 28 秒、预留并发上限 5；发布为不可变数字版本 |
 | CloudWatch | 接收 API／Lambda／构建日志；部署期间检查告警。请求日志不记录请求体、查询参数或凭据 |
 | IAM | 运行、构建、验证和发布各用对应角色；GitHub 通过 CodeConnections 授权连接 |
-| Terraform | 管理基础设施、角色和配置；S3 远程 State 分为 bootstrap、portfolio、cicd，支持状态锁 |
+| Terraform | 管理基础设施、角色和配置；S3 远程 State 分为 bootstrap、portfolio、cicd、cost-control、bedrock-content，支持状态锁 |
 
-Terraform 代码位于 `infra/terraform/bootstrap/`、`infra/terraform/portfolio/`、`infra/terraform/cicd/`。已有环境先恢复被忽略的本地输入，再执行 `fmt → validate/test → plan → 审核 → apply → plan`。基础设施变更与日常应用发布分开进行。
+Terraform 代码位于 `infra/terraform/bootstrap/`、`infra/terraform/portfolio/`、`infra/terraform/cicd/`、`infra/terraform/cost-control/`、`infra/terraform/bedrock-content/`。已有环境先恢复被忽略的本地输入，再执行 `fmt → validate/test → plan → 审核 → apply → plan`。基础设施变更与日常应用发布分开进行。
 
 Terraform 管 Lambda 运行配置和 CloudFront 分发配置；流水线负责应用代码与前端发布指向，CodeDeploy 负责 Lambda `live` 的版本和流量权重。
 
@@ -235,4 +241,5 @@ Invoke-RestMethod https://konglingtong44.com/api/health
 | `scripts/` | 本地启动、检查、候选打包与发布控制脚本 |
 | [AWS_LEARNING_GUIDE.md](AWS_LEARNING_GUIDE.md) | 按步骤学习首次搭建，第 22 步为日常发版 |
 | [AWS_EXECUTION_LOG.md](AWS_EXECUTION_LOG.md) | 实际操作、失败修复和验证历史 |
+| [2026-11-13～14命令补录](docs/aws-commands-20261114.md) | 模型调查、费用部署、停站演练、删除与429的实际命令／SDK操作 |
 | [前后端发布记录](docs/frontend-publication.md) | 完整发布验收结果与边界 |

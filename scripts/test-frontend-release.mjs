@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { frontendContext,frontendObjects,publishFrontend,routeCode,routeRelease,verifyRouterTest } from './frontend-release.mjs';
+import { contracts } from './staging-contract.mjs';
 const old='a'.repeat(64),next='b'.repeat(64);
 const file=(path,type)=>({path,contentType:type,cacheControl:['index.html','version.json'].includes(path)?'no-cache,max-age=0,must-revalidate':'public,max-age=31536000,immutable',sha256:'c'.repeat(64)});
 const manifest={gitCommit:'d'.repeat(40),releaseId:next,backend:{sha256:'e'.repeat(64)},frontend:[file('index.html','text/html; charset=utf-8'),file('version.json','application/json'),file('assets/a.js','text/javascript')]};
@@ -18,7 +19,7 @@ assert.equal(frontendObjects(manifest)[2].key,`releases/${next}/assets/a.js`);
 const request={method:'GET',uri:'/projects/one',querystring:{}};
 const context=vm.createContext({});vm.runInContext(routeCode(next),context);assert.equal(context.handler({request}).uri,`/releases/${next}/index.html`);
 
-const checks=['health','profile-ja','profile-zh','profile-en','bedrock-placeholder','api-not-found','method-not-allowed'].map(name=>({name,status:'passed'}));
+const checks=contracts.map(c=>({name:c.label,status:'passed'}));
 const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}],variables:[{name:'ReleaseMode',resolvedValue:'deploy'}]};
 const actions=['Source','BuildCandidate','VerifyStaging','ApproveProduction','VerifyGreen','ApproveTrafficShift','DeployProduction'].map(stageName=>({stageName,status:'Succeeded',actionExecutionId:'approval1',actionName:({ApproveProduction:'ApproveGreenCreation',VerifyGreen:'PublishAndVerifyGreen',ApproveTrafficShift:'ApproveBlueGreenDeployment',DeployProduction:'CanaryAndVerify'})[stageName]||'action'}));
 const stg={schemaVersion:1,kind:'staging-verification',passed:true,pipelineExecutionId:'run-1',gitCommit:manifest.gitCommit,releaseId:next,backendSha256:manifest.backend.sha256,functionName:'kongportfolio-stg',functionVersion:'7',checks};

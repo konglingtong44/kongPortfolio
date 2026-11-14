@@ -1,6 +1,6 @@
 # kongPortfolio AWS 学习手册
 
-更新：2026-11-12。学习起点：React + Spring Boot代码已经在GitHub，本项目还没有部署到AWS。IAM/SSO的建立过程略过，直接使用你会配置的kong-dev登录。
+更新：2026-11-14。学习起点：React + Spring Boot代码已经在GitHub，本项目还没有部署到AWS。IAM/SSO的建立过程略过，直接使用你会配置的kong-dev登录。
 
 这是一份按首次搭建顺序重新编排的学习文档。与按发生时间记账的[AWS_EXECUTION_LOG.md](AWS_EXECUTION_LOG.md)不同，这里从第1步开始教你理解和操作。每步区分“人亲手做什么”和“脚本/AWS替你做什么”，保留实际结果和故障。
 
@@ -48,6 +48,15 @@ flowchart LR
 | CodeDeploy | AWS | 调整Lambda别名权重并执行回滚 |
 
 Terraform和AWS CLI最终都在调用AWS API；脚本是组织操作的方式。看到一条.ps1或.mjs命令，不代表里面没有Terraform/AWS CLI。
+
+## 当前选型中的费用取舍
+
+| 选择 | 为什么这样做 | 后续何时重新考虑 |
+|---|---|---|
+| 当前后端用API Gateway＋Lambda，暂不部署ECS/ALB | 个人网站访问低且不连续，优先按需执行，减少常驻任务和负载均衡器的费用及维护 | 有持续高流量、长任务或容器运行需求时，再做第36节对照练习 |
+| 简历用普通私有S3＋Lambda内存缓存，暂不建Bedrock知识库 | 约5000到一万多汉字、每月最多约1000次访问，先省去额外检索／索引／向量存储组件，减少费用和维护环节 | 全文输入token费用、延迟或资料规模实际增长后，再比较便宜的托管知识库 |
+
+这是按当前规模作出的取舍，不是“知识库最低每月$975”。缓存只避免重复S3读取，每次发送的简历全文仍计模型输入tokens；全文也未必在所有用量下绝对更便宜。详见[简历存储实现与费用理由](docs/bedrock-content.md)。
 
 ## 第1步：确认起点与本机工具
 
@@ -648,7 +657,7 @@ list-action-executions查每个阶段实际结果；version.json识别前端发�
 | 当前前端发布 | [version.json](https://konglingtong44.com/version.json) |
 | 当前后端主版本/权重 | lambda get-alias，不能只看历史deployment target快照 |
 
-## 后续学习目录（待填写）
+## 后续学习与新增实践
 
 准备手动补练习时，先看[手动 CI/CD 故障演练](docs/manual-cicd-exercises.md)：区分已有证据与待演练场景，先完成一场审批拦截，再逐项准备真实故障回退。尚未执行的方案不记为通过。
 
@@ -664,9 +673,93 @@ list-action-executions查每个阶段实际结果；version.json识别前端发�
 
 ### 28. Bedrock模型选择与访问配置
 
+**目标：** 先证明选定模型能在本账号／东京实际调用，再接入Java。不要把模型目录存在、IAM允许、正数默认配额或操场能选中，当作账号真实可用的证明。
+
+**已选模型：** Qwen3 235B A22B 2507，`qwen.qwen3-235b-a22b-2507-v1:0`，`ap-northeast-1`，非流式 Converse。它是AWS托管基础模型，不需要自己创建GPU或市场端点；模型ID传给API，Lambda将来用执行角色认证。
+
+在仓库根目录运行下面的**只读**检查（本轮实际运行过）：
+
+```powershell
+$aws = 'D:\software\AWSCLI\aws.exe'
+& $aws sts get-caller-identity --profile kong-dev
+./scripts/check-bedrock-access.ps1 -ExpectedAccountId 561798268037 -AwsExecutable $aws
+```
+
+脚本内部使用的命令与目的：
+
+| 命令 | 检查什么 |
+|---|---|
+| `bedrock get-foundation-model --model-identifier <精确ID>` | 版本是ACTIVE、支持ON_DEMAND |
+| `bedrock get-foundation-model-availability --model-id <精确ID>` | 区域、授权、权益、协议是否就绪 |
+| `service-quotas get-service-quota --service-code bedrock --quota-code L-3875BCCF` | 本账号的Qwen TPM（每分钟token） |
+| 同上，quota code=`L-548A1A32` | 本账号的Qwen RPM（每分钟请求） |
+| `service-quotas get-aws-default-service-quota` | 公开默认值，仅用于对比，不能当账号实际额度 |
+
+以上内部CLI另带profile/东京区域；完整实际命令见[操作补录](docs/aws-commands-20261114.md)。
+
+**2026-11-14 双入口结果：** Runtime模型ACTIVE／访问正常，但实际TPM/RPM为0；一次128输出上限的Converse返回429。随后11:43 JST用同一东京账号和同一Qwen，Mantle Chat Completions一次16输出上限的请求返回200／OK、13输入+2输出tokens。**Qwen经Mantle已证明连通，Runtime仍受阻；不是所有Serverless都没有配额，也不能由Runtime失败推导所有入口不可用。**
+
+**本地改了什么：** PROD/STG Terraform模型权限草稿已改为Mantle `CreateInference`，精确限定本账号东京`project/default`及`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`；两开关仍默认false，没有apply这两个根栈。mock测试portfolio5个、cicd22个通过；真实IAM模拟8项通过，但不代表Lambda角色已经获得云上调用能力。
+
+**接入前保护已补齐：** 费用控制Lambda单项更新已部署，关停策略同时Deny `bedrock:*`和`bedrock-mantle:*`；20个Python测试及双入口IAM拒绝模拟通过。没有执行off/on，当前仍on、consumed=[5,10,15]、下一档$25，网站health正常。具体命令和验证见[操作补录](docs/aws-commands-20261114.md)。
+
+**下一步：** Java本地有界接入已完成，整理完整资料与问答样例，再审查STG应用开关／IAM及发布计划。Runtime的[Support草稿](docs/bedrock-quota-support-draft.md)继续暂停，无需以恢复Runtime为所有开发前提。[双入口证据](docs/bedrock-access.md)保留边界。
+
+11:33 JST[全量配额记录](docs/bedrock-current-quotas.md)中Runtime及已列少数Mantle指标无正数，但**不包含Qwen未公开的Mantle额度**。原“没有任何可用模型”的概括已在11:43成功调用后更正。两个旧语音／视频型号EOL仍不能作替代。Support继续暂停。
+
 ### 29. Spring Boot接入真实Bedrock问答
 
+**本地已实现，云端尚未部署。** Java通过AWS SDK现代SigV4 signer调用东京Mantle选定Qwen，不使用API key；真实SSO诊断返回OK、30输入＋2输出tokens。默认关闭，空POST仍为免费PREPARING探测；启用后接收message/language，限制输入、输出、超时和频率，访客内容不写回资料。详见[接口、价格与验证边界](docs/bedrock-java.md)。
+
+已从用户提供的旧版DOC整理并导入脱敏履历资料，6,875码点／17,433字节，涵盖7段职业项目经历等；原始DOC未改动或上传，正文仅在本地ignored目录和私有S3，不加入Git。本人确认当前任职／项目未变、资格未续情况后，按事实区分取得历史与当前有效状态，不编写转职理由。准备21个验收问题，但未实测三语问答质量或零幻觉。线上仍PREPARING，业务角色模型授权／应用开关尚未apply；下一步上STG验证，不直接开放公共问答。
+
+**因为费用，暂不使用知识库：** 用户已选择普通私有S3保存资料、Lambda内存缓存、逐次全文交给Qwen。独立bedrock-content根栈首次9新增／0更新／0删除；随后履历导入仅2更新（资料对象和STG版本权限），旧623码点摘要版本保留回退。Java对新资料真实读取、SHA-256校验及缓存复用通过，真实IAM 8项模拟确认仅新旧批准版本可读。资料上限20,000 Unicode码点／80KiB，覆盖后续一万多字需求；应用代码和资料配置尚未部署至云端。更新／回滚流程及实际命令见[资料方案](docs/bedrock-content.md)。
+
+**最新范围限制：只接受本人相关的审核问句。** 用户选择严格白名单，`portfolio-scope-v1`提供17主题／51个三语标准问句及有限别名；只对整条问句归一化后完整匹配，含有“孔令通／简历”不代表放行。通过后向Qwen发送对应服务端固定模板，不传访客原文。未知问法／夹带解题任务直接返回REFUSED、三语范围提示和可选问题，modelInvoked=false、usage=0；拒绝也计入频率保护。API Gateway／Lambda／日志仍可能计费，不能称整个请求免费。
+
+本地57项、Lambda profile 4项及真实ZIP运行通过，白名单之前不会读取S3／调用模型；GET `/api/bedrock/questions`可提供问题目录。旧资料的通用算法／数学允许条款已替换，职业事实不变，当前6,943码点／17,637字节，S3仅2更新且保留旧版；Java真实读取／hash／缓存及最终plan No changes通过。17主题的模型回答质量尚未实测，导出51个待执行标准问句，先前21个宽范围样例不能直接当新验收标准。代码与新接口仍未云端发布，线上仍PREPARING；详见[范围设计与限制](docs/bedrock-scope.md)。
+
 ### 30. 输入输出限制、请求节流与调用成本控制
+
+**账号费用保护已部署，Java逐请求限制已在本地实现。** 请求体8KiB、问题1000码点、资料20,000 Unicode码点／80KiB、输出最多2048 tokens、模型HTTP最多20秒；S3资料读取另有4秒SDK调用预算、1秒连接／2秒socket超时。每进程1在途、6次/分钟、60次/小时，重启／扩容重置，不能当账号全局硬限额。公开启用前还需核对网关、冷启动／凭证解析与Lambda28秒总超时、滥用控制。
+
+**如何避免无关问题消耗整份简历tokens：** 先在Java确定性白名单拒绝，再加载资料／调用模型。只写“与本人无关就拒绝”的System Prompt仍会产生输入费；Bedrock Denied Topics也不是“默认拒绝、例外放行”的许可表。当前不增加收费语义分类／Guardrails，后续如果放开自由问法，再单独比较语义检查费用、误判和防绕过效果。
+
+预算采用整账号、所有区域、包含税和域名等费用的实际成本，排除credits/refunds。月度$5/$10/$15/$25四档均已接通，不是Bedrock专属预算，也不是新增充值余额。东京Mantle Standard价格已核对为输入$0.27／百万、输出$1.06／百万tokens；每次8000入＋2000出时千次约$4.28，未含税和其他AWS服务。
+
+```mermaid
+flowchart LR
+  Budget[AWS Budgets 实际费用超档] --> SNS[SNS 对应档位主题]
+  SNS --> Control[费用控制 Lambda 并发1]
+  Control --> Snapshot[私有S3 原配置及已消费档位]
+  Control --> Stop[暂停CloudFront 后端与CI]
+  Control --> Email[SNS 结果邮件]
+```
+
+**实际搭建过程：** 独立`infra/terraform/cost-control`根栈；初次24新增、通知未接通；用户确认结果邮件，完成真实off/on演练，修复阶段ARN和控制函数内存问题；最后新增$25并接通四组通知，计划11新增/2更新/0删除。每次保存plan、show审范围、apply指定计划，再plan确认No changes。
+
+**控制台怎样手动执行：** 东京Lambda → `kongportfolio-cost-control` → 测试 → 选择已保存共享事件 → 点击测试。
+
+| 事件 | 输入 | 真实行为 |
+|---|---|---|
+| `check-status` | `{"action":"status"}` | 查看状态，不改变开关 |
+| `manual-stop` | `{"action":"off"}` | 真实关停，网站将不可用 |
+| `manual-start` | `{"action":"on"}` | 按快照恢复，并消费已跨过的档位 |
+
+“测试”是同步调用按钮，不是沙箱。CLI等价入口（这些脚本也实际运行过）：
+
+```powershell
+./scripts/cost-control.ps1 -Action status -AwsCli $aws
+# 以下两条是业务写操作，只有确实需要时才选一条执行：
+./scripts/stop-aws-services.ps1 -AwsCli $aws
+./scripts/start-aws-services.ps1 -AwsCli $aws
+```
+
+**为什么刚打开不会被旧告警再关闭：** S3保存本月consumed，恢复前发布的旧通知会忽略，已消费档位不再执行；消息重复投递也不会当成新档位。本月consumed=[5,10,15]，下一点是$25；下月按UTC月份重新监控，但不会自动开站。若恢复时已经超过$25，四档都消费，本月之后没有更高档。
+
+**实际验收：** 关停后并发0/0、API503、CloudFront停用Deployed；恢复后并发5/1、全部原配置一致、首页/API200。向已消费5/10/15主题实际Publish，逐MessageId看到ignored-consumed，快照不变、失败队列为空。没有往未消费的$25发测试，以免停站。真实账单跨档、跨月、停止在途发布尚无云上证据。
+
+预算数据有延迟，关停时费用可已超阈值；S3存储、DNS等仍可能收费。SNS是消息分发，本项目配置Lambda和邮件，没有配置短信。完整边界见[费用控制说明](docs/aws-cost-control.md)，实际命令／失败修复见[操作补录](docs/aws-commands-20261114.md)。
 
 ### 31. CloudFront双环境与前端渐进发布
 
@@ -674,8 +767,25 @@ list-action-executions查每个阶段实际结果；version.json识别前端发�
 
 ### 33. 旧Lambda版本与S3发布制品清理
 
+本章的Lambda旧版本／当前发布制品生命周期清理**尚未实施**，没有删除当前版本或回滚制品。2026-11-14另外完成的是旧练习资源清理：无用EFS、四个旧S3桶及3701个历史版本／删除标记、两个旧CloudFront、失效testec2 DNS别名。操作先核消费者、日志／复制、对象锁／版本清单，经用户授权后按固定名单删除；详见[清理记录](docs/aws-resource-cleanup.md)与[SDK操作补录](docs/aws-commands-20261114.md)。
+
+清理时保留正式Hosted Zone／证书验证、网站／制品／Terraform状态／费用控制四个桶；后续简历方案另新增一个私有资料桶，目前五个项目桶。EFS既有备份恢复点也保留。不要把旧练习桶删除脚本当日常制品清理脚本重跑。
+
 ### 34. 告警通知与日常费用复盘
 
+**已完成：** 结果邮件经用户确认；四个预算通过SNS连接控制Lambda；失败事件保留14天进入SQS队列，CloudWatch队列告警发往结果邮件；日志保留14天，配置快照版本保留规则见Terraform。没有发送故障测试到未消费$25，也没有验收所有故障通知路径。
+
+日常查看（前两条只读；最后一条是Cost Explorer查询，可能有API费）：
+
+```powershell
+./scripts/cost-control.ps1 -Action status -AwsCli $aws
+& $aws budgets describe-budgets --account-id 561798268037 --profile kong-dev
+./scripts/get-aws-costs.ps1 -AwsCli $aws
+```
+
+**要理解返回值：** mode=on/off是脚本记录的管理状态，CloudFront还需传播；consumed记录本月已消费的费用档位，不代表执行过几次关停。错误／失败队列非空时先核实际开关，再决定重试；费用关停不是代码版本回滚，不会重启被停止的旧发布。
+
+本月约$19.02大部分来自域名$16和税$1.73，并非全部是服务器常驻费。费用／清理／配额是不同问题，预算恢复不会给Bedrock增加服务配额。[当前费用来源](docs/aws-cost-control.md)与[历史原ECS预算](docs/aws-cost.md)要分开阅读。
 ### 35. Docker镜像构建与ECR
 
 ### 36. ECS与ALB蓝绿部署对照练习

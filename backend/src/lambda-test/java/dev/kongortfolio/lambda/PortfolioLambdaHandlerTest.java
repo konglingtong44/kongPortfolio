@@ -62,6 +62,16 @@ class PortfolioLambdaHandlerTest {
         assertThat(rootLogger.getAppender("INFO_FILE")).isNull();
     }
 
+    @Test void exposesReviewedQuestionsWhileModelFeatureIsDisabled() throws Exception {
+        JsonNode response = invoke("GET", "/api/bedrock/questions", "language=zh");
+        assertThat(response.path("statusCode").asInt()).isEqualTo(200);
+        JsonNode json = mapper.readTree(body(response));
+        assertThat(json.path("enabled").asBoolean()).isFalse();
+        assertThat(json.path("questions").size()).isEqualTo(17);
+        assertThat(json.path("policyVersion").asText()).isEqualTo("portfolio-scope-v1");
+        assertThat(json.path("questions").get(0).path("message").asText()).contains("请介绍一下你自己");
+    }
+
     @Test void returnsRealApiErrorsAndLogsWithoutQueryValues(CapturedOutput output) throws Exception {
         JsonNode response = invoke("GET", "/api/missing", "probe=synthetic-private-query");
         assertThat(response.path("statusCode").asInt()).isEqualTo(404);

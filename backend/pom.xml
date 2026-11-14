@@ -15,8 +15,16 @@
   <properties>
     <java.version>21</java.version>
     <spring-boot.repackage.skip>false</spring-boot.repackage.skip>
+    <aws-sdk.version>2.59.0</aws-sdk.version>
   </properties>
   <dependencies>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>s3</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>url-connection-client</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>auth</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>http-auth-aws</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>sso</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>ssooidc</artifactId><version>${aws-sdk.version}</version></dependency>
+    <dependency><groupId>software.amazon.awssdk</groupId><artifactId>sts</artifactId><version>${aws-sdk.version}</version></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-webmvc</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-actuator</artifactId></dependency>
     <dependency><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-test</artifactId><scope>test</scope></dependency>

@@ -1,5 +1,11 @@
 # 架构与边界
 
+问答入口的最新限制为[Java严格白名单](bedrock-scope.md)：完整匹配审核问句后，才读取资料并把固定主题模板交给模型；访客原文不进入模型。范围外返回三语可问范围／建议问句，零生成模型tokens。不是关键词放行或只靠System Prompt，也没有本轮新增Guardrails／分类模型服务；应用仍待STG发布。
+
+简历资料选型：基于约5000到一万多汉字、每月约1000次访问的规模，暂不建知识库／向量数据库，采用[普通私有S3＋Lambda实例缓存＋全文输入](bedrock-content.md)，减少额外组件费用和维护。资料根栈和脱敏履历资料已部署，保留旧摘要回退版本；STG指定版本权限及Java读取已验证，应用代码／配置尚未云端发布。缓存不减免每次模型输入tokens。
+
+2026-11-14 当前补充：独立费用控制Lambda经Budgets→SNS接收$5/$10/$15/$25通知，原配置保存在私有S3，控制正式站／后端／CI开关，结果邮件与失败队列保留；见[费用控制](aws-cost-control.md)。东京Qwen经Mantle及Java验证连通，Runtime仍429；[Java有界问答](bedrock-java.md)本地完成、默认关闭，云端仍PREPARING。Mantle单项目／单模型权限草稿和费用双入口Deny已验证，后者已部署，业务授权默认关闭，见[模型访问](bedrock-access.md)。两道生产发布审批不变。
+
 当前目标已由用户改为 Lambda + HTTP API，见 [当前 Serverless 路线](../README.md#aws-运行架构)。下文保留原 ECS/ALB 设计作历史参考，不作为当前执行计划；本地部分仍适用。State 已创建、AWS 预检已完成，不能再按下文旧 Phase 1 状态判断现状。
 
 状态：本地已实现；AWS 全部 Planned。Phase 1 不创建资源，不改变 5173/8080/3000 端口。

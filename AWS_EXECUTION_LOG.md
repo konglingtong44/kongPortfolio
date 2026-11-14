@@ -2362,3 +2362,188 @@ https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/k
 - 将运行Markdown标题/围栏/相对链接和引用脚本存在性检查，git diff --check、私有路径/Gitleaks扫描；仅文档增量，不运行应用构建/测试，不访问AWS或公网，不创建资源/启动CI/CD/替人审批。验证后仅本地提交，不push。若验证失败会补记修正。
 
 验证结果：22个步骤连续、未来14项仅标题、代码围栏闭合、所有相对链接及抽查脚本/buildspec路径存在，全部通过；git diff --check、tracked path与Gitleaks工作区扫描通过。将明确暂存本次3个文档，执行staged路径/diff及提交钩子的Gitleaks检查，本地提交 `docs: add numbered hands-on AWS learning guide`；不推送，不改变AWS。提交结果在本次回复报告。
+
+## 29. Bedrock 第 28 节：模型与访问准备（2026-11-13）
+
+验收：固定模型/区域/API，提供可运行的只读检查；准备默认关闭的 PROD/STG 最小 IAM 权限；本地验证后暂停 review。模型选择东京 `amazon.nova-lite-v1:0`、区域内按需、非流式 Converse。官方文档与理由见 docs/bedrock-access.md，实际账号访问仍须核验。
+
+本次改动：新增 scripts/check-bedrock-access.ps1，依次检查账号、模型 ACTIVE/ON_DEMAND、区域/授权/权益/协议状态；无订阅/激活/推理行为。两个 Terraform root 各增加默认 false 开关及仅绑定对应 Lambda 执行角色的单模型 InvokeModel policy；STG 开关依赖已有 STG。不改应用接口、环境变量、CI 构建角色、两道生产审批或 live 别名。
+
+验证：两个 root 的 validate、fmt -check 通过；完整离线 mock tests 为 portfolio 5/5、cicd 22/22。初次定向测试因 Windows 路径分隔符未匹配文件，0 tests 不计通过；改跑完整测试。新测试初次因本地 custom_domain 及 plan 阶段未知 ARN 导致失败，隔离域名输入并改为可确定的审批结构断言后通过。PowerShell 解析通过；本地模拟验证 ready 成功、错误账号在访问 Bedrock 前停止、模型不可用失败，全部通过（.local/test-bedrock-preflight.ps1，不提交）。
+
+前后端：完整 scripts/check.ps1 在 npm ci 阶段遇到 Windows EPERM（已加载的 rolldown native 文件无法删除），没有把全套检查称为通过。npm install --ignore-scripts --package-lock=false 恢复依赖（仍有被占用旧文件清理警告）；随后前端 build、64 tests 通过，后端 mvn test 9 tests 通过。未改 package-lock 或应用源码；未重跑 Lambda ZIP/容器构建。证据在 ignored .local/bedrock-story28-*.log。
+
+AWS：两次 kong-dev STS 检查均报 SSO token expired；随后启动 AWS CLI device-code 登录等待用户授权。当前尚无成功的账号模型查询、IAM apply 或真实推理证据，不将第 28 节标为云端完成。没有创建付费资源、启动流水线、发布/切流、commit 或 push。IAM 开关仍保持默认关闭。
+
+安全：Gitleaks 工作区扫描、tracked 私有路径检查、git diff --check 通过；文档补充后再次扫描。不记录 SSO device code、token 或凭证。后续先完成 CLI 登录及只读检查，再审查最小 IAM 计划；真实模型调用前另行明确测试费用范围。
+
+### 29.1 SSO 授权后只读核验
+
+用户完成 CLI 授权后，STS 账号核对成功（561798268037）。只读脚本确认精确版本 amazon.nova-lite-v1:0 为 ACTIVE、支持 ON_DEMAND；availability 返回 AUTHORIZED，region/entitlement/agreement 均 AVAILABLE。首次脚本误将 availability 返回的无版本 modelId（amazon.nova-lite-v1）判为不匹配；已修正为仅接受选定 ID 或其对应无版本 ID，精确版本仍由 GetFoundationModel 核验，重新运行通过。这是脚本判断问题，不是账号被拒绝。
+
+本轮没有 apply、推理或订阅。当前仅 CLI 身份的元数据/模型访问检查通过，Lambda 执行角色授权及真实推理仍未验证。用户先要求讲解 Terraform/控制台分工、完整流程与注意点，暂不推进 AWS 写入。
+
+### 30. 费用分档关停：本地实现与计划审查（2026-11-14，未部署）
+
+用户要求列费用来源、一键关闭／恢复、月度 $5/$10/$15 各关一次，手动恢复后等待下一档，跨月不自动恢复。验收范围与剩余收费详见 docs/aws-cost-control.md。
+
+只读 STS、Cost Explorer、现有 Budgets、东京基础服务、Lambda/CI/CD、全局 CloudFront 和 S3 元数据核查：本月约 $19.02，主要是域名 $16、税 $1.73；已有 Monthly Budget 实际费用 $19.021。没有推理或资源开关修改；所有区域未做逐服务完整扫描。
+
+新增独立 cost-control Terraform 栈、串行控制 Lambda、版本化 S3 配置快照、三个独立预算与 SNS、失败队列／结果邮件，以及 status/off/on/initialize PowerShell 命令。关停前保存原配置；恢复消耗已跨档位并屏蔽恢复前发布的旧通知；失败保留快照，不恢复旧流水线发布。默认 arm_notifications=false。
+
+验证：17 个 Python 状态机／离线 SDK 接口测试、2 个 Terraform mock 测试、validate/fmt、四脚本 PowerShell 语法、Gitleaks 与 diff whitespace。未修改前后端，不重复跑其测试；SDK mock 不是云上验收。
+
+已生成真实账号初始 plan 并核对 24 create / 0 update / 0 delete，自动 Lambda 通知订阅为 0。沿用现有预算唯一通知邮箱；邮箱输入、plan、日志在 ignored .local，不记录地址。没有 apply、initialize、真实 off/on、commit/push。首次 apply 仍需按 AGENTS.md 明确批准付费资源，之后分阶段初始化、演练和接通自动触发。
+
+### 30.1 获批部署与无用资源清理（2026-11-14）
+
+用户批准第一阶段部署并要求清理无用 EFS/DNS/S3；后续明确授权永久删除旧练习站与 2023 CloudTrail 日志。重新生成并审查 plan，apply 24 create / 0 update / 0 delete，自动关停保持未接通。控制 Lambda 云上 status 返回实际费用 $19.021，initialize 下限 $20，记录当月 consumed=[5,10,15]，没有变更业务开关。结果邮件订阅仍待用户确认。
+
+审计后删除未使用的 6KiB 旧 test EFS（14 天无客户连接、无 EC2/ECS/Batch/Lambda 消费者）及其 3 个挂载点、1 个访问点，自动备份停用；删除 4 个旧 S3 桶及全部 3701 个对象／标记版本；删除失效 testec2 ALB DNS 别名，保留正式 Hosted Zone/ACM/DNS。旧 CF 一份删除，另一份已禁用待传播后删除。保留当前项目的站点、制品、TF state、cost-control 四个桶与既有 EFS 恢复点。
+
+费用控制目标同步移除旧 CF，第二次 plan 审查仅控制 Lambda/IAM 两个 update 后 apply，自动关停订阅仍为 0。正式站首页 HTTP 200、API health 200/UP；17 Python 离线状态／SDK 测试、2 Terraform mock 测试再次通过。真实 off/on 和自动分档云上集成尚未演练；没有提交或 push。
+
+最终补验：第二个旧 CF 待 Deployed 后也已删除，全局仅剩正式站 E2NYEXSOAQ1TWE。失效 DNS 删除变更 INSYNC；prod/stg 并发仍 5/1；cost-control 真实 Terraform plan 为 No changes。资源清单与本地证据位置见 docs/aws-resource-cleanup.md。邮件订阅尚待确认，自动触发未接通。
+
+### 30.2 结果通知订阅确认
+
+用户完成邮件确认后，只读 SNS 核实结果主题 EMAIL 订阅已获得有效订阅 ARN，三个预算阈值主题订阅均为 0。控制 Lambda status 正常、资源快照为空、业务处于 on，本月档位仍 [5,10,15]。CodeDeploy 当前无进行中发布。尚未执行真实 off/on 或接通自动关停；真实演练会短暂影响站点，需要确认执行窗口。
+
+### 30.3 获批真实关停／恢复演练
+
+用户回复“开始”，授权短暂停站演练。预检保存原值：prod/stg 并发 5/1、8 个受控资源、无进行中构建／流水线／CodeDeploy。首次 off 部分成功，CodePipeline 阶段操作 AccessDenied；恢复先还原后端与 CloudFront，再修复 stage ARN 授权（原策略仅 pipeline ARN）。通过 Terraform 审查应用控制 IAM／Lambda 两个 update，补上恢复清理错误状态与具体 AWS 错误代码，IAM 真实模拟核实目标阶段 allowed、其他管线/root implicitDeny。
+
+第二次完整演练 2026-11-14 10:40–10:46 JST：off 返回成功，8 个快照保存；并发 0/0、API HTTP 503、Bedrock Deny、7 个非 Source 阶段暂停、2 CI webhook 阻断，CloudFront 关闭状态待 Deployed 后恢复。on 成功，各项原值逐一比对一致，快照清空；CloudFront 启用且 Deployed，首页与 API HTTP 200/UP。全程没有触发构建或生产发布，未改变 live alias／生产版本。
+
+补测重复通知时，128MB 控制函数最大内存接近 127MB，一次调用长时间占用唯一并发位，后续 Invoke 限流；未改变业务状态。通过 Terraform 仅更新控制 Lambda：256MB 并复用 warm SDK Session／客户端，补回归测试。修复后直接 Lambda 重放 SNS 格式的 5/10/15 告警各两次，全部 ignored-consumed、S3 状态字节不变；这不是 SNS 实际投递测试。按钮 CLI read timeout 改为 360s。18 Python 状态／SDK 测试、2 Terraform mock、IAM 模拟、validate/fmt、语法和安全检查通过。
+
+当前网站已恢复，三个自动关停订阅仍未接通；剩余为 SNS 实际链路验收与下一阶段接通，跨月及真实账单新档位跨越尚无云端证据。没有 commit 或 push。
+
+### 30.4 控制台手动操作入口
+
+用户要求直接配好控制台里的手动打开／关闭。核对 AWS Lambda 文档与官方 SAM CLI 共享事件实现，确认东京没有现存 lambda-testevent-schemas registry 后，通过 Terraform 新增 registry 与 _kongportfolio-cost-control-schema 两个资源（0 既有资源变更／删除）。保存 check-status/status、manual-start/on、manual-stop/off 三个同步共享测试事件，内容不含凭证。
+
+从 AWS DescribeSchema 读回确认三个名称、action 与 RequestResponse metadata 正确；仅执行保存的 check-status 验证，返回 on、resources=[]。本次未执行关停／恢复、未接通自动通知。控制台事件格式和云端存储已核验，未实际操作浏览器 UI。Terraform validate/fmt、plan 范围／payload 检查通过；文档补充直接入口与点击步骤。
+
+### 30.5 四档接通与 SNS 真实投递验收
+
+用户批准接通，并追加 $25 档位作本月兜底；保留 $5/$10/$15，新增档位按月度规则配置。预检状态 on、resources=[]、consumed=[5,10,15]，预算实际费用 $19.021。增加 $25 状态机／预算／主题，记录 SNS message_id/threshold/status，不记录通知正文；19 Python 测试和 2 Terraform mock 测试通过。
+
+启用真实输入 arm_notifications=true，审查并 apply 11 create / 2 update / 0 delete：四组 Lambda 调用权限／SNS 订阅、$25 budget/topic/policy，更新控制 Lambda 与失败队列策略。未修改业务资源或手工消费 $25。核对四个预算金额、ACTUAL/GREATER_THAN/100%、来源范围、确认订阅和失败路由。
+
+真实 Publish 只发往已消费的 5/10/15，三个 MessageId 全部在 Lambda 结构化日志找到 ignored-consumed；S3 状态字节不变，失败队列为空。没有 Publish 到未消费的 $25，以免停站。最终并发5/1、CloudFront Enabled/Deployed、全部阶段与 webhook 原值一致、网站与 API health HTTP 200/UP；真实 Terraform plan No changes。当前下一关停点 $25，月度四档均已接通；真实账单原生通知跨档、跨月和在途发布停止仍未做云端测试。证据位于 ignored .local/cost-control-armed25-*；未 commit/push。
+
+### 31. Qwen 第一次真实调用：账号配额当前为 0
+
+用户要求下一步，回到已选 Qwen3 235B A22B 2507。2026-11-14 11:19 JST 重新核对 STS 正确账号；精确模型 ACTIVE/ON_DEMAND，authorization AUTHORIZED，region/agreement/entitlement AVAILABLE。GetServiceQuota 与 ListServiceQuotas 两条路径的 TPM L-3875BCCF、RPM L-548A1A32 都为 0、Adjustable=false；公开默认 TPM 仍 100,000,000。核对凌晨 00:06 JST 旧文件确为本账号 QuotaArn，旧值正数；不能认定是默认值误读，也不能据此确定被调整原因。
+
+只做一次有界 Converse（maxTokens128、虚构资料、禁用自动重试），返回 429 ThrottlingException / Too many tokens, please wait before trying again，requestId 3ae65457-5c33-4700-943e-4213c2d2cded。未取得回答或 usage。证据 ignored .local/qwen-runtime-smoke-20261114.json。没有上传简历、替换模型、切地区、接受订阅、请求配额变更或提交 Support 消息。
+
+本地只读检查脚本切换为用户选定的 Qwen 并验证账号实际配额，实跑按预期拒绝零配额；PROD/STG 默认关闭的权限草稿与 mock 断言同步为精确 Qwen ARN。更新选型文档／学习指南，准备未提交的支持请求草稿。在线 Java API 仍为 PREPARING，Lambda 模型权限未 apply。需要先恢复账号非零配额再验证模型及接入 Java。
+
+本地验证：portfolio validate 与5个mock测试通过，cicd validate 与22个mock测试通过；PowerShell语法检查和实跑零配额拒绝分支通过，Gitleaks／diff whitespace通过。未改应用源码，不重复运行前后端测试。旧模型清单／价格工作簿仍为标明时间的历史快照，不能继续当作当前账号配额。
+
+### 31.1 命令／学习手册补录与下一步路径核查
+
+用户要求所有操作、实际命令、失败与验证补入log／learning及相关md。新增 docs/aws-commands-20261114.md，按SSO、账单取证、每次保存计划与apply范围、SDK清理、真实停站／恢复、共享事件、SNS投递、模型调查与429、失败命令、安全检查归并。明确CLI原命令、SDK原操作与脱敏执行形态，删除／停站／真实推理命令为历史而非可一键重跑教程；没有复跑写操作来“补日志”。
+
+补齐 AWS_LEARNING_GUIDE.md 第28节模型／实际配额／429，第29节未接Java状态，第30节费用控制与真实手动按钮，第33节旧练习清理和未做制品清理的区别，第34节通知／日常费用。同步README的四root及当前状态、docs/aws-cost.md历史标识、architecture当前补充和infra/terraform/README入口。历史章节保留其发生时状态，没有把旧失败改写为成功。
+
+本轮实际读取：Get-Content／rg／rg --files、Get-ChildItem .local指定操作前缀、git status；没有打印私人邮箱、凭证或完整tfvars。继续下一步时只读STS和两个Qwen GetServiceQuota，均仍为0；support describe-services --language en --profile kong-dev --region us-east-1返回SubscriptionRequiredException。查官方说明Basic支持仍包含配额请求，后续核对控制台路径，不升级付费支持。已向用户请求明确授权发送现成Support草稿，尚未获得答复，不提交case，也没有再次推理、部署或关停。
+
+最新命令索引与原证据位置见 docs/aws-commands-20261114.md；将检查Markdown围栏／本地链接、命令引用与secret／whitespace。本轮是文档补录加只读路径核查，不重复跑前后端／容器测试，不commit／push。
+
+补录验证完成：12份相关Markdown围栏闭合，46个相对文件链接、28个脚本引用核对；其中scripts/check-private-paths.mjs是旧日志明确记录过的猜测路径读取失败，保留历史并核实真实.githooks/check-staged-paths.mjs存在，不伪改历史。git diff --check及docs／README／learning／log／Terraform入口的Gitleaks扫描通过；没有打印私密通知信息。新增文件仍未暂存／提交，本轮没有触发CI/CD。
+
+### 31.2 按用户要求暂缓支持请求，重查所有非零模型配额
+
+2026-11-14 11:33 JST重新只读获取东京870个ListServiceQuotas账号配额、81个ListFoundationModels条目、50个ListInferenceProfiles。实际命令`python .local/read_current_bedrock.py`使用SDK分页，保存ignored .local/bedrock-current-quota-audit.json；未引用默认值替代账号值。全量有625条正数，但主要是batch／资源数／检索等功能限制，不是可用问答模型数。
+
+区域内TPM51/RPM55、Geo跨区域TPM18/RPM10、全球TPM33/RPM11、Mantle输入/输出各4条，均没有正数。六种Qwen对应TPM/RPM全0。仅Nova Reel1.0并发10、Nova Sonic1.0并发20为正；实际CLI逐一GetServiceQuota确认，GetFoundationModelAvailability仍AVAILABLE，但GetFoundationModel均ResourceNotFoundException/版本已EOL。Nova2Sonic并发0；Cross-Model每日1.5亿不能覆盖模型级0配额。
+
+新增docs/bedrock-current-quotas.md列完整口径、计数和两项退役排除，回链Bedrock访问说明及Support草稿。用户要求先等，不提交支持请求、不切模型或区域、不重做推理。此轮没有apply、短信/邮件发送、关停或恢复。公开历史工作簿不覆盖成新快照。需在学习指南与命令索引补入本次全量复查入口。
+
+### 31.3 更正入口范围：Qwen东京Mantle已实际成功
+
+用户提供“新版Serverless可直接用”的说明，促使重新核对官方Runtime/Mantle配额与端点文档。发现此前把Service Quotas无正数扩展为“没有任何可用问答模型”是不准确的：Mantle独立计额，部分模型不公开每账号TPM；此前8条Mantle配额只涉及其他4个型号，不含Qwen。Runtime的0及一次429事实仍有效，但不应推导Mantle也失败。
+
+已明确向用户说明补测另一入口。2026-11-14 11:43 JST实际`python .local/qwen_mantle_smoke.py`：同账号、东京、同Qwen，SSO临时凭证内存SigV4签名service=bedrock-mantle；GET https://bedrock-mantle.ap-northeast-1.api.aws/v1/models返回200、41个型号且包含Qwen；POST /v1/chat/completions，model qwen.qwen3-235b-a22b-2507、max_tokens16、temperature0.1、无重试，仅输入Reply with only OK.，返回200／OK、13输入+2输出tokens、约0.214s。requestId=req_dhte52v5cqfii6wpnptnz3kkwva2oleopovs3fkovqjinvxjwd7a，证据ignored .local/qwen-mantle-smoke-20261114.json。没有创建API key、切区域、上传简历、修改后端或apply权限。
+
+同步更正README、learning28、模型访问、当前配额报告、Support草稿、architecture、命令补录与费用边界；Support继续暂停。Java仍PREPARING，Runtime InvokeModel权限草稿仍false。下一Story要审查Mantle Chat Completions协议、bedrock-mantle:CreateInference资源范围和费用Deny覆盖（bedrock:*不会覆盖bedrock-mantle:*）；本轮没有启用不受现有角色费用Deny覆盖的新后端路径。未验证操场UI、其他40个型号或个人问答质量。
+
+### 31.4 官方说明复核、Mantle权限准备与费用关停覆盖
+
+用户给出官方what-is-bedrock概述并要求继续下一步。按一次一Story，验收标准：已有默认项目核实、IAM只允许选定Qwen／本账号东京默认项目、费用关停覆盖Runtime与Mantle、站点保持开启。概述推荐新应用优先Runtime，但不否定Mantle；Serverless并非没有配额／限流。此前Runtime429与Mantle200分别保留，Support继续暂停。
+
+实际`python .local/verify_mantle_permissions.py`：SigV4 GET /v1/organization/projects核实已有arn:aws:bedrock-mantle:ap-northeast-1:561798268037:project/default，没有创建新项目／API key。将PROD与STG的默认关闭Terraform草稿改为bedrock-mantle:CreateInference、上述精确project ARN和StringEquals bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507。真实IAM SimulateCustomPolicy八项通过：目标allowed，其他模型／项目／区域／账号及缺模型条件implicitDeny，叠加费用Deny后Runtime与Mantle explicitDeny。CreateInference覆盖流式与非流式，应用后续明确非流式，不能声称IAM禁止流式。
+
+费用控制器生成策略增加bedrock-mantle:*，保留bedrock:*和专用角色范围；增加实际SDK PutRolePolicy载荷Stubber测试。本地20个Python测试通过；portfolio与cicd的fmt／validate及5／22个mock通过。业务授权开关仍false，两根栈未apply，Java未改。
+
+先status确认on／resources=[]／consumed=[5,10,15]／actual19.021；保存.local/cost-control-mantle-stop.tfplan，show JSON严格断言仅aws_lambda_function.controller一项update后apply。实际0新增／1更新／0删除，未执行off/on或新增模型授权。部署后下载运行zip，CodeSha256和controller.py与本地一致；State Active／LastUpdateStatus Successful。`python .local/verify_mantle_deployment.py`核对status、真实S3状态、并发5/1、CloudFront Enabled/Deployed、正式首页200及health200/UP，均通过。最终真实Terraform plan退出0／No changes，四档通知原配置保持，本月下一关停点$25。证据.local/mantle-permission-verification.json、mantle-deployment-verification.json及cost-control-mantle-stop-*.log。
+
+同步learning28/29、模型访问、费用说明、architecture、Terraform维护入口及实际命令索引第8节。只读辅助失败（PROD函数名误写／PowerShell glob路径／旧进程ID失效）已在索引记录并修正，没有伪记通过。此轮未重复真实停站、未运行模型推理或上传个人简历，真实业务角色调用待第29节；未改前后端，不重复其测试。未commit/push。
+
+收尾检查通过：12份Markdown围栏、51个相对链接、28个脚本引用；git diff --check无空白错误（仅既有CRLF提示）；docs、infra及根目录执行日志／学习指南／README的Gitleaks扫描无泄漏。
+
+### 31.5 Java默认关闭的有界接入与Mantle价格复核
+
+用户要求开始Java并确认价格。验收标准：固定东京Qwen Mantle Standard，使用SSO／执行角色SigV4，默认关闭，输入／输出／超时／频率有界，访客内容不污染下一次资料。重新下载AWS东京offer JSON并精确匹配Mantle standard专用条目，确认每百万输入$0.27、输出$1.06；8000入＋2000出、1000次约$4.28，未含税及其他AWS服务。没有只凭Runtime价格推断，原始证据.local/qwen-current-price-verification.json。
+
+实现Java AWS SDK 2.59.0现代AwsV4HttpSigner，固定endpoint／model／service_tier=default、非流式，无应用自动重试或模型切换。接口保留空POST PREPARING，不触发付费；启用后接受message/language，拒绝history/system等额外字段，8KiB请求、1000码点问题、4000字符资料、输出最多2048tokens、网络最多20秒、响应128KiB，每进程1在途、6/分钟及60/小时。失败占频次，稳定错误不带上游正文或凭证。单进程限流重启／扩容会重置，不宣称账号硬限额；公开启用前需网关与滥用控制验收。
+
+资料仅从仓库已有公开profile整理有限摘要，没有上传完整简历、补造经历／转职动机。每次仅system规则＋本次问题，不保存聊天、不写知识库、不微调；测试核对第二位访客的上下文不含前一位断言。提示词不保证零幻觉，三语质量和注入样例仍待后续验证。
+
+真实Java诊断一次：从本轮Lambda包依赖运行ignored .local/MantleJavaSmoke.java，AWS_PROFILE=kong-dev、SSO临时凭证内存签名、max_tokens16、测试短句，无个人资料；返回OK，30输入＋2输出tokens。证据.local/bedrock-java-live-smoke.log。SDK只读预检确认PROD/STG Active、28秒，应用开关默认false、模型策略未授予；证据.local/bedrock-java-cloud-preflight.json。此轮没有新增付费资源、云端apply／上传／发布、停站或commit/push。
+
+命令、失败修正与验证边界补入docs/aws-commands-20261114.md第9节；新增docs/bedrock-java.md，更新learning28/29/30、README、架构及费用说明。首次增量编译旧target缺类、测试Flow泛型适配失败已记录并修正。后续先审核完整资料与问答样例，再审查STG配置和发布；两道生产审批保留。
+
+最终验证通过：后端clean verify 24/24，Lambda profile 3/3；node scripts/test-lambda-package.mjs对真实ZIP解压并运行检查health、三语、PREPARING和console-only日志，包34.7MiB／解压库38.7MiB。前端build和64/64通过。14份Markdown围栏／59个相对链接／28个脚本引用通过；git diff --check无空白错误，backend／docs及根目录日志、learning、README的Gitleaks无泄漏。没有容器构建、真实Lambda角色问答或网页端问答验收。
+
+### 31.6 因费用暂不建知识库：私有S3资料与Java缓存
+
+用户明确要求便宜方案并写入学习指南，类比当前低流量后端选Lambda、不部署ECS/ALB。按一个小Story实施普通私有S3保存审核资料、Lambda实例内缓存、每次全文交给Qwen；不创建知识库／向量数据库／OpenSearch。记录取舍而非声称知识库统一最低$975；全文仍有每次输入token费用，后续以真实资料／流量复核总成本。
+
+新增ApprovedFacts与AWS S3/URL Connection依赖：懒创建客户端／懒加载，固定approved/facts.txt的version+SHA-256+owner，严格UTF-8，最大20,000 Unicode码点／80KiB，缓存只读资料。失败时503 FACTS_UNAVAILABLE且不调用模型；不静默回退资料、不缓存访客输入，health与空POST不读S3。4项资料测试加1项模型前置失败测试，后端clean verify 29/29，Lambda profile 3/3；真实ZIP运行通过，38.6MiB／解压库43.1MiB。前端未变，本增量未重复测试。
+
+新增infra/terraform/bedrock-content独立根栈及state key，实际STS核对账户、fmt/validate及4项mock通过。保存并show严格核对9个精确资源地址全部create、仅STG reader，再apply：9新增／0更新／0删除。包含私有S3桶及BPA／ACL禁用／AES256／TLS-only／版本控制／旧版本90天生命周期、初始对象、STG精确对象版本只读policy；不变更业务函数／PROD／审批／费用开关。最新真实plan退出0／No changes。
+
+初始对象仅仓库已有公开摘要623码点／1135字节，未提供或上传完整简历。真实Java以本地SSO读取云端固定版本、校验内容与摘要、第二次复用缓存，未推理；真实IAM SimulatePrincipalPolicy 7项通过：目标版本allowed，其他版本／key、写／删／最新读取／列表implicitDeny。安全属性核对通过，PROD无新读取策略，业务模型授权／开关仍关闭、资料env未部署。并发5/1，站点首页及health200/UP；费用status on、resources=[]、consumed=[5,10,15]、actual19.021，下一档25不变。
+
+证据.local/bedrock-content-{plan-review,verification,environment}.json、bedrock-content-*.log；真实Java程序.local/FactsJavaSmoke.java，SDK核查.local/verify_bedrock_content.py。HCL解析／mock状态负例顺序／内联检查warning及未匹配文档补丁等辅助失败均在命令索引第10节记录并修正。没有绕过prevent_destroy，没有模型新推理、应用上传、commit/push或容器构建；真实Lambda角色S3读取和问答待STG发布验收。
+
+学习指南新增“当前选型中的费用取舍”对照Lambda/ECS与全文/知识库；第29/30节记录已做及未做边界。新增docs/bedrock-content.md与根栈README，同步Java接入、架构、资源清理历史口径、费用说明、README五root及实际命令索引。资料更新要保留live/Green/回滚版本读取，再按原AWS CI/CD及两道生产审批发布；完整脱敏简历仍待用户提供。
+
+收尾通过：16份Markdown围栏／71个相对文件链接／28个脚本引用，git diff --check及新根栈fmt -check；backend／infra／docs与根目录执行日志、learning、README的Gitleaks无泄漏。没有将真实简历源、tfvars、保存计划、state或SDK证据加入Git。
+
+### 31.7 导入用户履历为脱敏问答资料
+
+用户提供本机DOC；只读解析OLE2格式72,192字节，使用独立ignored Apache POI HWPF 6.0.0辅助程序提取246段／10张表，保留段落来源及原文件SHA-256。原DOC未修改、未上传。用户补充确认当前任职／项目仍一致、资格未续证；资料区分历史取得与当前有效，不添加转职理由、未记载能力或定量成果。
+
+从职业段落整理7段项目、技能、学业、资格及既有个人项目记录；删除非必要个人字段、雇主实名和内部项目名，形成UTF-8/LF文本6,875码点／17,433字节。正文、原提取物、provenance和21个待执行问答样例只保存在ignored .local/profile-import-20261114，不加入Git；新正文仅上传既定私有S3固定对象。原文件哈希／来源覆盖／字节大小／隐私模式核查及实际Java ApprovedFacts.validate通过，没有向模型发送履历。
+
+更新private tfvars指向脱敏文件并保留旧摘要版本；保存import.tfplan，show严格检查精确两项update（资料对象及STG reader policy）、0新增／删除、正确账号、无PROD／Lambda配置／模型开关变更后apply。真实0新增／2更新／0删除。新旧对象下载与SHA-256匹配，真实IAM SimulatePrincipalPolicy 8项通过：新旧批准版本allowed，其他版本／key、写／删／最新读取／列举implicitDeny；私有桶与版本保护保留。最终真实plan退出0／No changes。
+
+使用既有Lambda包依赖运行ProfileFactsSmoke.java：真实SSO读取新S3版本，6,875码点，内容与摘要匹配、缓存复用通过，modelInvoked=false。PROD未授予资料读取，两业务函数仍未配置资料env／模型授权和开关，费用状态on、resources=[]、consumed=[5,10,15]，正式首页与health200/UP。没有代码部署／生产切流／SNS消息／commit/push。仅资料变更，不重复已有前后端或容器构建；模型质量、真实Lambda角色资料读取及网页问答仍待STG。
+
+实际命令与GBK输出、DOC软换行、Windows CRLF字节／hash不一致等上传前修正见docs/aws-commands-20261114.md第11节。更新learning第29节、资料方案、Java状态、架构、README与资料根栈维护说明，保留初次623码点摘要的历史记录和回退权限。后续21个验收问题需要真正执行并审查，不能把“样例已准备”当作三语质量或零幻觉已通过。
+
+收尾通过：16份Markdown围栏／71个相对链接／28个脚本引用，git diff --check；脱敏正文、docs及根目录log／learning／README和资料根栈README的Gitleaks无泄漏，git check-ignore确认正文和原始提取物均被忽略。原始源文件哈希核对未变。
+
+### 31.8 仅本人相关问答：严格白名单前置拒绝
+
+用户提供Amazon AI建议并明确目标：拒绝无关问题，提示当前只开放本人相关问答；异步确认选择“严格白名单／有限常见问法，未识别拒绝，不耗模型tokens”。核对官方Denied Topics与ApplyGuardrail文档：System Prompt拒答仍有输入费，少数禁止话题也不等于默认拒绝的许可表。本轮不新增收费Guardrails、分类模型或治理平台资源。
+
+实现QuestionScope portfolio-scope-v1：17主题／51日中英标准问句及审核别名，归一化后整句匹配；未知、附加任务、名字诱导不放行。QuestionService在并发／次数检查后、读取资料／调用模型前执行；模型只收到服务端固定模板，访客原文不进入模型。REFUSED／OUT_OF_SCOPE返回三语范围提示／17建议问句、modelInvoked=false／usage0；拒绝也占本地次数，不声称Lambda/API/日志完全免费。新增免费GET问题目录、稳定版本字段和仅固定元数据的scope审计，不记录问题／回答原文。允许本人相关但资料缺项时必须说明，取消通用算法／数学回答。
+
+后端clean verify 57/57，覆盖19种无关／夹带攻击、三语完整问句、格式归一化、跨访客隔离、拒绝不访问facts/gateway、真实HTTP路径；Lambda profile4/4及ZIP运行通过（38.6MiB／解压库43.1MiB），新增问题目录兼容空POST准备状态。前端未改，没有部署新UI，未重复前端／容器构建。
+
+仅替换私有资料旧“通用算法／数学允许”条款，职业事实不变，当前6,943码点／17,637字节。严格核对保存plan仅对象＋STG reader两项update后apply：0新增／2更新／0删除，保留此前两版。Java真实S3读取／hash／缓存通过；IAM模拟5项通过，当前／上一版allowed，未知版／写／最新读取implicitDeny，权限仍限制精确对象及批准版本。最终真实plan No changes；PROD无新授权、两业务模型开关关闭／资料配置未部署，费用状态on、consumed=[5,10,15]，health200/UP。没有模型推理、应用上传、切流、SNS或commit/push。
+
+从最新包导出51标准问句供后续质量测试，明确not_model_executed；旧21宽范围样例留历史，不能当新范围的通过证据。用户“继续”后从已落盘证据完成核查／文档收尾；旧PTY ID失效未重放写操作。证据ignored .local/scope-policy-20261114/{provenance,plan-review,cloud-verification,environment,previous-environment,qa-cases}.json及日志。新增docs/bedrock-scope.md，更新learning29/30、Java接入、资料方案、README、架构、根栈说明和命令索引第12节；STG发布需继续验证policy版本、零模型拒绝路径及正常问答质量，线上仍PREPARING，两道生产审批保留。
+
+用户继续后再次只读核对（证据时间2026-11-14 08:51 UTC／17:51 JST）：新资料／IAM条件一致，模型开关与权限仍关闭、应用未部署，费用状态on／consumed=[5,10,15]，health200/UP；没有恢复操作或新推理。文档、backend、scripts及根目录log／learning／README／资料根栈说明和私有脱敏资料的Gitleaks无泄漏；git diff --check通过，私有资料与新验收集被ignore。
+
+最终Markdown检查17份文档、79个相对文件链接、28个脚本引用通过；未将私有正文／验收集／计划／tfvars加入Git。
+# 31.9 STG Bedrock 发布（2026-11-14，进行中）
+
+用户继续授权后进入 STG 发布。恢复 SSO，核对账户、现有 AWS 流水线和生产 live=18；无在途执行，两道生产审批仍在。费用控制状态 on，consumed=[5,10,15]，下一档25美元。新增 STG 专用模型/资料环境参数；真实问答验收与共享无推理发布合约分开。Node 合约通过、cicd Terraform 25/25。保存 plan 逐项确认只有 STG 模型策略 create 与 STG Lambda 环境 update，未包含生产或流水线修改。原始资料与云端回答仍不进入 Git。实际命令、首次断言／参数错误修复和后续结果见 [当日命令第13节](docs/aws-commands-20261114.md)。目前进入 apply／AWS 构建阶段，尚未宣称真实问答验收完成。

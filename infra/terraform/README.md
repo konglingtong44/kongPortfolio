@@ -1,5 +1,6 @@
 # Terraform State 安全准备（S2-01）
 
+当前根栈：bootstrap、portfolio、cicd、[cost-control](cost-control/README.md)及[bedrock-content](bedrock-content/README.md)，各用独立state key；下文是bootstrap首次创建／迁移记录。费用控制当前已接通四档，维护时必须恢复真实ignored输入，不能用默认false无意撤掉通知；资料根栈仅管理私有S3及指定版本读取权限，不发布应用。完整历史／命令见[操作补录](../../docs/aws-commands-20261114.md)。
 范围：东京区域的专用 State bucket。网站、Budget、IAM 角色、ECS 和流水线另作小 Story；本次不创建这些资源。认证沿用本机 SSO，不在配置中保存凭证或绑定个人 profile，AWS CI 将使用角色。
 
 当前状态：2026-11-11 经用户批准已创建并迁移，迁移后 plan 无差异，并发锁验证通过。执行过程见 [执行记录](EXECUTION.md)。本 Story 完成，暂停供用户审核。
