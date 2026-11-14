@@ -551,7 +551,7 @@ Green脚本离线增量：requireProductionConfig校验固定资料、最多1024
 
 收尾补齐执行状态保护：requireApprovedContext要求当前执行InProgress，Stopped旧执行不能复用审批；最初部署／前端测试fixture未带status而失败，按真实API字段补齐后相关Node合约全通过。持久化生产auto.tfvars后再次跑portfolio13项确认测试不受live启用参数影响；validate／fmt-check通过。文档检查21份／108相对链接／28脚本引用、git diff --check及portfolio／资料／scripts／docs／根log-learning-README的Gitleaks无泄漏。未把脚本离线测试称为真实生产冷问答通过。
 
-# 18. 新源码候选构建与STG验收（进行中）
+# 18. 新源码候选构建与STG验收（已通过，等待第一审批）
 
 用户继续授权提交新源码并运行AWS候选，到第一道生产审批即停。新助手`.local/bedrock-candidate-run.py`分为preflight／start／poll／report：使用SSO，只显式启动一次指定COMMIT_ID的新执行，不调用任何审批API，不写生产代码。预检无在途候选、live18／无权重、公开模型关闭，LATEST和STG资料／输出上限一致，费用状态on，Source分支feat/aws-serverless-ci且DetectChanges=false，两道人审在。
 
@@ -569,3 +569,15 @@ python .local/bedrock-candidate-run.py report
 ```
 
 开始前21份文档／108链接／28脚本引用及diff检查通过。本地应用／Terraform检查沿用前几Story已通过结果，新的完整构建、前端73／后端58／Lambda5及实际ZIP验证交给AWS运行；不预先宣称云上通过。构建完成后另补源码／执行／制品／STG版本与token指标。私有旧run文件不覆盖，证据在ignored `.local/bedrock-release-20261114/`。
+
+实际按明确pathspec暂存39个文件，Git hooks路径检查及staged扫描、pre-push58提交全历史扫描无泄漏；commit978a636dd9029cfdebec9d43ce4cf50a1b1ff7c9推送练习分支。未加入outputs／私有材料／tfvars／state。新执行61bcc02c-2138-44fd-9a9e-ed78443f6851由StartPipelineExecution的sourceRevisions COMMIT_ID固定该源码，启动前比对remote分支head与本地commit一致；Source DetectChanges=false，没有依赖自动触发。
+
+AWS candidate build=kongportfolio-candidate:5f7c67c8-88b4-44c0-8bca-84c363ff70da；sourceDirty=false，前端73、后端58、Lambda5、实际ZIP及Node发布守卫通过。STG build=kongportfolio-stg:9e63671f-11f0-47a6-a6ff-1cfa41104391，通过并发布24；8项HTTP合约及6条范围请求通过。三语生成分别5184入／429出、5195入／176出、5204入／269出tokens，未截断；三语范围拒绝各0 tokens／modelInvoked=false。下载同次StagingReport zip，仅读取report.json，核对execution／gitCommit／release及实际已发布CodeSha256。release=be998dc666b8d709c4a2638d9a6da92669f1149146d02a6035dbfa239dd7612a，backend SHA256=b1f8af77d8109997c591efc90f443cbda957a91da0db4f63f5cea4e06178ce75。
+
+追加实际命令：`python .local/verify-candidate-stg-extra.py`，以SDK lambda.invoke仅调用STG24：空正文POST两种路径变体返回400／INVALID_PATH，GET日中英目录各17项，所有响应no-store；不发新生成问题，不消耗额外模型tokens。再次核对生产别名、LATEST配置、费用状态hash和health正常，执行当前仅到第一审批，未有VerifyGreen／第二审批／DeployProduction／PublishFrontend动作。3次生成合计15,583入／874出，按当日已核对Mantle单价估算$0.00513385，另有构建／Lambda／税等费用，非账单总额。
+
+本轮未apply／发布生产版本／执行审批／发送SNS或关停。只有STG后端版本部署，新界面是同次候选的校验产物，没有独立公网STG网页，浏览器到真实模型E2E未做。按AGENTS保留两道人工审批，准备[本次审批说明](bedrock-candidate-approval.md)：用户第一审批后才运行Green发布／真实角色三语问答与冷记录验证，不直接切流。
+
+补录阶段仅改文档，另以docs提交推送，不新启候选；源码仍固定978a636，新docs HEAD不能替代当前候选身份。私有状态同步助手一次因过时文案断言中止，已保留此前已完成的文档更新、改成可重复同步并核对实际文本后完成，产品代码未改。SDK/helper日志只打印状态和安全指标，不打印简历／模型回答／审批token。
+
+同SHA的独立CI项目也核对成功：frontend fe892cb4-ed12-48b4-8ed4-ce5d00176139、backend f0e0e4e7-6d7d-4f0d-8d6c-ef9ae6b17e2c。STG代码由CI拥有，cicd根栈最终真实plan No changes，未apply。收尾22份文档／119相对链接／28脚本引用、diff检查及扫描通过；未再跑已通过的模型测试或新启流水线。

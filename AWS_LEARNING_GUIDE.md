@@ -709,6 +709,8 @@ $aws = 'D:\software\AWSCLI\aws.exe'
 
 ### 29. Spring Boot接入真实Bedrock问答
 
+**最新源码／AWS验收：** 已提交978a636并显式固定COMMIT_ID启动新执行61bcc02c…；AWS前端73／后端58／Lambda5及ZIP运行通过，STG24完成8项HTTP、三语问答＋三语零token拒绝；补查两种路径变体400、三语目录17项通过。生产live18及LATEST配置未变，未发布网页；新候选停在第一审批，批准后才运行生产Green角色／冷问答。见[本次候选审批说明](docs/bedrock-candidate-approval.md)。
+
 **生产配置后续：** 生产角色指定模型及审核版本资料读取已授权，`$LATEST`固定资料version／hash、1024输出tokens、15秒模型HTTP；live仍18、环境与流量不变。`pipeline_owns_lambda_versions=true`关闭Terraform自动发布版本，实际新增版本0，Green仍在第一审批后由流水线发布。两根栈共2新增策略／1配置更新、最终No changes，10项IAM模拟和费用Deny覆盖通过，本轮无模型生成。Green脚本已准备同STG资料校验、三语真实问答和首条冷问答记录检查，尚未在云端运行；详见[生产配置](docs/bedrock-production-config.md)。
 
 **已部署至STG版本23，生产尚未开启。** Java通过AWS SDK现代SigV4 signer调用东京Mantle选定Qwen，不使用API key；代码默认关闭，空POST仍为不调用模型的PREPARING探测。启用后接收message/language，限制输入、输出、超时和频率，访客内容不写回资料。详见[接口、价格与验证边界](docs/bedrock-java.md)。
@@ -723,7 +725,7 @@ AWS构建通过前端64项／后端57项／Lambda 4项和ZIP运行；资料6,943
 
 ### 30. 输入输出限制、请求节流与调用成本控制
 
-**公开入口检查及部署：** 核对真实API限流、PROD/STG并发5/1、四档预算→SNS→控制器及Runtime／Mantle拒绝权限后，已apply目标0.1请求/秒／突发1的独立问答POST路由，1新增／1更新。空请求在直连API及CloudFront均观察到429，普通资料200、两入口health200／no-store，最终plan No changes。部分小批次全部放行，不能称严格每10秒一次。Java规范路径修复仍本地：7种变体不进入模型服务；后端58／Lambda 5／ZIP／Terraform 6项通过。未模型生成或开启生产，代码／环境／并发未改。生产配置、冷请求、新代码候选仍待验收，见[公开入口检查](docs/bedrock-public-readiness.md)。
+**公开入口检查及部署：** 核对真实API限流、PROD/STG并发5/1、四档预算→SNS→控制器及Runtime／Mantle拒绝权限后，已apply目标0.1请求/秒／突发1的独立问答POST路由，1新增／1更新。空请求在直连API及CloudFront均观察到429，普通资料200、两入口health200／no-store，最终plan No changes。部分小批次全部放行，不能称严格每10秒一次。Java规范路径修复已到STG24，两种绕过写法实测400；本地验证覆盖：7种变体不进入模型服务；后端58／Lambda 5／ZIP／Terraform 6项通过。未模型生成或开启生产，代码／环境／并发未改。生产配置、冷请求、新代码候选仍待验收，见[公开入口检查](docs/bedrock-public-readiness.md)。
 
 **前端本地增量：** 已接问题目录及问题选择、纯文本回答、REFUSED／准备中／429／超时／截断提示。打开不生成回答，点击后只传当前问题及语言；不自动重试。73项前端测试、构建和15组三语Chrome／WebKit模拟检查通过，没有真实模型调用或新AWS发布。前端禁用按钮不是安全边界，Java白名单和限流仍生效。旧候选不含新UI，后续必须重新AWS构建验证；见[前端验收与边界](docs/bedrock-frontend.md)。
 

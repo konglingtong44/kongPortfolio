@@ -22,11 +22,11 @@
 
 ## API与用户提示
 
-本地新增规范路径检查：只有原始URI `/api/bedrock` 可进入问答处理，路径参数／编码变体返回400或由框架返回404，不调用模型服务，防止绕过专用网关路由。尚未部署，见[公开入口检查](bedrock-public-readiness.md)。
+规范路径检查已随978a636部署至STG24：只有原始URI `/api/bedrock`可进入问答处理，路径参数／编码两种变体云端实测400，无模型调用；生产live18尚未更新。见[本次候选](bedrock-candidate-approval.md)及[公开入口检查](bedrock-public-readiness.md)。
 
 [前端问答界面](bedrock-frontend.md)已本地接入目录、问题选择、纯文本回答、范围提示及限流／超时／截断状态；尚未云端发布。当前采用审核问题选择，不提供自由输入。实际Java仍按完整白名单校验，不能依靠前端限制代替后端。
 
-`GET /api/bedrock/questions?language=zh`返回17个该语言的可选问题、policyVersion和enabled；默认语言为日语，不读S3／不调用模型。**该接口已部署至STG版本23；生产及公开网页尚未接入**。
+`GET /api/bedrock/questions?language=zh`返回17个该语言的可选问题、policyVersion和enabled；默认语言为日语，不读S3／不调用模型。**该接口最新部署至STG版本24；生产及公开网页尚未接入**。
 
 问答启用后，现有`POST /api/bedrock`对范围外输入返回HTTP200业务拒绝结果：
 

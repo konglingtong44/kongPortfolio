@@ -4,17 +4,19 @@
 
 在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已在STG验收，公共问答尚未开放，生产 `/api/bedrock` 仍返回 `PREPARING`。
 
-2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已部署至STG版本23并完成小样本验收，生产live仍为18。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
+2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)最新已部署至STG24并完成小样本验收，生产live仍为18。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
-费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏履历资料已导入私有S3并在STG实际问答中使用；正文不入Git。成功验收的8次模型调用共41,563输入／2,059输出tokens，模型费约$0.0134，另有首次截断调用、构建及其他AWS费用。
+费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏履历资料已导入私有S3并在STG实际问答中使用；正文不入Git。前一轮8次成功模型调用约$0.0134，新候选3次生成约$0.005134，另有首次截断调用、税、构建及其他AWS费用，估算不等于账单。
 
 问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；范围外在Java中返回固定提示，不读取资料、不调用模型。三语拒绝和正常回答已在STG验证，公共问答尚未开放。最新核对旧候选执行已Stopped，第一审批及Green验证曾成功，未切流；后续新候选仍需两道新审批。
 
-前端后续增量：[问题选择与回答界面](docs/bedrock-frontend.md)已在本地完成，73项测试、生产构建及15组三语桌面／手机模拟检查通过，尚未发布。打开只读取问题目录，主动提问才调用问答；有范围拒绝、限流、超时与截断提示，兼容旧生产准备状态。旧候选不含这版界面，发布需重新AWS构建验证。
+前端后续增量：[问题选择与回答界面](docs/bedrock-frontend.md)已在本地完成，73项测试、生产构建及15组三语桌面／手机模拟检查通过，尚未发布。打开只读取问题目录，主动提问才调用问答；有范围拒绝、限流、超时与截断提示，兼容旧生产准备状态。目前已进入新候选并通过AWS构建，生产网页仍未发布。
 
-[公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429，资料／health仍正常，最终Terraform No changes。规范路径修复及新前端仍在本地；生产live18、模型功能关闭。后端58项、Lambda 5项、实际ZIP及Terraform 6项证据保留。
+[公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429，资料／health仍正常，最终Terraform No changes。规范路径修复已在STG24验证，新前端已进入候选；生产live18、模型功能关闭。后端58项、Lambda 5项、实际ZIP及Terraform 6项证据保留。
 
-[生产权限与参数](docs/bedrock-production-config.md)已准备至`$LATEST`：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。Terraform不自动发布版本，实际新增版本0，访客仍访问版本18。Green脚本补齐STG资料一致性、真实角色问答及冷启动记录检查，云端验证待第一审批后执行；尚未提交／启动新候选。
+[生产权限与参数](docs/bedrock-production-config.md)已准备至`$LATEST`：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。Terraform不自动发布版本，实际新增版本0，访客仍访问版本18。Green脚本补齐STG资料一致性、真实角色问答及冷启动记录检查，云端验证待第一审批后执行；随后新源码候选已通过STG24，正在等待第一审批。
+
+**最新候选已验证：** 新源码978a636经AWS构建通过前端73／后端58／Lambda5及ZIP运行，发布STG24，三语问答／拒绝及两种路径修复实测通过。执行61bcc02c…现停在第一道人审，生产live18未变，新网页未发布。审批前核对[本次候选与审批说明](docs/bedrock-candidate-approval.md)，不可复用旧Stopped执行。
 
 ## 环境与本地启动
 

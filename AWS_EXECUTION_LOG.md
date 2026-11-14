@@ -2591,6 +2591,10 @@ AWS：两次 kong-dev STS 检查均报 SSO token expired；随后启动 AWS CLI 
 
 本轮未发布Lambda版本、未改live／启动候选／执行审批、未commit/push、未上传资料、未新建付费服务、未SNS／off-on／模型生成，也未重跑未改Java／前端／容器。新增[生产配置说明](docs/bedrock-production-config.md)，同步学习、README、权限／资料／架构／范围／公开入口文档；命令与失败修正见[第17节](docs/aws-commands-20261114.md)。新前端及路径修复仍待新源码AWS构建与STG验证，之后由用户审查第一审批。
 
-### 31.14 新候选AWS构建与STG验证（2026-11-14，进行中）
+### 31.14 新候选AWS构建与STG验证（2026-11-14，等待第一审批）
 
 用户继续授权提交已验证的新界面、规范路径修复、生产配置及Green守卫，启动新候选并停在第一审批。新预检确认无在途候选、live18无权重且功能关闭，生产LATEST与STG使用同一资料／输出上限（超时15／20秒），费用on，两道人审定义存在。保留旧执行证据，单独新建ignored .local/bedrock-release-20261114目录；不复用旧审批，不自动批准。按明确路径暂存，排除outputs、私有简历／参数／计划；扫描及hooks通过后推练习分支，由AWS重新构建并验证，结果后补。实际命令见[第18节](docs/aws-commands-20261114.md)。
+
+实际39个文件／新源码978a636dd9029cfdebec9d43ce4cf50a1b1ff7c9经提交与全历史Gitleaks通过，推送feat/aws-serverless-ci。以COMMIT_ID固定源码启动execution61bcc02c-2138-44fd-9a9e-ed78443f6851。AWS candidate5f7c67c8…通过前端73／后端58／Lambda5及实际ZIP（38.6MiB／解压43.1MiB）和发布守卫；STG build9e63671f…发布24。release be998dc6…／backend b1f8af77…与报告及实际版本摘要一致；8项HTTP、三语正常回答／三语拒绝全部通过，无截断，拒绝modelInvoked=false／usage0。补充直调STG24两种非规范路径400、三语目录各17项，均no-store，未额外生成模型回答。
+
+3次生成报告共15,583输入／874输出tokens，按已核对价格估算$0.00513385，未含税及其他AWS费用。21:18 JST最终核对live18别名／权重／RevisionId、生产LATEST配置和已发布版本列表不变，费用状态hash不变，health200／UP；本次执行停在ApproveProduction，Green／第二审批／切流／网页发布尚未执行。本轮没有创建服务、apply、SNS／off-on或批准；没有公网STG网页，浏览器到真实STG模型E2E未运行，未把UI源码进入候选当成网页已上线。新增[本次候选审批说明](docs/bedrock-candidate-approval.md)，同步学习和相关当前状态文档，等待用户按项目约定审查第一审批；该审批后Green会有3次生产模型生成测试，live仍不切流。

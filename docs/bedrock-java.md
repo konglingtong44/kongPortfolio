@@ -17,9 +17,9 @@
 
 ## 接口与限制
 
-后续[公开入口检查](bedrock-public-readiness.md)已部署问答专用网关限流，并在两个入口以空请求观察到429；Java规范URI检查仍本地，7种路径变体不进入模型服务。后端58项／Lambda 5项与ZIP验证通过，既有STG23不含这次修复。
+后续[公开入口检查](bedrock-public-readiness.md)已部署问答专用网关限流，并在两个入口以空请求观察到429；Java规范URI检查已到STG24，两种变体实测400；本地7种路径测试、AWS后端58项／Lambda 5项与ZIP验证通过，生产尚未更新。
 
-[前端消费接口](bedrock-frontend.md)已在本地实现并验证，兼容旧生产PREPARING；尚未进入新的AWS候选。模拟浏览器检查不作为新一轮真实模型调用证据。
+[前端消费接口](bedrock-frontend.md)已在本地实现并验证，兼容旧生产PREPARING；已进入978a636候选并通过AWS构建，生产网页未发布。模拟浏览器检查不作为新一轮真实模型调用证据。
 
 `POST /api/bedrock`：关闭时，以及空请求探测时，返回`200 {"status":"PREPARING"}`，不调用模型。启用后发送`Content-Type: application/json`：
 
@@ -29,7 +29,7 @@
 
 只接受`message`和`language`两个字段；语言为ja/zh/en。成功返回status=ANSWER、answer、truncated及usage。回答作为文本使用；未来前端不可直接当作HTML渲染。
 
-新增`GET /api/bedrock/questions?language=zh`提供审核问句；问答启用后未命中白名单的输入返回REFUSED／OUT_OF_SCOPE和三语范围提示，modelInvoked=false、usage为0并给出可选问句，不读S3／不调用模型。已部署至STG版本23，生产没有该新接口。
+新增`GET /api/bedrock/questions?language=zh`提供审核问句；问答启用后未命中白名单的输入返回REFUSED／OUT_OF_SCOPE和三语范围提示，modelInvoked=false、usage为0并给出可选问句，不读S3／不调用模型。最新已部署至STG版本24，生产live18没有该新接口。
 
 | 限制 | 当前值 |
 |---|---|
