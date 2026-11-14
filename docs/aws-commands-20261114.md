@@ -364,4 +364,8 @@ python .local/review-bedrock-stg-plan.py
 terraform.exe '-chdir=infra/terraform/cicd' apply '-input=false' '-no-color' '../../../.local/bedrock-stg.tfplan'
 ```
 
-Node 合约通过，Terraform 25/25。首次测试把 map 与 object 直接比较导致一项断言失败，改用 tomap 后通过。首次辅助脚本误读费用状态键 status（实际 mode），且 PowerShell 未引用带点路径的 CLI 参数导致 plan 报错；未产生变更，修正后重新执行。实际费用 mode=on、consumed=[5,10,15]。保存 plan 严格核对：仅创建 STG 模型内联策略、更新 STG Lambda 环境；并发、运行时、代码及生产资源未纳入变更。后续 AWS 构建／STG 验收结果另行补录，不提前记为完成。
+Node 合约通过，Terraform 25/25。首次测试把 map 与 object 直接比较导致一项断言失败，改用 tomap 后通过。首次辅助脚本误读费用状态键 status（实际 mode），且 PowerShell 未引用带点路径的 CLI 参数导致 plan 报错；未产生变更，修正后重新执行。实际费用 mode=on、consumed=[5,10,15]。保存 plan 严格核对：仅创建 STG 模型内联策略、更新 STG Lambda 环境；并发、运行时、代码及生产资源未纳入变更。实际 apply 1新增／1更新／0删除；私有启用参数保存到 ignored `infra/terraform/cicd/bedrock.auto.tfvars.json`，保留原有 live tfvars。随后的真实 plan No changes。
+
+按明确文件范围暂存（排除 outputs／私有资料／.local／state／tfvars），Gitleaks目录、提交及完整历史扫描通过；提交并 push 到练习分支 `feat/aws-serverless-ci`，源码 `bd46abafcafcd0310f03c7ec48efb398ad9a01a7`。费用控制、S3资料及此前Java增量一并纳入版本控制，但没有再次部署这些根栈。实际 SDK 通过 `start_pipeline_execution` 并使用 COMMIT_ID 固定该源码，execution=`7ac11129-a64d-42fa-b9ff-77659e52c447`。启动前误用生产函数简称 `kongportfolio` 的只读检查得到NotFound，按实际 `kongportfolio-prod` 修正；未修改生产。
+
+AWS candidate build `882deddf-9d51-4bc6-a5de-41f6385b4eec` 成功。STG build `cabe327a-1f2a-481f-b0c8-f98c6c51cee5` 发布版本22：8项HTTP合约、3条三语拒绝通过，实际日语自我介绍回答触及1024输出tokens上限，truncated=true，严格验收因此失败，没有生成passed报告／进入审批。模型调用及资料读取已打通，但不能称问答验收完成。保留完整结束断言和1024硬上限，在服务端提示词增加最多4短段／约200英文单词或400日中文字符、自我介绍只用一段、不重复整份履历的要求，准备通过AWS重新构建验证。日志读取曾遇本机GBK输出失败，改PYTHONIOENCODING=utf-8后成功；云端构建本身不受此编码问题影响。
