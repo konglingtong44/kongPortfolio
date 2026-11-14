@@ -1,4 +1,4 @@
-# 29. 有界Java问答（本地完成，尚未部署）
+# 29. 有界Java问答（STG已验收，生产尚未开启）
 
 验收：默认关闭；只调用东京Qwen Mantle Standard；通过角色／SSO临时凭证签名；输入、输出、耗时和调用频率有上限；仅审核问句完整匹配后读取资料并使用固定模板，访客原文不传模型、不写回资料。最新[严格问答范围](bedrock-scope.md)覆盖早先允许通用算法／数学问答的设想。
 
@@ -25,7 +25,7 @@
 
 只接受`message`和`language`两个字段；语言为ja/zh/en。成功返回status=ANSWER、answer、truncated及usage。回答作为文本使用；未来前端不可直接当作HTML渲染。
 
-新增`GET /api/bedrock/questions?language=zh`提供审核问句；问答启用后未命中白名单的输入返回REFUSED／OUT_OF_SCOPE和三语范围提示，modelInvoked=false、usage为0并给出可选问句，不读S3／不调用模型。新增接口尚未部署。
+新增`GET /api/bedrock/questions?language=zh`提供审核问句；问答启用后未命中白名单的输入返回REFUSED／OUT_OF_SCOPE和三语范围提示，modelInvoked=false、usage为0并给出可选问句，不读S3／不调用模型。已部署至STG版本23，生产没有该新接口。
 
 | 限制 | 当前值 |
 |---|---|
@@ -44,9 +44,9 @@
 
 ## 资料与隔离
 
-本地默认资料为[bedrock-facts.md](../backend/src/main/resources/content/bedrock-facts.md)，摘自仓库已有公开profile-zh.json，属于有限初稿。[私有S3方案](bedrock-content.md)随后已导入从用户DOC整理的脱敏履历资料，固定对象版本＋SHA-256、实例内缓存、保留旧摘要回退版本；环境变量配置尚未部署到业务Lambda。未补写转职动机、私人联系方式或缺失经历，正文不入Git。
+本地默认资料为[bedrock-facts.md](../backend/src/main/resources/content/bedrock-facts.md)，摘自仓库已有公开profile-zh.json，属于有限初稿。[私有S3方案](bedrock-content.md)已导入从用户DOC整理的脱敏履历资料，固定对象版本＋SHA-256、实例内缓存；STG版本23实际使用该资料。未补写转职动机、私人联系方式或缺失经历，正文不入Git，生产无新增资料授权。
 
-白名单匹配后只发送一条system规则与对应的服务端固定问题模板；访客原文不传模型，不接收客户端history／system／模型ID，不保存聊天，不写文件或知识库，不进行微调。个人经历只依据资料、缺项明确说明；通用算法／数学解题等不在本服务范围。模型输出质量仍待STG验收，不把提示词当确定性安全边界。
+白名单匹配后只发送一条system规则与对应的服务端固定问题模板；访客原文不传模型，不接收客户端history／system／模型ID，不保存聊天，不写文件或知识库，不进行微调。个人经历只依据资料、缺项明确说明；通用算法／数学解题等不在本服务范围。STG小样本已抽查，不把提示词当确定性安全边界或零幻觉保证。
 
 ## 本地运行与后续发布
 
@@ -67,11 +67,11 @@ $body = @{message='Tell me about yourself.'; language='en'} | ConvertTo-Json
 Invoke-RestMethod http://127.0.0.1:8080/api/bedrock -Method Post -ContentType 'application/json; charset=utf-8' -Body $body
 ```
 
-启用开关是应用配置，不会自动授予IAM权限。云端使用Lambda执行角色，不设置AWS_PROFILE或API key。现有Terraform单模型授权开关与应用环境变量是两个独立步骤，本轮均未apply；发布前需将应用配置纳入Terraform审查，先STG，再保留两道生产审批发布。原空请求发布探测继续兼容，但不能代替真实问答验收。
+启用开关是应用配置，不会自动授予IAM权限。云端使用Lambda执行角色，不设置AWS_PROFILE或API key。STG的单模型授权及固定资料环境已纳入Terraform审查并apply，应用由AWS流水线构建／上传，未绕过CI。两道生产审批仍保留；当前执行停在第一道，生产仍未开启。原空请求探测继续兼容，但不能代替真实问答验收。
 
-早期Java连通诊断已成功：从Lambda打包依赖运行ignored `.local/MantleJavaSmoke.java`，使用SSO与SigV4、max_tokens16、测试短句，返回OK、30输入＋2输出tokens；没有发送个人资料。该成功不代表真实Lambda角色或网页已接入。最新严格白名单已准备17主题／51个三语标准问句，模型质量尚未实测；下一步部署STG验证。
+STG实际结果：版本23、源码2a88caf，8项HTTP合约、三语拒绝及三语正常问答通过；补充事实／注入检查6项通过。正常模型调用8次合计41,563输入／2,059输出tokens，约$0.013405（不含首次截断调用、税和其他AWS服务）；样本平均折算千次约$1.68，仅作当前短回答参考。单次输出68–509 tokens，资料全文输入约5,200 tokens／次；STG硬上限1024，首次截断后增加聚焦与长度提示，未放松完整结束断言。51问未全部做模型质量测试，中文繁简及职称风格仍待统一；详见[命令第13节](aws-commands-20261114.md)。
 
-本轮验证：后端clean verify 24项、Lambda profile 3项，实际ZIP运行冒烟通过（34.7 MiB／解压库38.7 MiB）；前端build及64项测试通过。文档链接／围栏、diff空白与Gitleaks通过；未做容器构建或线上问答验收。命令及失败修正见[操作补录第9节](aws-commands-20261114.md)。
+历史Java初版验证：后端clean verify 24项、Lambda profile 3项，实际ZIP运行冒烟通过（34.7 MiB／解压库38.7 MiB）；前端build及64项测试通过。文档链接／围栏、diff空白与Gitleaks通过；该阶段未做容器构建或线上问答验收。命令及失败修正见[操作补录第9节](aws-commands-20261114.md)。最新AWS构建为前端64／后端57／Lambda 4及ZIP运行通过（38.6MiB／解压43.1MiB）；仍未测试容器。
 
 后续S3资料增量：后端29项、Lambda profile 3项及实际ZIP运行通过（38.6MiB／解压库43.1MiB）；资料存储Terraform 4项、真实IAM 7项及Java云端读取／缓存复用通过。没有修改前端，本增量未重跑其测试。费用取舍与资料更新方式见[说明](bedrock-content.md)。
 

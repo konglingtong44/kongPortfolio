@@ -699,29 +699,31 @@ $aws = 'D:\software\AWSCLI\aws.exe'
 
 **2026-11-14 双入口结果：** Runtime模型ACTIVE／访问正常，但实际TPM/RPM为0；一次128输出上限的Converse返回429。随后11:43 JST用同一东京账号和同一Qwen，Mantle Chat Completions一次16输出上限的请求返回200／OK、13输入+2输出tokens。**Qwen经Mantle已证明连通，Runtime仍受阻；不是所有Serverless都没有配额，也不能由Runtime失败推导所有入口不可用。**
 
-**本地改了什么：** PROD/STG Terraform模型权限草稿已改为Mantle `CreateInference`，精确限定本账号东京`project/default`及`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`；两开关仍默认false，没有apply这两个根栈。mock测试portfolio5个、cicd22个通过；真实IAM模拟8项通过，但不代表Lambda角色已经获得云上调用能力。
+**权限与部署：** PROD/STG Terraform使用Mantle `CreateInference`，精确限定本账号东京`project/default`及`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`。代码默认false；当前仅STG启用，实际角色调用成功，生产无新增授权。最初mock测试portfolio5个／cicd22个；新增STG配置验收后cicd25/25，真实IAM模拟8项仍保留为权限边界证据。
 
 **接入前保护已补齐：** 费用控制Lambda单项更新已部署，关停策略同时Deny `bedrock:*`和`bedrock-mantle:*`；20个Python测试及双入口IAM拒绝模拟通过。没有执行off/on，当前仍on、consumed=[5,10,15]、下一档$25，网站health正常。具体命令和验证见[操作补录](docs/aws-commands-20261114.md)。
 
-**下一步：** Java本地有界接入已完成，整理完整资料与问答样例，再审查STG应用开关／IAM及发布计划。Runtime的[Support草稿](docs/bedrock-quota-support-draft.md)继续暂停，无需以恢复Runtime为所有开发前提。[双入口证据](docs/bedrock-access.md)保留边界。
+**下一步：** STG实际问答已完成小样本验收；下一Story接前端可选问句／回答／拒绝提示，并检查公共入口限流，再按两道审批审查生产发布。Runtime的[Support草稿](docs/bedrock-quota-support-draft.md)继续暂停。[双入口证据](docs/bedrock-access.md)保留边界。
 
 11:33 JST[全量配额记录](docs/bedrock-current-quotas.md)中Runtime及已列少数Mantle指标无正数，但**不包含Qwen未公开的Mantle额度**。原“没有任何可用模型”的概括已在11:43成功调用后更正。两个旧语音／视频型号EOL仍不能作替代。Support继续暂停。
 
 ### 29. Spring Boot接入真实Bedrock问答
 
-**本地已实现，云端尚未部署。** Java通过AWS SDK现代SigV4 signer调用东京Mantle选定Qwen，不使用API key；真实SSO诊断返回OK、30输入＋2输出tokens。默认关闭，空POST仍为免费PREPARING探测；启用后接收message/language，限制输入、输出、超时和频率，访客内容不写回资料。详见[接口、价格与验证边界](docs/bedrock-java.md)。
+**已部署至STG版本23，生产尚未开启。** Java通过AWS SDK现代SigV4 signer调用东京Mantle选定Qwen，不使用API key；代码默认关闭，空POST仍为不调用模型的PREPARING探测。启用后接收message/language，限制输入、输出、超时和频率，访客内容不写回资料。详见[接口、价格与验证边界](docs/bedrock-java.md)。
 
-已从用户提供的旧版DOC整理并导入脱敏履历资料，6,875码点／17,433字节，涵盖7段职业项目经历等；原始DOC未改动或上传，正文仅在本地ignored目录和私有S3，不加入Git。本人确认当前任职／项目未变、资格未续情况后，按事实区分取得历史与当前有效状态，不编写转职理由。准备21个验收问题，但未实测三语问答质量或零幻觉。线上仍PREPARING，业务角色模型授权／应用开关尚未apply；下一步上STG验证，不直接开放公共问答。
+已从用户提供的旧版DOC整理并导入脱敏履历资料，涵盖7段职业项目经历等；原始DOC未改动或上传，正文仅在本地ignored目录和私有S3，不加入Git。本人确认当前任职／项目未变、资格未续情况后，按事实区分取得历史与当前有效状态，不编写转职理由。STG三语问答通过，补充检查未续证SAP、当前工作、转职动机缺失及团队贡献均符合资料。仅小样本，不保证零幻觉；生产仍PREPARING。
 
-**因为费用，暂不使用知识库：** 用户已选择普通私有S3保存资料、Lambda内存缓存、逐次全文交给Qwen。独立bedrock-content根栈首次9新增／0更新／0删除；随后履历导入仅2更新（资料对象和STG版本权限），旧623码点摘要版本保留回退。Java对新资料真实读取、SHA-256校验及缓存复用通过，真实IAM 8项模拟确认仅新旧批准版本可读。资料上限20,000 Unicode码点／80KiB，覆盖后续一万多字需求；应用代码和资料配置尚未部署至云端。更新／回滚流程及实际命令见[资料方案](docs/bedrock-content.md)。
+**因为费用，暂不使用知识库：** 用户已选择普通私有S3保存资料、Lambda内存缓存、逐次全文交给Qwen。独立bedrock-content根栈首次9新增／0更新／0删除；随后履历导入仅2更新（资料对象和STG版本权限），旧623码点摘要版本保留回退。Java真实读取、SHA-256校验及缓存复用通过；资料上限20,000 Unicode码点／80KiB。STG资料配置已部署且实际使用，生产无新增资料权限。更新／回滚流程见[资料方案](docs/bedrock-content.md)。
 
 **最新范围限制：只接受本人相关的审核问句。** 用户选择严格白名单，`portfolio-scope-v1`提供17主题／51个三语标准问句及有限别名；只对整条问句归一化后完整匹配，含有“孔令通／简历”不代表放行。通过后向Qwen发送对应服务端固定模板，不传访客原文。未知问法／夹带解题任务直接返回REFUSED、三语范围提示和可选问题，modelInvoked=false、usage=0；拒绝也计入频率保护。API Gateway／Lambda／日志仍可能计费，不能称整个请求免费。
 
-本地57项、Lambda profile 4项及真实ZIP运行通过，白名单之前不会读取S3／调用模型；GET `/api/bedrock/questions`可提供问题目录。旧资料的通用算法／数学允许条款已替换，职业事实不变，当前6,943码点／17,637字节，S3仅2更新且保留旧版；Java真实读取／hash／缓存及最终plan No changes通过。17主题的模型回答质量尚未实测，导出51个待执行标准问句，先前21个宽范围样例不能直接当新验收标准。代码与新接口仍未云端发布，线上仍PREPARING；详见[范围设计与限制](docs/bedrock-scope.md)。
+AWS构建通过前端64项／后端57项／Lambda 4项和ZIP运行；资料6,943码点／17,637字节，固定版本并保留旧版。STG验收8项HTTP合约、3语拒绝＋3语正常回答；补充6项事实与注入检查通过。访客新增技能断言被拒绝，后续回答未采用该内容。51标准问句全部做过匹配测试，未全部做模型质量测试；旧21个宽范围样例不作新标准。执行6c2aa1d9…停在首次审批，STG23／生产18，前端未开放问答；详见[范围设计](docs/bedrock-scope.md)及[命令第13节](docs/aws-commands-20261114.md)。
 
 ### 30. 输入输出限制、请求节流与调用成本控制
 
-**账号费用保护已部署，Java逐请求限制已在本地实现。** 请求体8KiB、问题1000码点、资料20,000 Unicode码点／80KiB、输出最多2048 tokens、模型HTTP最多20秒；S3资料读取另有4秒SDK调用预算、1秒连接／2秒socket超时。每进程1在途、6次/分钟、60次/小时，重启／扩容重置，不能当账号全局硬限额。公开启用前还需核对网关、冷启动／凭证解析与Lambda28秒总超时、滥用控制。
+**账号费用保护与STG Java逐请求限制已部署。** 请求体8KiB、问题1000码点、资料20,000 Unicode码点／80KiB；STG输出硬上限1024 tokens，代码允许配置至2048；模型HTTP最多20秒，S3另有4秒SDK预算。每进程1在途、6次/分钟、60次/小时，重启／扩容重置，不能当账号全局硬限额。首次自我介绍截断导致验收失败，增加聚焦主题与长度提示后重建通过，未放松截断检查。公开启用前仍需核对网关、冷启动／凭证解析与Lambda28秒总超时、滥用控制。
+
+**真实token费用：** 本轮成功的8次模型调用共41,563输入＋2,059输出tokens，按当前单价约$0.013405；平均折算约$1.68／千次短回答，不是固定单次报价。另有首次截断调用及税／构建／Lambda等费用。每次资料全文仍计入约5,200输入tokens；S3内存缓存只减少重复读S3，不等于模型提示词缓存。
 
 **如何避免无关问题消耗整份简历tokens：** 先在Java确定性白名单拒绝，再加载资料／调用模型。只写“与本人无关就拒绝”的System Prompt仍会产生输入费；Bedrock Denied Topics也不是“默认拒绝、例外放行”的许可表。当前不增加收费语义分类／Guardrails，后续如果放开自由问法，再单独比较语义检查费用、误判和防绕过效果。
 

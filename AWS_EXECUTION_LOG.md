@@ -2544,6 +2544,13 @@ AWS：两次 kong-dev STS 检查均报 SSO token expired；随后启动 AWS CLI 
 用户继续后再次只读核对（证据时间2026-11-14 08:51 UTC／17:51 JST）：新资料／IAM条件一致，模型开关与权限仍关闭、应用未部署，费用状态on／consumed=[5,10,15]，health200/UP；没有恢复操作或新推理。文档、backend、scripts及根目录log／learning／README／资料根栈说明和私有脱敏资料的Gitleaks无泄漏；git diff --check通过，私有资料与新验收集被ignore。
 
 最终Markdown检查17份文档、79个相对文件链接、28个脚本引用通过；未将私有正文／验收集／计划／tfvars加入Git。
-# 31.9 STG Bedrock 发布（2026-11-14，进行中）
 
-用户继续授权后进入 STG 发布。恢复 SSO，核对账户、现有 AWS 流水线和生产 live=18；无在途执行，两道生产审批仍在。费用控制状态 on，consumed=[5,10,15]，下一档25美元。新增 STG 专用模型/资料环境参数；真实问答验收与共享无推理发布合约分开。Node 合约通过、cicd Terraform 25/25。保存 plan 逐项确认只有 STG 模型策略 create 与 STG Lambda 环境 update，未包含生产或流水线修改。原始资料与云端回答仍不进入 Git。实际命令、首次断言／参数错误修复和后续结果见 [当日命令第13节](docs/aws-commands-20261114.md)。目前进入 apply／AWS 构建阶段，尚未宣称真实问答验收完成。
+### 31.9 STG Bedrock 发布与真实验收（2026-11-14）
+
+用户继续授权后进入STG发布。恢复SSO，核对账户、流水线、生产live=18和费用状态on／consumed=[5,10,15]，下一档25美元。新增STG模型／固定资料配置；真实问答检查只放在STG，共享生产发布合约不调用模型。Node合约通过、cicd Terraform 25/25；保存plan逐项确认只有STG模型策略create与Lambda环境update，实际apply 1新增／1更新／0删除。原有live输入保留，私有启用参数另存ignored auto.tfvars.json，真实plan No changes。
+
+扫描明确文件范围、提交hook与全历史Gitleaks通过后，将本日已完成增量提交到练习分支。第一轮源码bd46aba／execution7ac11129…：AWS构建成功，STG22通过8项HTTP与3条范围拒绝，但日语自我介绍触及1024 tokens上限，严格完整结束断言失败。未把失败记为通过，也未调高上限；增加聚焦主题和短回答要求后，源码2a88caf／execution6c2aa1d9-f520-44fc-ae71-7ee7f3cfc3f3重新AWS构建。前端64／后端57／Lambda 4项及真实ZIP运行通过，STG23全部8项HTTP、3条三语拒绝和3条三语正常回答通过。
+
+额外6条受控调用：当前职责、未续证SAP、转职动机缺失、30多个服务为团队成果、注入新技能后再查技能。5条模型回答完整结束并完成事实抽查，1条注入拒绝无模型tokens，后续回答没有采纳虚构技能。只作小样本，不宣称51问全部模型验收或零幻觉；一条中文使用繁体及日文职称，留作风格改进。8次成功模型调用总41,563输入／2,059输出tokens，约$0.013405；不含首次截断调用、税与其他AWS费用。
+
+09:58 UTC／18:58 JST最终云端核对：生产live版本18、RevisionId与路由不变、模型功能未启用，health200/UP；费用状态on／consumed=[5,10,15]。STG23代码摘要与同次候选一致，资料版本与hash一致。流水线停在第一道ApproveProduction，未执行Green／第二审批／切流／前端发布，两道生产审批完整保留。前端仍PREPARING，无独立公网STG问答页面。没有创建知识库、Guardrails或新常驻服务，没有发送SNS。私有回答仅在.local，报告只存安全指标。命令、构建ID、首次错误修复和证据路径见[当日命令第13节](docs/aws-commands-20261114.md)；学习28–30、README及接入／资料／范围／架构文档同步更新。

@@ -340,7 +340,7 @@ python .local/scope-policy-20261114/verify_cloud.py
 实际从最新解压Lambda lib运行ignored `.local/ScopeFactsSmoke.java`：读取云端固定版本与本地完全相等，6,943码点、cacheReused=true、modelInvoked=false；并导出51个标准问题到qa-cases.json，标注not_model_executed。旧21个宽范围样例仍作历史记录，不继续用“通用算法应回答”作为新验收标准。当前私有环境指针已更新，先前指针留在本轮previous-environment.json。证据`.local/scope-policy-20261114/{provenance,plan-review,cloud-verification,environment,previous-environment,qa-cases}.json`及日志。
 
 用户随后“继续”，恢复读取已完成云端核查证据并补齐文档；旧PTY session ID已失效，改读落盘结果，没有重新推理、发布或重复apply。此轮没有模型调用／收费Guardrails创建／应用上传／生产切流／SNS消息／commit/push。新增接口及Java白名单尚未部署，STG还要验证policy版本、范围拒绝及模型调用质量；原PREPARING探测不足以验收这些功能。
-# 13. STG Bedrock 发布与真实验收（进行中）
+# 13. STG Bedrock 发布与真实验收
 
 验收：仅 STG 开启指定 Qwen 模型；固定脱敏资料版本；三语范围拒绝不调模型；三语正常问答实际调用；生产 live 版本及两道审批保持不变。原始简历、私有资料和测试回答不入 Git。
 
@@ -369,3 +369,39 @@ Node 合约通过，Terraform 25/25。首次测试把 map 与 object 直接比�
 按明确文件范围暂存（排除 outputs／私有资料／.local／state／tfvars），Gitleaks目录、提交及完整历史扫描通过；提交并 push 到练习分支 `feat/aws-serverless-ci`，源码 `bd46abafcafcd0310f03c7ec48efb398ad9a01a7`。费用控制、S3资料及此前Java增量一并纳入版本控制，但没有再次部署这些根栈。实际 SDK 通过 `start_pipeline_execution` 并使用 COMMIT_ID 固定该源码，execution=`7ac11129-a64d-42fa-b9ff-77659e52c447`。启动前误用生产函数简称 `kongportfolio` 的只读检查得到NotFound，按实际 `kongportfolio-prod` 修正；未修改生产。
 
 AWS candidate build `882deddf-9d51-4bc6-a5de-41f6385b4eec` 成功。STG build `cabe327a-1f2a-481f-b0c8-f98c6c51cee5` 发布版本22：8项HTTP合约、3条三语拒绝通过，实际日语自我介绍回答触及1024输出tokens上限，truncated=true，严格验收因此失败，没有生成passed报告／进入审批。模型调用及资料读取已打通，但不能称问答验收完成。保留完整结束断言和1024硬上限，在服务端提示词增加最多4短段／约200英文单词或400日中文字符、自我介绍只用一段、不重复整份履历的要求，准备通过AWS重新构建验证。日志读取曾遇本机GBK输出失败，改PYTHONIOENCODING=utf-8后成功；云端构建本身不受此编码问题影响。
+
+修复提交／push源码`2a88cafc007e64768b8efae9127e56bb18c3b576`，再次通过Gitleaks hooks。实际Git操作使用明确pathspec暂存本轮backend／docs／infra／scripts及根目录log／learning／README／.gitignore，未用git add .，outputs仍未跟踪；提交／发布命令如下。最终文档提交另用docs标题，不再次启动流水线。
+
+```powershell
+git diff --cached --check
+node .githooks/check-staged-paths.mjs
+git commit -m 'feat: bound Bedrock portfolio questions and enable staging verification'
+git push origin feat/aws-serverless-ci
+git add -- backend/src/main/java/dev/kongortfolio/bedrock/QuestionService.java docs/aws-commands-20261114.md
+git commit -m 'fix: keep portfolio model answers within the staging output budget'
+git push origin feat/aws-serverless-ci
+```
+
+以下ignored助手保存本次证据，不是仓库公共脚本；SDK沿用SSO，不在脚本写入密钥。
+
+```powershell
+python .local/start-bedrock-stg.py
+python .local/poll-bedrock-stg.py
+python .local/fetch-bedrock-stg-report.py
+# 等前一批六次请求离开60秒限流窗口
+python .local/bedrock-stg-quality.py
+python .local/verify-bedrock-stg-final.py
+terraform.exe '-chdir=infra/terraform/cicd' plan '-input=false' '-no-color' '-detailed-exitcode'
+python .local/check_aws_docs.py
+git diff --check
+```
+
+实际SDK：`get_object`读取费用状态；`get_alias`／`get_function_configuration`／`get_role_policy`核对环境；`start_pipeline_execution(sourceRevisions=COMMIT_ID)`固定源码；`get_pipeline_execution`／`list_action_executions`／`batch_get_builds`／`get_log_events`跟踪结果；S3 `get_object`下载该次报告，核对commit／execution／摘要；`lambda.invoke`只调用STG发布版本23，保存私有回答并做事实抽查；最后HTTPS GET生产health。没有调用生产审批或生产部署API。
+
+第二轮execution=`6c2aa1d9-f520-44fc-ae71-7ee7f3cfc3f3`，candidate build=`950a7e57-30fb-40fb-ba61-6b45ee24cc08`，STG build=`e9c05569-2c30-4614-ba6c-459e1186cdf5`。AWS构建通过前端64／后端57／Lambda 4项、ZIP真实运行及发布保护合约；ZIP38.6MiB／解压43.1MiB。STG23／release=`3796747ae3f8a3fdbdb39262ad6857f388291092cf3a47b24dd943e6e6d8a98d`／backend SHA256=`e5dd2041e5083fc2f37a1ef8370361e35ed8cbbc9c52bcad8bd48d306863ebdd`，与本次候选一致。
+
+STG报告8项HTTP通过；三语范围拒绝均无模型调用／0 tokens，三语正常回答均未截断。补充6项：当前项目、SAP未续、转职理由未给、团队成果归属、伪造新技能被拒绝、后续技能回答未采用该断言；5条模型输出完成事实抽查、1条固定拒绝通过。补充调用约1.0–3.6秒／条，均为热环境样本，不代表公网延迟或冷启动SLA。一条中文用繁体及日文职称，记录风格限制；没有覆盖51问的全部模型输出。
+
+8次成功推理总41,563输入／2,059输出tokens，按输入$0.27／百万、输出$1.06／百万估算$0.013405；平均千次短回答约$1.68，非固定报价，另计首次截断调用、税／CodeBuild／Lambda等费用。09:58 UTC核对：生产live=18且RevisionId／路由不变、功能仍关闭、health200/UP；费用mode=on／consumed=[5,10,15]。流水线等待第一审批，第二审批仍存在，Green／切流／前端发布均未执行。最终真实cicd plan No changes。前端未改，没有公网STG页面、知识库或Guardrails。
+
+证据：`.local/bedrock-stg-{preflight,run,run-first,report,progress,final-verification}.json`、`bedrock-stg-{plan,apply,final-plan}.log`、`bedrock-stg-quality/`及AWS构建日志。报告取回曾早于CodePipeline更新状态而断言“未成功”，等待状态传播后成功，没有重跑模型。文档补丁曾因上下文不匹配被原子拒绝，核对原文后重做，无改动丢失。最终文档提交不启动新候选流水线、不推进生产审批。

@@ -2,13 +2,13 @@
 
 持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
-在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 尚待接入，目前 `/api/bedrock` 仅返回 `PREPARING`。
+在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已在STG验收，公共问答尚未开放，生产 `/api/bedrock` 仍返回 `PREPARING`。
 
-2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle及Java真实调用成功，Runtime Converse仍429；[Java有界问答](docs/bedrock-java.md)已在本地实现，默认关闭、尚未部署。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
+2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已部署至STG版本23并完成小样本验收，生产live仍为18。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
-费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏后的履历资料已导入私有S3并保留旧摘要版本，Java读取／缓存及STG版本权限验证通过；正文不入Git，云端应用发布和问答质量验收待后续。
+费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏履历资料已导入私有S3并在STG实际问答中使用；正文不入Git。成功验收的8次模型调用共41,563输入／2,059输出tokens，模型费约$0.0134，另有首次截断调用、构建及其他AWS费用。
 
-问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；范围外在Java中返回固定提示，不读取资料、不调用模型。代码本地验证通过，尚未部署新接口或开放线上问答。
+问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；范围外在Java中返回固定提示，不读取资料、不调用模型。三语拒绝和正常回答已在STG验证；前端仍是准备状态，公共问答尚未开放。流水线停在第一次生产审批，两道生产审批均保留。
 
 ## 环境与本地启动
 

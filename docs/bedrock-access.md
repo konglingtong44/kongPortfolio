@@ -63,22 +63,22 @@ aws sso login --profile kong-dev
 
 ## Mantle权限准备及下一步边界
 
-**2026-11-14 已完成接入前的权限准备；后续Java本地实现见[第29节](bedrock-java.md)，云端未启用。** 按[官方IAM说明](https://docs.aws.amazon.com/service-authorization/latest/reference/list_bedrock-mantle.html)，Mantle使用独立的`bedrock-mantle:CreateInference`，资源是project，不是Runtime的foundation-model ARN。通过签名GET `/v1/organization/projects`确认本账号东京已有`default`项目，没有创建新项目或API key。
+**2026-11-14 STG已授权并实际调用成功；生产未启用。** 按[官方IAM说明](https://docs.aws.amazon.com/service-authorization/latest/reference/list_bedrock-mantle.html)，Mantle使用独立的`bedrock-mantle:CreateInference`，资源是project，不是Runtime的foundation-model ARN。通过签名GET `/v1/organization/projects`确认本账号东京已有`default`项目，没有创建新项目或API key。应用及验收见[第29节](bedrock-java.md)。
 
 - PROD root `infra/terraform/portfolio`：`enable_bedrock_access = false`（默认）。
-- STG root `infra/terraform/cicd`：`enable_staging_bedrock_access = false`（默认）；启用时必须已有 `enable_staging = true`。
+- STG root `infra/terraform/cicd`：代码默认`enable_staging_bedrock_access = false`；当前私有部署参数明确开启模型权限和有界问答，要求已有STG及固定资料版本。
 - 每个开关只新增对应 Lambda 执行角色的 `qwen-235b-mantle-tokyo-only` inline policy：Action=`bedrock-mantle:CreateInference`，Resource=`arn:aws:bedrock-mantle:ap-northeast-1:561798268037:project/default`，`StringEquals`条件`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`。
 - 不授予项目创建、上传文件、模型列表或CI构建角色权限。CreateInference本身同时覆盖流式及非流式，后续由应用明确使用非流式，不能宣称此IAM策略禁用了流式。
-- 真实IAM `SimulateCustomPolicy`八项通过：指定模型／项目allowed；其他模型、项目、区域、账号及缺模型条件implicitDeny；叠加费用Deny后Runtime与Mantle均explicitDeny。模拟不等于业务角色实际调用成功，两根栈均未apply模型授权。
+- 真实IAM `SimulateCustomPolicy`八项通过：指定模型／项目allowed；其他模型、项目、区域、账号及缺模型条件implicitDeny；叠加费用Deny后Runtime与Mantle均explicitDeny。随后仅STG模型授权apply并实际调用成功，生产未apply该授权。
 
 费用控制Lambda已通过Terraform单项更新部署：后续关停策略同时Deny `bedrock:*`和`bedrock-mantle:*`，Resource=`*`，仍只写入指定PROD/STG角色。离线SDK接口测试确认策略生成，真实IAM模拟确认拒绝。本轮没有再次停站演练；网站保持on、并发5/1、CloudFront Enabled/Deployed，首页及health均200/UP。管理员SSO与其他角色不受该角色策略限制。
 
-这次只准备配置，默认开关保持关闭。后续先审查 STG 的启用计划，再实施；PROD 单独审查。使用原有 ignored tfvars，不覆盖其他 CI/CD 开关。两道生产审批及 live 别名所有权不变；应用环境变量留到第 29 节。
+STG启用计划已逐项审查并apply：1新增模型内联策略／1更新Lambda资料与应用环境，生产没有变更。保留原有ignored tfvars，新增启用参数存于ignored `bedrock.auto.tfvars.json`，最终plan No changes。实际应用由AWS流水线构建发布至STG版本23，执行停在第一道生产审批；两道审批及live别名所有权不变。
 
 ## 费用与后续边界
 
 [官方价格页](https://aws.amazon.com/bedrock/pricing/)需按东京、Qwen3 235B A22B 2507、标准按需模式确认。模型费计算：`输入 tokens / 1,000,000 × 输入每百万单价 + 输出 tokens / 1,000,000 × 输出每百万单价`；另计 Lambda/API/日志。已有 $5/$10/$15/$25 月度关停保护，预算延迟不能视作硬额度。
 
-两个入口诊断分别为Runtime429、Mantle200；随后Java客户端也通过SSO短调用成功，均不证明简历问答质量。[Mantle Standard专用价格](bedrock-java.md)已单独核对，输入$0.27／百万、输出$1.06／百万tokens。Java已在本地实现逐请求限制及资料规则，尚未部署，完整简历与STG验证待后续。
+两个入口早期诊断分别为Runtime429、Mantle200；随后Java／真实STG角色均已通过Mantle调用成功，Runtime Support继续暂停。[Mantle Standard专用价格](bedrock-java.md)输入$0.27／百万、输出$1.06／百万tokens。STG三语与事实小样本已验收，未覆盖所有模型输出；网页仍PREPARING，生产未接入。
 
-验证记录见 [AWS_EXECUTION_LOG.md](../AWS_EXECUTION_LOG.md) 第31.3／31.4节。未记录通过的账号检查、IAM apply、模型调用都视为未完成。
+验证记录见 [AWS_EXECUTION_LOG.md](../AWS_EXECUTION_LOG.md) 第31.3／31.4／31.9节。未记录通过的账号检查、IAM apply、模型调用都视为未完成。

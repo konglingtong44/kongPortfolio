@@ -1,5 +1,7 @@
 # Terraform State 安全准备（S2-01）
 
+2026-11-14 STG问答：cicd根栈模型授权与固定资料环境已审查并apply（1新增／1更新），私有启用参数保存于ignored `cicd/bedrock.auto.tfvars.json`；保留原有terraform.tfvars，后续plan须加载当前live输入。代码由AWS流水线发布STG23，生产未开启、两道审批保留。见[命令第13节](../../docs/aws-commands-20261114.md)。
+
 当前根栈：bootstrap、portfolio、cicd、[cost-control](cost-control/README.md)及[bedrock-content](bedrock-content/README.md)，各用独立state key；下文是bootstrap首次创建／迁移记录。费用控制当前已接通四档，维护时必须恢复真实ignored输入，不能用默认false无意撤掉通知；资料根栈仅管理私有S3及指定版本读取权限，不发布应用。完整历史／命令见[操作补录](../../docs/aws-commands-20261114.md)。
 范围：东京区域的专用 State bucket。网站、Budget、IAM 角色、ECS 和流水线另作小 Story；本次不创建这些资源。认证沿用本机 SSO，不在配置中保存凭证或绑定个人 profile，AWS CI 将使用角色。
 
