@@ -9,7 +9,7 @@ import './bedrock.css';
 function Questions({ locale }: { locale: Locale }) {
   const t = qaCopy[locale];
   const [catalog, setCatalog] = useState<Catalog | null>(null);
-  const [selected, setSelected] = useState('');
+  const [message, setMessage] = useState('');
   const [result, setResult] = useState<{ question: string; response: Answer } | null>(null);
   const [error, setError] = useState<QaFailure['kind'] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -17,6 +17,10 @@ function Questions({ locale }: { locale: Locale }) {
   const request = useRef<AbortController | null>(null);
   const timeout = useRef<number | null>(null);
   const coolingUntil = useRef(0);
+  const input = useRef<HTMLTextAreaElement | null>(null);
+  const examples = useRef<HTMLDetailsElement | null>(null);
+  const length = Array.from(message).length;
+  const tooLong = length > 1000;
 
   useEffect(() => {
     if (!wait) return;
@@ -52,7 +56,7 @@ function Questions({ locale }: { locale: Locale }) {
     void run(async signal => {
       const next = await loadQuestions(locale, signal);
       if (signal.aborted) return;
-      setCatalog(next); setSelected(next.questions[0]?.id ?? '');
+      setCatalog(next);
     }, 8000);
   }
 
@@ -65,14 +69,14 @@ function Questions({ locale }: { locale: Locale }) {
   }, []);
 
   function ask() {
-    const question = catalog?.questions.find(q => q.id === selected);
-    if (!question || request.current || Date.now() < coolingUntil.current) return;
+    const question = message.trim();
+    if (!catalog?.enabled || !question || tooLong || request.current || Date.now() < coolingUntil.current) return;
     setResult(null);
     void run(async signal => {
       const response = await askQuestion(question, locale, signal);
       if (signal.aborted) return;
       if (response.status === 'PREPARING') setCatalog({ enabled: false, questions: [] });
-      else setResult({ question: question.message, response });
+      else setResult({ question, response });
     }, 32000);
   }
 
@@ -86,10 +90,20 @@ function Questions({ locale }: { locale: Locale }) {
     </div>
     {catalog?.enabled && <form className="bedrock-form" onSubmit={event => { event.preventDefault(); ask(); }}>
       <label htmlFor="bedrock-question">{t.label}</label>
-      <select id="bedrock-question" value={selected} disabled={busy || wait > 0} onChange={event => { setSelected(event.target.value); setResult(null); setError(null); }}>
-        {catalog.questions.map(q => <option key={q.id} value={q.id}>{q.message}</option>)}
-      </select>
-      <button className="primary-button" disabled={busy || wait > 0 || !selected} type="submit">{wait > 0 ? t.wait(wait) : busy ? t.asking : t.ask}</button>
+      <textarea ref={input} id="bedrock-question" rows={4} maxLength={2000} value={message} placeholder={t.placeholder}
+        aria-describedby="bedrock-input-help bedrock-input-count" aria-invalid={tooLong}
+        disabled={busy || wait > 0} onChange={event => { setMessage(event.target.value); setResult(null); setError(null); }}/>
+      <p id="bedrock-input-help" className="bedrock-input-help">{t.inputHelp}</p>
+      <p id="bedrock-input-count" className={tooLong ? 'bedrock-warning' : 'bedrock-count'} role={tooLong ? 'alert' : undefined}>{t.count(length)}</p>
+      <button className="primary-button" disabled={busy || wait > 0 || !message.trim() || tooLong} type="submit">{wait > 0 ? t.wait(wait) : busy ? t.asking : t.ask}</button>
+      <details ref={examples} className="bedrock-examples">
+        <summary>{t.examples}</summary>
+        <ul>{catalog.questions.map(q => <li key={q.id}><button type="button" disabled={busy || wait > 0} onClick={() => {
+          setMessage(q.message); setResult(null); setError(null);
+          if (examples.current) examples.current.open = false;
+          input.current?.focus();
+        }}>{q.message}</button></li>)}</ul>
+      </details>
     </form>}
     {error && <p className="bedrock-error" role="alert">{t[error]}</p>}
     {!catalog && !busy && <button className="primary-button" disabled={wait > 0} onClick={load}>{wait > 0 ? t.wait(wait) : t.retry}</button>}

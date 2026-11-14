@@ -1,4 +1,6 @@
-# 问答公开入口检查（2026-11-14，尚未开放生产）
+# 问答公开入口检查（2026-11-14）
+
+最新：源码978a636／执行61bcc02c…已完成两道人审、CodeDeploy切至live20及同候选网页发布，公开version／health核对通过。以下表格和分时记录描述切流前的入口／权限检查，保留当时live18状态；本轮输入框和回答风格改版仍为本地，见[前端说明](bedrock-frontend.md)及[发布记录](bedrock-candidate-approval.md)。
 
 验收：核对入口、调用限制及费用关停，最小修补后验证。**网关专用限流已部署；生产权限／参数已准备至$LATEST，规范路径修复已在STG24实测，访客问答仍关闭。** [生产配置记录](bedrock-production-config.md)、[新候选](bedrock-candidate-approval.md)
 

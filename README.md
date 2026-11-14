@@ -2,21 +2,21 @@
 
 持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
-在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已在STG验收，公共问答尚未开放，生产 `/api/bedrock` 仍返回 `PREPARING`。
+在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已通过两道人审并随源码978a636发布，生产live20、网页release be998dc6…。
 
-2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)最新已部署至STG24并完成小样本验收，生产live仍为18。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
+2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已在STG24／Green20完成小样本验收，生产现为20。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
 费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏履历资料已导入私有S3并在STG实际问答中使用；正文不入Git。前一轮8次成功模型调用约$0.0134，新候选3次生成约$0.005134，另有首次截断调用、税、构建及其他AWS费用，估算不等于账单。
 
-问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；范围外在Java中返回固定提示，不读取资料、不调用模型。三语拒绝和正常回答已在STG验证，公共问答尚未开放。最新核对旧候选执行已Stopped，第一审批及Green验证曾成功，未切流；后续新候选仍需两道新审批。
+问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；未识别的问题在Java中返回固定提示，不读取资料、不调用模型。三语拒绝和正常回答已在STG／Green验证；后续新源码仍需两道新审批。
 
-前端后续增量：[问题选择与回答界面](docs/bedrock-frontend.md)已在本地完成，73项测试、生产构建及15组三语桌面／手机模拟检查通过，尚未发布。打开只读取问题目录，主动提问才调用问答；有范围拒绝、限流、超时与截断提示，兼容旧生产准备状态。目前已进入新候选并通过AWS构建，生产网页仍未发布。
+最新本地增量：[手动输入与回答界面](docs/bedrock-frontend.md)替换下拉框，示例可点击填入后编辑，点击提问才提交；空白／超限不发送，原有拒绝／限流／超时保留。前端76项、构建、后端58项及15组三语桌面／手机模拟检查通过。回答提示改为直接描述经历，不主动说明读取了哪些资料或追加未经询问的经历限制。**这次输入框与回答风格修改尚未发布，线上仍为原下拉框；风格效果尚未真实模型验证。**
 
-[公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429，资料／health仍正常，最终Terraform No changes。规范路径修复已在STG24验证，新前端已进入候选；生产live18、模型功能关闭。后端58项、Lambda 5项、实际ZIP及Terraform 6项证据保留。
+[公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429。规范路径修复已随978a636发布至生产20；后端58项、Lambda 5项、实际ZIP及Terraform 6项历史证据保留。
 
-[生产权限与参数](docs/bedrock-production-config.md)已准备：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。配置准备未发布版本，后续由AWS流水线在第一人审后发布Green20；真实角色三语问答及冷启动检查通过，访客仍访问版本18。
+[生产权限与参数](docs/bedrock-production-config.md)：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。配置准备未发布版本，后续由AWS流水线在第一人审后发布Green20；真实角色三语问答及冷启动检查通过，第二审批后已切至20。
 
-**最新候选已验证：** 新源码978a636经AWS构建通过前端73／后端58／Lambda5及ZIP运行，发布STG24，三语问答／拒绝及两种路径修复实测通过。第一审批后Green20也通过8项接口、三语问答／拒绝，首条冷问答合计11.08秒。执行61bcc02c…现停在第二道人审，生产live18未变，新网页未发布。审批将授权真实切流和前端发布，先核对[本次候选与审批说明](docs/bedrock-candidate-approval.md)。
+**最近发布：** 源码978a636／执行61bcc02c…已全部成功，CodeDeploy d-S2M745KFM完成18→20，网页release be998dc6…已发布；只读核对公开version与health通过。本次输入框修改仍需新一轮AWS构建、验收和两道人审，详见[发布记录](docs/bedrock-candidate-approval.md)。
 
 ## 环境与本地启动
 

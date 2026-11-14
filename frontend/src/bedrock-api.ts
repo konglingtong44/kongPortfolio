@@ -41,10 +41,10 @@ export async function loadQuestions(locale: Locale, signal: AbortSignal): Promis
   return { enabled: data.enabled, questions: data.questions };
 }
 
-export async function askQuestion(question: Question, locale: Locale, signal: AbortSignal): Promise<Answer> {
+export async function askQuestion(message: string, locale: Locale, signal: AbortSignal): Promise<Answer> {
   const data = await json(await fetch('/api/bedrock', {
     method: 'POST', signal, cache: 'no-store', redirect: 'error', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: question.message, language: locale }),
+    body: JSON.stringify({ message, language: locale }),
   }));
   if (data.status === 'PREPARING') return { status: 'PREPARING' };
   if ((data.status !== 'ANSWER' && data.status !== 'REFUSED') || typeof data.answer !== 'string'

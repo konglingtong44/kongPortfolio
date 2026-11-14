@@ -604,3 +604,49 @@ Green build=kongportfolio-green:e542f5cf-2e0f-43cd-b4be-9c086bf3475d，SUCCEEDED
 21:37 JST核对live仍18、RevisionId与权重不变，Green20角色／超时／内存／资料及其他环境均匹配审核快照；费用状态字节hash不变、health200／UP。实际ReleaseMode=deploy，ApproveTrafficShift当前InProgress，尚无DeployProduction／PublishFrontend动作。下一步由用户进入ApproveTrafficShift → ApproveBlueGreenDeployment → Review，审查Blue18／Green20／源码978a636后批准；这会授权真实10%五分钟后全量切流和后端成功后同候选网页发布。项目AGENTS两道人工审批要求保留，不用“OK”代发批准API。
 
 证据：ignored `.local/bedrock-release-20261114/{green-build,green-report,green-verification}.json`和green.log。另一次rg把Windows通配文件名作为路径而读取失败，改目录＋-g过滤后完成只读检索，未影响AWS操作。文档提交只同步执行记录／学习／README与当前审批说明，不改变固定候选源码；没有新收费服务、apply、SNS或off/on。单次冷样本不保证所有时延，未把报告合约检查当作所有问句零幻觉或公网浏览器真实E2E。
+
+# 20. 手动输入及直接回答风格（本地完成）
+
+用户要求自行输入、取消下拉框，以及不主动说读取了哪些资料或附加“未独立负责正式生产”等说明。验收为输入／示例填入／三语／错误状态可用、严格白名单和事实边界保留。只改前端、Java系统／主题／拒绝提示和文档，不改S3事实或AWS资源。
+
+```powershell
+. ./scripts/tools.ps1
+npm --prefix frontend test -- --run src/BedrockEntry.test.tsx
+npm --prefix frontend run build
+mvn.cmd -f backend/pom.xml test -B -ntp *> .local/typed-qa-backend-test.log
+npm --prefix frontend test
+npm --prefix frontend run dev -- --port 5173
+node .local/typed-qa-browser.mjs
+python .local/bedrock-candidate-run.py poll
+python .local/read-typed-qa-baseline.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+前端76项／问答19项、构建、后端58项通过。浏览器脚本使用现有Playwright依赖、本机Vite与本地模拟API，Chrome三个尺寸和WebKit两个尺寸各三语共15组通过；保存report及30张截图，查看WebKit390中文输入图。检查Unicode1000码点／原生2000单元上限、空白／超限禁发、Enter及composition不发送、示例只填入／可编辑、模拟拒绝／正常长回答、提交字段、溢出／焦点／滚动。没有真实模型调用或第三方下载；浏览器模拟不能验证新提示词真实措辞。
+
+只读基线助手：get_pipeline_execution／list_action_executions确认61bcc02c…已全部成功；S3 get_object下载同次DeployProduction／PublishFrontend的report.json，Lambda get_alias确认live20无权重，HTTPS GET公开version.json与health核对978a636／be998dc6…／sourceDirty=false／UP。部署构建kongportfolio-deploy:a779570c-50cb-4417-a274-68f77b255ae4，CodeDeploy d-S2M745KFM；前端构建kongportfolio-frontend-release:e4cde87c-9fe6-4980-994b-504fb1a7ea99。报告显示原版本已上线，不代表本次本地输入框已发布；没有调用审批／部署／模型API。
+
+开发时两次读取猜测的组件／Java服务路径失败，随后按rg文件列表读取实际BedrockEntry.tsx／QuestionService.java。一次补丁因空hunk格式失败、一次文档标题不匹配失败，均未部分应用，修正后重试成功；另一次宽搜.local输出过多，改精确文件读取。以上未改变AWS。Java仅提示词及拒绝文案变化，已有白名单／注入／资料／跨访客／限流测试复跑通过，未添加仅镜像提示词的测试，不声称真实模型风格已验收。
+
+同步README、学习29／30、执行日志、架构及问答前端／范围／Java／配置／公开检查／发布记录。原31.15与第19节保留当时待审批状态，当前以本节原发布基线为准。未新启候选、commit／push、Terraform apply、SNS／off-on或资料写入；用户outputs保持未追踪。按一小Story暂停供审查，新源码后续仍需AWS构建／STG及两道人审。
+
+收尾命令：`gitleaks dir frontend/src --redact --no-banner`、backend/src及docs同参数；根三份文档以PowerShell Get-Content -Raw -Encoding utf8管道输入`gitleaks stdin --redact --no-banner`，均无泄漏。`.local/check_aws_docs.py`检查22份／128相对链接／28脚本引用通过，git diff --check通过。没有提交／推送或新建生产资源，未将私有截图或测试日志加入Git。
+
+# 21. 输入框与回答风格的新AWS候选
+
+用户继续。新候选使用单独.local/typed-qa-release-20261114保存证据，预检当前live20／无权重／模型启用、无在途执行、费用on、同一资料及上限、原两道人审；不复用旧审批。原helper固定旧live18／关闭模式，仅复制到新ignored助手并明确核对live20，不修改旧证据。
+
+```powershell
+python .local/prepare-typed-candidate.py
+python .local/typed-candidate-run.py preflight
+python .local/check_aws_docs.py
+git diff --check
+# 仅按已核对pathspec暂存18份代码／文档，排除outputs和私有目录
+git commit -m 'feat: allow typed profile questions and direct career answers'
+git push origin feat/aws-serverless-ci
+python .local/typed-candidate-run.py start
+python .local/typed-candidate-run.py poll
+```
+
+开始前本地应用及浏览器检查已在第20节通过，不重复不变测试；将由AWS完整重建和发布STG。仅Source显式COMMIT_ID启动一次新候选，Source DetectChanges=false。预检及start内部再次核对生产快照与费用hash、remote HEAD一致；不调用审批API，第一审批后的Green／第二审批／切流仍由原流程处理。新STG报告及限量真实回答风格／事实边界结果后补，未提前声称成功。

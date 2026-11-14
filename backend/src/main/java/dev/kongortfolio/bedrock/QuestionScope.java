@@ -45,7 +45,7 @@ public final class QuestionScope {
         topic("pmo", "Describe Kong's PMO duties, technical development support and release coordination; do not invent managerial authority.",
             "PMOとして何を担当しましたか。", "你在 PMO 工作中负责什么？", "What did you do in the PMO role?",
             "PMO経験を教えて", "PMOの仕事は事務作業だけでしたか", "你的PMO只是管理工作吗", "Was the PMO role purely administrative"),
-        topic("leadership", "Describe Kong's subleader experience. Explicitly distinguish the team's deployment to over 30 services from personal solo delivery.",
+        topic("leadership", "Describe Kong's subleader duties and personal contributions. Attribute team-wide deployment outcomes to the team.",
             "サブリーダー経験とチームでの役割を教えてください。", "介绍你的团队管理经历和个人贡献。", "Describe your team leadership and individual contributions.",
             "チーム管理経験を教えて", "30以上のサービスは全部一人で対応しましたか", "30多个服务都是你一个人改造的吗", "你有带团队的经验吗", "Did you deliver all 30 services alone"),
         topic("migration", "Describe Kong's documented application and middleware migration responsibilities, using only supplied project facts.",
@@ -63,7 +63,7 @@ public final class QuestionScope {
         topic("portfolio", "Explain only Kong's portfolio architecture and implemented deployment decisions. Distinguish deployed features from planned Bedrock work; do not give general tutorials or code.",
             "このポートフォリオの構成と工夫を教えてください。", "介绍这个作品集的架构和部署方式。", "Explain your portfolio architecture and deployment choices.",
             "このサイトの構成を教えて", "这个网站后端部署在ECS上吗知识库用什么", "这个网站的架构是什么", "请介绍你的项目架构", "这个网站是怎么部署的", "你为什么用Lambda不用ECS", "Why did you choose Lambda for your portfolio"),
-        topic("motivation", "Explain Kong's career-change motivation and preferences only if the approved facts provide them. Otherwise clearly say the materials do not state them, without guessing dissatisfaction or salary motives.",
+        topic("motivation", "Explain Kong's career-change motivation and preferences only if established by the approved facts. Otherwise briefly say the reason has not been confirmed, without guessing dissatisfaction or salary motives.",
             "転職理由と今後の希望を教えてください。", "你为什么考虑转职？", "Why are you considering a career change?",
             "転職理由を教えて", "今後のキャリアの希望は何ですか", "你的转职原因是什么", "你为什么要转职是不是对公司不满意", "What are your career goals"),
         topic("ai-experience", "Describe only Kong's documented AI-related investigations, proof-of-concept support and study. Do not invent sole production AI ownership or answer general AI tutorials.",
@@ -105,9 +105,9 @@ public final class QuestionScope {
 
     public static String refusal(String language) {
         return switch (language) {
-            case "zh" -> "目前仅开放孔令通的经历、技能、教育、资格、项目及职业方向相关问答。请从下方问题中选择；暂不提供通用解题、代码生成或其他无关内容。";
-            case "en" -> "This assistant currently answers only reviewed questions about Kong's experience, skills, education, qualifications, projects and career direction. Please choose a question below. General problem solving, code generation and unrelated requests are not available.";
-            default -> "現在は孔令通の経歴・スキル・学歴・資格・プロジェクト・キャリアに関する所定の質問のみ受け付けています。下の質問からお選びください。一般的な問題解答・コード生成・無関係な依頼には対応していません。";
+            case "zh" -> "目前仅开放孔令通的经历、技能、教育、资格、项目及职业方向相关问答。这个问法暂不支持，可以参考示例问题后再提问；暂不提供通用解题、代码生成或其他无关内容。";
+            case "en" -> "This question is not currently supported. You can ask about Kong's experience, skills, education, qualifications, projects and career direction using an example question. General problem solving, code generation and unrelated requests are not available.";
+            default -> "現在は孔令通の経歴・スキル・学歴・資格・プロジェクト・キャリアに関する所定の質問のみ受け付けています。この質問形式には未対応のため、質問例を参考に再度ご質問ください。一般的な問題解答・コード生成・無関係な依頼には対応していません。";
         };
     }
 
