@@ -14,9 +14,9 @@
 
 [公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429，资料／health仍正常，最终Terraform No changes。规范路径修复已在STG24验证，新前端已进入候选；生产live18、模型功能关闭。后端58项、Lambda 5项、实际ZIP及Terraform 6项证据保留。
 
-[生产权限与参数](docs/bedrock-production-config.md)已准备至`$LATEST`：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。Terraform不自动发布版本，实际新增版本0，访客仍访问版本18。Green脚本补齐STG资料一致性、真实角色问答及冷启动记录检查，云端验证待第一审批后执行；随后新源码候选已通过STG24，正在等待第一审批。
+[生产权限与参数](docs/bedrock-production-config.md)已准备：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。配置准备未发布版本，后续由AWS流水线在第一人审后发布Green20；真实角色三语问答及冷启动检查通过，访客仍访问版本18。
 
-**最新候选已验证：** 新源码978a636经AWS构建通过前端73／后端58／Lambda5及ZIP运行，发布STG24，三语问答／拒绝及两种路径修复实测通过。执行61bcc02c…现停在第一道人审，生产live18未变，新网页未发布。审批前核对[本次候选与审批说明](docs/bedrock-candidate-approval.md)，不可复用旧Stopped执行。
+**最新候选已验证：** 新源码978a636经AWS构建通过前端73／后端58／Lambda5及ZIP运行，发布STG24，三语问答／拒绝及两种路径修复实测通过。第一审批后Green20也通过8项接口、三语问答／拒绝，首条冷问答合计11.08秒。执行61bcc02c…现停在第二道人审，生产live18未变，新网页未发布。审批将授权真实切流和前端发布，先核对[本次候选与审批说明](docs/bedrock-candidate-approval.md)。
 
 ## 环境与本地启动
 

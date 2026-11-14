@@ -23,9 +23,9 @@
 - 总计六条范围请求，三次生成＋三次零token拒绝；只保存安全指标，正文不进入报告或日志。
 - 从Lambda Invoke Tail的REPORT读取Init Duration及Duration，合计须低于28秒，为30秒API集成留余量；没有冷启动记录或样本过慢即失败，不把热调用当冷调用。重新使用已热版本不能补出冷证据，需新候选版本。单个冷样本不是公网SLA。
 
-上述Green真实问答／冷启动验证**尚未运行**，只做了脚本离线测试；真实生产角色调用仍待第一审批后验证。15秒是模型HTTP预算，S3另有4秒，初始化／凭证与网络需看实际记录，不靠相加保证成功。[Lambda生命周期](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
+上述Green真实问答／冷启动验证已在用户第一审批后运行并通过：Green20三语回答／三语拒绝、8项接口通过，首条日语冷请求初始化4722.55ms＋执行6360.09ms，合计11082.64ms。只是一条冷样本，不能保证所有请求时延。15秒是模型HTTP预算，S3另有4秒，初始化／凭证与网络需看实际记录，不靠相加保证成功。[Lambda生命周期](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html)
 
-配置准备阶段未发布版本、未启动候选；后续新源码978a636已通过AWS构建及STG24，新界面进入候选、路径修复已在STG实测。当前新执行61bcc02c…等待第一审批，旧执行仍Stopped；见[本次审批说明](bedrock-candidate-approval.md)。第一审批前未执行生产Green模型调用。管理员直接测试`$LATEST`可能发生真实模型费用，本轮没有执行。
+配置准备阶段未发布版本、未启动候选；后续新源码978a636已通过AWS构建及STG24，新界面进入候选、路径修复已在STG实测。用户第一审批后由流水线发布Green20，实际生产角色完成3次模型生成及3次零token拒绝；当前执行61bcc02c…等待第二审批，live仍18、网页未发布。旧执行仍Stopped；见[本次审批说明](bedrock-candidate-approval.md)。没有手动调用`$LATEST`或绕过流水线发布。
 
 紧急停用仍使用既有费用控制Lambda；单独修改`$LATEST`开关不会关闭已发布版本中的功能。角色Deny及函数并发归零能覆盖已发布版本，原关停／恢复机制未改。
 

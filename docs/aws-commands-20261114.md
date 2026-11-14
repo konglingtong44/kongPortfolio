@@ -581,3 +581,26 @@ AWS candidate build=kongportfolio-candidate:5f7c67c8-88b4-44c0-8bca-84c363ff70da
 补录阶段仅改文档，另以docs提交推送，不新启候选；源码仍固定978a636，新docs HEAD不能替代当前候选身份。私有状态同步助手一次因过时文案断言中止，已保留此前已完成的文档更新、改成可重复同步并核对实际文本后完成，产品代码未改。SDK/helper日志只打印状态和安全指标，不打印简历／模型回答／审批token。
 
 同SHA的独立CI项目也核对成功：frontend fe892cb4-ed12-48b4-8ed4-ce5d00176139、backend f0e0e4e7-6d7d-4f0d-8d6c-ef9ae6b17e2c。STG代码由CI拥有，cicd根栈最终真实plan No changes，未apply。收尾22份文档／119相对链接／28脚本引用、diff检查及扫描通过；未再跑已通过的模型测试或新启流水线。
+
+# 19. 用户第一审批后的Green复核及第二审批交接
+
+用户OK后先查询实际状态，确认第一审批成功才观察Green。验收为同一源码／制品、真实生产角色问答和冷启动通过，live18与费用状态保持不变，停在第二审批。助手不调用PutApprovalResult，不重复模型测试。
+
+```powershell
+python .local/bedrock-candidate-run.py poll
+python .local/review-current-green.py
+python .local/check_aws_docs.py
+git diff --check
+# 明确暂存本次8份文档，执行提交／推送hooks扫描
+git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs/aws-commands-20261114.md docs/bedrock-candidate-approval.md docs/bedrock-frontend.md docs/bedrock-production-config.md docs/bedrock-public-readiness.md
+git commit -m 'docs: record Green validation and second approval handoff'
+git push origin feat/aws-serverless-ci
+```
+
+只读SDK使用get_pipeline_execution／list_action_executions、CodeBuild list_builds_for_project／batch_get_builds、CloudWatch get_log_events、S3 get_object读取同次GreenReport zip、Lambda get_alias／get_function_configuration和GET公开health。构建最初运行中，等待其自然完成；助手另按execution环境变量定位构建，保存完整构建元数据与日志到ignored目录，仅打印安全检查指标。执行仍61bcc02c-2138-44fd-9a9e-ed78443f6851，源码978a636dd9029cfdebec9d43ce4cf50a1b1ff7c9，没有start_pipeline_execution或本机上传生产代码。
+
+Green build=kongportfolio-green:e542f5cf-2e0f-43cd-b4be-9c086bf3475d，SUCCEEDED，生产新版本20。下载GreenReport仅包含report.json，核对execution／source／release／backend SHA／实际Lambda hash与候选及STG24完全一致，第一审批action ID存在。8项HTTP、3语回答和3语拒绝通过；REPORT冷启动init4722.55ms＋duration6360.09ms＝11082.64ms。日语5184／411、中语5195／164、英语5204／273输入／输出tokens，拒绝各0且modelInvoked=false，总15,583／848，按已核对单价估算$0.00510629，未含税及其他AWS费用。
+
+21:37 JST核对live仍18、RevisionId与权重不变，Green20角色／超时／内存／资料及其他环境均匹配审核快照；费用状态字节hash不变、health200／UP。实际ReleaseMode=deploy，ApproveTrafficShift当前InProgress，尚无DeployProduction／PublishFrontend动作。下一步由用户进入ApproveTrafficShift → ApproveBlueGreenDeployment → Review，审查Blue18／Green20／源码978a636后批准；这会授权真实10%五分钟后全量切流和后端成功后同候选网页发布。项目AGENTS两道人工审批要求保留，不用“OK”代发批准API。
+
+证据：ignored `.local/bedrock-release-20261114/{green-build,green-report,green-verification}.json`和green.log。另一次rg把Windows通配文件名作为路径而读取失败，改目录＋-g过滤后完成只读检索，未影响AWS操作。文档提交只同步执行记录／学习／README与当前审批说明，不改变固定候选源码；没有新收费服务、apply、SNS或off/on。单次冷样本不保证所有时延，未把报告合约检查当作所有问句零幻觉或公网浏览器真实E2E。

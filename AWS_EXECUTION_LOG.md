@@ -2598,3 +2598,15 @@ AWS：两次 kong-dev STS 检查均报 SSO token expired；随后启动 AWS CLI 
 实际39个文件／新源码978a636dd9029cfdebec9d43ce4cf50a1b1ff7c9经提交与全历史Gitleaks通过，推送feat/aws-serverless-ci。以COMMIT_ID固定源码启动execution61bcc02c-2138-44fd-9a9e-ed78443f6851。AWS candidate5f7c67c8…通过前端73／后端58／Lambda5及实际ZIP（38.6MiB／解压43.1MiB）和发布守卫；STG build9e63671f…发布24。release be998dc6…／backend b1f8af77…与报告及实际版本摘要一致；8项HTTP、三语正常回答／三语拒绝全部通过，无截断，拒绝modelInvoked=false／usage0。补充直调STG24两种非规范路径400、三语目录各17项，均no-store，未额外生成模型回答。
 
 3次生成报告共15,583输入／874输出tokens，按已核对价格估算$0.00513385，未含税及其他AWS费用。21:18 JST最终核对live18别名／权重／RevisionId、生产LATEST配置和已发布版本列表不变，费用状态hash不变，health200／UP；本次执行停在ApproveProduction，Green／第二审批／切流／网页发布尚未执行。本轮没有创建服务、apply、SNS／off-on或批准；没有公网STG网页，浏览器到真实STG模型E2E未运行，未把UI源码进入候选当成网页已上线。新增[本次候选审批说明](docs/bedrock-candidate-approval.md)，同步学习和相关当前状态文档，等待用户按项目约定审查第一审批；该审批后Green会有3次生产模型生成测试，live仍不切流。
+
+### 31.15 第一审批后Green真实验证（2026-11-14，等待第二审批）
+
+用户回复OK后，只读查询确认本次61bcc02c…的ApproveProduction成功、VerifyGreen运行中；验收为同一候选、生产角色真实问答／冷启动成功，live18及费用状态不变，并停在第二道人审。没有代替用户调用审批API。AWS green构建kongportfolio-green:e542f5cf-2e0f-43cd-b4be-9c086bf3475d成功，由已批准流水线发布生产Green20；源码仍978a636，release／backend／Lambda hash均与同次STG24及候选一致。
+
+Green首条日语问答先于health执行，真实REPORT显示初始化4722.55ms＋执行6360.09ms＝11082.64ms，低于28秒；三语正常回答、三语范围拒绝和8项HTTP合约全部成功，无截断，拒绝modelInvoked=false／usage0。三次生成分别5184入／411出、5195入／164出、5204入／273出，合计15,583入／848出，按此前已核对价格估算$0.00510629，未含税及其他AWS费用。没有为复核重放模型调用；报告只含指标，不复制简历或回答正文。
+
+21:37 JST SDK复核生产live18版本／RevisionId／权重与候选前快照一致，Green20代码hash及角色／环境／超时／内存与审核值一致，费用状态字节hash不变、health200／UP。实际ReleaseMode=deploy，执行停在ApproveTrafficShift，尚无DeployProduction或PublishFrontend动作，网页未更新。第二审批动作ApproveBlueGreenDeployment将授权10%观察5分钟后全量切换，以及后端成功后的同候选S3／CloudFront前端发布；不能先称已上线。
+
+新增ignored只读助手.local/review-current-green.py，仅读取同次构建／日志／GreenReport、Lambda配置／别名、费用状态与公开health，不发审批、推理、SNS或Terraform写操作。私有证据green-build.json、green.log、green-report.json、green-verification.json；命令及边界见[第19节](docs/aws-commands-20261114.md)。本轮只改文档，不新启候选、不改产品代码或重跑已通过的应用测试。同步学习、README、审批说明及前端／生产配置／公开检查当前状态。冷启动仅一个样本、问答仅三语小样本，公网浏览器到真实模型E2E仍待发布后验证。
+
+收尾22份文档／121相对链接／28脚本引用及git diff --check通过。明确暂存8份文档，保留用户outputs及所有私有证据；提交前执行路径保护与Gitleaks，推送前扫描全历史。仅文档提交，不替换当前候选978a636，不自动批准第二关。
