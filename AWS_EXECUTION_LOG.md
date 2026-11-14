@@ -2554,3 +2554,43 @@ AWS：两次 kong-dev STS 检查均报 SSO token expired；随后启动 AWS CLI 
 额外6条受控调用：当前职责、未续证SAP、转职动机缺失、30多个服务为团队成果、注入新技能后再查技能。5条模型回答完整结束并完成事实抽查，1条注入拒绝无模型tokens，后续回答没有采纳虚构技能。只作小样本，不宣称51问全部模型验收或零幻觉；一条中文使用繁体及日文职称，留作风格改进。8次成功模型调用总41,563输入／2,059输出tokens，约$0.013405；不含首次截断调用、税与其他AWS费用。
 
 09:58 UTC／18:58 JST最终云端核对：生产live版本18、RevisionId与路由不变、模型功能未启用，health200/UP；费用状态on／consumed=[5,10,15]。STG23代码摘要与同次候选一致，资料版本与hash一致。流水线停在第一道ApproveProduction，未执行Green／第二审批／切流／前端发布，两道生产审批完整保留。前端仍PREPARING，无独立公网STG问答页面。没有创建知识库、Guardrails或新常驻服务，没有发送SNS。私有回答仅在.local，报告只存安全指标。命令、构建ID、首次错误修复和证据路径见[当日命令第13节](docs/aws-commands-20261114.md)；学习28–30、README及接入／资料／范围／架构文档同步更新。
+
+### 31.10 个人问答前端（2026-11-14，本地完成）
+
+用户继续后，按一小Story接入现有像素弹窗：打开只读问题目录，选择审核问题后才POST当前message／language，展示纯文本回答、范围拒绝、等待、准备中、429、网络／服务失败、超时和截断提示；拒绝自动模型重试。兼容旧生产目录404＋空POST探测，保持Java严格白名单为安全边界。关闭／换语言取消等待，清除旧回答，不保存聊天；取消浏览器等待不保证云端停止／免计费。
+
+前端73项及生产构建通过。Chrome1366×900／390×844／320×568、WebKit390×844／844×390各三语，共15组浏览器模拟通过；17选项、点击前无推理提交、提交字段、长回答／无横溢、关闭后父弹窗保留、焦点／页面滚动恢复验证通过。全部接口及回答为明确标注的本地fixture，没有AWS／模型调用。初次App测试保留旧“未连接”文案断言而失败，更新后通过；浏览器发现真实原生dialog关闭前恢复焦点失败，以及WebKit鼠标点击按钮不自动聚焦，修正后重验通过。非iPhone真机／真实STG浏览器E2E，未逐项重测所有旧手势。
+
+新前端未commit／push／云端部署，没有新建资源、修改Java／Terraform、审批或SNS；不重跑未变更后端／容器测试。旧待审批候选没有新UI，不能直接批准当作本次发布；下一Story仍需公开入口限流／生产配置审查、新候选AWS构建与STG验证，再按两道生产审批发布。新增[前端说明](docs/bedrock-frontend.md)，同步学习、范围、Java接口、README、手机布局和[实际命令第14节](docs/aws-commands-20261114.md)；本地验证证据在ignored `.local/qa-frontend-browser/`。
+
+### 31.11 公开入口保护检查及最小修补（2026-11-14）
+
+用户授权开始发布前检查。SSO核对账户，19:40 JST只读审计：API两ANY路由／默认1请求秒突发5、无问答路由限流；PROD/STG并发5/1、28秒、无Function URL；生产live18、模型关闭、无新增模型／资料策略，两道人审存在。费用mode=on／consumed=[5,10,15]，预算25已报告$19.021。下载已部署控制器ZIP比对源码字节相同，确认同时Deny Runtime／Mantle；四预算到对应SNS到控制器及调用权限连接通过，只读IAM模拟确认仅能修改两业务角色、无关角色implicitDeny，双入口explicitDeny通过。没有发送告警或执行off/on。
+
+本地Terraform增加POST /api/bedrock专用路由及目标0.1请求秒／突发1、关闭详细指标，保持资料／health默认值。保存真实plan严格确认1新增路由／1更新stage，代码、环境、IAM、别名、流量均不变，**未apply**。另外复现路径参数被Spring映射到同一问答处理器、进入mock模型服务返回200的问题；Java新增原始URI精确检查，7类路径变体不进入服务。Lambda适配器及实际ZIP确认原始路径保留且变体返回INVALID_PATH，正常空POST仍PREPARING。
+
+后端clean verify58／Lambda profile5／实际ZIP运行通过，ZIP38.6MiB／解压43.1MiB；portfolio Terraform6项及四组Node发布保护合约通过。真实HTTPS两入口health200／no-store，生产空POST仅PREPARING；CloudFront两API行为TTL0、允许POST、强制HTTPS。生产RevisionId／live18不变，新路由未应用。没有真实模型推理、付费新资源、SNS投递、发布或审批；不重复未改前端／容器验证。单实例频率、网关目标、延迟预算均非全站费用硬上限，冷请求及真实429仍待后续。前端和路径修复需新候选，旧审批包不能替代。新增[检查说明](docs/bedrock-public-readiness.md)，同步学习／README／接口／范围；命令、失败修正与证据见[第15节](docs/aws-commands-20261114.md)。
+
+### 31.12 问答专用网关限流应用与实测（2026-11-14）
+
+用户继续后，重新SSO／账户／费用mode=on核对，保存PROD/STG代码／环境／RevisionId／并发、生产live18和费用状态hash快照；重新生成plan并严格确认只有问答路由create＋stage限流update，实际apply 1新增／1更新／0删除。限流目标0.1请求秒／突发1、DetailedMetrics关闭；默认API限流仍1请求秒／突发5，不改应用代码、环境、权限或别名。
+
+在生产模型仍关闭时空POST小批探测，直连第二批出现200／200／429／429，普通日语profile同时200；CloudFront初两批8条均200，未把该阶段记为通过。读取API部署DEPLOYED及访问日志确认这些请求实际命中专用POST路由，再做最多12条的单连接有限补测，首条即429，其后profile200，两入口health200／no-store。总21个空POST（含首次检查器断言出错前4条），均无模型生成；17个已记录requestId与API日志全部匹配，含CloudFront429。网关尽力限流，不能说严格每10秒只放行1次；请求／Lambda等费用仍可能产生。
+
+最终Terraform No changes。PROD/STG代码、环境、RevisionId、并发及生产alias／路由与本轮前快照一致；费用状态字节hash不变，两道审批定义未改。本轮另只读发现旧execution6c2aa1d9…已Stopped：第一审批19:05、Green验证19:06成功，未部署生产切流／前端；生产live仍18。本轮未启动流水线或执行审批，未推测旧执行由谁停止；此前沿用“待第一审批”的当前状态说明已更正，18:58的历史核对记录保留。新候选不得复用旧审批，且旧源码不含本地新前端与路径修复。
+
+没有commit/push、新建收费服务、修改Java／前端、SNS投递、off/on或真实模型调用；不重复未变更应用测试。学习、README及Bedrock接入／范围／前端／公开检查文档同步最新状态；命令、失败检查与证据见[第16节](docs/aws-commands-20261114.md)。下一Story准备生产权限／资料／有界配置及新代码候选，规范URI修复和新UI仍未部署。
+
+### 31.13 生产角色、固定资料及LATEST参数准备（2026-11-14）
+
+用户继续授权生产配置准备。核对SSO账户、live18／无权重、模型未公开、费用mode=on；读取现有私有S3固定版本校验SHA-256及本机审核文本一致，17637字节，没有改资料。发现Terraform原publish=true会在配置更新时发布版本，新增pipeline_owns_lambda_versions显式交接和只读live数据源，生产准备改为publish=false；live别名继续由CodeDeploy拥有。配置最多1024输出tokens、15秒模型HTTP，固定与STG同一资料version／hash／owner。
+
+保存plan严格审查：bedrock-content仅生产reader策略1create，portfolio仅生产Qwen策略1create＋Lambda配置1update（含publish=false），代码、别名、并发、资料对象均不变。实际apply分别1新增／0更新及1新增／1更新，0删除。生产启用参数持久于ignored portfolio/bedrock.auto.tfvars.json，原terraform.tfvars保留；资料live输入仅增加生产reader，旧审核回滚版本保留。两根栈最终plan No changes。发布版本列表前后相同、新增0；live18环境／RevisionId／权重不变，$LATEST代码hash不变、配置已准备，health200/UP、费用状态hash一致。
+
+10项真实IAM模拟确认指定模型／资料allowed，其余模型／项目、缺模型条件、未知版本／latest／写／列举／Runtime implicitDeny；合并当前Allow与费用控制Deny后Mantle explicitDeny，未真实关停或调用模型。portfolio Terraform13项、资料5项及Green／部署Node合约检查通过。Green脚本新增：同STG审核资料／输出上限及六条问答证据检查，首道人审后先做生产角色日语冷问答，再完成其余五条范围请求；REPORT提取Init与Invoke合计低于28秒才通过，未取得冷证据不伪装通过。真实生产角色／冷问答尚未运行，部署脚本仅本地验证，不能算云上验收。
+
+本轮未发布Lambda版本、未改live／启动候选／执行审批、未commit/push、未上传资料、未新建付费服务、未SNS／off-on／模型生成，也未重跑未改Java／前端／容器。新增[生产配置说明](docs/bedrock-production-config.md)，同步学习、README、权限／资料／架构／范围／公开入口文档；命令与失败修正见[第17节](docs/aws-commands-20261114.md)。新前端及路径修复仍待新源码AWS构建与STG验证，之后由用户审查第一审批。
+
+### 31.14 新候选AWS构建与STG验证（2026-11-14，进行中）
+
+用户继续授权提交已验证的新界面、规范路径修复、生产配置及Green守卫，启动新候选并停在第一审批。新预检确认无在途候选、live18无权重且功能关闭，生产LATEST与STG使用同一资料／输出上限（超时15／20秒），费用on，两道人审定义存在。保留旧执行证据，单独新建ignored .local/bedrock-release-20261114目录；不复用旧审批，不自动批准。按明确路径暂存，排除outputs、私有简历／参数／计划；扫描及hooks通过后推练习分支，由AWS重新构建并验证，结果后补。实际命令见[第18节](docs/aws-commands-20261114.md)。

@@ -23,7 +23,7 @@ flowchart LR
 
 - 独立Terraform根栈[bedrock-content](../infra/terraform/bedrock-content/README.md)，复用State桶，独立key=`bedrock-content/terraform.tfstate`，避免修改网站／CI/CD／费用控制根栈。
 - 普通S3桶`kongportfolio-content-561798268037-ap-northeast-1`，固定对象`approved/facts.txt`；禁用公网／ACL、SSE-S3加密、强制HTTPS、版本控制、旧版本90天过期，当前对象无自动过期。
-- 应用配置只包含bucket、version、SHA-256和owner；不把简历正文放Lambda环境变量（合计上限4KB）。STG角色只读这个对象已批准的版本，不获Put/Delete/List/GetObject最新版本权限；生产角色没有新增读取权限。
+- 应用配置只包含bucket、version、SHA-256和owner；不把简历正文放Lambda环境变量（合计上限4KB）。STG角色只读这个对象已批准的版本，不获Put/Delete/List/GetObject最新版本权限；生产角色随后也已获相同精确对象／审核版本读取权限，应用配置仅准备至$LATEST，live18不变。
 - Java `ApprovedFacts`仅在实际问答需要资料时读取，SDK客户端懒创建，启动／health／空POST探测不读取S3。固定版本＋SHA-256＋UTF-8校验，最多20,000 Unicode码点及80KiB；超限／缺失／摘要不匹配返回FACTS_UNAVAILABLE，模型不调用，不静默换成旧资料。
 - 读取成功后在同一实例内复用只读String；扩容／新执行环境各自读取一次。资料只由维护者更新，不缓存访客聊天，不自动学习访客断言。符合[Lambda执行环境复用建议](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)。
 
@@ -35,7 +35,7 @@ flowchart LR
 
 后续[严格白名单](bedrock-scope.md)替换了“可回答通用算法／数学”这一旧范围条款，职业事实不变；当前资料为6,943码点／17,637字节，仅对象和STG版本权限2更新，保留此前版本。新验收集为17主题／51个三语标准问句；原21个样例属于旧范围，不直接作为最新验收依据。未执行新模型调用或部署应用。
 
-随后STG版本23已部署：Terraform固定资料version／SHA-256／owner及指定模型权限，实际Lambda角色读取资料并完成三语问答；8次成功模型调用平均约5,195输入tokens，说明内存缓存没有减免每次全文输入费用。生产live=18、没有新增读取／模型权限，网站仍PREPARING。完整记录见[命令第13节](aws-commands-20261114.md)。
+随后STG版本23已部署：Terraform固定资料version／SHA-256／owner及指定模型权限，实际Lambda角色读取资料并完成三语问答；8次成功模型调用平均约5,195输入tokens，说明内存缓存没有减免每次全文输入费用。生产live=18、网站仍PREPARING；随后生产角色及$LATEST已准备读取／模型配置，尚未切流。完整记录见[命令第13节](aws-commands-20261114.md)。
 
 真实验证：Java用SSO读取新资料指定版本，6,875码点、内容／SHA-256匹配、第二次复用缓存，没有推理调用。真实IAM模拟8项：新资料／旧摘要回退版本allowed，其他版本／对象、写、删、列举、最新版本读取均implicitDeny。新旧对象均下载核对，最终真实plan No changes，站点health和费用开关正常；见[操作补录第11节](aws-commands-20261114.md)。
 

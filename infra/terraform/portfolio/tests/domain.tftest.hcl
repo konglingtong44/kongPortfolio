@@ -13,6 +13,13 @@ mock_provider "aws" {
   }
 }
 
+variables {
+  enable_bedrock_access         = false
+  enable_bedrock_qa             = false
+  pipeline_owns_lambda_versions = false
+  bedrock_content              = null
+}
+
 run "default_domain_leaves_website_unchanged" {
   command = plan
   variables { custom_domain = null }

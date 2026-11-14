@@ -72,6 +72,16 @@ class PortfolioLambdaHandlerTest {
         assertThat(json.path("questions").get(0).path("message").asText()).contains("请介绍一下你自己");
     }
 
+    @Test void canonicalPaidEntryGuardWorksAcrossTheLambdaAdapter(CapturedOutput output) throws Exception {
+        // Feature stays disabled, so this adapter-boundary probe cannot call AWS.
+        for (String path : new String[] {"/api/bedrock;alias=1", "/api/%62edrock"}) {
+            var response = invoke("POST", path, "");
+            assertThat(response.path("statusCode").asInt()).isEqualTo(400);
+            assertThat(body(response)).contains("INVALID_PATH");
+            assertThat(output.getOut()).contains("path=" + path + " status=");
+        }
+    }
+
     @Test void returnsRealApiErrorsAndLogsWithoutQueryValues(CapturedOutput output) throws Exception {
         JsonNode response = invoke("GET", "/api/missing", "probe=synthetic-private-query");
         assertThat(response.path("statusCode").asInt()).isEqualTo(404);

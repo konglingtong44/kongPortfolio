@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { appSpec, isBlueBaseline, requireDeploymentContext, requireReleaseMode, runDeployment } from './deployment-contract.mjs';
 import { contracts } from './staging-contract.mjs';
 const manifest={gitCommit:'a'.repeat(40),releaseId:'b'.repeat(64),backend:{sha256:'c'.repeat(64)}};
-const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}]};
+const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',status:'InProgress',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}]};
 const actions=['Source','BuildCandidate','VerifyStaging','ApproveProduction','VerifyGreen','ApproveTrafficShift'].map(stageName=>({stageName,actionName:({ApproveProduction:'ApproveGreenCreation',VerifyGreen:'PublishAndVerifyGreen',ApproveTrafficShift:'ApproveBlueGreenDeployment'})[stageName]||'action',status:'Succeeded',actionExecutionId:'approval1'}));
 const checks=contracts.map(c=>({name:c.label,status:'passed'}));
 const staging={schemaVersion:1,kind:'staging-verification',passed:true,pipelineExecutionId:'run-1',gitCommit:manifest.gitCommit,releaseId:manifest.releaseId,backendSha256:manifest.backend.sha256,functionName:'kongportfolio-stg',functionVersion:'4',checks};

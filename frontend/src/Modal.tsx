@@ -6,10 +6,16 @@ export function Modal({ title, kicker, closeLabel, onClose, children, titleId = 
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    ref.current?.showModal();
+    const dialog = ref.current;
+    dialog?.showModal();
     const old = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = old; previous?.focus({ preventScroll: true }); };
+    return () => {
+      // Release the native top layer before restoring focus to the parent dialog.
+      if (dialog?.open) dialog.close();
+      document.body.style.overflow = old;
+      previous?.focus({ preventScroll: true });
+    };
   }, []);
   return <dialog ref={ref} className={`module-dialog ${className}`} aria-labelledby={titleId} onCancel={event => { event.stopPropagation(); onClose(); }}
     onClick={event => {

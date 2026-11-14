@@ -20,12 +20,14 @@ class LambdaPackageSmoke {
                 default -> "package-smoke";
             });
         for (String[] sample : new String[][] {
-                {"GET", "/api/health", "", "UP"},
-                {"GET", "/api/profile", "lang=ja", "ソフトウェアエンジニア"},
-                {"GET", "/api/profile", "lang=zh", "软件工程师"},
-                {"GET", "/api/profile", "lang=en", "Software engineer"},
-                {"POST", "/api/bedrock", "", "PREPARING"},
-                {"GET", "/api/bedrock/questions", "language=zh", "portfolio-scope-v1"}}) {
+                {"GET", "/api/health", "", "UP", "200"},
+                {"GET", "/api/profile", "lang=ja", "ソフトウェアエンジニア", "200"},
+                {"GET", "/api/profile", "lang=zh", "软件工程师", "200"},
+                {"GET", "/api/profile", "lang=en", "Software engineer", "200"},
+                {"POST", "/api/bedrock", "", "PREPARING", "200"},
+                {"GET", "/api/bedrock/questions", "language=zh", "portfolio-scope-v1", "200"},
+                {"POST", "/api/bedrock;alias=1", "", "INVALID_PATH", "400"},
+                {"POST", "/api/%62edrock", "", "INVALID_PATH", "400"}}) {
             var event = Map.of("version", "2.0", "routeKey", "$default", "rawPath", sample[1], "rawQueryString", sample[2],
                 "headers", Map.of("host", "example.execute-api.ap-northeast-1.amazonaws.com", "x-forwarded-proto", "https"),
                 "requestContext", Map.of("stage", "$default", "requestId", "package-smoke",
@@ -38,12 +40,12 @@ class LambdaPackageSmoke {
             if (response.path("isBase64Encoded").asBoolean()) {
                 body = new String(Base64.getDecoder().decode(body), StandardCharsets.UTF_8);
             }
-            if (response.path("statusCode").asInt() != 200 || !body.contains(sample[3])) {
+            if (response.path("statusCode").asInt() != Integer.parseInt(sample[4]) || !body.contains(sample[3])) {
                 throw new AssertionError("Packaged Lambda contract failed: " + sample[0] + " " + sample[1]);
             }
         }
         var root = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         if (root.getAppender("INFO_FILE") != null) throw new AssertionError("Lambda must not use local file logging");
-        System.out.println("Packaged Lambda smoke passed: health, three languages, question catalog, POST placeholder, console-only logging.");
+        System.out.println("Packaged Lambda smoke passed: health, three languages, question catalog, POST placeholder, canonical Q&A paths, console-only logging.");
     }
 }

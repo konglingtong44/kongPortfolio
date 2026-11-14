@@ -134,8 +134,8 @@ it('opens each module, restores focus and handles the side navigation', async ()
     expect(screen.getByRole('dialog', { name: heading })).toHaveAttribute('open');
     if (module === 'REGEX') expect(screen.getByLabelText(/Regular expression/)).toHaveValue('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
     if (module === 'ABOUT') {
-      expect(screen.getByText(/not connected yet/)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Check availability' })).toBeInTheDocument();
+      expect(screen.getByText(/using reviewed materials/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Open profile Q&A' })).toBeInTheDocument();
     }
     if (module === 'NOTES') expect(screen.getByText('A real development note.')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));

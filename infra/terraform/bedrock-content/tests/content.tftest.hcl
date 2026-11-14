@@ -48,3 +48,19 @@ run "reject_other_roles" {
   }
   expect_failures = [var.reader_role_names]
 }
+
+run "production_reader_is_limited_to_approved_object_versions" {
+  command = apply
+  variables {
+    approved_text_path   = "tests/fixtures/approved.txt"
+    reader_role_names    = ["kongportfolio-stg-lambda", "kongportfolio-prod-lambda"]
+    rollback_version_ids = ["approved-previous"]
+  }
+  assert {
+    condition = jsondecode(aws_iam_role_policy.reader["kongportfolio-prod-lambda"].policy).Statement == [{
+      Effect = "Allow", Action = ["s3:GetObjectVersion"], Resource = "${aws_s3_bucket.content.arn}/approved/facts.txt",
+      Condition = { StringEquals = { "s3:VersionId" = ["approved-previous", "reviewed-v1"] } }
+    }]
+    error_message = "Production may read only the exact object and reviewed versions, never latest/list/write."
+  }
+}

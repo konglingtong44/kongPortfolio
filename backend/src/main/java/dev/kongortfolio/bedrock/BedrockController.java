@@ -32,6 +32,9 @@ public class BedrockController {
 
     @PostMapping("/api/bedrock")
     public ResponseEntity<?> answer(HttpServletRequest request) throws IOException {
+        // MVC can map matrix/encoded paths to this handler. Keep the paid entry
+        // identical to the explicit API Gateway route with its tighter throttle.
+        if (!"/api/bedrock".equals(request.getRequestURI())) return error(400, "INVALID_PATH");
         if (!settings.enabled()) return ResponseEntity.ok(Map.of("status", "PREPARING"));
         byte[] body = request.getInputStream().readNBytes(8193);
         if (body.length > 8192) return error(413, "INPUT_TOO_LARGE");

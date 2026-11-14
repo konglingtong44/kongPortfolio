@@ -699,7 +699,7 @@ $aws = 'D:\software\AWSCLI\aws.exe'
 
 **2026-11-14 双入口结果：** Runtime模型ACTIVE／访问正常，但实际TPM/RPM为0；一次128输出上限的Converse返回429。随后11:43 JST用同一东京账号和同一Qwen，Mantle Chat Completions一次16输出上限的请求返回200／OK、13输入+2输出tokens。**Qwen经Mantle已证明连通，Runtime仍受阻；不是所有Serverless都没有配额，也不能由Runtime失败推导所有入口不可用。**
 
-**权限与部署：** PROD/STG Terraform使用Mantle `CreateInference`，精确限定本账号东京`project/default`及`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`。代码默认false；当前仅STG启用，实际角色调用成功，生产无新增授权。最初mock测试portfolio5个／cicd22个；新增STG配置验收后cicd25/25，真实IAM模拟8项仍保留为权限边界证据。
+**权限与部署：** PROD/STG Terraform使用Mantle `CreateInference`，精确限定本账号东京`project/default`及`bedrock-mantle:Model=qwen.qwen3-235b-a22b-2507`。代码默认false；STG实际调用成功，生产角色随后已获指定模型与资料权限，仅$LATEST准备配置，live18环境仍关闭。最初mock测试portfolio5个／cicd22个；新增STG配置验收后cicd25/25，真实IAM模拟8项仍保留为权限边界证据。
 
 **接入前保护已补齐：** 费用控制Lambda单项更新已部署，关停策略同时Deny `bedrock:*`和`bedrock-mantle:*`；20个Python测试及双入口IAM拒绝模拟通过。没有执行off/on，当前仍on、consumed=[5,10,15]、下一档$25，网站health正常。具体命令和验证见[操作补录](docs/aws-commands-20261114.md)。
 
@@ -709,17 +709,23 @@ $aws = 'D:\software\AWSCLI\aws.exe'
 
 ### 29. Spring Boot接入真实Bedrock问答
 
+**生产配置后续：** 生产角色指定模型及审核版本资料读取已授权，`$LATEST`固定资料version／hash、1024输出tokens、15秒模型HTTP；live仍18、环境与流量不变。`pipeline_owns_lambda_versions=true`关闭Terraform自动发布版本，实际新增版本0，Green仍在第一审批后由流水线发布。两根栈共2新增策略／1配置更新、最终No changes，10项IAM模拟和费用Deny覆盖通过，本轮无模型生成。Green脚本已准备同STG资料校验、三语真实问答和首条冷问答记录检查，尚未在云端运行；详见[生产配置](docs/bedrock-production-config.md)。
+
 **已部署至STG版本23，生产尚未开启。** Java通过AWS SDK现代SigV4 signer调用东京Mantle选定Qwen，不使用API key；代码默认关闭，空POST仍为不调用模型的PREPARING探测。启用后接收message/language，限制输入、输出、超时和频率，访客内容不写回资料。详见[接口、价格与验证边界](docs/bedrock-java.md)。
 
 已从用户提供的旧版DOC整理并导入脱敏履历资料，涵盖7段职业项目经历等；原始DOC未改动或上传，正文仅在本地ignored目录和私有S3，不加入Git。本人确认当前任职／项目未变、资格未续情况后，按事实区分取得历史与当前有效状态，不编写转职理由。STG三语问答通过，补充检查未续证SAP、当前工作、转职动机缺失及团队贡献均符合资料。仅小样本，不保证零幻觉；生产仍PREPARING。
 
-**因为费用，暂不使用知识库：** 用户已选择普通私有S3保存资料、Lambda内存缓存、逐次全文交给Qwen。独立bedrock-content根栈首次9新增／0更新／0删除；随后履历导入仅2更新（资料对象和STG版本权限），旧623码点摘要版本保留回退。Java真实读取、SHA-256校验及缓存复用通过；资料上限20,000 Unicode码点／80KiB。STG资料配置已部署且实际使用，生产无新增资料权限。更新／回滚流程见[资料方案](docs/bedrock-content.md)。
+**因为费用，暂不使用知识库：** 用户已选择普通私有S3保存资料、Lambda内存缓存、逐次全文交给Qwen。独立bedrock-content根栈首次9新增／0更新／0删除；随后履历导入仅2更新（资料对象和STG版本权限），旧623码点摘要版本保留回退。Java真实读取、SHA-256校验及缓存复用通过；资料上限20,000 Unicode码点／80KiB。STG资料已实际使用，生产角色和$LATEST也已准备固定资料配置，live18环境未改。更新／回滚流程见[资料方案](docs/bedrock-content.md)。
 
 **最新范围限制：只接受本人相关的审核问句。** 用户选择严格白名单，`portfolio-scope-v1`提供17主题／51个三语标准问句及有限别名；只对整条问句归一化后完整匹配，含有“孔令通／简历”不代表放行。通过后向Qwen发送对应服务端固定模板，不传访客原文。未知问法／夹带解题任务直接返回REFUSED、三语范围提示和可选问题，modelInvoked=false、usage=0；拒绝也计入频率保护。API Gateway／Lambda／日志仍可能计费，不能称整个请求免费。
 
-AWS构建通过前端64项／后端57项／Lambda 4项和ZIP运行；资料6,943码点／17,637字节，固定版本并保留旧版。STG验收8项HTTP合约、3语拒绝＋3语正常回答；补充6项事实与注入检查通过。访客新增技能断言被拒绝，后续回答未采用该内容。51标准问句全部做过匹配测试，未全部做模型质量测试；旧21个宽范围样例不作新标准。执行6c2aa1d9…停在首次审批，STG23／生产18，前端未开放问答；详见[范围设计](docs/bedrock-scope.md)及[命令第13节](docs/aws-commands-20261114.md)。
+AWS构建通过前端64项／后端57项／Lambda 4项和ZIP运行；资料6,943码点／17,637字节，固定版本并保留旧版。STG验收8项HTTP合约、3语拒绝＋3语正常回答；补充6项事实与注入检查通过。访客新增技能断言被拒绝，后续回答未采用该内容。51标准问句全部做过匹配测试，未全部做模型质量测试；旧21个宽范围样例不作新标准。旧执行6c2aa1d9…现已Stopped，第一审批及Green验证成功、未切流，STG23／生产18，前端未开放问答；详见[范围设计](docs/bedrock-scope.md)及[命令第13节](docs/aws-commands-20261114.md)。
 
 ### 30. 输入输出限制、请求节流与调用成本控制
+
+**公开入口检查及部署：** 核对真实API限流、PROD/STG并发5/1、四档预算→SNS→控制器及Runtime／Mantle拒绝权限后，已apply目标0.1请求/秒／突发1的独立问答POST路由，1新增／1更新。空请求在直连API及CloudFront均观察到429，普通资料200、两入口health200／no-store，最终plan No changes。部分小批次全部放行，不能称严格每10秒一次。Java规范路径修复仍本地：7种变体不进入模型服务；后端58／Lambda 5／ZIP／Terraform 6项通过。未模型生成或开启生产，代码／环境／并发未改。生产配置、冷请求、新代码候选仍待验收，见[公开入口检查](docs/bedrock-public-readiness.md)。
+
+**前端本地增量：** 已接问题目录及问题选择、纯文本回答、REFUSED／准备中／429／超时／截断提示。打开不生成回答，点击后只传当前问题及语言；不自动重试。73项前端测试、构建和15组三语Chrome／WebKit模拟检查通过，没有真实模型调用或新AWS发布。前端禁用按钮不是安全边界，Java白名单和限流仍生效。旧候选不含新UI，后续必须重新AWS构建验证；见[前端验收与边界](docs/bedrock-frontend.md)。
 
 **账号费用保护与STG Java逐请求限制已部署。** 请求体8KiB、问题1000码点、资料20,000 Unicode码点／80KiB；STG输出硬上限1024 tokens，代码允许配置至2048；模型HTTP最多20秒，S3另有4秒SDK预算。每进程1在途、6次/分钟、60次/小时，重启／扩容重置，不能当账号全局硬限额。首次自我介绍截断导致验收失败，增加聚焦主题与长度提示后重建通过，未放松截断检查。公开启用前仍需核对网关、冷启动／凭证解析与Lambda28秒总超时、滥用控制。
 

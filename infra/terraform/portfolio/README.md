@@ -1,5 +1,7 @@
 # S2-04 — 首次 Serverless 部署
 
+2026-11-14后续：生产问答权限及固定资料配置已准备至`$LATEST`，live仍18；`pipeline_owns_lambda_versions=true`使Terraform只改配置、不发布版本，Green仍由第一审批后的流水线创建。新私有参数保存在ignored `bedrock.auto.tfvars.json`，保留原live tfvars。不要仅用原始默认值覆盖现有启用参数；见[当前生产配置](../../../docs/bedrock-production-config.md)。下文首次创建记录保留。
+
 当前网站：https://konglingtong44.com 。2026-11-11 完成首次部署，2026-11-12 完成 [域名接入](../../../README.md#aws-运行架构)。原 CloudFront 地址仍可用。初次创建命令、修复和验证见 [上线记录](DEPLOYMENT.md)。
 
 当前维护只需运行 `terraform -chdir=infra/terraform/portfolio plan` 检查差异。下方 23-create 计划和 apply 包装属于本次首次创建的历史步骤，**不要重新执行旧 first.tfplan**；后续发布在新 Story 中生成新计划。新机器需保留/取回对应候选 ZIP、manifest 和前端文件，不能把重新构建的不同文件冒充原发布包。

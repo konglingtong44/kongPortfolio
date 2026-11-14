@@ -405,3 +405,167 @@ STG报告8项HTTP通过；三语范围拒绝均无模型调用／0 tokens，三�
 8次成功推理总41,563输入／2,059输出tokens，按输入$0.27／百万、输出$1.06／百万估算$0.013405；平均千次短回答约$1.68，非固定报价，另计首次截断调用、税／CodeBuild／Lambda等费用。09:58 UTC核对：生产live=18且RevisionId／路由不变、功能仍关闭、health200/UP；费用mode=on／consumed=[5,10,15]。流水线等待第一审批，第二审批仍存在，Green／切流／前端发布均未执行。最终真实cicd plan No changes。前端未改，没有公网STG页面、知识库或Guardrails。
 
 证据：`.local/bedrock-stg-{preflight,run,run-first,report,progress,final-verification}.json`、`bedrock-stg-{plan,apply,final-plan}.log`、`bedrock-stg-quality/`及AWS构建日志。报告取回曾早于CodePipeline更新状态而断言“未成功”，等待状态传播后成功，没有重跑模型。文档补丁曾因上下文不匹配被原子拒绝，核对原文后重做，无改动丢失。最终文档提交不启动新候选流水线、不推进生产审批。
+
+# 14. 个人问答前端（本地增量）
+
+用户继续后，验收范围为三语问题选择／回答／范围提示／等待和错误处理，兼容现有生产PREPARING；桌面与手机弹窗可用。实际读取AGENTS、BedrockController、既有入口／Modal／语言／CSS与手机布局约定；本地实现[前端说明](bedrock-frontend.md)，不部署AWS。
+
+```powershell
+git status --short
+rg --files -g AGENTS.md -g '*Bedrock*' -g '*bedrock*' frontend docs
+python .local/update-qa-entry-copy.py
+# 以下在frontend目录执行
+npm test -- --reporter=dot
+npm run build
+npm run dev
+# 以下在仓库根目录执行
+node .local/qa-frontend-browser.mjs
+python .local/check_aws_docs.py
+git diff --check
+gitleaks dir --redact --no-banner frontend/src
+gitleaks dir --redact --no-banner docs
+```
+
+新增API解析／三语文案文件，替换BedrockEntry与专用CSS；更新App卡片状态及旧准备文案。目录GET8秒、问答POST32秒，只发message／language；429显示Retry-After倒计时，504超时，503暂不可用，未知或畸形响应失败，不展示服务器内部详情。不自动重试；关闭／语言变化取消等待，旧响应不写回；回答作为文本呈现。UI只提供后端审核问题的选择，Java仍完整校验白名单。
+
+验证：前端73/73＋生产构建通过。第一次App测试保留旧文案断言，更新后通过。最初Playwright缺少捆绑Chromium，改用已安装Chrome channel，没有另装浏览器；复用现有WebKit。首次浏览器检查发现焦点恢复失败：Modal清理时先调用原生close释放top layer，再恢复焦点；入口点击显式focus兼容WebKit；补齐jsdom原生close模拟。修正长回答左对齐、字号与吸顶关闭栏后，Chrome桌面／两手机宽度和WebKit竖横屏共15组三语通过。每组验证17目录选项、主动提交前零POST、单次提交字段、长回答无横溢、父弹窗／焦点／页面滚动恢复，无pageerror。所有API均Playwright route fixture，示例回答明确说明没有调用模型。
+
+证据脚本与报告／截图：ignored `.local/qa-frontend-browser.mjs`、`.local/qa-frontend-browser/report.json`及15张png；仅本地UI证据，不能当作真实STG浏览器或iPhone真机验收。首次文件搜索的PowerShell通配符写法和不存在的拆分tsconfig路径报错，随后按实际目录与tsconfig.json读取；一次过宽.local搜索产生无关浏览器缓存文件列表，改为顶层定向查找。替换文件的初次补丁因同路径删除／新增被工具拒绝，分开执行成功；没有丢失用户文件。
+
+本轮未改变后端／Terraform／AWS资源，未做新模型调用、后端／容器重测、commit／push或AWS发布／审批。旧待审批候选不含本地新UI；下一轮必须从新源码构建并验证，不把批准旧候选当作新UI发布。
+
+最终检查19份文档、92个相对链接、28个脚本引用通过；前端源码、docs及根目录log／learning／README经Gitleaks扫描无泄漏（根目录三文件使用`Get-Content -Raw -Encoding UTF8 ... | gitleaks stdin --redact --no-banner`）。git diff --check通过，模拟报告15/15通过且modelCalled=false。验证完成后Ctrl+C停止本轮启动的Vite，未停止其他服务；预览截图仍保留。私有文档检查器的一次内联Python更新因PowerShell转义报SyntaxError，改用apply_patch后成功，没有影响产品代码或报告。
+
+# 15. 公开入口限流／费用关停核对（配置与修复尚未部署）
+
+验收：只读检查网关、并发、逐请求限制、费用关停覆盖及生产状态；形成最小计划并验证，不推进审批。读取AGENTS／api.tf／Controller／QuestionService／MantleGateway／成本控制源码与相关测试，核对官方HTTP API限流、路由优先级、Lambda并发作用范围及Budgets数据延迟；结论见[检查说明](bedrock-public-readiness.md)。
+
+```powershell
+aws.exe sts get-caller-identity --profile kong-dev --region ap-northeast-1 --query Account --output text
+python .local/audit-bedrock-public.py
+python .local/verify-public-cost-wiring.py
+terraform.exe '-chdir=infra/terraform/portfolio' fmt '-no-color'
+terraform.exe '-chdir=infra/terraform/portfolio' test '-no-color'
+terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-no-color' '-out=../../../.local/bedrock-public-throttle.tfplan'
+terraform.exe '-chdir=infra/terraform/portfolio' show -json '../../../.local/bedrock-public-throttle.tfplan'
+python .local/review-public-throttle-plan.py
+mvn.cmd -B -ntp -f backend/pom.xml '-Dtest=BedrockEnabledApiTest#nonCanonicalPathsCannotReachModelService' test
+mvn.cmd -B -ntp -f backend/pom.xml clean verify
+mvn.cmd -B -ntp -f backend/pom.xml -Plambda clean verify
+node scripts/test-lambda-package.mjs
+python .local/verify-public-http.py
+node scripts/test-staging-contract.mjs
+node scripts/test-green-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
+```
+
+CLI实际路径沿用D:/software工具目录，Terraform明确AWS_PROFILE=kong-dev，Maven前加载scripts/tools.ps1。ignored助手操作：STS身份、API get_apis/get_stage/get_routes/get_integrations；Lambda配置／别名／URL与策略读取；IAM两业务角色策略读取；控制Lambda get_function后下载临时签名URL的ZIP，仅比对controller.py字节（不打印URL）；S3只读费用状态；Budgets四档描述／通知／订阅者读取；SNS只列控制器订阅；CodePipeline读取两审批；CloudFront读取配置及API缓存策略。IAM simulate_principal_policy核对控制器仅能写两指定角色策略，simulate_custom_policy核对双Bedrock入口Deny。没有put/update/apply/invoke控制器／publish SNS操作。
+
+19:40 JST审计：PROD live18／模型关闭／无新增模型和资料权限，STG权限存在；并发5/1、28秒、无Function URL。默认API1请求秒／突发5、无问答覆盖项，execute-api仍公开。费用on／consumed=[5,10,15]，下一档25，四预算实际费用仍为延迟数据$19.021。预算通知实际采用100%预算金额（$5/$10/$15/$25），与四对应SNS和已确认Lambda订阅、来源调用权限一致。部署控制器与本地源码hash一致，Runtime／Mantle均Deny模拟通过；对两个目标角色可PutRolePolicy、无关角色implicitDeny。不执行真实停站、跨档或SNS投递。
+
+Terraform仅添加`POST /api/bedrock`及route_settings目标0.1请求秒／突发1／detailed_metrics=false，默认资料限流不变。首次测试误把未设置／computed字段按false和整对象比较而失败，改为只断言审查字段并显式关闭详细指标，6/6通过。真实保存plan严格检查仅1create路由／1update stage，其他API设置、代码／环境／IAM／别名均无变化；未apply。第一次内联Python计划检查被PowerShell引号转义破坏，改ignored review脚本后通过。
+
+路径防绕过测试最初在`/api/bedrock;alias=1`实际返回mock模型回答200，未记为通过。Controller改为先检查原始URI精确等于/api/bedrock，再处理功能开关／请求；7种路径参数、编码、重复斜线、尾斜线／点段写法不再调用service。Lambda5项和实际ZIP验证两种变体返回400／INVALID_PATH且raw URI保留，规范空POST仍200／PREPARING；后端58/58、ZIP38.6MiB／解压43.1MiB通过，均无真实模型调用。路径修复后重复全量测试用于验证最终代码。
+
+只读HTTPS：CloudFront和直连API的health均200/UP且no-store，空POST生产返回PREPARING；CloudFront两API行为CachePolicy TTL0、允许POST、HTTPS。生产alias RevisionId／18版本不变，新route_settings仍未应用。助手首次误用CloudFront返回字段OrderedCacheBehaviors，改SDK实际CacheBehaviors后通过；费用助手先误把默认PERCENTAGE阈值当绝对值、又忽略IAM聚合ResourceSpecificResults，按实际结构修正后核对通过，不修改预算或权限。若干猜测文件名不存在的读取已用rg定位实际api.tf及src/lambda目录；文档补丁上下文不符时原子拒绝，核对后重做。
+
+证据：ignored `.local/bedrock-public-{audit,cost-verification,http-verification,plan-review}.json`、`bedrock-public-throttle.tfplan`及plan JSON／日志、Terraform测试日志、path-probe失败／path-fixed／backend／lambda日志。本轮未commit/push、未新建收费服务、未apply／SNS／关停／模型生成／生产审批；未重复未改前端或容器测试。限流是否返回真实429、冷请求总耗时及新版本STG验收仍待后续。
+
+收尾追加只读核对四个SNS topic的budgets.amazonaws.com发布策略、账号条件与来源ARN，及四预算MONTHLY／COST／无服务过滤／含税不含credit-refund，均通过。计划检查另核新路由复用现有integration并指向生产live：先误按直接Lambda ARN判断，实际为API Gateway包装后的invoke URI，按明确两种合法格式校验后通过，未修改integration。
+
+最终`terraform fmt -check`／`validate`、20份Markdown／100相对链接／28脚本引用、git diff --check通过；backend/src、portfolio Terraform、docs、根log／learning／README与LambdaPackageSmoke经Gitleaks扫描无泄漏。前端上一Story73项及15组浏览器证据保留，本轮未重跑未改前端。没有把本地修复记作STG23或生产已部署。
+
+# 16. 应用问答网关限流并验证（未开启生产模型）
+
+用户继续授权应用两项网关配置；验收为新route_settings实际生效、空POST可观察429、普通资料及health正常、代码／环境／并发／live／费用状态不变、不推进审批。使用原live tfvars，不覆盖其他配置。
+
+```powershell
+aws.exe sts get-caller-identity --profile kong-dev --region ap-northeast-1 --query Account --output text
+python .local/prepare-throttle-deploy.py
+$env:AWS_PROFILE = 'kong-dev'
+terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-no-color' '-out=../../../.local/bedrock-throttle-deploy/deploy.tfplan'
+terraform.exe '-chdir=infra/terraform/portfolio' show -json '../../../.local/bedrock-throttle-deploy/deploy.tfplan'
+python .local/review-public-throttle-plan.py .local/bedrock-throttle-deploy/plan.json .local/bedrock-throttle-deploy/plan-review.json
+terraform.exe '-chdir=infra/terraform/portfolio' apply '-input=false' '-no-color' '../../../.local/bedrock-throttle-deploy/deploy.tfplan'
+python .local/verify-throttle-deploy.py
+python .local/diagnose-throttle-routes.py
+python .local/finalize-throttle-deploy.py
+python .local/record-throttle-pipeline-state.py
+terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-no-color' '-detailed-exitcode'
+python .local/sync-throttle-status-docs.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+plan-review助手新增可选输入／输出参数，保留上一Story证据；新before快照防覆盖。严格检查plan只有POST /api/bedrock路由create与stage update，新路由复用原integration／生产live，默认路由限流／日志设置不变，无Lambda／IAM／alias变更。实际apply：1新增／1更新／0删除，配置rate0.1、burst1、DetailedMetrics=false；API自动部署状态DEPLOYED。
+
+实际SDK只读getStage／getRoutes／getDeployment、Lambda配置／并发／别名、S3费用状态hash、CodePipeline配置／执行状态；HTTP只发送空正文POST和GET profile／health，不发送简历或问题。第一遍检查器错误假设profile包含locale字段，四条POST已执行后抛KeyError；改为按真实role字段验证。正式小批：直连第一批全200，第二批200／200／429／429，profile均200；CloudFront两批8条全200，有限测试因此失败，未弱化断言写成通过。
+
+读取API访问日志确认16条探测都命中POST专用路由，排除落入ANY路由或未部署；保持rate／burst原值，针对CloudFront用一条复用连接补测，最多12次、观察到429即停，实际首条429，随后profile200。含首次错误检查4条在内，共21个空POST；追加日志核对，17条已保存requestId全匹配，含CloudFront429。证明有限样本出现网关节流，不证明严格6次/分钟或固定比例；记录全200样本。HTTP／Lambda请求仍可计费，模型生成次数0。
+
+两入口health200／UP／no-store，PROD/STG校验code hash／环境／Role／Timeout／Memory／RevisionId／并发均与before相同，生产live版本18及alias RevisionId／RoutingConfig一致，生产模型仍关闭，费用状态hash一致。最终真实plan No changes，不重跑本轮未改Java／前端／容器。没有IAM写、SNS投递、off/on、CodeBuild或新候选启动、审批／切流。
+
+旧流水线只读检查的“等待第一审批”断言失败；查询实际记录后确认execution6c2aa1d9-f520-44fc-ae71-7ee7f3cfc3f3已Stopped，源码2a88caf，第一审批19:05成功、Green19:06成功，无DeployProduction／PublishFrontend动作。此前当前状态描述沿用18:58记录，本轮已纠正；不推断谁批准／停止，也不复用旧审批。当前两道人审定义保留，下一次新候选需重新审批。一次内联Python把$default传给PowerShell导致stage字段读取为空，改文件脚本后正确读取；未执行任何对应写操作。
+
+证据：ignored `.local/bedrock-throttle-deploy/{before,plan-review,http-progress,cloudfront-followup,route-diagnosis,verification,pipeline-status}.json`、保存plan／plan JSON／plan.log／apply.log／final-plan.log。第一次和后续失败检查均保留，不以删除失败样本方式宣称通过。新界面和Java路径修复仍为本地改动，下一步准备生产权限／固定资料环境与新候选。
+
+收尾证据检查通过：两入口429、17/17日志、live18／应用配置／费用状态未变、旧执行Stopped及最终No changes。20份Markdown／101相对链接／28脚本引用和git diff --check通过；docs、根log／learning／README经Gitleaks扫描无泄漏。没有为了检查重放apply或模型请求。
+
+# 17. 准备生产模型／资料权限及LATEST参数
+
+用户继续；验收为仅指定模型／资料版本可读、参数有界、live18和版本数量不变、版本发布仍经过首道人审。本轮不做新生产模型调用。原publish=true会在环境更新时发布版本，因此新增pipeline_owns_lambda_versions及只读既有live alias数据源；生产采用publish=false，只配置LATEST，首道人审后由CodeBuild发布候选Green。默认首次建站路径仍沿用原publish=true。
+
+```powershell
+terraform.exe '-chdir=infra/terraform/portfolio' fmt '-no-color'
+terraform.exe '-chdir=infra/terraform/portfolio' test '-no-color'
+terraform.exe '-chdir=infra/terraform/bedrock-content' test '-no-color'
+node scripts/test-green-contract.mjs
+node scripts/test-staging-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
+node --check scripts/verify-green.mjs
+python .local/prepare-bedrock-prod.py
+$env:AWS_PROFILE = 'kong-dev'
+terraform.exe '-chdir=infra/terraform/bedrock-content' plan '-input=false' '-no-color' '-var-file=../../../.local/bedrock-prod-config/content.tfvars.json' '-out=../../../.local/bedrock-prod-config/content.tfplan'
+terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-no-color' '-var-file=../../../.local/bedrock-prod-config/portfolio.tfvars.json' '-out=../../../.local/bedrock-prod-config/portfolio.tfplan'
+# 对两个保存plan分别show -json后进行严格审查
+python .local/review-bedrock-prod-plans.py
+terraform.exe '-chdir=infra/terraform/bedrock-content' apply '-input=false' '-no-color' '../../../.local/bedrock-prod-config/content.tfplan'
+terraform.exe '-chdir=infra/terraform/portfolio' apply '-input=false' '-no-color' '../../../.local/bedrock-prod-config/portfolio.tfplan'
+python .local/verify-bedrock-prod-config.py
+terraform.exe '-chdir=infra/terraform/bedrock-content' plan '-input=false' '-no-color' '-detailed-exitcode' '-var-file=../../../.local/bedrock-content.tfvars.json'
+terraform.exe '-chdir=infra/terraform/portfolio' plan '-input=false' '-no-color' '-detailed-exitcode'
+python .local/sync-prod-config-docs.py
+```
+
+prepare助手只读核对账户、别名／live环境、已发布版本列表、并发、费用状态hash，下载现有固定S3版本校验hash（不打印正文），保留原live内容输入，生成两个私有输入。首次把approved_text_path相对路径按仓库根解析导致FileNotFound，改为按bedrock-content根栈解析后通过；未重写资料。测试中对测试变量的引用产生弃用警告，显式声明测试账号；各test文件显式关闭生产启用参数，避免真实auto.tfvars影响安全默认值测试。最终portfolio13／资料5项通过。
+
+计划审查只允许：精确对象GetObjectVersion、现有当前／两个审核回滚版本的生产reader策略create；生产模型策略create（Mantle、东京default、单Qwen条件）；Lambda环境及publish=false update。其他runtime／handler／memory1024／timeout28／并发5／code hash相同，alias无变更。实际apply资料1新增／0更新，portfolio1新增／1更新，0删除；没有S3对象更新或代码上传。随后复制私有content输入到原.local/bedrock-content.tfvars.json，复制生产增量输入到ignored infra/terraform/portfolio/bedrock.auto.tfvars.json，保留原terraform.tfvars。git check-ignore确认两者私有。
+
+真实SDK验证：get_alias/get_function_configuration逐字段对比live18、get/ListVersions确认新增版本0、LATEST code hash相同而固定环境已就绪；10次SimulatePrincipalPolicy覆盖允许与拒绝边界，SimulateCustomPolicy合并实际Allow与费用Deny仍explicitDeny；读取费用S3状态hash不变，GET公开health200/UP，两道人审定义保留。IAM模拟不是实际生产角色S3／模型调用；后者待新Green验证。本轮没有lambda.invoke、PublishVersion、SNS、模型生成或审批。verification.json记录11:44 UTC，即20:44 JST。两根栈最终No changes。
+
+Green脚本离线增量：requireProductionConfig校验固定资料、最多1024／15秒；requireReviewedBedrockRelease核对同候选STG真实问答报告、三条零token拒绝及三条生成证据；第一审批后、发布Green后先调用日语问答并获取Invoke Tail，提取真实REPORT冷／执行时间合计<28秒，再验证剩余五条，不先health预热。日志和report只存安全指标，正文留构建临时文件。冷记录缺失／样本过慢失败；复用已热版本不能算冷验证。Node测试使用合成REPORT验证多行日志、热调用、超时边界，没有实际模型调用。真实冷请求不是已完成项，样本也不能保证所有公网时延。
+
+新代码尚未commit/push，未启动AWS候选；新前端／路径修复仍本地。证据为ignored `.local/bedrock-prod-config/{before,plan-review,verification}.json`、两个tfplan／plan JSON、content／portfolio plan／apply／final-plan日志，原私有内容输入备份保留。没有更改简历事实、创建API key／知识库或付费新服务，未重跑未改应用／容器测试。
+
+收尾补齐执行状态保护：requireApprovedContext要求当前执行InProgress，Stopped旧执行不能复用审批；最初部署／前端测试fixture未带status而失败，按真实API字段补齐后相关Node合约全通过。持久化生产auto.tfvars后再次跑portfolio13项确认测试不受live启用参数影响；validate／fmt-check通过。文档检查21份／108相对链接／28脚本引用、git diff --check及portfolio／资料／scripts／docs／根log-learning-README的Gitleaks无泄漏。未把脚本离线测试称为真实生产冷问答通过。
+
+# 18. 新源码候选构建与STG验收（进行中）
+
+用户继续授权提交新源码并运行AWS候选，到第一道生产审批即停。新助手`.local/bedrock-candidate-run.py`分为preflight／start／poll／report：使用SSO，只显式启动一次指定COMMIT_ID的新执行，不调用任何审批API，不写生产代码。预检无在途候选、live18／无权重、公开模型关闭，LATEST和STG资料／输出上限一致，费用状态on，Source分支feat/aws-serverless-ci且DetectChanges=false，两道人审在。
+
+```powershell
+python .local/bedrock-candidate-run.py preflight
+python .local/check_aws_docs.py
+git diff --check
+# 明确pathspec暂存frontend/src、三个backend改动、docs、两个根md及README、相关infra和六个scripts；不包含outputs／.local／tfvars
+git commit -m 'feat: stage profile Q&A UI and production release guards'
+git push origin feat/aws-serverless-ci
+python .local/bedrock-candidate-run.py start
+python .local/bedrock-candidate-run.py poll
+# STG完成且等待第一审批后取同次报告
+python .local/bedrock-candidate-run.py report
+```
+
+开始前21份文档／108链接／28脚本引用及diff检查通过。本地应用／Terraform检查沿用前几Story已通过结果，新的完整构建、前端73／后端58／Lambda5及实际ZIP验证交给AWS运行；不预先宣称云上通过。构建完成后另补源码／执行／制品／STG版本与token指标。私有旧run文件不覆盖，证据在ignored `.local/bedrock-release-20261114/`。

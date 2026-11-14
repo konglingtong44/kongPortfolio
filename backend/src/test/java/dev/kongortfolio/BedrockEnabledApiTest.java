@@ -47,6 +47,16 @@ class BedrockEnabledApiTest {
         verifyNoInteractions(service);
     }
 
+    @Test void nonCanonicalPathsCannotReachModelService() throws Exception {
+        when(service.ask(anyString(), anyString())).thenReturn(new ModelGateway.Answer("must not be generated", false, 20, 3));
+        for (String path : new String[] {"/api/bedrock;alias=1", "/api/%62edrock", "/api//bedrock", "/api/bedrock/", "/api/x/../bedrock", "/api%2fbedrock", "/api/bedrock%3balias=1"}) {
+            var response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + path))
+                .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString("{\"message\":\"Tell me about yourself.\",\"language\":\"en\"}")).build(), HttpResponse.BodyHandlers.ofString());
+            assertThat(response.statusCode()).as("Non-canonical path %s", path).isNotEqualTo(200);
+        }
+        verifyNoInteractions(service);
+    }
+
     @Test void returnsBoundedAnswerWithUsageWithoutLoggingContent(CapturedOutput output) throws Exception {
         when(service.ask("synthetic-private-message", "zh")).thenReturn(new ModelGateway.Answer("synthetic-private-answer", true, 100, 512));
         var response = post("application/json; charset=UTF-8", "{\"message\":\"synthetic-private-message\",\"language\":\"zh\"}");

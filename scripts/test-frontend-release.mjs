@@ -20,7 +20,7 @@ const request={method:'GET',uri:'/projects/one',querystring:{}};
 const context=vm.createContext({});vm.runInContext(routeCode(next),context);assert.equal(context.handler({request}).uri,`/releases/${next}/index.html`);
 
 const checks=contracts.map(c=>({name:c.label,status:'passed'}));
-const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}],variables:[{name:'ReleaseMode',resolvedValue:'deploy'}]};
+const execution={pipelineName:'kongportfolio-candidate',pipelineExecutionId:'run-1',status:'InProgress',artifactRevisions:[{name:'SourceRef',revisionId:manifest.gitCommit}],variables:[{name:'ReleaseMode',resolvedValue:'deploy'}]};
 const actions=['Source','BuildCandidate','VerifyStaging','ApproveProduction','VerifyGreen','ApproveTrafficShift','DeployProduction'].map(stageName=>({stageName,status:'Succeeded',actionExecutionId:'approval1',actionName:({ApproveProduction:'ApproveGreenCreation',VerifyGreen:'PublishAndVerifyGreen',ApproveTrafficShift:'ApproveBlueGreenDeployment',DeployProduction:'CanaryAndVerify'})[stageName]||'action'}));
 const stg={schemaVersion:1,kind:'staging-verification',passed:true,pipelineExecutionId:'run-1',gitCommit:manifest.gitCommit,releaseId:next,backendSha256:manifest.backend.sha256,functionName:'kongportfolio-stg',functionVersion:'7',checks};
 const green={...stg,kind:'production-green-verification',liveTrafficUnchanged:true,functionName:'kongportfolio-prod',approval1ActionId:'approval1',stagingVersion:'7',blueVersion:'5',greenVersion:'6'};

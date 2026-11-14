@@ -3,8 +3,8 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
-import { apiEvent, checkResponse, contracts, matchingVersion, selectVersion } from './staging-contract.mjs';
-import { liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig } from './green-contract.mjs';
+import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, selectVersion } from './staging-contract.mjs';
+import { coldQaMetrics, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
 
 const region = 'ap-northeast-1';
 const functionName = process.env.GREEN_FUNCTION_NAME;
@@ -38,6 +38,7 @@ const before = aws(['lambda', 'get-alias', '--function-name', functionName, '--n
 const blue = liveSnapshot(before);
 const current = aws(['lambda', 'get-function-configuration', '--function-name', functionName]);
 requireProductionConfig(current, account);
+requireReviewedBedrockRelease(stg, current, staging);
 const existing = aws(['lambda', 'list-versions-by-function', '--function-name', functionName]).Versions;
 let version = current.CodeSha256 === expectedHash ? matchingVersion(existing, current, expectedHash) : undefined;
 if (!version) {
@@ -52,6 +53,25 @@ requireProductionConfig(green, account);
 assert.equal(green.Version, version);
 assert.equal(green.CodeSha256, expectedHash);
 const checks = [];
+const bedrock = { enabled: green.Environment?.Variables?.BEDROCK_ENABLED === 'true', checks: [] };
+if (bedrock.enabled) {
+  // First request tests the real production execution role and first S3/model use.
+  // The other five scoped requests keep the total inside the six/minute allowance.
+  const first = bedrockContracts.find(c => c.label === 'answer-ja');
+  const ordered = [first, ...bedrockContracts.filter(c => c !== first)];
+  for (const [index, contract] of ordered.entries()) {
+    const payload = join(workspace, `${contract.label}-event.json`);
+    const response = join(workspace, `${contract.label}-response.json`);
+    writeFileSync(payload, JSON.stringify(apiEvent(contract.method, contract.path, contract.query, contract.body)));
+    const metadata = aws(['lambda', 'invoke', '--function-name', functionName, '--qualifier', version, '--invocation-type', 'RequestResponse', '--log-type', 'Tail', '--cli-binary-format', 'raw-in-base64-out', '--payload', `file://${payload}`, '--cli-read-timeout', '60', response]);
+    assert.equal(metadata.ExecutedVersion, version);
+    bedrock.checks.push(checkBedrockResponse(metadata, JSON.parse(readFileSync(response, 'utf8')), contract));
+    if (index === 0) bedrock.coldQa = coldQaMetrics(metadata);
+    console.log(`Green Q&A passed: ${contract.label} (version ${version}; response text omitted)`);
+  }
+  bedrock.passed = true;
+  bedrock.policyVersion = 'portfolio-scope-v1';
+}
 for (const contract of contracts) {
   const payload = join(workspace, `${contract.label}-event.json`);
   const response = join(workspace, `${contract.label}-response.json`);
@@ -70,7 +90,7 @@ const report = {
   gitCommit: manifest.gitCommit, releaseId: manifest.releaseId, backendSha256: manifest.backend.sha256,
   stagingVersion: staging.functionVersion, functionName, blueVersion: blue.version,
   greenVersion: version, lambdaCodeSha256: green.CodeSha256, liveAliasRevisionId: blue.revisionId,
-  liveTrafficUnchanged: true, checks,
+  liveTrafficUnchanged: true, checks, bedrock,
   frontend: 'same candidate verified; no website promotion in this Story',
 };
 writeFileSync(join(workspace, 'report.json'), JSON.stringify(report, null, 2) + '\n');

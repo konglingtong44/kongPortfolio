@@ -39,14 +39,22 @@ resource "aws_lambda_function" "api" {
   memory_size                    = 1024
   timeout                        = 28
   reserved_concurrent_executions = 5
-  publish                        = true
+  publish                        = !var.pipeline_owns_lambda_versions
   environment {
-    variables = {
+    variables = merge({
       DEBUG                            = "false"
       MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp"
-    }
+      }, var.enable_bedrock_qa ? {
+      BEDROCK_ENABLED           = "true"
+      BEDROCK_FACTS_BUCKET      = var.bedrock_content.bucket
+      BEDROCK_FACTS_OWNER       = var.bedrock_content.owner
+      BEDROCK_FACTS_VERSION     = var.bedrock_content.version
+      BEDROCK_FACTS_SHA256      = var.bedrock_content.sha256
+      BEDROCK_MAX_OUTPUT_TOKENS = tostring(var.bedrock_max_output_tokens)
+      BEDROCK_TIMEOUT_SECONDS   = tostring(var.bedrock_timeout_seconds)
+    } : {})
   }
-  depends_on = [aws_iam_role_policy.logs]
+  depends_on = [aws_iam_role_policy.logs, aws_iam_role_policy.bedrock]
   lifecycle {
     # The release pipeline owns code after the reviewed Green handoff.
     # Terraform still owns runtime, execution role, memory and environment.
@@ -63,7 +71,7 @@ resource "aws_lambda_function" "api" {
 resource "aws_lambda_alias" "live" {
   name             = "live"
   function_name    = aws_lambda_function.api.function_name
-  function_version = aws_lambda_function.api.version
+  function_version = var.pipeline_owns_lambda_versions ? data.aws_lambda_alias.current_live[0].function_version : aws_lambda_function.api.version
   lifecycle {
     ignore_changes = [function_version, routing_config]
   }
@@ -84,7 +92,7 @@ resource "aws_apigatewayv2_integration" "lambda" {
 }
 
 resource "aws_apigatewayv2_route" "api" {
-  for_each  = toset(["ANY /api", "ANY /api/{proxy+}"])
+  for_each  = toset(["ANY /api", "ANY /api/{proxy+}", "POST /api/bedrock"])
   api_id    = aws_apigatewayv2_api.api.id
   route_key = each.value
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
@@ -112,6 +120,14 @@ resource "aws_apigatewayv2_stage" "live" {
   default_route_settings {
     throttling_burst_limit = 5
     throttling_rate_limit  = 1
+  }
+  # Apply the costlier Q&A throttle at API Gateway, including direct API calls.
+  # Best-effort token bucket target, not a global or billing hard ceiling.
+  route_settings {
+    route_key                = aws_apigatewayv2_route.api["POST /api/bedrock"].route_key
+    throttling_burst_limit   = 1
+    throttling_rate_limit    = 0.1
+    detailed_metrics_enabled = false
   }
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api.arn

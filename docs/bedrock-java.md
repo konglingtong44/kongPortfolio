@@ -17,6 +17,10 @@
 
 ## 接口与限制
 
+后续[公开入口检查](bedrock-public-readiness.md)已部署问答专用网关限流，并在两个入口以空请求观察到429；Java规范URI检查仍本地，7种路径变体不进入模型服务。后端58项／Lambda 5项与ZIP验证通过，既有STG23不含这次修复。
+
+[前端消费接口](bedrock-frontend.md)已在本地实现并验证，兼容旧生产PREPARING；尚未进入新的AWS候选。模拟浏览器检查不作为新一轮真实模型调用证据。
+
 `POST /api/bedrock`：关闭时，以及空请求探测时，返回`200 {"status":"PREPARING"}`，不调用模型。启用后发送`Content-Type: application/json`：
 
 ```json
@@ -44,7 +48,7 @@
 
 ## 资料与隔离
 
-本地默认资料为[bedrock-facts.md](../backend/src/main/resources/content/bedrock-facts.md)，摘自仓库已有公开profile-zh.json，属于有限初稿。[私有S3方案](bedrock-content.md)已导入从用户DOC整理的脱敏履历资料，固定对象版本＋SHA-256、实例内缓存；STG版本23实际使用该资料。未补写转职动机、私人联系方式或缺失经历，正文不入Git，生产无新增资料授权。
+本地默认资料为[bedrock-facts.md](../backend/src/main/resources/content/bedrock-facts.md)，摘自仓库已有公开profile-zh.json，属于有限初稿。[私有S3方案](bedrock-content.md)已导入从用户DOC整理的脱敏履历资料，固定对象版本＋SHA-256、实例内缓存；STG版本23实际使用该资料。未补写转职动机、私人联系方式或缺失经历，正文不入Git，生产角色及$LATEST随后已准备精确资料配置，live18未改。
 
 白名单匹配后只发送一条system规则与对应的服务端固定问题模板；访客原文不传模型，不接收客户端history／system／模型ID，不保存聊天，不写文件或知识库，不进行微调。个人经历只依据资料、缺项明确说明；通用算法／数学解题等不在本服务范围。STG小样本已抽查，不把提示词当确定性安全边界或零幻觉保证。
 
@@ -67,7 +71,7 @@ $body = @{message='Tell me about yourself.'; language='en'} | ConvertTo-Json
 Invoke-RestMethod http://127.0.0.1:8080/api/bedrock -Method Post -ContentType 'application/json; charset=utf-8' -Body $body
 ```
 
-启用开关是应用配置，不会自动授予IAM权限。云端使用Lambda执行角色，不设置AWS_PROFILE或API key。STG的单模型授权及固定资料环境已纳入Terraform审查并apply，应用由AWS流水线构建／上传，未绕过CI。两道生产审批仍保留；当前执行停在第一道，生产仍未开启。原空请求探测继续兼容，但不能代替真实问答验收。
+启用开关是应用配置，不会自动授予IAM权限。云端使用Lambda执行角色，不设置AWS_PROFILE或API key。STG的单模型授权及固定资料环境已纳入Terraform审查并apply，应用由AWS流水线构建／上传，未绕过CI。两道生产审批定义保留；旧执行已Stopped，第一审批及Green曾成功，生产问答仍未开启。原空请求探测继续兼容，但不能代替真实问答验收。
 
 STG实际结果：版本23、源码2a88caf，8项HTTP合约、三语拒绝及三语正常问答通过；补充事实／注入检查6项通过。正常模型调用8次合计41,563输入／2,059输出tokens，约$0.013405（不含首次截断调用、税和其他AWS服务）；样本平均折算千次约$1.68，仅作当前短回答参考。单次输出68–509 tokens，资料全文输入约5,200 tokens／次；STG硬上限1024，首次截断后增加聚焦与长度提示，未放松完整结束断言。51问未全部做模型质量测试，中文繁简及职称风格仍待统一；详见[命令第13节](aws-commands-20261114.md)。
 
