@@ -1,6 +1,6 @@
 # 生产问答配置准备与后续发布
 
-最新发布补充：源码978a636／执行61bcc02c…已完成两道人审，CodeDeploy将live由18切至20，同候选前端已发布，公开version和health已只读核对。下面“live18不变／待第二审批”等为配置准备和Green验收阶段记录；最新见[发布记录](bedrock-candidate-approval.md)。本轮输入框／回答风格改动仅本地，未更新生产。
+最新发布补充：源码978a636／执行61bcc02c…已完成两道人审，CodeDeploy将live由18切至20，同候选前端已发布，公开version和health已只读核对。下面“live18不变／待第二审批”等为配置准备和Green验收阶段记录；最新见[发布记录](bedrock-candidate-approval.md)。本轮输入框／回答风格已随33ecac8通过STG26，尚未更新生产；见[新候选](bedrock-typed-release.md)。
 
 2026-11-14实际apply：资料根栈1新增生产reader策略；portfolio根栈1新增模型策略、1更新Lambda配置，0删除。没有上传资料、更新代码、发布版本或移动live别名。
 

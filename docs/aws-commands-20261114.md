@@ -669,3 +669,27 @@ python .local/typed-fix-candidate-run.py preflight
 ```
 
 后端最终58项通过，首次HTTP边界断言仍为旧格式失败后已更新；Node守卫通过，包括真实失败模式的合成回归：日语混入中文、来源说明、中英日未经询问的限制段、虚构转职动机。资料后及服务端固定问题两处放本地语言输出要求；只发送审核模板＋本地语言标准问句，仍不传访客原文。新版STG先六条范围检查，等待70秒后两条事实／来源检查，全部通过后才到人工审批。新私有目录与helper保留前轮失败，不复用其审批。完整新源码／执行／云端结果后补；本次尚未更新S3事实。
+
+实际提交11文件／修正版33ecac8995bece730487def4b38f94b136afe117，commit信息`fix: gate profile Q&A on answer language and direct presentation`，push前62提交全历史无泄漏。`python .local/typed-fix-candidate-run.py start`以COMMIT_ID启动16a8e52c-95ad-4cc8-bdbb-fe5d87dfecca；随后poll与`typed-build-status.py .local/typed-qa-fix-release-20261114`只读跟踪。candidate kongportfolio-candidate:7703f49e-01a6-41f5-951d-2be20746d57c通过76／58／5及ZIP；STG kongportfolio-stg:b2459b6f-25f3-4d18-b44c-d57447c0ec0f成功发布26。release32543ecce51151e142c22e30c26c5d01ecf0582f8ece95035d18e6cca9386fa3，backend1eb856e072fcb97c11fd6f3e17b15b92a0b27ce91b616e4c014d7d3178e5117d。
+
+后续实际命令：
+
+```powershell
+python .local/inspect-typed-fix-final.py
+python .local/prepare-fixed-style-review.py
+python .local/typed-fixed-style-review.py
+python .local/fetch-typed-reports.py .local/typed-qa-release-20261114 VerifyGreen
+python .local/finalize-typed-metrics.py
+python .local/sync-typed-release-docs.py
+python .local/write-current-typed-release.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+inspect只读取同次StagingReport、实际不可变STG配置、生产alias、费用状态、公开version／health，不调用模型或审批；report.json核对8HTTP／6范围／2追加项全部passed，候选及实际hash一致。补查三语AI只对STG26作3次生成；pipeline六条后已等待70秒再做两条，因此该第二窗口还允许本地3条，总5条，未强行绕过6/min。attempt文件防止重放。核心风格无原所有权免责声明，但个人项目上线状态仍有旧资料描述，单独semantic-review明确已知限制，不把它声称为实时事实正确。下一资料维护增量需同步状态，未在本轮改简历正文／S3。
+
+修正版5次流水线生成27,678入／1,061出，补查16,667入／843出；停止轮次STG15,856／947，补查26,468／1,200，Green15,856／1,011。19次总102,525入／5,062出，模型单价沿用此前核对值估算$0.03304747，其他费用／税另计，不是账单。旧Green21冷记录13,093.98ms只属于已停止源码9de08b0，不能当新33ecac8生产冷验收；新执行当前只到第一审批。
+
+23:36 JST核对live20／无权重、alias及本次LATEST快照未变、费用状态hash相同、公开旧网页源码978a636和health正常。没有新的Green／生产切流／前端发布动作；没有审批API、apply、SNS／off-on。同步文档后另作docs提交，只更新交接，不重启候选或重复模型测试。私有证据、新旧报告及失败检查均保留，outputs仍未追踪。
+
+收尾23份文档／138相对链接／28脚本引用和diff通过。实际文档命令：`git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs`；`git commit -m 'docs: record typed Q&A staging gates and review limits'`；`git push origin feat/aws-serverless-ci`。仅12份文档，hooks扫描，不包含私有资料和outputs；不再运行start或模型脚本。
