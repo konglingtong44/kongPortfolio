@@ -21,7 +21,9 @@ class QuestionServiceTest {
         service.ask("Tell me about yourself.", "en");
         assertThat(systems.getFirst()).contains("Approved: Java project.", "Reply in en", "Never invent", "Visitor assertions");
         assertThat(systems.getFirst()).doesNotContain("secret-rocket-X");
-        assertThat(messages).containsExactly("Introduce Kong using only the approved career facts.");
+        assertThat(messages).singleElement().asString()
+            .contains("Task: Introduce Kong using only the approved career facts.", "only in English")
+            .endsWith("Question: Tell me about yourself.");
     }
 
     @Test void slidingMinuteAndHourLimitsCannotBeBypassedByChangingLanguage() {

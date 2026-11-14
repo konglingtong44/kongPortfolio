@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
-import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, requireStagingConfig, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, presentationContracts, requireStagingConfig, requireStagingTarget, selectVersion } from './staging-contract.mjs';
 
 const region = 'ap-northeast-1';
 const functionName = process.env.STAGING_FUNCTION_NAME;
@@ -63,6 +64,15 @@ if (bedrock.enabled) {
     console.log(`STG Bedrock passed: ${contract.label} (version ${version}; response text omitted)`);
   }
   bedrock.policyVersion = 'portfolio-scope-v1';
+  console.log('STG presentation checks: waiting for the next request allowance window.');
+  await sleep(35_000);
+  await sleep(35_000);
+  bedrock.presentationChecks = [];
+  for (const contract of presentationContracts) {
+    const result = invoke(contract);
+    bedrock.presentationChecks.push(checkBedrockResponse(result.metadata, result.response, contract));
+    console.log(`STG presentation passed: ${contract.label} (version ${version}; response text omitted)`);
+  }
   bedrock.passed = true;
 }
 const report = {

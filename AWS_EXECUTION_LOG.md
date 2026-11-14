@@ -2630,3 +2630,15 @@ Green首条日语问答先于health执行，真实REPORT显示初始化4722.55ms
 用户继续授权提交本地已验收的输入框及提示词改动，启动新的AWS候选并验证STG，到第一人审暂停。验收：完整AWS构建、接口／三语拒绝／问答通过，新提示词真实回答不主动复述来源或附加未询问的经历限制；缺失事实与团队贡献仍如实处理。新预检确认生产live20、无权重、模型已启用，生产LATEST／STG资料及输出上限一致、超时15／20秒，费用mode=on、无在途候选、两道人审保留。
 
 新证据目录.local/typed-qa-release-20261114和独立助手typed-candidate-run.py从当前live20建立快照，不覆盖前次61bcc02c执行证据。只提交明确18个已追踪改动文件，排除用户outputs及所有私有资料／tfvars。将由AWS验证实际候选，不把本地76／58项及模拟截图当新云端通过；新真实模型风格测试限量执行。命令见[第21节](docs/aws-commands-20261114.md)，结果后补。本轮不创建新服务、apply或自动审批生产。
+
+实际提交9de08b0272c56d7335d0e1037db1217b4042fd18，hooks及61提交全历史Gitleaks通过，显式COMMIT_ID启动db9e6a63-34c9-4de1-a869-84591c0d630e。AWS candidate7fdf35e2…通过前端76／后端58／Lambda5／ZIP，STG77efdb47…发布25，8HTTP及三语回答／三语拒绝通过，原基础合约没有检查新风格。候选release e2fd8d7e…／backend4bae1056…与实际STG摘要一致。
+
+额外限量5次生成＋1次零token拒绝完成，先等待满限流窗口，不重复已尝试样本。人工语义复核失败：中文AI经历实际用日语，英／日AI回答仍有未被询问的生产责任限制，转职动机回答仍解释资料来源；团队成果归属正确，但不能把这一项通过当整体成功。私有style-checks记录manualSemanticReview=failed，所有原始回答保留在ignored证据，不加入Git。
+
+复核期间第一、第二审批已成功，Green b8df0fd2…也完成，DeployProduction开始，助手没有调用审批API。最初停止助手因阶段已前进而在写操作前拒绝；只读确认live20无权重。随后CodeDeploy基线登记d-TE3HEELFM（20→20）更新alias RevisionId，旧RevisionId断言再次在写操作前拒绝。改为只停止本次精确execution／build，不直接编辑alias，调用stop_pipeline_execution(abandon=false)和stop_build(kongportfolio-deploy:ded74498-c309-46eb-b2c6-493f871c5b83)，最终执行Stopped、部署构建STOPPED。仅同版本基线Succeeded，没有新版本金丝雀部署或前端发布；live20／无权重，旧网页保留。没有需要停止或回滚的活动CodeDeploy，rollbackRequestedForDeployments为空；不能声称完成了新版本回滚。
+
+### 31.18 将语言与回答风格纳入STG自动门槛（2026-11-14，执行中）
+
+在资料后追加对应语言的最终输出规范，服务端固定模型问题同时包含审核任务和该语言标准问句；不传访客原文。AI主题仅问具体工作与学习技术，托管细节留架构主题。新增STG／Green展示检查：语言、来源说明、未经询问的AI职责限制；STG六条范围请求改为三语AI回答＋三语拒绝，并等待两个35秒窗口后再测未确认转职原因和团队30服务归属。两项追加报告独立于原六项，流水线只有全部通过才暴露第一审批，避免仅基础烟测通过就放行。检查只覆盖明确模式及样本，不承诺所有语言语义或零幻觉。
+
+Node STG／Green／部署／前端守卫通过；首次后端58项中HTTP边界测试仍期待旧模型问题格式而失败，更新为固定模板及中文标准问句断言，最终58项通过。既有前端未改，不重复76项或15组浏览器。新根助手typed-fix-candidate-run.py／证据目录typed-qa-fix-release-20261114，预检旧执行已Stopped、live20及费用on、新LATEST快照、同资料／上限、两道人审保留。后续新源码／执行与真实结果后补，原失败记录不覆盖，不复用旧审批。

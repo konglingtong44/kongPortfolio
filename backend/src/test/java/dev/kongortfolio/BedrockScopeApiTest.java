@@ -40,6 +40,8 @@ class BedrockScopeApiTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).contains("ANSWER", "Synthetic career answer", "\"modelInvoked\":true");
         verify(facts).read();
-        verify(gateway).answer(contains("narrowly scoped"), eq("Introduce Kong using only the approved career facts."));
+        verify(gateway).answer(contains("narrowly scoped"), argThat(prompt ->
+            prompt.contains("Task: Introduce Kong using only the approved career facts.")
+                && prompt.endsWith("Question: 请介绍一下你自己。")));
     }
 }

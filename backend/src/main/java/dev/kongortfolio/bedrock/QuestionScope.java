@@ -66,7 +66,7 @@ public final class QuestionScope {
         topic("motivation", "Explain Kong's career-change motivation and preferences only if established by the approved facts. Otherwise briefly say the reason has not been confirmed, without guessing dissatisfaction or salary motives.",
             "転職理由と今後の希望を教えてください。", "你为什么考虑转职？", "Why are you considering a career change?",
             "転職理由を教えて", "今後のキャリアの希望は何ですか", "你的转职原因是什么", "你为什么要转职是不是对公司不满意", "What are your career goals"),
-        topic("ai-experience", "Describe only Kong's documented AI-related investigations, proof-of-concept support and study. Do not invent sole production AI ownership or answer general AI tutorials.",
+        topic("ai-experience", "Summarize Kong's actual AI-related work tasks and current areas of study. Describe concrete investigations, development assistance and named technologies. Keep portfolio hosting details for the architecture topic.",
             "AI関連の経験と学習状況を教えてください。", "你有哪些 AI 相关经历，目前在学习什么？", "What AI-related experience and study do you have?",
             "本番AIサービスを単独で運用した経験がありますか", "你做过AI相关工作吗", "Describe your AI experience")
     );

@@ -35,7 +35,8 @@ class QuestionScopeTest {
         var service = new QuestionService(gateway, "approved facts", () -> 0);
         service.ask(message, "ja");
         verify(gateway).answer(contains("Answer only the server-selected personal career question"),
-            eq("Introduce Kong using only the approved career facts."));
+            argThat(prompt -> prompt.contains("Task: Introduce Kong using only the approved career facts.")
+                && prompt.endsWith("Question: 自己紹介をお願いします。")));
     }
 
     @Test void everyPublishedQuestionIsAcceptedAndPrivateContactsAreNotOffered() {

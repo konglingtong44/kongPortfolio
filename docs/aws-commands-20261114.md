@@ -650,3 +650,22 @@ python .local/typed-candidate-run.py poll
 ```
 
 开始前本地应用及浏览器检查已在第20节通过，不重复不变测试；将由AWS完整重建和发布STG。仅Source显式COMMIT_ID启动一次新候选，Source DetectChanges=false。预检及start内部再次核对生产快照与费用hash、remote HEAD一致；不调用审批API，第一审批后的Green／第二审批／切流仍由原流程处理。新STG报告及限量真实回答风格／事实边界结果后补，未提前声称成功。
+
+实际9de08b0／db9e6a63…：AWS candidate7fdf35e2…和STG77efdb47…基础合约通过，STG25；release e2fd8d7e…、backend4bae1056…。`typed-candidate-run.py report`下载并核对同次报告及实际摘要，生产版本列表／LATEST／live20在第一审批前不变。`typed-style-review.py`初次只输出需要再等待42秒，未调用模型；再执行时第一审批已成功而守卫拒绝，未推理。按实际在途阶段改为只验证同执行有效、只调用固定STG25，记录生产实际状态，不再声称LATEST未变。最终5次生成／1拒绝，逐次先写attempted文件防止中断重放；回答私有保存，自动模式及人工复核发现语言与不期望段落失败。
+
+停止命令：`python .local/stop-typed-quality.py`、`python .local/typed-candidate-run.py poll`、`python .local/inspect-typed-deploy.py`。前两次停止预检分别因DeployProduction已出现、基线更新RevisionId而在写前拒绝；实际仅基线20→20 d-TE3HEELFM成功，尚无金丝雀。最终按精确execution stop_pipeline_execution(abandon=false)并定位DEPLOY_PIPELINE_EXECUTION_ID匹配的构建stop_build；本次deploy ded74498…停止，执行Stopped。没有PublishFrontend，没有新版本切流，未直接更新alias或创建回滚。证据quality-stop.json／deployment-inspection.json及style私有文件保留。
+
+# 22. 提示顺序／固定语言问句及自动质量门槛修正
+
+```powershell
+node scripts/test-staging-contract.mjs
+node scripts/test-green-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
+node --check scripts/verify-staging.mjs
+mvn.cmd -f backend/pom.xml test -B -ntp *> .local/typed-qa-prompt-fix-final-test.log
+python .local/prepare-typed-fix-candidate.py
+python .local/typed-fix-candidate-run.py preflight
+```
+
+后端最终58项通过，首次HTTP边界断言仍为旧格式失败后已更新；Node守卫通过，包括真实失败模式的合成回归：日语混入中文、来源说明、中英日未经询问的限制段、虚构转职动机。资料后及服务端固定问题两处放本地语言输出要求；只发送审核模板＋本地语言标准问句，仍不传访客原文。新版STG先六条范围检查，等待70秒后两条事实／来源检查，全部通过后才到人工审批。新私有目录与helper保留前轮失败，不复用其审批。完整新源码／执行／云端结果后补；本次尚未更新S3事实。

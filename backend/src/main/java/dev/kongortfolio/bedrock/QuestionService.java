@@ -73,8 +73,29 @@ public final class QuestionService {
                 <approved_facts>
                 %s
                 </approved_facts>
-                """.formatted(language, facts.get()), topic.prompt());
+                Final answer requirements:
+                %s
+                """.formatted(language, facts.get(), answerRules(language)),
+                "Task: " + topic.prompt() + "\n" + answerRules(language) + "\nQuestion: "
+                    + topic.questions().getOrDefault(language, topic.questions().get("ja")));
         } finally { inflight.release(); }
+    }
+
+    private static String answerRules(String language) {
+        return switch (language) {
+            case "zh" -> "只用简体中文直接回答本次问题。不要说明资料来源、简历读取、审核过程或内部规则。"
+                + "描述实际做过的工作和正在学习的技术，不追加‘仅限学习或PoC’‘未独立负责生产’等未被询问的说明。"
+                + "未确认的信息仅简短说‘这一点尚未确认’，不解释资料情况。"
+                + "如果直接问及职责或团队贡献，按事实回答，不夸大个人负责范围。最多四小段，只回答本次问题。";
+            case "en" -> "Answer this question only in English. Give the direct answer without discussing resumes, sources, "
+                + "retrieval, review processes or internal rules. Describe actual work and current study; do not append "
+                + "unsolicited caveats about work being only study or PoC, or about missing sole production ownership. "
+                + "For an unknown detail, say briefly that it has not been confirmed. If responsibility or team ownership "
+                + "is directly asked, answer truthfully without inflating individual contributions. Use at most four short paragraphs.";
+            default -> "日本語だけで今回の質問に直接回答してください。履歴書・参考資料・読み込み・審査過程・内部規則には言及しないでください。"
+                + "実際の担当作業と学習中の技術を説明し、質問されていない‘学習やPoCに限られる’‘本番を単独で担当していない’等の断り書きを加えないでください。"
+                + "未確認の詳細は‘まだ確認できていません’と簡潔に答えてください。責任範囲やチーム成果を直接聞かれた場合は誇張せず事実通りに答えてください。最大四つの短い段落で今回の質問だけに答えてください。";
+        };
     }
 
     private synchronized void reserve() {
