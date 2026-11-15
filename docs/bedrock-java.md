@@ -1,5 +1,7 @@
 # 29. 有界Java问答（生产23已发布）
 
+**11月16日当前发布：** 新面板及自然问答已随08731dc发布生产25，STG31／Green25、两道人审、金丝雀、同次前端及公开浏览器真实问答通过；[当前验收](bedrock-qa-panel-release.md)。下文旧版本／待审批／773码点等是历史记录。
+
 **AWS新候选，尚未发布：** 源码b8ca8b0／执行7e728e3d-42fb-4043-acf8-1c2f0b47c20f通过AWS构建及STG30：8HTTP、三语回答／拒绝与4条自然问法／事实展示全部通过，正在第一审批。生产live23／无权重、公开76f04a8／release96f5109b…及health200／UP未变，费用state hash未变；没有新Green／切流／前端发布。 语义判断替代严格问句匹配，18项仅示例，拒绝也计tokens。旧生产23／773码点等描述保留为历史；当前以[自然问答候选](bedrock-natural-questions.md)为准。
 
 2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。 下面准备／待审批描述保留为此前阶段记录，当前以[成功发布复核](bedrock-typed-release.md)为准。

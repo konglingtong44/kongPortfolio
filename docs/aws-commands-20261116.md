@@ -47,3 +47,63 @@ python .local/review-qa-panel-baseline.py
 ```
 
 下一步只提交SSO／基线文档，应用代码仍与80918df一致；push后显式COMMIT_ID启动新候选，实际源码／执行ID及AWS结果后补。不得复用已完成7e728e3d审批，新面板按新候选两道人审。没有新模型调用、S3资料／IAM／费用开关修改或生产写入。
+
+## 面板新候选：AWS构建／STG通过
+
+应用80918df后只提交4份登录／基线文档，08731dc7696c3a4223743e7b9b046f9569ffc371；git diff 80918df…HEAD仅Markdown。71提交全历史扫描通过，push后显式COMMIT_ID启动fdde9128-4fc1-4e5b-bf53-a22ad6728805，没有自动触发第三执行或复用旧审批。
+
+```powershell
+git commit -m 'docs: record production24 baseline for panel release'
+git diff --name-only 80918df HEAD
+git push origin feat/aws-serverless-ci
+python .local/qa-panel-candidate-run.py start
+python .local/qa-panel-candidate-run.py poll
+python .local/typed-build-status.py .local/qa-panel-release-20261116
+python .local/qa-panel-candidate-run.py report
+python .local/inspect-qa-panel-candidate.py
+python .local/record-qa-panel-staging.py
+```
+
+candidate bc68e220-6459-4928-aed5-2a8b30846f6d通过79／41／5和ZIP；STG 7e6b98e2-c140-4e50-a1d3-6866c81fa7ee发布31，8HTTP／三语回答拒绝及70秒后的4条自然问法／事实检查通过。源码08731dc／执行fdde9128-4fc1-4e5b-bf53-a22ad6728805通过AWS构建和STG31，正在第一审批。生产仍24／无权重、公开b8ca8b0／release4fa9c776…及health200／UP未变，费用state hash未变。 逐项核对同次source／execution／release、实际版本CodeSha256、prod alias／LATEST／已发布版本列表和费用快照；没有新增生产Green或发布写入。release b7bd2bcb37038a7d9f67c38d620e2e2a242353557c16f4b6d06158928474321b，backend 392b392d03875a7f363f71f052e82b3e984148040daec2e9ca04fa9b10c8a7dd。
+
+STG10次真实Qwen 50,709输入／673输出，沿用已核对东京Mantle单价估算模型费$0.01440481，非账单、未含税／其他AWS费用。安全报告无问答正文。第一道人审入口已向用户发出，引用AGENTS保留两道人审，不调用审批API；后续Green／切流和公开浏览器验收须以本次实际阶段继续，不能套旧24或本地17组模拟。
+
+## 首审批通过／Green25验收
+
+第一审批实际Succeeded，助手未发送审批结果。green e92dda01-2355-442d-9c81-7ff876c3ec5e已通过，新Green25通过8HTTP、三语回答／拒绝，真实冷问答3755.54＋3397.29＝7152.83ms；生产仍24／无权重，网页和费用快照未变，正在第二审批。 SDK下载同次Green报告，与STG31、源码08731dc、release b7bd2bcb…、backend392b392d…绑定一致；实际Green25 CodeSha256、Role／Environment／Memory／Timeout与审核配置相符。live alias版本／RevisionId／权重、前端version及费用state hash与预检一致，health200／UP。
+
+```powershell
+python .local/qa-panel-candidate-run.py poll
+python .local/qa-panel-phase-logs.py VerifyGreen
+python .local/inspect-qa-panel-stage.py green
+python .local/record-qa-panel-green.py
+```
+
+Green本轮6次模型30,387输入／313输出，三语拒绝也计费；真实冷问答总7.15283秒低于28秒，仅本次样本，不外推全部请求。新Green实际验证不能用旧24或本地SSO样本代替。第二审批ApproveTrafficShift入口已发给用户；批准后才金丝雀切流和同候选网页发布，不使用原b8ca8b0的旧审批或代批。
+
+## 第二审批、金丝雀及新面板公开验收
+
+第二审批实际Succeeded，助手未调用批准API。deploy ef78be33-3ea5-44d6-ace2-399288a9a230按真实CodeDeploy配置LambdaCanary10Percent5Minutes执行，d-BJ3DCQAGM观察到live24＋25权重0.1，最终live25／无权重、Succeeded；部署报告含蓝基线d-DHCA2WAGM及实际金丝雀d-BJ3DCQAGM，不把基线当成新部署。frontend 3a68b8e3-98f3-456e-87c5-eb2b124fd14c随后成功，同次不可变资源／路由／公开HTML-version-assets-API均通过。管线8阶段全部Succeeded，用户亦确认本番已上。
+
+```powershell
+python .local/qa-panel-candidate-run.py poll
+python .local/qa-panel-phase-logs.py DeployProduction
+python .local/qa-panel-canary-status.py
+python .local/qa-panel-phase-logs.py PublishFrontend
+python .local/inspect-qa-panel-stage.py final
+. ./scripts/tools.ps1
+node .local/qa-panel-public-browser.mjs
+python .local/finish-qa-panel-release-docs.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+final-inspection下载同次四份报告并核对passed／source／execution／release／hash，STG31／Green25／live25真实CodeSha256一致，部署outcome=deployed及CodeDeploy实际Succeeded，两审批Succeeded；公开version源码08731dc／release b7bd2bcb…／sourceDirty=false，health200／UP。费用state字节hash未变；prod角色／环境／内存／超时与预检一致。仅alias／代码及同次前端由已批准流水线按预期更新，不修改资料对象／权限／费用开关。
+
+公开浏览器使用真实URL，未mock网络：Chrome1366×900仅打开面板，0模型请求；WebKit390×844仅一次技能问题POST，返回ANSWER／semantic-v2／modelInvoked=true及5094输入／160输出，Java标记与纯中文通过。MutationObserver记录进度条节点，返回正文top229.375低于feed底581.828、scrollTop0、标题焦点，发送按钮底771低于844屏高；关闭及页面错误检查通过。已查看真实手机模拟答案截图。不是iPhone真机／软键盘或所有模型回答质量证明。
+
+本次STG10＋Green6＋公开1共17次，86,190输入／1,146输出，按此前核对输入$0.27／百万、输出$1.06／百万估算模型费$0.02448606，未含税／其他AWS费用，非账单。公开helper写attempt标记限制重放，未循环请求取好答案；真实正文及截图仅ignored .local，报告／Git只安全指标。SSO登录及源码提交／旧24基线、STG与Green／两道人审的各阶段均在本页记录，不复用旧审批。
+
+当前发布页面、前端／手机／README／学习／架构／Java／资料／范围等说明已同步25及实际源码身份。后续仅文档收尾，不启动第三候选、重跑模型／容器、改S3资料／Terraform或发送SNS。用户outputs未暂存。
+
+最终28份文档／189相对链接／29脚本引用及diff通过。仅暂存12份Markdown，收尾命令`git commit -m 'docs: record production25 panel release and public verification'`、`git push origin feat/aws-serverless-ci`，由既有hooks执行staged／全历史Gitleaks和私有路径检查。Source DetectChanges=false，文档HEAD不是另一个部署源码，实际发布始终固定08731dc；本轮不再启动管线或模型请求。

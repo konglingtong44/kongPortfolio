@@ -1,12 +1,14 @@
 # kongPortfolio
 
-用户已确认[AI问答面板](docs/bedrock-frontend.md)并要求上线：像素等待条、独立回答阅读区、固定输入及返回后直接显示；79项前端测试、构建及17组浏览器模拟通过。[新发布正在准备](docs/bedrock-qa-panel-release.md)，不把此前固定b8ca8b0的验收当作此UI已上线。
+**11月16日已上线：** 2026-11-16，问答新面板已发布生产25，源码08731dc／执行fdde9128-4fc1-4e5b-bf53-a22ad6728805全部成功。公开网页与同次release一致，health200／UP，费用state hash未变。 公开浏览器真实问答及新面板通过，见[发布记录](docs/bedrock-qa-panel-release.md)。下文准备／待审批描述为此前过程。
+
+新面板已上线：像素等待条、独立回答阅读区、固定输入及返回后直接显示。AWS前端79／后端41／Lambda5、STG31／Green25及公开浏览器真实问答通过；[完整记录](docs/bedrock-qa-panel-release.md)。
 
 持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
-在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 手动输入及主题证据修复已通过两道人审，生产live23、网页release96f5109b…，源码76f04a8。
+在线访问：[konglingtong44.com](https://konglingtong44.com)。AWS托管、CI/CD、Lambda蓝绿／金丝雀和自然问答已上线；当前生产25，网页release b7bd2bcb…，源码08731dc。
 
-2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。[完整发布记录](docs/bedrock-typed-release.md)。
+此前2026-11-15：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。[完整发布记录](docs/bedrock-typed-release.md)。
 
 2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已在STG24／Green20完成小样本验收，生产现为20。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
