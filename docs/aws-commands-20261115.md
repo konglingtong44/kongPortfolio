@@ -34,3 +34,27 @@ python .local/green-repair-candidate-run.py preflight
 本地后端61项通过（新增3项主题证据测试），Node守卫和失败报告不泄露正文测试通过；前端未改，不重复本地76项／15组浏览器。真实资料匹配与选择在本地完成，不等于新代码模型质量已验收。新预检live20／无权重、无在途候选、费用on，固定资料及上限一致，两道人审保留；新证据目录`.local/green-repair-release-20261115/`。没有重试旧Green、apply、更新资料、创建新收费服务、SNS或off/on。
 
 接下来明确暂存修复代码及文档，hooks扫描后push，显式COMMIT_ID启动新候选。AWS完整构建／STG及后续Green结果后补；助手不调用任何审批API。
+
+## 新候选实际结果
+
+明确暂存13文件并提交`fix: isolate AI career evidence and retain safe Green failure diagnostics`，源码78ac795344c46f39a97ec7bb4b843111b62d2f09；staged及64提交全历史Gitleaks通过，推送feat/aws-serverless-ci。`python .local/green-repair-candidate-run.py start`显式COMMIT_ID启动c4801ece-4249-4e79-9732-4456d1272b76。candidate kongportfolio-candidate:8bed06b0-1d8b-498d-ba5d-18d8a691e72b通过76／61／5及实际ZIP；STG kongportfolio-stg:540b6c1d-d831-4a57-86f2-6a6325ee24da发布27并通过8HTTP／6范围／2事实展示检查。
+
+```powershell
+python .local/green-repair-candidate-run.py poll
+python .local/typed-build-status.py .local/green-repair-release-20261115
+python .local/prepare-green-repair-reviews.py
+python .local/inspect-green-repair-final.py
+python .local/green-repair-style-review.py
+python .local/finish-green-repair-docs.py
+python .local/sync-green-repair-docs.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+只读inspection下载同次STG报告并验证实际CodeSha256、固定来源执行／commit、生产alias、费用状态和公开version／health。release bfea6640ec45cc3e99ef4090d8fe476f11b63ce0fc80ae94b0f4b8229a2ade23，backend bc39c4cdad8be92cfcfcb86604c80f34ec3d5f505dad0d01829594b94fc79959。追加三语私有STG27样本，attempt文件防止重放；第二窗口原有2条加此3条共5条，不超应用6/min。三语原限制性说明及个人网站历史段未出现；输入1315／1218／1192、输出211／145／169，人工复核范围仅这些样本。
+
+新STG5次生成14,736／884 tokens，补查3725／525，合计8次18,461／1,409，模型费用按此前核对单价估算$0.00647801。另一次旧Green诊断5506／260；原失败Green3次生成未完整留tokens，排除估算，不当成免费。税、构建／Lambda等另计。其他主题仍全文，AI选择不减少首次S3完整快照读取，减少的是送模型的相关内容。
+
+15:26 JST核对首审批InProgress、live20／无权重、生产alias及LATEST与预检相同、费用hash未变、公开网页仍978a636且health200／UP。没有新生产Green验收、切流或前端发布。原失败Green22资料及日志在旧目录保留，新修复目录有run／report／final-inspection／style-safety／semantic-review／usage-summary。失败报告安全性在Node单测验证，没有故意制造云上故障验证该分支；不承诺已在生产修复。当前候选见[交接说明](bedrock-typed-release.md)。
+
+文档收尾24份／145相对链接／28脚本引用及diff通过。命令为`git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs`、`git commit -m 'docs: record Green repair staging evidence and approval handoff'`、`git push origin feat/aws-serverless-ci`；仅12份文档，hooks扫描，不包含私有资料／报告／outputs，不再运行start或模型测试。候选源码仍固定78ac795。
