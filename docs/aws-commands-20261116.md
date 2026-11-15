@@ -30,3 +30,20 @@ node .githooks/check-staged-paths.mjs
 git diff --cached --check
 git commit -m 'feat: add compact AI answer panel and waiting progress'
 ```
+
+实际本地提交80918df（13文件），staged Gitleaks通过；28份文档／181相对链接／29脚本引用及diff通过。尚未push，CLI设备登录仍等待用户完成，未能读取新AWS状态或启动发布。此后续记录留本地待发布收尾同步，不把登录等待算作已上线。
+
+## 登录恢复与实际生产24基线
+
+用户确认登录后SDK已可用。读取实际7e728e3d执行，全部阶段Succeeded，两道人审成功；下载同次STG／Green／部署／前端报告并核对source b8ca8b0、passed及execution一致，生产live24实际CodeSha256与报告ba8caf35…一致、无权重。公开version=b8ca8b0／release4fa9c776…、sourceDirty=false，health200／UP。旧Green冷问答4859.31＋3366.30＝8225.61ms仅是旧版样本，不算新面板验收。此前“生产23／等首审批”的文档快照不能当作当前状态。
+
+新预检无在途候选、费用on、两道人审／Source DetectChanges=false、资料pin及输出1024一致、prod模型HTTP15／STG20秒。新before.json、public-before.json和accepted-prior-release.json保留实际基线；不需停止任何旧执行。capture辅助脚本输出的production23是旧固定提示文字，实际JSON与断言已是动态线上基线；已修正提示，不重复覆盖已记录的基线。
+
+```powershell
+python .local/inspect-qa-panel-before.py
+python .local/qa-panel-candidate-run.py preflight
+python .local/capture-qa-panel-public-before.py
+python .local/review-qa-panel-baseline.py
+```
+
+下一步只提交SSO／基线文档，应用代码仍与80918df一致；push后显式COMMIT_ID启动新候选，实际源码／执行ID及AWS结果后补。不得复用已完成7e728e3d审批，新面板按新候选两道人审。没有新模型调用、S3资料／IAM／费用开关修改或生产写入。
