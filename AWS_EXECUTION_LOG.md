@@ -2670,3 +2670,15 @@ Green脚本异常时写安全passed=false报告，记录failedCheck／版本／�
 学习、README、前端／Java／资料方案／架构／范围／当前候选同步新状态；旧33ecac8和失败Green22的证据保留。文档收尾单独提交，不变更固定候选78ac795或自动审批；私有正文／样本／配置／用户outputs不加入Git。
 
 收尾24份文档／145相对链接／28脚本引用及git diff --check通过，明确暂存12份文档，经提交／推送Gitleaks hooks扫描；未修改产品代码或新启另一候选。生产Green需要本次新首审批后验证，两道人审保留。
+
+### 31.20 用户新执行发布验收（2026-11-15，生产23已上线）
+
+用户OK后先查询原c4801ece，发现其第一审批Failed；读取实际审批摘要为Rejected，而非Green再次失败。再列最近执行，发现用户另启530833d0-8539-4c94-a71c-fc8b9b210d30，源码76f04a816f35c74a754422feb3809a7c1f353d5c，已全部Succeeded。没有重启被拒绝执行、代批或绕过用户选择。git diff核对78ac795→76f04a8仅12份Markdown，应用修复代码相同；不能沿用此前“c4801ece待首审批”的当前状态。
+
+同次StagingReport／GreenReport／DeploymentReport／FrontendReport下载并核对passed、execution／commit／release一致，STG28／Green23／backend22352c62…一致；Green三语AI回答／三语零token拒绝及8HTTP通过。真实冷问答初始化3710.62ms＋执行4447.76ms＝8158.38ms，低于28秒，仅本次样本。CodeDeploy d-UBZGH91GM记录20→23金丝雀成功，前端不可变资源／路由／公开HTML-version-assets-API检查通过。release96f5109b01bc947421118c96dcd8082e309274cc85a897052dbdec77112aab2e。
+
+16:20 JST只读复核live23／无权重、实际不可变版本CodeSha256与报告一致，角色／固定资料／输出1024／模型HTTP15秒及其他环境与审核快照一致。费用状态字节hash未变；公开version源码76f04a8、sourceDirty=false和同次release一致，health200／UP，日中英目录enabled=true各17项。新网页随同候选发布，手动输入与AI主题证据修复已上线；没有新增生产浏览器交互／iPhone真机验证，也未重复模型调用。
+
+助手本轮仅读AWS及HTTPS，没有启动新执行、审批、修改alias、部署代码、上传资料、apply、SNS或off/on。原c4801ece拒绝、16a8e52c的Green22失败和本次成功执行分别保留，不互相覆盖。证据ignored .local/accepted-repair-release-20261115/的四份报告及verification.json；命令见[当日发布复核](docs/aws-commands-20261115.md)。同步README／学习／相关当前状态文档，后续资料维护仍需更新其他主题的个人项目上线描述，不在本轮改写履历事实。
+
+文档收尾24份／153相对链接／28脚本引用、git diff --check通过，12份文档经提交／推送Gitleaks hooks扫描；仅文档记录，不启动新候选。私有报告、配置及用户outputs保持不入Git。

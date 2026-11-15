@@ -1,4 +1,6 @@
-# 29. 有界Java问答（生产20已发布，风格改版本地完成）
+# 29. 有界Java问答（生产23已发布）
+
+2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。 下面准备／待审批描述保留为此前阶段记录，当前以[成功发布复核](bedrock-typed-release.md)为准。
 
 2026-11-15：Green22英文检查失败后，新增[QuestionFacts](../backend/src/main/java/dev/kongortfolio/bedrock/QuestionFacts.java)为AI主题保留相关原文及项目归属，其他主题仍全文；失败Green报告不含正文。修复78ac795已通过AWS前端76／后端61／Lambda5及STG27，三语追加样本通过；生产20未改，见[当前候选](bedrock-typed-release.md)。
 

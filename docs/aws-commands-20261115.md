@@ -58,3 +58,26 @@ git diff --check
 15:26 JST核对首审批InProgress、live20／无权重、生产alias及LATEST与预检相同、费用hash未变、公开网页仍978a636且health200／UP。没有新生产Green验收、切流或前端发布。原失败Green22资料及日志在旧目录保留，新修复目录有run／report／final-inspection／style-safety／semantic-review／usage-summary。失败报告安全性在Node单测验证，没有故意制造云上故障验证该分支；不承诺已在生产修复。当前候选见[交接说明](bedrock-typed-release.md)。
 
 文档收尾24份／145相对链接／28脚本引用及diff通过。命令为`git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs`、`git commit -m 'docs: record Green repair staging evidence and approval handoff'`、`git push origin feat/aws-serverless-ci`；仅12份文档，hooks扫描，不包含私有资料／报告／outputs，不再运行start或模型测试。候选源码仍固定78ac795。
+
+## 用户另启执行后的成功发布复核
+
+用户OK后原c4801ece查询到ApproveProduction Failed。读取审批摘要Rejected，列最近执行发现530833d0-8539-4c94-a71c-fc8b9b210d30已Succeeded，源码为当时分支最新76f04a816f35c74a754422feb3809a7c1f353d5c。没有重试被拒绝的旧执行，也未推断其为新的模型故障。
+
+```powershell
+python .local/green-repair-candidate-run.py poll
+python .local/diag-approval-20261115.py
+python .local/review-user-release-20261115.py
+python .local/write-accepted-release-docs-20261115.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+只读SDK：get_pipeline_execution／list_action_executions／list_pipeline_executions，按成功执行的outputArtifacts位置S3 get_object读取四份report.json；Lambda get_alias／get_function_configuration，费用S3状态hash，以及公开GET version／health／三语目录。git diff --name-only 78ac795…76f04a8仅Markdown，应用代码一致；仍严格按本次源码、执行、release和实际hash验收，不能拿旧报告代替。
+
+STG28，Green23，live23无权重；backend SHA-256=22352c625e146eb0de42060fb66bcf4d0123ee153ea53892cb79e14fa1bf12cf，release96f5109b01bc947421118c96dcd8082e309274cc85a897052dbdec77112aab2e。Green8HTTP、三语回答／三语拒绝passed，冷问答3710.62＋4447.76＝8158.38ms。CodeDeploy d-UBZGH91GM outcome=deployed，20→23；同次前端报告passed，包含immutable-assets／development-routing／live-html-version-assets-api。两道审批均Succeeded，助手未执行批准。
+
+16:20 JST公开version=76f04a8／同次release／sourceDirty=false，health200／UP，日中英问题目录各17项enabled=true；角色／配置／资料pin符合原审核值，费用状态hash未变。本轮0新模型生成、0新部署／配置写入，未重复已通过的应用／容器测试或新增浏览器交互。新手动输入已随网页上线，但不称为iPhone真机或新增浏览器到生产模型E2E已测。私有证据`.local/accepted-repair-release-20261115/{VerifyStaging-report,VerifyGreen-report,DeployProduction-report,PublishFrontend-report,verification}.json`。
+
+同步当前发布文档，保留旧失败与拒绝执行历史。后续资料维护应更新其他主题的个人项目状态；本轮不修改职业事实或S3资料版本。文档提交不会自动启动候选（Source DetectChanges=false），不复用旧审批。
+
+最终24份文档／153相对链接／28脚本引用及diff检查通过。文档命令：`git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs`，`git commit -m 'docs: record accepted production23 release and execution identity'`，`git push origin feat/aws-serverless-ci`。仅12份文档，经hooks扫描，不重新部署或生成模型回答；私有报告／配置与用户outputs未暂存。

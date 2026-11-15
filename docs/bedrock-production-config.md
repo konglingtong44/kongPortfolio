@@ -1,5 +1,7 @@
 # 生产问答配置准备与后续发布
 
+2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。 下面准备／待审批描述保留为此前阶段记录，当前以[成功发布复核](bedrock-typed-release.md)为准。
+
 最新发布补充：源码978a636／执行61bcc02c…已完成两道人审，CodeDeploy将live由18切至20，同候选前端已发布，公开version和health已只读核对。下面“live18不变／待第二审批”等为配置准备和Green验收阶段记录；最新见[发布记录](bedrock-candidate-approval.md)。本轮输入框／回答风格已随78ac795通过STG27，尚未更新生产；见[新候选](bedrock-typed-release.md)。
 
 2026-11-14实际apply：资料根栈1新增生产reader策略；portfolio根栈1新增模型策略、1更新Lambda配置，0删除。没有上传资料、更新代码、发布版本或移动live别名。

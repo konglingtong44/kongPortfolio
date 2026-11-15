@@ -1,29 +1,22 @@
-# 手动输入问答：Green故障修复版STG27通过，待第一审批
+# 手动输入问答修复：已发布生产23
 
-| 核对项 | 新候选 |
+| 核对项 | 实际成功执行 |
 |---|---|
-| 源码 | `78ac795344c46f39a97ec7bb4b843111b62d2f09` |
-| 执行 | `c4801ece-4249-4e79-9732-4456d1272b76` |
-| releaseId | `bfea6640ec45cc3e99ef4090d8fe476f11b63ce0fc80ae94b0f4b8229a2ade23` |
-| 后端SHA-256 | `bc39c4cdad8be92cfcfcb86604c80f34ec3d5f505dad0d01829594b94fc79959` |
-| AWS检查 | 前端76／后端61／Lambda5及实际ZIP运行通过 |
-| STG | 27，实际Lambda摘要与同次候选及报告一致 |
-| 生产 | live20／无权重，网页仍978a636／be998dc6…；alias／LATEST与本次预检相同，费用hash不变，health200／UP |
+| 执行 | `530833d0-8539-4c94-a71c-fc8b9b210d30`，所有阶段Succeeded |
+| 源码 | `76f04a816f35c74a754422feb3809a7c1f353d5c`；应用代码与78ac795一致，仅Markdown不同 |
+| releaseId | `96f5109b01bc947421118c96dcd8082e309274cc85a897052dbdec77112aab2e` |
+| 后端SHA-256 | `22352c625e146eb0de42060fb66bcf4d0123ee153ea53892cb79e14fa1bf12cf` |
+| STG／Green／live | 28／23／23，无附加流量权重 |
+| Green冷问答 | 初始化3710.62ms＋执行4447.76ms＝8158.38ms |
+| 部署 | `d-UBZGH91GM`，20→23金丝雀发布成功 |
+| 网页／接口 | 公开version匹配同次候选，health200／UP，三语问题目录各17项 |
 
-原33ecac8／16a8e52c…在Green22英文回答检查失败，未切流、未发布网页。原失败正文未留档，一次固定版本复现通过，不能断言具体句子或一定误报；检查未放宽。后来制品上传失败是未生成report.json的后续错误。不要直接重试已热的旧Green22作为冷启动验收。
+用户告知OK后只读核查：原c4801ece…在第一审批被拒绝，没有继续运行；另一个执行530833d0…已用分支最新源码76f04a8完成构建、STG、两道人审、Green、CodeDeploy及前端发布。助手没有代发审批或启动此执行，后续检查均只读，不应再按旧c4801ece等待审批。
 
-修复为AI主题只传已校验快照中的相关原文：工作／项目／学习事实，保留项目归属，排除资料规则、个人网站部署说明和责任对照注释。当前6943→773码点，其他主题仍全文，S3资料版本及角色权限未变。AI任务采用工作、工具、学习三段，第三段结束。模型输入示例从约5500降至约1200 tokens，不改变判断范围的严格白名单。
+同次StagingReport／GreenReport／DeploymentReport／FrontendReport均passed，execution／源码／release一致。Green三语AI回答、三语零token拒绝和8项HTTP通过，真实生产执行角色及首条冷启动通过；发布检查包含不可变制品、路由和公开HTML／version／资源／API。公开网页已更新为可自行输入的问题框，示例可填入编辑。没有新增浏览器交互或iPhone真机检查，不把已有本地15组模拟证据当作新生产浏览器E2E。
 
-Green主验证异常时保存passed=false安全报告，包含failedCheck／Green版本／已完成指标／当前调用usage和已知安全原因，不含回答正文、原始错误或私有资料。发布校验继续拒绝失败报告。该分支已本地测试，未额外注入云上失败。
+本次保留严格审核问句／有限别名，未识别问法仍可能拒绝。AI经历主题只带相关原文与项目归属，当前6943→773码点；其他主题仍全文，资料版本未变。AI三段表达、原语言／来源／经历限制检查和安全失败报告保留；不保证所有未来模型措辞，其他主题的个人项目状态仍需后续同步资料快照。
 
-STG27通过8项HTTP、三语拒绝（零模型tokens）、三语AI回答语言／来源／经历限制检查，70秒后追加转职未知及团队30服务归属通过。另三次私有AI样本复核通过，未见旧的所有权免责声明或个人网站历史段。只是小样本，不保证所有未来措辞；其他主题中的个人项目状态仍需要后续资料维护。没有独立公网STG页面，浏览器到真实STG模型E2E未运行。
+历史：33ecac8的Green22英文回答检查失败，未切流；一次复现通过不能证明原句误报。78ac795修复候选通过STG27，但其c4801ece审批被拒绝；最终实际发布身份以本页76f04a8／530833d0为准。失败记录和此前代码／文档候选证据保留，不重试旧Green冒充新冷验收。
 
-按[项目约定](../AGENTS.md)“Production retains two AWS approval gates.”，本次停在第一关：
-
-1. 在[AWS流水线](https://ap-northeast-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/kongportfolio-candidate/view?region=ap-northeast-1)选择 **c4801ece…**，确认源码 **78ac795**。
-2. **ApproveProduction → ApproveGreenCreation → Review**：批准新Green发布、真实生产角色问答及冷启动检查；不会直接切流或发布网页。
-3. Green成功后仍停在 **ApproveTrafficShift / ApproveBlueGreenDeployment**，第二审批才授权生产切流和同候选网页发布。助手未执行审批，不复用已失败或Stopped的旧执行。
-
-新修复版STG与补查共8次生成，18,461输入／1,409输出tokens，按此前已核对单价估算$0.006478。另一次旧Green英文诊断5506入／260出；原失败Green3次生成未完整保留tokens，不能计成0。均未含税、CodeBuild／Lambda等费用，非账单。
-
-证据：ignored `.local/green-failure-20261115/`和`.local/green-repair-release-20261115/`。原始资料和回答不入Git，文档HEAD不替代本次固定源码78ac795。[当日命令与验证边界](aws-commands-20261115.md)
+证据：ignored `.local/accepted-repair-release-20261115/` 的四份同次报告和verification.json。资料／原始回答未入Git；只读复核没有模型生成、Terraform／IAM／S3资料更新、SNS或off/on。[当日命令与发布复核](aws-commands-20261115.md)

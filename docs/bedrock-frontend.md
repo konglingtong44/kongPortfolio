@@ -1,8 +1,10 @@
-# 个人问答前端（修复候选STG27已通过）
+# 个人问答前端（手动输入已发布生产23）
+
+2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。 下面准备／待审批描述保留为此前阶段记录，当前以[成功发布复核](bedrock-typed-release.md)为准。
 
 2026-11-15：该候选后续Green22英文回答检查失败，尚未发布输入框；生产仍为原版本20。主题证据及失败诊断修复已随78ac795通过STG27，待第一审批，见[当前进展](bedrock-typed-release.md)。
 
-生产基线：源码978a636、执行61bcc02c…已完成两道人审、CodeDeploy切流及S3／CloudFront发布；live20、网页release be998dc6…、health200／UP已只读核对。线上仍为下拉框版本。输入框和回答风格已随新源码33ecac8通过AWS构建及STG26，待第一审批、尚未更新生产；见[发布记录](bedrock-candidate-approval.md)。
+生产基线：源码978a636、执行61bcc02c…已完成两道人审、CodeDeploy切流及S3／CloudFront发布；live20、网页release be998dc6…、health200／UP已只读核对。这是此前下拉框版本的历史基线。输入框和回答风格已随新源码33ecac8通过AWS构建及STG26，待第一审批、尚未更新生产；见[发布记录](bedrock-candidate-approval.md)。
 
 验收：沿用现有入口及像素弹窗，日／中／英可手动输入、编辑并点击发送；示例仅填入；保留范围判断及等待／错误状态，打开不调用模型；保持手机滚动与嵌套弹窗操作。
 

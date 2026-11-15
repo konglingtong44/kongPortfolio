@@ -2,9 +2,9 @@
 
 持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
-在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已通过两道人审并随源码978a636发布，生产live20、网页release be998dc6…。
+在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 手动输入及主题证据修复已通过两道人审，生产live23、网页release96f5109b…，源码76f04a8。
 
-2026-11-15：输入框候选的Green22英文回答检查失败，生产仍20、网页未变。修复版78ac795已通过AWS构建和STG27，待第一审批；已加入AI主题证据选择和安全失败报告，见[当前候选进展](docs/bedrock-typed-release.md)，不通过直接重试跳过检查。
+2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。[完整发布记录](docs/bedrock-typed-release.md)。
 
 2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已在STG24／Green20完成小样本验收，生产现为20。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
@@ -12,13 +12,13 @@
 
 问答范围采用[严格白名单](docs/bedrock-scope.md)：17个审核主题、51个三语标准问句及有限别名；未识别的问题在Java中返回固定提示，不读取资料、不调用模型。三语拒绝和正常回答已在STG／Green验证；后续新源码仍需两道新审批。
 
-最新候选增量：[手动输入与回答界面](docs/bedrock-frontend.md)替换下拉框，示例可点击填入后编辑，点击提问才提交；空白／超限不发送，原有拒绝／限流／超时保留。前端76项、构建、后端58项及15组三语桌面／手机模拟检查通过。回答提示改为直接描述经历，不主动说明读取了哪些资料或追加未经询问的经历限制。**已随78ac795通过AWS构建及STG27：三语AI风格、范围拒绝、转职未知和团队贡献检查通过；生产尚未更新，待第一人审。实际样本仍有个人项目状态沿用旧资料的限制，见[本次验收](docs/bedrock-typed-release.md)。**
+最新已发布增量：[手动输入与回答界面](docs/bedrock-frontend.md)替换下拉框，示例可点击填入后编辑，点击提问才提交；空白／超限不发送，原有拒绝／限流／超时保留。前端76项、构建、后端58项及15组三语桌面／手机模拟检查通过。回答提示改为直接描述经历，不主动说明读取了哪些资料或追加未经询问的经历限制。**应用修复已随源码76f04a8发布至生产23：STG28、Green三语问答／拒绝及冷启动通过。其他主题的个人项目历史状态仍需后续资料维护，见[验收记录](docs/bedrock-typed-release.md)。**
 
 [公开入口检查](docs/bedrock-public-readiness.md)后，问答专用网关限流已部署，直连API和CloudFront均观察到429。规范路径修复已随978a636发布至生产20；后端58项、Lambda 5项、实际ZIP及Terraform 6项历史证据保留。
 
 [生产权限与参数](docs/bedrock-production-config.md)：指定Qwen／审核资料版本、1024输出tokens／15秒模型HTTP。配置准备未发布版本，后续由AWS流水线在第一人审后发布Green20；真实角色三语问答及冷启动检查通过，第二审批后已切至20。
 
-**最近发布：** 源码978a636／执行61bcc02c…已全部成功，CodeDeploy d-S2M745KFM完成18→20，网页release be998dc6…已发布；只读核对公开version与health通过。本次输入框修改仍需新一轮AWS构建、验收和两道人审，详见[发布记录](docs/bedrock-candidate-approval.md)。
+**最近发布：** 76f04a8／530833d0…全部成功，CodeDeploy d-UBZGH91GM完成20→23，同候选前端已上线；公开version／health和三语目录通过，冷问答8.16秒。见[发布记录](docs/bedrock-typed-release.md)。
 
 ## 环境与本地启动
 
