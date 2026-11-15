@@ -207,3 +207,31 @@ python .local/capture-semantic-locale-public-before.py
 公开基线读取首次按本地version字段commit取值报KeyError；核对线上固定结构为gitCommit后正确重读，只读无写入。公开version仍76f04a8／release96f5109b…、health200／UP。新独立目录semantic-locale-release-20261115预检仍live23／无权重、费用on、两道人审、无在途候选、资料及上限一致；旧semantic-release-20261115失败证据保留。
 
 修复后后端41项／Node守卫通过，6次本机SSO真实Qwen（技能／需求定义／未知动机中文、AI日中英）及现有风格检查通过；30,484输入／619输出，模型费估算$0.00888682，未含税／其他AWS费用，不是STG角色验收。回答私存semantic-locale-review-20261115；没有重测未改动的前端浏览器／容器，也未改职业事实、资料版本或模型权限。接下来提交此修复并走新候选，结果后补。
+
+## 语言修复新候选：STG通过、停在首审批
+
+提交`fix: enforce localized Q&A output and preserve staging failures`，源码b8ca8b0d3b655b41be9ac9ec3ad62cd1d56815f8，10文件经hooks及68提交全历史扫描推送。显式COMMIT_ID启动7e728e3d-42fb-4043-acf8-1c2f0b47c20f；本轮未重试旧失败STG29。源码b8ca8b0／执行7e728e3d-42fb-4043-acf8-1c2f0b47c20f通过AWS构建及STG30：8HTTP、三语回答／拒绝与4条自然问法／事实展示全部通过，正在第一审批。生产live23／无权重、公开76f04a8／release96f5109b…及health200／UP未变，费用state hash未变；没有新Green／切流／前端发布。
+
+```powershell
+git add -- $localePaths
+git commit -m 'fix: enforce localized Q&A output and preserve staging failures'
+git push origin feat/aws-serverless-ci
+python .local/semantic-locale-candidate-run.py start
+python .local/semantic-locale-candidate-run.py poll
+python .local/typed-build-status.py .local/semantic-locale-release-20261115
+python .local/semantic-locale-candidate-run.py report
+python .local/inspect-semantic-locale-candidate.py
+python .local/finish-semantic-staging-docs.py
+python .local/check_aws_docs.py
+git diff --check
+```
+
+SDK下载同次StagingReport并核对passed、策略semantic-v2、8HTTP／6范围＋4事实展示，所有10条modelInvoked=true且usage>0；STG30实际CodeSha256与报告backend SHA一致，固定execution／commit／release不能替换。release 4fa9c776bee0f3d26bb51c7db04c18a9e7ab6a380b09d81405cd1f5327db4693，backend ba8caf355735637b4dfb29cf0a5d7ef34303cd3e8d3fea22bb5c2b6dfbeddabc。prod alias版本／RevisionId／权重、LATEST配置／代码、已发布版本列表均与本轮预检一致；费用state字节hash未变，公开version与前置快照一致。未调用批准API或新增生产版本。
+
+本次STG10次Qwen 50,709输入／629输出，模型费估算$0.01435817，含3次语义拒绝；未含税／其他AWS费用、不是账单。首轮失败7次无usage不可纳入精确总计，本机语言6次另$0.00888682。未增加STG样本抽查或重复模型请求；三语语言／来源／职责提示及两种用户自然问法／未知动机／团队归属由既有发布检查验收，正文不进入报告或Git。
+
+前端78、后端41、Lambda5／ZIP由本轮AWS构建验证；未新测Docker镜像、浏览器到真实模型、iPhone真机或新生产角色／冷启动，后两项应在首审批后Green完成。安全失败报告只作本地Node测试，没有云端故障注入。私有证据semantic-locale-release-20261115，旧失败证据semantic-release-20261115保留。
+
+更新README／学习／log及范围、前端、Java、资料、架构、当前候选等文档；文档收尾不启动第三个候选、不改变固定源码b8ca8b0，用户outputs及私有资料／回答不暂存。接下来用户在AWS第一审批审核本次执行；Green成功后还有第二审批，助手不代批。
+
+文档收尾26份／169相对链接／29脚本引用及diff通过。仅暂存11份Markdown，`git commit -m 'docs: record semantic staging approval handoff'`、`git push origin feat/aws-serverless-ci`经hooks扫描；Source DetectChanges=false，不启动第三轮。提交后只读poll复核同次执行仍等首审批，源码固定b8ca8b0，不与文档HEAD混淆。

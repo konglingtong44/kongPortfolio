@@ -2700,3 +2700,7 @@ Green脚本异常时写安全passed=false报告，记录failedCheck／版本／�
 用户明确开始AWS下一步。验收为固定本次源码，经AWS构建及独立STG验证8HTTP、三语回答／拒绝及4条自然问法／事实展示，在第一审批前核对生产23和费用状态未变。semantic-candidate-run.py与独立semantic-release-20261115目录已准备，只读预检live23无权重、费用on、无在途候选、资料／上限一致和两道人审通过。拟hooks扫描后commit／push，显式COMMIT_ID只启动一次新候选；不代发审批结果。实际结果与命令见[当日记录](docs/aws-commands-20261115.md)。
 
 40文件源码163c270经hooks推送，c1a531aa显式启动，AWS构建78／41／5及ZIP通过。STG29通过8HTTP及三语回答／拒绝，在技能口语中文检查发现假名混入，管线Failed且未到审批／生产。原STG无失败报告，7次模型usage无法精确追溯，不记0。保持检查不放宽，补最终语言指令及不含正文的安全STG失败报告；后端41／Node守卫和本机6个实模／风格样本通过，30,484入／619出、模型费约$0.00888682。独立semantic-locale-release-20261115复查live23／费用on／无在途候选／两道人审，拟提交新修复候选。未重试旧版本取好结果、未改S3资料／权限／费用开关；命令与失败细节见当日记录。
+
+修复源码b8ca8b0d3b655b41be9ac9ec3ad62cd1d56815f8经hooks推送，执行7e728e3d-42fb-4043-acf8-1c2f0b47c20f的AWS构建78／41／5及ZIP通过。源码b8ca8b0／执行7e728e3d-42fb-4043-acf8-1c2f0b47c20f通过AWS构建及STG30：8HTTP、三语回答／拒绝与4条自然问法／事实展示全部通过，正在第一审批。生产live23／无权重、公开76f04a8／release96f5109b…及health200／UP未变，费用state hash未变；没有新Green／切流／前端发布。 同次release 4fa9c776bee0f3d26bb51c7db04c18a9e7ab6a380b09d81405cd1f5327db4693，STG10次50,709入／629出、模型费估算$0.01435817，旧失败7次usage未知不记0。两道人审保留，等待用户首审批，未新增生产角色／冷启动验收、切流或前端发布。
+
+文档收尾26份／169相对链接／29脚本引用和diff检查通过，明确只提交11份Markdown，经Gitleaks hooks推送；不启动新候选，b8ca8b0的现有执行停在第一审批。私有报告／配置及用户outputs未暂存。
