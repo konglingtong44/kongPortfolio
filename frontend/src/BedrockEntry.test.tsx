@@ -12,7 +12,7 @@ const settle = async () => { await act(async () => {}); };
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 async function open() {
-  fireEvent.click(screen.getByRole('button', { name: 'Open profile Q&A' }));
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button }));
   fireEvent.change(await screen.findByRole('textbox'), { target: { value: choices[0].message } });
 }
 
@@ -81,7 +81,7 @@ it('honors Retry-After, prevents submissions during cooldown, and never retries 
   const fetchMock = vi.fn().mockResolvedValueOnce(catalog()).mockResolvedValueOnce(reply({}, 429, { 'Retry-After': '60' })).mockResolvedValue(answer());
   vi.stubGlobal('fetch', fetchMock);
   render(<BedrockEntry locale="en"/>);
-  fireEvent.click(screen.getByRole('button', { name: 'Open profile Q&A' })); await settle();
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button })); await settle();
   fireEvent.change(screen.getByRole('textbox'), { target: { value: choices[0].message } });
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' })); await settle();
   expect(screen.getByRole('button', { name: 'Please wait 60 seconds' })).toBeDisabled();
@@ -101,7 +101,7 @@ it('aborts an unanswered generation at 32 seconds, shows timeout, and makes no r
   }));
   vi.stubGlobal('fetch', fetchMock);
   render(<BedrockEntry locale="en"/>);
-  fireEvent.click(screen.getByRole('button', { name: 'Open profile Q&A' })); await settle();
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button })); await settle();
   fireEvent.change(screen.getByRole('textbox'), { target: { value: choices[0].message } });
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
   await act(async () => vi.advanceTimersByTime(32000));
@@ -116,7 +116,7 @@ it('aborts on close, ignores late responses, restores focus, and keeps the paren
   vi.stubGlobal('fetch', fetchMock);
   const closeParent = vi.fn();
   render(<Modal title="About" kicker="Kong" closeLabel="Close about" onClose={closeParent}><BedrockEntry locale="en"/></Modal>);
-  const entry = screen.getByRole('button', { name: 'Open profile Q&A' }); entry.focus(); await open();
+  const entry = screen.getByRole('button', { name: qaCopy.en.button }); entry.focus(); await open();
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
   const signal = fetchMock.mock.calls[1][1].signal as AbortSignal;
   fireEvent(screen.getByRole('dialog', { name: 'Experience and projects' }), new Event('cancel', { bubbles: true }));
@@ -145,7 +145,7 @@ it.each([true, false])('shows preparation for %s legacy API fallback without a m
   const fetchMock = legacy ? vi.fn().mockResolvedValueOnce(reply({}, 404)).mockResolvedValueOnce(reply({ status: 'PREPARING' }))
     : vi.fn().mockResolvedValueOnce(reply({ enabled: false, questions: choices }));
   vi.stubGlobal('fetch', fetchMock); render(<BedrockEntry locale="en"/>);
-  fireEvent.click(screen.getByRole('button', { name: 'Open profile Q&A' }));
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button }));
   expect(await screen.findByText(/Q&A is being prepared/)).toBeInTheDocument();
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   if (legacy) expect(fetchMock.mock.calls[1][1]).not.toHaveProperty('body');
@@ -155,7 +155,7 @@ it.each([true, false])('shows preparation for %s legacy API fallback without a m
 it('can reload a malformed question catalog without calling the model', async () => {
   const fetchMock = vi.fn().mockResolvedValueOnce(reply({ enabled: true, questions: [] })).mockResolvedValueOnce(catalog());
   vi.stubGlobal('fetch', fetchMock); render(<BedrockEntry locale="en"/>);
-  fireEvent.click(screen.getByRole('button', { name: 'Open profile Q&A' }));
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button }));
   await screen.findByRole('alert'); fireEvent.click(screen.getByRole('button', { name: 'Reload questions' }));
   await screen.findByRole('textbox');
   expect(fetchMock.mock.calls.every(call => call[1]?.method !== 'POST')).toBe(true);

@@ -59,7 +59,7 @@ export const contracts = [
   { label: 'profile-zh', method: 'GET', path: '/api/profile', query: 'lang=zh', status: 200, marker: '软件工程师' },
   { label: 'profile-en', method: 'GET', path: '/api/profile', query: 'lang=en', status: 200, marker: 'Software engineer' },
   { label: 'bedrock-placeholder', method: 'POST', path: '/api/bedrock', status: 200, marker: 'PREPARING' },
-  { label: 'question-catalog', method: 'GET', path: '/api/bedrock/questions', query: 'language=ja', status: 200, marker: 'portfolio-scope-v1' },
+  { label: 'question-catalog', method: 'GET', path: '/api/bedrock/questions', query: 'language=ja', status: 200, marker: 'portfolio-semantic-v2' },
   { label: 'api-not-found', method: 'GET', path: '/api/not-a-route', status: 404 },
   { label: 'method-not-allowed', method: 'POST', path: '/api/profile', status: 405 },
 ];
@@ -77,6 +77,8 @@ export const bedrockContracts = [
 
 // Run in a later rate-limit window, before the first human approval is exposed.
 export const presentationContracts = [
+  { label: 'skills-colloquial-zh', kind: 'answer', language: 'zh', message: '你的技能是啥', markers: ['Java'] },
+  { label: 'requirements-typo-zh', kind: 'answer', language: 'zh', message: '你怎么做要件定义的的', markers: [] },
   { label: 'unknown-motivation-zh', kind: 'answer', language: 'zh', message: '你为什么考虑转职？', markers: [], minCharacters: 1, requiresUnconfirmed: true },
   { label: 'team-contribution-en', kind: 'answer', language: 'en', message: 'Did you deliver all 30 services alone', markers: ['team', '30'] },
 ].map(c => ({ ...c, method: 'POST', path: '/api/bedrock', status: 200, body: { message: c.message, language: c.language } }));
@@ -94,14 +96,14 @@ export function checkBedrockResponse(metadata, response, contract) {
   checkResponse(metadata, response, contract);
   const raw = response.isBase64Encoded ? Buffer.from(response.body, 'base64').toString('utf8') : response.body;
   const result = JSON.parse(raw);
-  assert.equal(result.policyVersion, 'portfolio-scope-v1');
+  assert.equal(result.policyVersion, 'portfolio-semantic-v2');
   assert.equal(typeof result.answer, 'string');
   if (contract.kind === 'refused') {
     assert.equal(result.status, 'REFUSED');
     assert.equal(result.code, 'OUT_OF_SCOPE');
-    assert.equal(result.modelInvoked, false);
-    assert.deepEqual(result.usage, { inputTokens: 0, outputTokens: 0 });
-    assert.equal(result.questions.length, 17);
+    assert.equal(result.modelInvoked, true);
+    assert.ok(result.usage.inputTokens > 0 && result.usage.outputTokens > 0);
+    assert.equal(result.questions.length, 18);
   } else {
     assert.equal(result.status, 'ANSWER');
     assert.equal(result.modelInvoked, true);

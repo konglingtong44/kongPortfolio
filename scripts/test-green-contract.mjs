@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bedrockContracts, contracts } from './staging-contract.mjs';
+import { bedrockContracts, contracts, presentationContracts } from './staging-contract.mjs';
 import { coldQaMetrics, greenFailureReport, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
 
 requireGreenTarget('kongportfolio-prod', '123456789012');
@@ -27,20 +27,29 @@ requireProductionConfig(enabled, account);
 for (const [key, bad] of [['BEDROCK_ENABLED', 'TRUE'], ['BEDROCK_FACTS_OWNER', '999999999999'], ['BEDROCK_FACTS_VERSION', 'null'], ['BEDROCK_FACTS_SHA256', 'wrong'], ['BEDROCK_MAX_OUTPUT_TOKENS', '2048'], ['BEDROCK_TIMEOUT_SECONDS', '20']]) {
   assert.throws(() => requireProductionConfig({ ...enabled, Environment: { Variables: { ...env, [key]: bad } } }, account));
 }
-const qaReport = { bedrock: { enabled: true, passed: true, policyVersion: 'portfolio-scope-v1', checks: bedrockContracts.map(c => ({ name: c.label, status: 'passed', kind: c.kind, modelInvoked: c.kind === 'answer', usage: c.kind === 'answer' ? { inputTokens: 100, outputTokens: 50 } : { inputTokens: 0, outputTokens: 0 } })) } };
+const qaReport = { bedrock: { enabled: true, passed: true, policyVersion: 'portfolio-semantic-v2', checks: bedrockContracts.map(c => ({ name: c.label, status: 'passed', kind: c.kind, modelInvoked: true, usage: { inputTokens: 100, outputTokens: 50 } })) } };
+qaReport.bedrock.presentationChecks = presentationContracts.map(c => ({ name: c.label, status: 'passed', kind: c.kind, modelInvoked: true, usage: { inputTokens: 100, outputTokens: 50 } }));
 const stgConfig = { Environment: { Variables: { ...env, BEDROCK_TIMEOUT_SECONDS: '20' } } };
 requireReviewedBedrockRelease(stgConfig, enabled, qaReport);
 assert.throws(() => requireReviewedBedrockRelease(stgConfig, enabled, { bedrock: { ...qaReport.bedrock, passed: false } }));
 assert.throws(() => requireReviewedBedrockRelease(stgConfig, { Environment: { Variables: { ...env, BEDROCK_FACTS_VERSION: 'unreviewed' } } }, qaReport));
 assert.throws(() => requireReviewedBedrockRelease(stgConfig, enabled, { bedrock: { ...qaReport.bedrock, checks: [] } }));
-const badRefusal = structuredClone(qaReport); badRefusal.bedrock.checks[0].usage.inputTokens = 1;
+const badRefusal = structuredClone(qaReport); badRefusal.bedrock.checks[0].usage.inputTokens = 0;
 assert.throws(() => requireReviewedBedrockRelease(stgConfig, enabled, badRefusal));
+for (const c of presentationContracts) {
+  const missingPresentation = structuredClone(qaReport);
+  missingPresentation.bedrock.presentationChecks = missingPresentation.bedrock.presentationChecks.filter(x => x.name !== c.label);
+  assert.throws(() => requireReviewedBedrockRelease(stgConfig, enabled, missingPresentation));
+  const failedPresentation = structuredClone(qaReport);
+  failedPresentation.bedrock.presentationChecks.find(x => x.name === c.label).status = 'failed';
+  assert.throws(() => requireReviewedBedrockRelease(stgConfig, enabled, failedPresentation));
+}
 const tail = text => ({ LogResult: Buffer.from(text).toString('base64') });
 assert.deepEqual(coldQaMetrics(tail('INIT_REPORT Init Duration: 999 ms\nREPORT RequestId: cold-qa\tDuration: 1500 ms\tBilled Duration: 5500 ms\tInit Duration: 4000 ms')), { coldStartObserved: true, initMs: 4000, durationMs: 1500, combinedMs: 5500 });
 assert.throws(() => coldQaMetrics(tail('REPORT RequestId: warm-qa\tDuration: 1000 ms')), /fresh Green cold/);
 assert.throws(() => coldQaMetrics(tail('REPORT RequestId: slow-qa\tDuration: 24000 ms\tInit Duration: 5000 ms')), /headroom/);
 console.log('Green guard checks passed: wrong target, existing traffic shift, changed live alias, missing approval and cross-run/candidate reports rejected. No AWS calls.');
-console.log('Production Q&A guards passed: pinned facts/limits, STG match, zero-token refusal evidence and real cold REPORT metrics required. No AWS calls.');
+console.log('Production Q&A guards passed: pinned facts/limits, STG match, semantic refusal usage evidence and real cold REPORT metrics required. No AWS calls.');
 const failed = greenFailureReport({ pipelineExecutionId:'run',gitCommit:'commit',releaseId:'release',backendSha256:'hash',stagingVersion:'26',greenVersion:'22',failedCheck:'answer-en',checks:[],bedrock:{enabled:true,checks:[],answer:'PRIVATE_BODY'},lastInvocation:{name:'answer-en',kind:'answer',modelInvoked:true,usage:{inputTokens:10,outputTokens:2},answer:'PRIVATE_BODY'} },new Error('PRIVATE_BODY'));
 assert.equal(failed.passed,false);assert.equal(failed.failedCheck,'answer-en');
 assert.deepEqual(failed.lastInvocation.usage,{inputTokens:10,outputTokens:2});

@@ -63,7 +63,7 @@ if (bedrock.enabled) {
     bedrock.checks.push(checkBedrockResponse(result.metadata, result.response, contract));
     console.log(`STG Bedrock passed: ${contract.label} (version ${version}; response text omitted)`);
   }
-  bedrock.policyVersion = 'portfolio-scope-v1';
+  bedrock.policyVersion = 'portfolio-semantic-v2';
   console.log('STG presentation checks: waiting for the next request allowance window.');
   await sleep(35_000);
   await sleep(35_000);

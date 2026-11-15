@@ -13,11 +13,11 @@ import { useTimelineDrag } from './useTimelineDrag';
 
 type Project = Profile['projects'][number];
 type Event = Profile['timeline'][number];
-const homeLabel = { ja: '自己紹介へ', zh: '返回简介', en: 'Back to intro' };
+export const homeLabel = { ja: '自己紹介へ', zh: '返回简介', en: 'Back to intro' };
 const thisProjectLabel = { ja: '本プロジェクト', zh: '本项目', en: 'This project' };
-const mobileHint = { ja: '左：上下に経歴 · 右：左右にプロジェクト · 上下で次の章へ', zh: '左侧上下看时间线 · 右侧左右换项目，上下滑动进入其他章节', en: 'Left: scroll timeline · Right: swipe projects · Swipe vertically for chapters' };
+export const mobileHint = { ja: '左：上下に経歴 · 右：左右にプロジェクト · 上下で次の章へ', zh: '左侧上下看时间线 · 右侧左右换项目，上下滑动进入其他章节', en: 'Left: scroll timeline · Right: swipe projects · Swipe vertically for chapters' };
 export type JourneyEntry = { title: string; period: string; description: string; project?: Project; event?: Event };
-const galleryCopy = {
+export const galleryCopy = {
   ja: { title: '経験とプロジェクト', hint: 'スクロールで一つずつ · 時間軸を選ぶと詳細へ', previous: '前のプロジェクト', next: '次のプロジェクト', open: 'プロジェクトを開く', label: '経験とプロジェクト一覧', career: 'これまでの経験', overview: '経歴・担当内容', skills: '技術スタックへ', timeline: '経歴の時間軸', team: '役割・チーム規模', tasks: '担当したこと', environment: '使用技術・環境', outcome: '成果・現在の状況' },
   zh: { title: '经历与项目', hint: '滚动翻看 · 点击左侧时间线前往详情', previous: '上一个项目', next: '下一个项目', open: '打开项目', label: '经历与项目列表', career: '个人经历', overview: '经历与职责', skills: '前往技术栈', timeline: '职业时间线', team: '角色与团队规模', tasks: '具体负责内容', environment: '技术栈与环境', outcome: '成果与当前状态' },
   en: { title: 'Experience & projects', hint: 'Scroll through · Select a timeline entry for details', previous: 'Previous project', next: 'Next project', open: 'Open project', label: 'Experience and projects', career: 'Career experience', overview: 'Experience & responsibilities', skills: 'View the toolkit', timeline: 'Career timeline', team: 'Role & team', tasks: 'Responsibilities', environment: 'Technologies & environment', outcome: 'Outcomes & current status' },

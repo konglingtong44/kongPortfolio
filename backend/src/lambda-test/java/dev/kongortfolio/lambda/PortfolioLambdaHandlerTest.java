@@ -67,8 +67,8 @@ class PortfolioLambdaHandlerTest {
         assertThat(response.path("statusCode").asInt()).isEqualTo(200);
         JsonNode json = mapper.readTree(body(response));
         assertThat(json.path("enabled").asBoolean()).isFalse();
-        assertThat(json.path("questions").size()).isEqualTo(17);
-        assertThat(json.path("policyVersion").asText()).isEqualTo("portfolio-scope-v1");
+        assertThat(json.path("questions").size()).isEqualTo(18);
+        assertThat(json.path("policyVersion").asText()).isEqualTo("portfolio-semantic-v2");
         assertThat(json.path("questions").get(0).path("message").asText()).contains("请介绍一下你自己");
     }
 

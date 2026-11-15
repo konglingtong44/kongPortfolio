@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { bedrockContracts, contracts } from './staging-contract.mjs';
+import { bedrockContracts, contracts, presentationContracts } from './staging-contract.mjs';
 
 export function greenFailureReport(context, error) {
   const metrics = c => ({ name: c.name, status: c.status, kind: c.kind, modelInvoked: c.modelInvoked,
@@ -57,15 +57,22 @@ export function requireReviewedBedrockRelease(stgConfig, prodConfig, report) {
   }
   assert.equal(report.bedrock?.enabled, true);
   assert.equal(report.bedrock?.passed, true);
-  assert.equal(report.bedrock?.policyVersion, 'portfolio-scope-v1');
+  assert.equal(report.bedrock?.policyVersion, 'portfolio-semantic-v2');
   assert.equal(report.bedrock?.checks?.length, bedrockContracts.length);
   for (const c of bedrockContracts) {
     const check = report.bedrock.checks.find(x => x.name === c.label);
     assert.equal(check?.status, 'passed', `Missing successful STG ${c.label}`);
     assert.equal(check.kind, c.kind);
-    assert.equal(check.modelInvoked, c.kind === 'answer');
-    if (c.kind === 'refused') assert.deepEqual(check.usage, { inputTokens: 0, outputTokens: 0 });
-    else assert.ok(check.usage?.inputTokens > 0 && check.usage?.outputTokens > 0 && check.usage.outputTokens <= Number(prod.BEDROCK_MAX_OUTPUT_TOKENS));
+    assert.equal(check.modelInvoked, true);
+    assert.ok(check.usage?.inputTokens > 0 && check.usage?.outputTokens > 0 && check.usage.outputTokens <= Number(prod.BEDROCK_MAX_OUTPUT_TOKENS));
+  }
+  assert.equal(report.bedrock?.presentationChecks?.length, presentationContracts.length);
+  for (const c of presentationContracts) {
+    const check = report.bedrock.presentationChecks.find(x => x.name === c.label);
+    assert.equal(check?.status, 'passed', `Missing successful STG ${c.label}`);
+    assert.equal(check.kind, c.kind);
+    assert.equal(check.modelInvoked, true);
+    assert.ok(check.usage?.inputTokens > 0 && check.usage?.outputTokens > 0 && check.usage.outputTokens <= Number(prod.BEDROCK_MAX_OUTPUT_TOKENS));
   }
 }
 

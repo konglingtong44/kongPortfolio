@@ -79,7 +79,7 @@ if (bedrock.enabled) {
     console.log(`Green Q&A passed: ${contract.label} (version ${version}; response text omitted)`);
   }
   bedrock.passed = true;
-  bedrock.policyVersion = 'portfolio-scope-v1';
+  bedrock.policyVersion = 'portfolio-semantic-v2';
 }
 for (const contract of contracts) {
   diagnostic.failedCheck = contract.label;

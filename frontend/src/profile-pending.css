@@ -1,0 +1,30 @@
+.pending-rail { min-width: 0; border-right: 1px solid #63814844; display: flex; flex-direction: column; justify-content: center; gap: 38px; padding: 15px; overflow: hidden; }
+.pending-rail > div { display: grid; gap: 12px; }
+.pending-rail span, .pending-card-top span, .pending-card-bottom span, .pending-skill span { display: block; height: 10px; background: #8c6a4320; }
+.pending-rail span:first-child { width: 55%; }
+.pending-viewport { display: flex; align-items: center; min-width: 0; height: 100%; padding: 10px 15px 14px; }
+.pending-card { width: 100%; max-width: 740px; height: min(440px, 100%); margin: auto; display: grid; grid-template-rows: 40px minmax(0, 1fr) 44px; border: 2px solid #8c6a43; background: #fff8ec; box-shadow: 4px 4px 0 #8c6a4344; }
+.pending-card-top, .pending-card-bottom { display: flex; gap: 15px; align-items: center; justify-content: space-between; padding: 12px 18px; }
+.pending-card-top { border-bottom: 1px solid #8c6a4338; }
+.pending-card-bottom { border-top: 1px solid #8c6a4338; }
+.pending-card-top span { width: 70px; }.pending-card-top span:last-child { width: 22px; }
+.pending-card-bottom span { width: 20%; }
+.pending-message { min-height: 0; padding: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 15px; }
+.pending-message .pixel-mark { width: 48px; height: 48px; color: #6d8b74; }
+.pending-message h3 { font-size: clamp(17px, 3vw, 23px); line-height: 1.6; }
+.pending-message p { font-size: 13px; line-height: 1.8; max-width: 350px; color: #716655; }
+.pending-progress { width: min(240px, 100%); height: 16px; border: 2px solid #8c6a43; background: #f4dfb4; padding: 2px; overflow: hidden; }
+.pending-progress > span { display: block; height: 100%; width: 8%; background: repeating-linear-gradient(90deg, #638148 0 10px, transparent 10px 13px); animation: pending-fill 15s cubic-bezier(.15,.6,.35,1) forwards, pending-pulse 2s 15s infinite; }
+.pending-controls { color: #638148; }
+.pending-skill { min-height: 175px; display: grid; align-content: center; gap: 18px; }
+.pending-skill span:nth-child(2) { width: 65%; }.pending-skill span:last-child { width: 85%; }
+@keyframes pending-fill { to { width: 90%; } }
+@keyframes pending-pulse { 50% { opacity: .45; } }
+@media (max-width: 700px), (max-width: 950px) and (hover: none) and (pointer: coarse) {
+  .pending-rail { padding: 8px; gap: 32px; }.pending-viewport { padding: 0 4px 5px; }
+  .pending-card { height: 100%; grid-template-rows: 34px minmax(0, 1fr) 34px; }
+  .pending-message { padding: 12px; gap: 10px; }.pending-message p { font-size: 11px; }
+  .pending-message .pixel-mark { width: 34px; height: 34px; }.pending-message .primary-button { padding: 10px; font-size: 11px; }
+  .pending-card-top, .pending-card-bottom { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .pending-progress > span { animation: none; width: 70%; } }

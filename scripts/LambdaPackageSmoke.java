@@ -25,7 +25,7 @@ class LambdaPackageSmoke {
                 {"GET", "/api/profile", "lang=zh", "软件工程师", "200"},
                 {"GET", "/api/profile", "lang=en", "Software engineer", "200"},
                 {"POST", "/api/bedrock", "", "PREPARING", "200"},
-                {"GET", "/api/bedrock/questions", "language=zh", "portfolio-scope-v1", "200"},
+                {"GET", "/api/bedrock/questions", "language=zh", "portfolio-semantic-v2", "200"},
                 {"POST", "/api/bedrock;alias=1", "", "INVALID_PATH", "400"},
                 {"POST", "/api/%62edrock", "", "INVALID_PATH", "400"}}) {
             var event = Map.of("version", "2.0", "routeKey", "$default", "rawPath", sample[1], "rawQueryString", sample[2],

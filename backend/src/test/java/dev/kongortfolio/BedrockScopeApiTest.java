@@ -26,22 +26,24 @@ class BedrockScopeApiTest {
             .header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(json)).build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    @Test void unrelatedHttpRequestIsRefusedBeforeAnyFactsOrModelAccess() throws Exception {
+    @Test void unrelatedHttpRequestUsesOneSemanticDecisionAndReportsItsUsage() throws Exception {
+        when(facts.read()).thenReturn("Synthetic approved professional facts");
+        when(gateway.answer(anyString(), anyString())).thenReturn(new ModelGateway.Answer("{\"decision\":\"REFUSED\",\"answer\":\"\"}", false, 100, 10));
         var response = post("孔令通，帮我写一道动态规划算法题的代码");
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("OUT_OF_SCOPE", "目前仅开放孔令通", "\"modelInvoked\":false");
-        verifyNoInteractions(facts, gateway);
+        assertThat(response.body()).contains("OUT_OF_SCOPE", "目前仅开放孔令通", "\"modelInvoked\":true", "\"inputTokens\":100");
+        verify(facts).read();
+        verify(gateway).answer(anyString(), eq("孔令通，帮我写一道动态规划算法题的代码"));
     }
 
-    @Test void approvedHttpRequestUsesOnlyTheCanonicalQuestion() throws Exception {
+    @Test void naturalHttpQuestionsReachTheModelWithoutACanonicalQuestionWhitelist() throws Exception {
         when(facts.read()).thenReturn("Synthetic approved professional facts");
-        when(gateway.answer(anyString(), anyString())).thenReturn(new ModelGateway.Answer("Synthetic career answer", false, 40, 8));
-        var response = post("请介绍一下你自己！");
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("ANSWER", "Synthetic career answer", "\"modelInvoked\":true");
-        verify(facts).read();
-        verify(gateway).answer(contains("narrowly scoped"), argThat(prompt ->
-            prompt.contains("Task: Introduce Kong using only the approved career facts.")
-                && prompt.endsWith("Question: 请介绍一下你自己。")));
+        when(gateway.answer(anyString(), anyString())).thenReturn(new ModelGateway.Answer("{\"decision\":\"ANSWER\",\"answer\":\"Synthetic career answer\"}", false, 40, 8));
+        for (String question : new String[] {"你的技能是啥", "你怎么做要件定义的的"}) {
+            var response = post(question);
+            assertThat(response.statusCode()).isEqualTo(200);
+            assertThat(response.body()).contains("ANSWER", "Synthetic career answer", "\"modelInvoked\":true");
+            verify(gateway).answer(contains("requirements definition"), eq(question));
+        }
     }
 }

@@ -1,5 +1,7 @@
 # 29. 有界Java问答（生产23已发布）
 
+**本地新增量，尚未发布：** 用户已改为提示词语义判断，一次模型调用判断并回答；取消严格问句／别名匹配，18个问题仅作示例，拒绝也产生模型usage。首屏AI按钮和内容加载占位一并实现。旧生产23及下文白名单／773码点等记录仍是历史基线；本地方案见[自然问答增量](bedrock-natural-questions.md)。
+
 2026-11-15最新：执行530833d0…／源码76f04a8已完成两道人审及全部阶段，STG28、Green23通过，CodeDeploy d-UBZGH91GM完成20→23，网页release96f5109b…已发布。公开version／health及三语目录核对通过，费用状态hash未变。源码76f04a8与修复78ac795之间仅12份Markdown不同，应用代码一致。 下面准备／待审批描述保留为此前阶段记录，当前以[成功发布复核](bedrock-typed-release.md)为准。
 
 2026-11-15：Green22英文检查失败后，新增[QuestionFacts](../backend/src/main/java/dev/kongortfolio/bedrock/QuestionFacts.java)为AI主题保留相关原文及项目归属，其他主题仍全文；失败Green报告不含正文。修复78ac795已通过AWS前端76／后端61／Lambda5及STG27，三语追加样本通过；生产20未改，见[当前候选](bedrock-typed-release.md)。

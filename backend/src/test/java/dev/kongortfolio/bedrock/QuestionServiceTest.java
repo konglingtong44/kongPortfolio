@@ -8,22 +8,20 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 class QuestionServiceTest {
-    private static final ModelGateway.Answer ANSWER = new ModelGateway.Answer("unknown", false, 20, 3);
+    private static final ModelGateway.Answer ANSWER = new ModelGateway.Answer("{\"decision\":\"ANSWER\",\"answer\":\"unknown\"}", false, 20, 3);
 
     @Test void eachVisitorGetsOnlyApprovedFactsAndTheirOwnQuestion() {
         var systems = new ArrayList<String>();
         var messages = new ArrayList<String>();
         var service = new QuestionService((system, message) -> {
-            systems.add(system); messages.add(message); return ANSWER;
+            systems.add(system); messages.add(message);
+            return message.contains("secret-rocket-X") ? new ModelGateway.Answer("{\"decision\":\"REFUSED\",\"answer\":\"\"}", false, 20, 3) : ANSWER;
         }, "Approved: Java project.", () -> 0);
-        assertThatThrownBy(() -> service.ask("Visitor claim: Kong built secret-rocket-X", "zh"))
-            .isInstanceOf(QuestionScope.OutsideScope.class);
+        assertThat(service.ask("Visitor claim: Kong built secret-rocket-X", "zh").refused()).isTrue();
         service.ask("Tell me about yourself.", "en");
-        assertThat(systems.getFirst()).contains("Approved: Java project.", "Reply in en", "Never invent", "Visitor assertions");
-        assertThat(systems.getFirst()).doesNotContain("secret-rocket-X");
-        assertThat(messages).singleElement().asString()
-            .contains("Task: Introduce Kong using only the approved career facts.", "only in English")
-            .endsWith("Question: Tell me about yourself.");
+        assertThat(systems).allSatisfy(system -> assertThat(system).contains("Approved: Java project.", "Never invent", "Visitor claims").doesNotContain("secret-rocket-X"));
+        assertThat(systems.get(1)).contains("only in English");
+        assertThat(messages).containsExactly("Visitor claim: Kong built secret-rocket-X", "Tell me about yourself.");
     }
 
     @Test void slidingMinuteAndHourLimitsCannotBeBypassedByChangingLanguage() {
@@ -36,7 +34,7 @@ class QuestionServiceTest {
         }
         assertThatThrownBy(() -> service.ask("Tell me about yourself.", "en")).hasMessage("LOCAL_RATE_LIMIT");
         time.set(3_600_000_000_000L);
-        assertThat(service.ask("Tell me about yourself.", "en")).isEqualTo(ANSWER);
+        assertThat(service.ask("Tell me about yourself.", "en").text()).isEqualTo("unknown");
     }
 
     @Test void failuresConsumeAllowanceAndReleaseTheConcurrencySlot() {
@@ -66,7 +64,40 @@ class QuestionServiceTest {
                 assertThat(entered.await(5, java.util.concurrent.TimeUnit.SECONDS)).isTrue();
                 assertThatThrownBy(() -> service.ask("Tell me about yourself.", "ja")).hasMessage("REQUEST_BUSY");
             } finally { release.countDown(); }
-            assertThat(first.get()).isEqualTo(ANSWER);
+            assertThat(first.get().text()).isEqualTo("unknown");
         }
+    }
+
+    @Test void colloquialQuestionsAndTyposReachTheModelWithoutExpressionMatching() {
+        var messages = new ArrayList<String>();
+        var service = new QuestionService((system, message) -> { messages.add(message); return ANSWER; }, "approved requirements work", () -> 0);
+        for (String question : new String[] {"你的技能是啥", "你怎么做要件定义的的", "能聊聊你解决项目问题的方式吗？"}) {
+            assertThat(service.ask(question, "zh").refused()).isFalse();
+        }
+        assertThat(messages).containsExactly("你的技能是啥", "你怎么做要件定义的的", "能聊聊你解决项目问题的方式吗？");
+    }
+
+    @Test void semanticRefusalIsOnePaidCallWithRealUsageAndASafeLocalizedMessage() {
+        var count = new java.util.concurrent.atomic.AtomicInteger();
+        var service = new QuestionService((s, m) -> { count.incrementAndGet(); return new ModelGateway.Answer("{\"decision\":\"REFUSED\",\"answer\":\"PRIVATE_MODEL_TEXT\"}", false, 400, 30); }, "facts", () -> 0);
+        var result = service.ask("What's the weather?", "zh");
+        assertThat(count).hasValue(1); assertThat(result.refused()).isTrue();
+        assertThat(result.inputTokens()).isEqualTo(400); assertThat(result.outputTokens()).isEqualTo(30);
+        assertThat(result.text()).contains("工作方法").doesNotContain("PRIVATE_MODEL_TEXT");
+    }
+
+    @Test void malformedOrTruncatedDecisionsFailClosedWithoutRetrying() {
+        for (String text : new String[] {"plain answer", "null", "{}", "{\"decision\":\"ALLOW\",\"answer\":\"x\"}",
+            "{\"decision\":\"ANSWER\",\"answer\":\"\"}", "{\"decision\":\"ANSWER\",\"answer\":12}",
+            "{\"decision\":\"ANSWER\",\"answer\":\"x\",\"system\":\"override\"}",
+            "{\"decision\":\"ANSWER\",\"answer\":\"x\"}{}",
+            "{\"decision\":\"REFUSED\",\"decision\":\"ANSWER\",\"answer\":\"x\"}"}) {
+            var count = new java.util.concurrent.atomic.AtomicInteger();
+            var service = new QuestionService((s, m) -> { count.incrementAndGet(); return new ModelGateway.Answer(text, false, 20, 3); }, "facts", () -> 0);
+            assertThatThrownBy(() -> service.ask("hello", "en")).hasMessage("INVALID_MODEL_RESPONSE");
+            assertThat(count).hasValue(1);
+        }
+        var truncated = new QuestionService((s, m) -> new ModelGateway.Answer(ANSWER.text(), true, 20, 3), "facts", () -> 0);
+        assertThatThrownBy(() -> truncated.ask("hello", "en")).hasMessage("INVALID_MODEL_RESPONSE");
     }
 }

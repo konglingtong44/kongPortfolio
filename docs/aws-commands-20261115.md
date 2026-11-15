@@ -81,3 +81,88 @@ STG28，Green23，live23无权重；backend SHA-256=22352c625e146eb0de42060fb66b
 同步当前发布文档，保留旧失败与拒绝执行历史。后续资料维护应更新其他主题的个人项目状态；本轮不修改职业事实或S3资料版本。文档提交不会自动启动候选（Source DetectChanges=false），不复用旧审批。
 
 最终24份文档／153相对链接／28脚本引用及diff检查通过。文档命令：`git add -- AWS_EXECUTION_LOG.md AWS_LEARNING_GUIDE.md README.md docs`，`git commit -m 'docs: record accepted production23 release and execution identity'`，`git push origin feat/aws-serverless-ci`。仅12份文档，经hooks扫描，不重新部署或生成模型回答；私有报告／配置与用户outputs未暂存。
+
+## 首屏AI／内容占位／自然提问：本地Story
+
+用户授权将表达式白名单替换为一次提示词语义判断。先读取AGENTS及现有App／Gallery／问答、测试、STG／Green守卫、已批准私有资料与发布／学习文档，git status初始只有用户outputs未跟踪。无子代理。实现与验收范围见[本地增量](bedrock-natural-questions.md)。
+
+修改：新增ProfilePending及CSS；App保留加载／失败时的正式外框和技术栈占位，超时8→20秒，10秒慢提示、15秒接近末端的非定量进度，失败手动重试。首屏增加单个三语AI按钮，去掉工具区about嵌套入口。QuestionScope成为18项示例目录；QuestionService传访客原文，单次Qwen返回严格JSON，Java检查两字符串字段、决定、尾随／重复内容、空答案、截断及usage，坏响应502不重试。拒绝附真实tokens，日志只记录决定与策略。原输入／限流／超时保护保留。所有问句使用职业事实并排除旧政策、过期Q&A未公开备注和未经询问的责任注释；S3对象／版本／SHA／权限不变。STG补技能口语及要件定义笔误样本，语义拒绝验收不再认零tokens，生产两道人审保留。
+
+工具／命令（PowerShell，helper与真实回答留ignored .local）：
+
+```powershell
+git status --short
+rg --files frontend/src
+rg -n 'gallery-pin|gallery-body|gallery-controls' frontend/src/mobile.css frontend/src/intro.css
+. ./scripts/tools.ps1
+python .local/app-loading-hero-edit.py
+python .local/make-semantic-catalog.py
+python .local/semantic-service-edit.py
+python .local/semantic-ci-edit.py
+npm --prefix frontend test
+npm --prefix frontend run build
+node scripts/package-frontend.mjs
+mvn.cmd -f backend/pom.xml test dependency:build-classpath '-Dmdep.outputFile=D:/study/kongPortfolio/.local/semantic-classpath.txt' -B -ntp
+mvn.cmd -f backend/pom.xml test -B -ntp
+mvn.cmd -f backend/pom.xml -Plambda clean verify -B -ntp
+node scripts/test-lambda-package.mjs
+node --check scripts/verify-staging.mjs
+node --check scripts/verify-green.mjs
+node scripts/test-staging-contract.mjs
+node scripts/test-green-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
+npm --prefix frontend run dev
+node .local/semantic-ui-browser.mjs
+node .local/semantic-error-browser.mjs
+& 'D:\software\AWSCLI\aws.exe' sts get-caller-identity --profile kong-dev --query '{Account:Account}' --output json
+$env:AWS_PROFILE='kong-dev'
+$env:AWS_REGION='ap-northeast-1'
+$semanticCp = 'backend/target/classes;' + (Get-Content .local/semantic-classpath.txt -Raw).Trim()
+javac -encoding UTF-8 -cp $semanticCp -d .local .local/SemanticModelSmoke.java
+java -cp ($semanticCp + ';.local') dev.kongortfolio.bedrock.SemanticModelSmoke
+java -cp ($semanticCp + ';.local') dev.kongortfolio.bedrock.SemanticModelSmoke .local/semantic-review-20261115/final
+java -cp ($semanticCp + ';.local') dev.kongortfolio.bedrock.SemanticModelSmoke .local/semantic-review-20261115/verified
+node .local/review-semantic-results.mjs
+python .local/write-semantic-docs.py
+python .local/finish-semantic-docs.py
+```
+
+所有后续小修使用apply_patch：共享Gallery标题／提示／控制区使加载前后尺寸一致；更新Lambda目录18项断言；严格JSON重复字段检查；语义提示修正和过期备注过滤；输入示例、HTTP／隔离／usage／错误保护测试。helpers不是可反复执行的部署脚本；实模helper校验资料hash并拒绝重放已存在的报告。每轮超过6次时等待65秒换窗口，无自动重试、无并行调用。
+
+遇到的问题与修复：首次Maven未给-D属性加引号被PowerShell拆解，报`.outputFile=D`插件不存在，正确引用后通过。Lambda专用测试仍期待17项，改为18／semantic-v2后通过。浏览器先发现手机加载／正式高度差22px、WebKit英文控制区差约10px，补齐同样的标题提示及控制结构后15组通过。错误场景初始被开发StrictMode双挂载的第二次成功fixture覆盖；fixture改为点击重试前全部503，再允许恢复，6组通过，不当成产品自动重试漏洞。
+
+实模第一轮9次，转职动机被错误REFUSED；增强“缺少事实仍ANSWER且未确认”。第二轮12次决定／结构通过，但人工复核发现需求回答推测Jira／Confluence用途、非功能流程，AI经历复述旧未公开备注，未知答案还提来源。未把该轮标为最终质量通过：保留原样本，增强具体项目证据／不推测工具用途／直接未知说明，固定排除过期备注，再测试最终源码。最终12次全部按预期：技能口语、要件定义笔误、日英具体做法、天气、夹带快排、记忆新技能、再次技能、转职未知及三语AI经历；9条ANSWER沿用发布风格检查通过。人工复核最终要件动作可在审核原文找到依据、未知动机直接未确认、未复述旧未公开或职责免责声明，后续未采用secret-rocket-X。模型仍可能误判／幻觉，不保证全部未来问句。
+
+最终前端78项／构建及静态制品、后端41项、Lambda5项／ZIP 38.6MiB实际运行、Node STG／Green／部署／前端守卫通过。后端测试由原61→41主要因为取消问句完整匹配及19种确定性拒绝参数用例；新的传递／单次调用／结构失败／usage／限流／隔离／日志保护测试和实模样本分别验证，不能宣称仍有硬白名单的确定性语义保证。浏览器Chrome1366×900／390×844／320×568，WebKit390×844／844×390三语15组通过，加载前后章节及主体区域高度差不超过2px；Chrome／WebKit320×568三语错误与手动恢复另6组高度一致。查看桌面及WebKit手机首屏、占位和错误截图。不是iPhone真机、浏览器到真实模型或新Lambda生产角色验收。
+
+实模证据`.local/semantic-review-20261115/{model-report.json,final/,verified/,summary.json}`；各轮9／12／12次，输入43,812／59,298／60,162，输出663／1,020／1,036，共33次163,272输入／2,719输出。复用当日官方东京价格精确Mantle Standard核对，输入$0.27／百万、输出$1.06／百万，模型费估算$0.04696558，失败样本也计入；不含税和其他服务、非账单。最终每次输入约5,007～5,021、输出10～183，仅本组样本；长问题及后续补资料会增加。没有知识库／向量／Embedding／Guardrail／第二次分类调用费。
+
+AWS只读STS确认账号，模型经现有Mantle端点、本机SSO真实调用；无新资源、资料上传、IAM／Terraform、SNS／费用off/on、管线启动、审批或生产部署。本轮代码未发布，线上基线仍76f04a8／live23。学习、log、README、范围／前端／Java／资料／架构／发布及手机文档已标本地新策略与历史生产的差别。私有资料／回答／.local及用户outputs不入Git，待本轮评审后再进入新AWS候选。
+
+收尾追加Green守卫：同次STG必须包含技能口语、要件定义笔误、未知转职动机及团队贡献四条presentationChecks，逐条成功且有真实usage；缺少或失败的任意一条均拒绝发布。Node守卫及部署／前端回归通过，不新增模型调用。补充DESIGN_NOTES首屏／占位当前说明。
+
+```powershell
+python .local/check_aws_docs.py
+node .githooks/check-staged-paths.mjs --all
+git -c core.safecrlf=false diff --check
+& 'D:\software\Gitleaks\gitleaks.exe' dir --redact --no-banner .
+```
+
+当前文档链接／脚本路径、私有跟踪路径、diff及Gitleaks通过，无泄漏。浏览器模拟完成后通过Get-NetTCPConnection获取5173所属PID，再用Get-CimInstance确认命令行同时属于本仓库frontend与vite，仅Stop-Process结束本轮启动的Vite PID34388；未停用户其他服务。没有commit／push，保留工作区供评审。
+
+## 自然问答候选：启动预检
+
+用户明确“开始”，授权进入AWS现有候选流程。新建ignored helper semantic-candidate-run.py与独立semantic-release-20261115目录，保留旧发布身份／失败证据。SDK只读预检STS账号、成本state、管线和动作定义、prod live／LATEST／版本及STG配置：live23无权重、无在途候选、费用on、相同资料pin及输出1024、prod模型HTTP15／STG20秒、两道人审、Source分支与DetectChanges=false均符合。新helper报告核对四条presentationChecks、同次commit／execution／实际不可变版本hash、生产与费用快照不变；不发审批结果。
+
+```powershell
+git status --short
+git branch --show-current
+git log -3 --oneline
+git config --get core.hooksPath
+python .local/prepare-semantic-candidate.py
+python .local/semantic-candidate-run.py preflight
+git -c core.safecrlf=false diff --check
+```
+
+接下来明确暂存本Story已审阅的已跟踪改动与三个新文件，经过hooks扫描后commit／push；显式COMMIT_ID启动一次候选。AWS构建、STG及第一审批交接结果后补，不沿用旧审批或自动部署生产。用户outputs与私有资料／回答不暂存。

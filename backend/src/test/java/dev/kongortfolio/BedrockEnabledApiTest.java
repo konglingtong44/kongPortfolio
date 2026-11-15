@@ -77,12 +77,12 @@ class BedrockEnabledApiTest {
         assertThat(timeout.body()).contains("MODEL_TIMEOUT").doesNotContain("stackTrace");
     }
 
-    @Test void scopeRefusalIsLocalizedAndReportsNoModelTokens(CapturedOutput output) throws Exception {
+    @Test void semanticRefusalIsLocalizedAndReportsActualModelTokens(CapturedOutput output) throws Exception {
         String message = "synthetic-unrelated-private-input";
-        when(service.ask(message, "zh")).thenThrow(new QuestionScope.OutsideScope("zh"));
+        when(service.ask(message, "zh")).thenReturn(new ModelGateway.Answer(QuestionScope.refusal("zh"), false, 100, 8, true));
         var response = post("application/json", "{\"message\":\"" + message + "\",\"language\":\"zh\"}");
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("REFUSED", "OUT_OF_SCOPE", "目前仅开放孔令通", "\"modelInvoked\":false", "\"inputTokens\":0", "\"outputTokens\":0");
+        assertThat(response.body()).contains("REFUSED", "OUT_OF_SCOPE", "目前仅开放孔令通", "\"modelInvoked\":true", "\"inputTokens\":100", "\"outputTokens\":8");
         assertThat(response.headers().firstValue("cache-control")).contains("no-store");
         assertThat(output.getAll()).doesNotContain(message);
     }
@@ -91,7 +91,7 @@ class BedrockEnabledApiTest {
         var response = HttpClient.newHttpClient().send(HttpRequest.newBuilder(
             URI.create("http://127.0.0.1:" + port + "/api/bedrock/questions?language=zh")).build(), HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.body()).contains("portfolio-scope-v1", "请介绍一下你自己");
+        assertThat(response.body()).contains("portfolio-semantic-v2", "请介绍一下你自己", "需求定义");
         assertThat(response.headers().firstValue("cache-control")).contains("no-store");
         verifyNoInteractions(service);
     }

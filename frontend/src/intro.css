@@ -9,6 +9,9 @@
 .intro-layout .home-copy .greeting { margin-bottom: 17px; }
 .intro-layout .hero-role { margin-top: 20px; }
 .intro-layout .hero-intro { margin: 22px 0 28px; max-width: 480px; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.hero-actions .bedrock-button { margin: 0; background: #fff8ec; color: #526b58; border-color: #8c6a43; box-shadow: 3px 3px 0 #8c6a43; }
+.hero-actions .bedrock-button:hover { background: #e8eddf; }
 .intro-timeline {
   min-width: 0;
   background: #fff4d6;

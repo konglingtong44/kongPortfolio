@@ -3,6 +3,7 @@ import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import App from './App';
 import { localeKey } from './i18n';
 import { mobileLayoutQuery } from './useMobileLayout';
+import { qaCopy } from './bedrock-copy';
 
 const profile = {
   name: 'Kong', role: 'Software engineer', introduction: 'A profile from the API.',
@@ -19,7 +20,55 @@ const profile = {
 const ok = (value = profile) => ({ ok: true, json: async () => value } as Response);
 
 beforeEach(() => { localStorage.clear(); localStorage.setItem(localeKey, 'en'); });
-afterEach(() => { vi.unstubAllGlobals(); });
+afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
+
+it('keeps the project shell and anchors while loading, and opens AI from the hero without generating', async () => {
+  let finish: (value: Response) => void = () => {};
+  const fetchMock = vi.fn().mockImplementation((url: string) => url.startsWith('/api/profile')
+    ? new Promise<Response>(resolve => { finish = resolve; })
+    : Promise.resolve(new Response(JSON.stringify({ enabled: true, questions: [{ id: 'skills', message: 'What are your skills?' }] }))));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<App/>);
+  const pending = document.getElementById('projects')!;
+  expect(pending).toHaveClass('project-gallery', 'chapter-screen');
+  expect(pending).toHaveAttribute('aria-busy', 'true');
+  expect(pending.querySelector('.gallery-body')).not.toBeNull();
+  expect(document.getElementById('journey')).not.toBeNull();
+  expect(document.getElementById('skills')).toHaveAttribute('aria-busy', 'true');
+  expect(screen.getByRole('progressbar')).not.toHaveAttribute('aria-valuenow');
+  const ai = screen.getByRole('button', { name: qaCopy.en.button });
+  expect(ai.closest('#introduction')).not.toBeNull();
+  ai.focus(); fireEvent.click(ai);
+  expect(await screen.findByRole('textbox')).toHaveValue('');
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+  expect(fetchMock.mock.calls.every(([, init]) => !init?.method || init.method === 'GET')).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+  expect(ai).toHaveFocus();
+  await act(async () => { finish(ok()); });
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  expect(document.getElementById('projects')).toHaveClass('project-gallery', 'chapter-screen');
+  expect(screen.getByRole('heading', { name: 'My blog' })).toBeInTheDocument();
+});
+
+it('changes the slow-loading notice, times out at 20 seconds and waits for an explicit retry', async () => {
+  vi.useFakeTimers();
+  const fetchMock = vi.fn().mockImplementationOnce((_url, init: RequestInit) => new Promise((_resolve, reject) => {
+    init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+  })).mockResolvedValue(ok());
+  vi.stubGlobal('fetch', fetchMock);
+  render(<App/>);
+  await act(async () => { await vi.advanceTimersByTimeAsync(10000); });
+  expect(screen.getByRole('status')).toHaveTextContent('taking a little longer');
+  await act(async () => { await vi.advanceTimersByTimeAsync(10000); });
+  expect(screen.getByRole('alert')).toHaveTextContent('could not be loaded');
+  expect(document.getElementById('projects')).toHaveClass('project-gallery');
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  await act(async () => { await vi.advanceTimersByTimeAsync(30000); });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  await act(async () => { fireEvent.click(screen.getByRole('button', { name: /Try again/ })); });
+  expect(screen.getByRole('heading', { name: 'My blog' })).toBeInTheDocument();
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+});
 
 it('renders API content, changes language and remembers the choice on reload', async () => {
   const fetchMock = vi.fn().mockResolvedValue(ok());
@@ -56,10 +105,10 @@ it('shows an error for an unavailable backend and recovers after retry', async (
   render(<App />);
   expect(await screen.findByRole('alert')).toHaveTextContent('could not be loaded');
   expect(screen.queryByText(profile.introduction)).not.toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /03 \/ NOTES/ })).toBeDisabled();
+  expect(screen.getByRole('button', { name: /02 \/ NOTES/ })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: /Try again/ }));
   expect(await screen.findByText(profile.introduction)).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /03 \/ NOTES/ })).toBeEnabled();
+  expect(screen.getByRole('button', { name: /02 \/ NOTES/ })).toBeEnabled();
 });
 
 it('rejects malformed API data', async () => {
@@ -111,7 +160,7 @@ it('opens a dedicated project card with its contribution, and retains developmen
   expect(screen.getByText('The team rolled out changes to 30+ services.')).toBeVisible();
   fireEvent.click(screen.getByRole('button', { name: 'Close' }));
   expect(projectButton).toHaveFocus();
-  fireEvent.click(screen.getByRole('button', { name: /03 \/ NOTES/ }));
+  fireEvent.click(screen.getByRole('button', { name: /02 \/ NOTES/ }));
   expect(screen.getByRole('dialog', { name: 'Development notes' })).toHaveAttribute('open');
   expect(screen.getByText('A real development note.')).toBeVisible();
   for (const anchor of document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')) {
@@ -128,15 +177,11 @@ it('opens each module, restores focus and handles the side navigation', async ()
   expect(nav).toHaveAttribute('aria-expanded', 'true');
   fireEvent.keyDown(nav, { key: 'Escape' });
   expect(nav).toHaveAttribute('aria-expanded', 'false');
-  for (const [module, heading] of [['REGEX', 'See the expression.'], ['ABOUT', 'A little more about me.'], ['NOTES', 'Development notes']]) {
+  for (const [module, heading] of [['REGEX', 'See the expression.'], ['NOTES', 'Development notes']]) {
     const button = screen.getByRole('button', { name: new RegExp(module) });
     button.focus(); fireEvent.click(button);
     expect(screen.getByRole('dialog', { name: heading })).toHaveAttribute('open');
     if (module === 'REGEX') expect(screen.getByLabelText(/Regular expression/)).toHaveValue('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$');
-    if (module === 'ABOUT') {
-      expect(screen.getByText(/using reviewed materials/)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Open profile Q&A' })).toBeInTheDocument();
-    }
     if (module === 'NOTES') expect(screen.getByText('A real development note.')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

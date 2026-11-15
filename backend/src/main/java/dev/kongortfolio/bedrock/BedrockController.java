@@ -56,13 +56,15 @@ public class BedrockController {
         } catch (RuntimeException malformed) { return error(400, "INVALID_INPUT"); }
         try {
             var answer = service.ask(message, language);
+            if (answer.refused()) {
+                return ResponseEntity.ok(Map.of("status", "REFUSED", "code", "OUT_OF_SCOPE", "answer", answer.text(),
+                    "truncated", false, "policyVersion", QuestionScope.VERSION, "modelInvoked", true,
+                    "questions", QuestionScope.choices(language),
+                    "usage", Map.of("inputTokens", answer.inputTokens(), "outputTokens", answer.outputTokens())));
+            }
             return ResponseEntity.ok(Map.of("status", "ANSWER", "answer", answer.text(), "truncated", answer.truncated(),
                 "policyVersion", QuestionScope.VERSION, "modelInvoked", true,
                 "usage", Map.of("inputTokens", answer.inputTokens(), "outputTokens", answer.outputTokens())));
-        } catch (QuestionScope.OutsideScope refused) {
-            return ResponseEntity.ok(Map.of("status", "REFUSED", "code", "OUT_OF_SCOPE", "answer", refused.answer(),
-                "policyVersion", QuestionScope.VERSION, "modelInvoked", false, "questions", refused.questions(),
-                "usage", Map.of("inputTokens", 0, "outputTokens", 0)));
         } catch (ModelGateway.Failure failure) {
             return error(failure.status, failure.code);
         }

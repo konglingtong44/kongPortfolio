@@ -18,12 +18,12 @@ assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, statusCode
 assert.throws(() => checkResponse({ StatusCode: 200 }, { ...response, headers: {} }, contract), /cache/);
 assert.equal(apiEvent('GET', '/api/profile', 'lang=ja').rawQueryString, 'lang=ja');
 assert.equal(JSON.parse(apiEvent('POST', '/api/bedrock', '', { message: 'hello', language: 'en' }).body).message, 'hello');
-const refused={status:'REFUSED',code:'OUT_OF_SCOPE',answer:'范围提示',modelInvoked:false,policyVersion:'portfolio-scope-v1',usage:{inputTokens:0,outputTokens:0},questions:Array(17).fill({})};
+const refused={status:'REFUSED',code:'OUT_OF_SCOPE',answer:'范围提示',modelInvoked:true,policyVersion:'portfolio-semantic-v2',usage:{inputTokens:100,outputTokens:10},questions:Array(18).fill({})};
 const wrapped=body=>({statusCode:200,headers:{'cache-control':'no-store'},body:JSON.stringify(body)});
-assert.equal(checkBedrockResponse({StatusCode:200},wrapped(refused),bedrockContracts[0]).modelInvoked,false);
-assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...refused,modelInvoked:true}),bedrockContracts[0]));
+assert.equal(checkBedrockResponse({StatusCode:200},wrapped(refused),bedrockContracts[0]).modelInvoked,true);
+assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...refused,modelInvoked:false}),bedrockContracts[0]));
 assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...refused,usage:{inputTokens:1,outputTokens:0}}),bedrockContracts[0]));
-const answer={status:'ANSWER',answer:'AI関連の技術調査やPoCを支援しています。現在はBedrockや関連技術を学習しています。',modelInvoked:true,truncated:false,policyVersion:'portfolio-scope-v1',usage:{inputTokens:100,outputTokens:20}};
+const answer={status:'ANSWER',answer:'AI関連の技術調査やPoCを支援しています。現在はBedrockや関連技術を学習しています。',modelInvoked:true,truncated:false,policyVersion:'portfolio-semantic-v2',usage:{inputTokens:100,outputTokens:20}};
 checkBedrockResponse({StatusCode:200},wrapped(answer),bedrockContracts[3]);
 assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...answer,truncated:true}),bedrockContracts[3]));
 checkAnswerPresentation('参与AI技术调查与PoC验证，目前在学习Bedrock等技术。', 'zh', true);
@@ -33,6 +33,6 @@ assert.throws(()=>checkAnswerPresentation('根据提供的资料，他正在学�
 assert.throws(()=>checkAnswerPresentation('目前学习Bedrock，但未独立负责生产AI服务。', 'zh', true), /disclaimer/);
 assert.throws(()=>checkAnswerPresentation('Kong studies Bedrock. There is no indication of sole ownership of production AI systems.', 'en', true), /disclaimer/);
 assert.throws(()=>checkAnswerPresentation('AIを調査しています。本番の単独運用責任は区別しています。', 'ja', true), /disclaimer/);
-checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'这一点尚未确认。'}),presentationContracts[0]);
-assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'为了涨薪。'}),presentationContracts[0]), /unconfirmed/);
+checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'这一点尚未确认。'}),presentationContracts[2]);
+assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'为了涨薪。'}),presentationContracts[2]), /unconfirmed/);
 console.log('STG contract checks passed: production target blocked, immutable version selection, checksum/runtime/HTTP/cache failures rejected. No AWS calls.');

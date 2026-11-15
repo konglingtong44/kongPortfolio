@@ -1,5 +1,7 @@
 # Design notes — S1-01H
 
+2026-11-15 local increment: the hero now pairs its project link with a single localized AI button. Loading and failure states retain the experience/project shell and matching dimensions, with an indeterminate pixel progress bar and explicit retry. No new artwork. Desktop/mobile simulation evidence and deployment limits: [natural Q&A increment](docs/bedrock-natural-questions.md). Historical layout notes below predate this change.
+
 Current scene: [original discovery garden provenance and prompt](docs/original-scene.md). It supersedes the historical farm reference below; the farm file is no longer publicly served.
 
 References: [Stardew Valley official media](https://www.stardewvalley.net/media/) and the earlier [Taste Skill](https://github.com/leonxlnx/taste-skill/blob/main/skills/taste-skill/SKILL.md). The user's latest direction replaces the diagonal shelf with a full-screen horizontal career/project chapter and requests one-item wheel steps. Supplied interaction and pixel-art direction override the skill's no-carousel, no-wheel-control, automatic palette and photography recipes. Its browser checker was not run.
