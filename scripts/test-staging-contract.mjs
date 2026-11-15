@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { apiEvent, bedrockContracts, checkAnswerPresentation, checkBedrockResponse, checkResponse, presentationContracts, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkAnswerPresentation, checkBedrockResponse, checkResponse, presentationContracts, requireStagingTarget, selectVersion, stagingFailureReport } from './staging-contract.mjs';
 
 assert.throws(() => requireStagingTarget('kongportfolio-prod', '123456789012'), /isolated STG/);
 requireStagingTarget('kongportfolio-stg', '123456789012');
@@ -36,3 +36,11 @@ assert.throws(()=>checkAnswerPresentation('AIを調査しています。本番�
 checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'这一点尚未确认。'}),presentationContracts[2]);
 assert.throws(()=>checkBedrockResponse({StatusCode:200},wrapped({...answer,answer:'为了涨薪。'}),presentationContracts[2]), /unconfirmed/);
 console.log('STG contract checks passed: production target blocked, immutable version selection, checksum/runtime/HTTP/cache failures rejected. No AWS calls.');
+const failureContext={pipelineExecutionId:'run',gitCommit:'commit',releaseId:'release',backendSha256:'hash',functionName:'kongportfolio-stg',functionVersion:'29',failedCheck:'skills-colloquial-zh',checks:[],bedrock:{enabled:true,checks:[],presentationChecks:[],answer:'PRIVATE_BODY'},lastInvocation:{name:'skills-colloquial-zh',kind:'answer',modelInvoked:true,usage:{inputTokens:5000,outputTokens:100},answer:'PRIVATE_BODY'}};
+const failed=stagingFailureReport(failureContext,new assert.AssertionError({message:'Chinese answer contains Japanese prose'}));
+assert.equal(failed.passed,false);assert.equal(failed.bedrock.passed,false);
+assert.equal(failed.failureReason,'Chinese answer contains Japanese prose');
+assert.deepEqual(failed.lastInvocation.usage,{inputTokens:5000,outputTokens:100});
+assert.ok(!JSON.stringify(failed).includes('PRIVATE_BODY'));
+assert.ok(!JSON.stringify(stagingFailureReport(failureContext,new Error('PRIVATE_BODY'))).includes('PRIVATE_BODY'));
+console.log('STG failures retain safe check/usage evidence without publishing question, answer or raw errors.');

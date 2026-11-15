@@ -4,7 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
-import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, presentationContracts, requireStagingConfig, requireStagingTarget, selectVersion } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, presentationContracts, requireStagingConfig, requireStagingTarget, selectVersion, stagingFailureReport } from './staging-contract.mjs';
 
 const region = 'ap-northeast-1';
 const functionName = process.env.STAGING_FUNCTION_NAME;
@@ -27,6 +27,12 @@ function aws(args) {
   return result.stdout.trim() ? JSON.parse(result.stdout) : {};
 }
 assert.equal(aws(['sts', 'get-caller-identity']).Account, account, 'AWS account mismatch');
+const checks = [];
+const bedrock = { enabled: false, checks: [], presentationChecks: [] };
+const diagnostic = { pipelineExecutionId: process.env.STAGING_PIPELINE_EXECUTION_ID, gitCommit: manifest.gitCommit,
+  releaseId: manifest.releaseId, backendSha256: manifest.backend.sha256, functionName,
+  failedCheck: 'publish-staging', checks, bedrock };
+try {
 const current = aws(['lambda', 'get-function-configuration', '--function-name', functionName]);
 requireStagingConfig(current, account);
 const existing = aws(['lambda', 'list-versions-by-function', '--function-name', functionName]).Versions;
@@ -41,7 +47,7 @@ const deployed = aws(['lambda', 'get-function-configuration', '--function-name',
 requireStagingConfig(deployed, account);
 assert.equal(deployed.Version, version, 'Lambda did not resolve the selected immutable version');
 assert.equal(deployed.CodeSha256, expectedHash, 'Published STG version differs from artifact');
-const checks = [];
+diagnostic.functionVersion = version;
 function invoke(contract) {
   const payload = join(workspace, `${contract.label}-event.json`);
   const response = join(workspace, `${contract.label}-response.json`);
@@ -51,26 +57,33 @@ function invoke(contract) {
   return { metadata, response: JSON.parse(readFileSync(response, 'utf8')) };
 }
 for (const contract of contracts) {
+  diagnostic.failedCheck = contract.label;
   const result = invoke(contract);
   checkResponse(result.metadata, result.response, contract);
   checks.push({ name: contract.label, status: 'passed', expectedHttpStatus: contract.status });
   console.log(`STG passed: ${contract.label} (published version ${version})`);
 }
-const bedrock = { enabled: deployed.Environment?.Variables?.BEDROCK_ENABLED === 'true', checks: [] };
+function checkedBedrock(contract) {
+  diagnostic.failedCheck = contract.label;
+  diagnostic.lastInvocation = { name: contract.label, kind: contract.kind };
+  const result = invoke(contract);
+  const response = JSON.parse(result.response.isBase64Encoded ? Buffer.from(result.response.body, 'base64').toString('utf8') : result.response.body);
+  diagnostic.lastInvocation = { name: contract.label, kind: contract.kind, modelInvoked: response.modelInvoked, usage: response.usage };
+  return checkBedrockResponse(result.metadata, result.response, contract);
+}
+bedrock.enabled = deployed.Environment?.Variables?.BEDROCK_ENABLED === 'true';
 if (bedrock.enabled) {
+  bedrock.policyVersion = 'portfolio-semantic-v2';
   for (const contract of bedrockContracts) {
-    const result = invoke(contract);
-    bedrock.checks.push(checkBedrockResponse(result.metadata, result.response, contract));
+    bedrock.checks.push(checkedBedrock(contract));
     console.log(`STG Bedrock passed: ${contract.label} (version ${version}; response text omitted)`);
   }
-  bedrock.policyVersion = 'portfolio-semantic-v2';
   console.log('STG presentation checks: waiting for the next request allowance window.');
   await sleep(35_000);
   await sleep(35_000);
   bedrock.presentationChecks = [];
   for (const contract of presentationContracts) {
-    const result = invoke(contract);
-    bedrock.presentationChecks.push(checkBedrockResponse(result.metadata, result.response, contract));
+    bedrock.presentationChecks.push(checkedBedrock(contract));
     console.log(`STG presentation passed: ${contract.label} (version ${version}; response text omitted)`);
   }
   bedrock.passed = true;
@@ -84,3 +97,9 @@ const report = {
 };
 writeFileSync(join(workspace, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(`STG verified: ${report.releaseId}; awaiting human production approval. No production change.`);
+} catch (error) {
+  const report = stagingFailureReport(diagnostic, error);
+  writeFileSync(join(workspace, 'report.json'), JSON.stringify(report, null, 2) + '\n');
+  console.error(`STG verification failed at ${diagnostic.failedCheck}: ${report.failureReason || report.errorType}; safe report written.`);
+  process.exitCode = 1;
+}

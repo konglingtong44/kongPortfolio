@@ -166,3 +166,44 @@ git -c core.safecrlf=false diff --check
 ```
 
 接下来明确暂存本Story已审阅的已跟踪改动与三个新文件，经过hooks扫描后commit／push；显式COMMIT_ID启动一次候选。AWS构建、STG及第一审批交接结果后补，不沿用旧审批或自动部署生产。用户outputs与私有资料／回答不暂存。
+
+## 首次AWS结果与中文语言修复
+
+明确暂存40文件，经staged及67提交全历史Gitleaks通过，提交163c270fdd4fff8ee741332b8b2bfb2c2933d56d并push。显式源码启动c1a531aa-2a2d-4815-8a44-37fe0432897f。candidate cb30b004-86b7-4ae4-8fb8-6a099212285f通过前端78、后端41、Lambda5、实际ZIP及Node守卫。STG b11e2b2a-7e09-47de-81f1-18ea6c5e160f发布29，8HTTP／三语语义拒绝／三语AI回答通过；70秒窗口后首条skills-colloquial-zh触发Chinese answer contains Japanese prose，VerifyStaging失败，后续未到审批／Green／生产。原脚本未在失败时写report，UPLOAD_ARTIFACTS也失败；这不是主要失败原因。7次模型请求已发生，但未留usage报告，不能算免费或给精确费用。
+
+未放宽假名检查，也未重复旧STG29直到得到好答案。增强zh最终指令为纯简体、不含平假名／片假名，将职称／业务术语译中文，英文字母技术名保留；日英有各自语言指令。STG增加passed=false安全报告，逐步保存check与usage，失败也能上传report，不含问题、回答、资料或原始错误；本地测试验证安全字段和失败值，未故意云端注入故障。旧失败正文未保存，不能精确指出当时哪一个假名词。
+
+```powershell
+. ./scripts/tools.ps1
+$storyPaths = @(git diff --name-only)
+$storyPaths += @('docs/bedrock-natural-questions.md','frontend/src/ProfilePending.tsx','frontend/src/profile-pending.css')
+git add -- $storyPaths
+node .githooks/check-staged-paths.mjs
+git diff --cached --check
+git commit -m 'feat: add natural portfolio Q&A and loading states'
+git push origin feat/aws-serverless-ci
+python .local/semantic-candidate-run.py start
+python .local/semantic-candidate-run.py poll
+python .local/typed-build-status.py .local/semantic-release-20261115
+python .local/prepare-semantic-inspection.py
+python .local/capture-semantic-public-before.py
+node --check scripts/verify-staging.mjs
+node scripts/test-staging-contract.mjs
+node scripts/test-green-contract.mjs
+node scripts/test-deployment.mjs
+node scripts/test-frontend-release.mjs
+mvn.cmd -f backend/pom.xml test -B -ntp
+$env:AWS_PROFILE='kong-dev'
+$env:AWS_REGION='ap-northeast-1'
+$localeCp = 'backend/target/classes;' + (Get-Content .local/semantic-classpath.txt -Raw).Trim()
+javac -encoding UTF-8 -cp $localeCp -d .local .local/SemanticLocaleSmoke.java
+java -cp ($localeCp + ';.local') dev.kongortfolio.bedrock.SemanticLocaleSmoke
+node .local/review-semantic-locale.mjs
+python .local/prepare-semantic-locale-run.py
+python .local/semantic-locale-candidate-run.py preflight
+python .local/capture-semantic-locale-public-before.py
+```
+
+公开基线读取首次按本地version字段commit取值报KeyError；核对线上固定结构为gitCommit后正确重读，只读无写入。公开version仍76f04a8／release96f5109b…、health200／UP。新独立目录semantic-locale-release-20261115预检仍live23／无权重、费用on、两道人审、无在途候选、资料及上限一致；旧semantic-release-20261115失败证据保留。
+
+修复后后端41项／Node守卫通过，6次本机SSO真实Qwen（技能／需求定义／未知动机中文、AI日中英）及现有风格检查通过；30,484输入／619输出，模型费估算$0.00888682，未含税／其他AWS费用，不是STG角色验收。回答私存semantic-locale-review-20261115；没有重测未改动的前端浏览器／容器，也未改职业事实、资料版本或模型权限。接下来提交此修复并走新候选，结果后补。

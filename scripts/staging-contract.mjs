@@ -1,5 +1,23 @@
 import assert from 'node:assert/strict';
 
+export function stagingFailureReport(context, error) {
+  const safeReasons = new Set(['Chinese answer contains Japanese prose', 'Japanese answer is missing Japanese prose',
+    'English answer has the wrong language', 'Answer discusses its source or review process',
+    'AI answer adds an unsolicited experience disclaimer', 'The bounded smoke answer must finish naturally',
+    'Unknown motivation must remain unconfirmed']);
+  const metrics = c => ({ name: c.name, status: c.status, kind: c.kind, modelInvoked: c.modelInvoked,
+    usage: c.usage && { inputTokens: c.usage.inputTokens, outputTokens: c.usage.outputTokens } });
+  return { schemaVersion: 1, kind: 'staging-verification', passed: false,
+    pipelineExecutionId: context.pipelineExecutionId, gitCommit: context.gitCommit, releaseId: context.releaseId,
+    backendSha256: context.backendSha256, functionName: context.functionName, functionVersion: context.functionVersion,
+    failedCheck: context.failedCheck, errorType: error instanceof assert.AssertionError ? 'AssertionError' : 'Error',
+    failureReason: safeReasons.has(error.message) ? error.message : undefined,
+    checks: context.checks.map(c => ({ name: c.name, status: c.status, expectedHttpStatus: c.expectedHttpStatus })),
+    bedrock: { enabled: context.bedrock.enabled, passed: false, policyVersion: context.bedrock.policyVersion,
+      checks: context.bedrock.checks.map(metrics), presentationChecks: context.bedrock.presentationChecks.map(metrics) },
+    lastInvocation: context.lastInvocation && metrics(context.lastInvocation) };
+}
+
 export function requireStagingTarget(name, account) {
   assert.equal(name, 'kongportfolio-stg', 'Only the isolated STG function may be changed');
   assert.match(account, /^[0-9]{12}$/);

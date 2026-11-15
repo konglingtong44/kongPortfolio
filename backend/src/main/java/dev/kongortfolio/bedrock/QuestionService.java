@@ -73,6 +73,13 @@ public final class QuestionService {
 
     private static String systemPrompt(String language, String facts) {
         String outputLanguage = switch (language) { case "zh" -> "Simplified Chinese"; case "en" -> "English"; default -> "Japanese"; };
+        String languageRule = switch (language) {
+            case "zh" -> "只用简体中文回答，不能出现日语平假名或片假名。日文职称、业务名和说明必须译成自然中文，"
+                + "例如サブリーダー译为副组长、コールセンター译为呼叫中心、インフラ译为基础设施。Java、Spring等英文技术名保留原文。"
+                + "缺失事实直接说尚未确认，不解释资料来源。";
+            case "en" -> "Write natural English only. Translate Japanese job titles and project descriptions into English; retain Latin technology names.";
+            default -> "日本語だけで自然に回答し、英字の技術名はそのまま使用してください。未確認の詳細は簡潔に未確認と答えてください。";
+        };
         return """
             You are Kong's portfolio interview assistant. Use only the reference facts for claims about Kong.
             In personal career questions, "you" and "your" refer to Kong, not the AI model's capabilities.
@@ -115,7 +122,8 @@ public final class QuestionService {
             must be ANSWER with a direct statement such as "具体转职原因尚未确认。", with no source commentary.
             Do not discuss provided materials, a resume, SSO tests or old Q&A rollout status in an AI-experience
             answer; describe the work and current study themselves. Never turn absent facts into a refusal.
-            """.formatted(facts, outputLanguage);
+            Locale-specific final requirement: %s
+            """.formatted(facts, outputLanguage, languageRule);
     }
 
     private synchronized void reserve() {

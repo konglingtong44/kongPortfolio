@@ -70,7 +70,10 @@ class QuestionServiceTest {
 
     @Test void colloquialQuestionsAndTyposReachTheModelWithoutExpressionMatching() {
         var messages = new ArrayList<String>();
-        var service = new QuestionService((system, message) -> { messages.add(message); return ANSWER; }, "approved requirements work", () -> 0);
+        var service = new QuestionService((system, message) -> {
+            assertThat(system).contains("不能出现日语平假名或片假名", "副组长", "呼叫中心");
+            messages.add(message); return ANSWER;
+        }, "approved requirements work", () -> 0);
         for (String question : new String[] {"你的技能是啥", "你怎么做要件定义的的", "能聊聊你解决项目问题的方式吗？"}) {
             assertThat(service.ask(question, "zh").refused()).isFalse();
         }
