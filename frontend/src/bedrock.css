@@ -1,31 +1,58 @@
 .bedrock-button { margin: 12px 0 20px; min-width: 140px; }
-.module-dialog.bedrock-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100svh - 32px); overflow-y: auto; overscroll-behavior: contain; background: #fff0cd; border: 4px solid #8c6a43; box-shadow: inset 0 0 0 3px #e6c48a, 6px 6px 0 #63391e; padding: clamp(18px, 5vw, 36px); }
-.bedrock-dialog h2 { font-size: clamp(22px, 5vw, 28px); line-height: 1.6; padding-right: 10px; }
-.module-dialog.bedrock-dialog .dialog-header { position: sticky; top: calc(-1 * clamp(18px, 5vw, 36px)); z-index: 5; background: #fff0cd; padding-block: 12px; }
-.bedrock-content { min-width: 0; line-height: 1.9; text-align: left; }
-.bedrock-dialog .bedrock-content p { font-size: 15px; line-height: 1.9; text-align: left; }
-.bedrock-art { margin-top: 16px; color: #6d8b74; }
-.bedrock-art .pixel-mark { width: 36px; height: 36px; }
-.bedrock-scope { margin: 16px 0 20px; }
-.bedrock-form { display: grid; gap: 12px; margin: 20px 0; }
-.bedrock-form label { font-weight: 700; }
-.bedrock-form textarea { display: block; width: 100%; min-width: 0; min-height: 112px; resize: vertical; font: inherit; font-size: 16px; line-height: 1.8; color: #392e27; background: #fffaf0; border: 2px solid #8c6a43; border-radius: 2px; padding: 10px; }
+.module-dialog.bedrock-dialog { width: min(680px, calc(100vw - 32px)); height: min(740px, calc(100svh - 32px)); height: min(740px, calc(100dvh - 32px)); max-height: calc(100dvh - 32px); overflow: hidden; background: #fff0cd; border: 4px solid #8c6a43; box-shadow: inset 0 0 0 3px #e6c48a, 6px 6px 0 #63391e; padding: clamp(16px, 3vw, 28px); }
+.module-dialog.bedrock-dialog[open] { display: grid; grid-template-columns: minmax(0, 1fr) 44px; grid-template-rows: auto minmax(0, 1fr); gap: 14px 12px; }
+.module-dialog.bedrock-dialog h2 { grid-row: 1; grid-column: 1; align-self: center; font-size: clamp(20px, 4.5vw, 26px); line-height: 1.5; padding: 0; margin: 0; }
+.module-dialog.bedrock-dialog .dialog-header { grid-row: 1; grid-column: 2; align-self: start; position: static; border: 0; padding: 0; margin: 0; }
+.bedrock-dialog .dialog-header > .eyebrow { display: none; }
+.bedrock-content { grid-row: 2; grid-column: 1 / -1; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 14px; text-align: left; }
+.bedrock-feed { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #8c6a43 transparent; padding: 4px 8px 4px 0; }
+.bedrock-dialog .bedrock-content p { font-size: 14px; line-height: 1.85; text-align: left; }
+.bedrock-welcome { padding: 20px 0 12px; }
+.bedrock-welcome h3 { font-size: clamp(19px, 4vw, 24px); line-height: 1.6; margin: 6px 0 12px; }
+.bedrock-scope { color: #765d47; }
+.bedrock-form { display: grid; flex-shrink: 0; gap: 8px; margin: 0; border-top: 2px solid #b3976d; padding-top: 14px; }
+.bedrock-composer-heading, .bedrock-compose-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.bedrock-form label { font-weight: 700; font-size: 13px; }
+.bedrock-form textarea { display: block; width: 100%; min-width: 0; min-height: 72px; max-height: 112px; resize: vertical; font: inherit; font-size: 16px; line-height: 1.6; color: #392e27; background: #fffaf0; border: 2px solid #8c6a43; border-radius: 2px; padding: 10px; }
 .bedrock-form textarea:focus-visible, .bedrock-examples summary:focus-visible { outline: 3px solid #8c6a43; outline-offset: 3px; }
 .bedrock-form textarea[aria-invalid=true] { border-color: #9c4e27; }
-.bedrock-dialog .bedrock-content .bedrock-input-help, .bedrock-dialog .bedrock-content .bedrock-count { font-size: 13px; color: #6e5945; }
-.bedrock-count { text-align: right !important; }
+.bedrock-dialog .bedrock-content .bedrock-input-help, .bedrock-dialog .bedrock-content .bedrock-count { font-size: 11px; color: #6e5945; margin: 0; }
+.bedrock-count { text-align: right !important; white-space: nowrap; }
+.bedrock-composer-heading .bedrock-warning { padding: 2px 6px; font-size: 11px; }
 .bedrock-examples { min-width: 0; }
 .bedrock-examples summary { cursor: pointer; padding-block: 10px; min-height: 44px; color: #765d47; }
 .bedrock-examples ul { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
 .bedrock-examples button { width: 100%; text-align: left; min-height: 44px; padding: 10px; font: inherit; font-size: 14px; background: #fffaf0; border: 1px solid #b3976d; overflow-wrap: anywhere; }
 .bedrock-examples button:hover { background: #f4dfb4; }
-.bedrock-form .primary-button { justify-self: start; min-height: 44px; max-width: 100%; white-space: normal; }
+.bedrock-form .primary-button { flex-shrink: 0; min-height: 44px; max-width: 62%; padding: 9px 14px; font-size: 12px; white-space: normal; }
 .bedrock-content button:disabled { opacity: .65; cursor: not-allowed; }
-.bedrock-progress, .bedrock-preparing { padding: 12px 16px; background: #f4dfb4; border-left: 3px solid #8c6a43; }
+.bedrock-preparing { padding: 12px 16px; background: #f4dfb4; border-left: 3px solid #8c6a43; }
+.bedrock-waiting { display: flex; flex-direction: column; justify-content: center; min-height: 100%; padding: 0 0 4px; }
+.bedrock-progress { padding: 12px; background: #fff8ec; border: 2px solid #b3976d; box-shadow: 3px 3px 0 #8c6a4333; }
+.bedrock-progress p { margin: 0 0 10px; }
+.bedrock-progress-track { height: 16px; border: 2px solid #8c6a43; background: #f4dfb4; padding: 2px; overflow: hidden; }
+.bedrock-progress-track > span { display: block; width: 8%; height: 100%; background: repeating-linear-gradient(90deg, #638148 0 10px, transparent 10px 13px); animation: bedrock-fill 16s cubic-bezier(.15,.6,.35,1) forwards, bedrock-pulse 2s 16s infinite; }
 .bedrock-error, .bedrock-warning { padding: 12px; color: #713519; background: #ffe0bc; border-left: 3px solid #9c4e27; }
-.bedrock-answer { margin-top: 24px; border-top: 2px solid #b3976d; padding-top: 16px; }
-.bedrock-answer h3 { margin: 16px 0 8px; font-size: 18px; }
-.bedrock-question-text { margin: 0; overflow-wrap: anywhere; }
-.bedrock-question-text span { display: block; color: #765d47; font-size: 13px; }
+.bedrock-answer { margin: 0; padding: 14px 16px; background: #fff8ec; border: 1px solid #b3976d; animation: bedrock-answer-in .22s ease-out; }
+.bedrock-answer h3 { margin: 0 0 10px; color: #526b58; font-size: 17px; line-height: 1.6; }
+.bedrock-answer h3:focus { outline: none; }
+.bedrock-question-text { margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid #b3976d66; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.bedrock-dialog .bedrock-content .bedrock-question-text { font-size: 12px; color: #765d47; }
+.bedrock-question-text span { margin-right: 8px; font-size: 10px; }
 .bedrock-answer-text { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
-.bedrock-dialog .bedrock-content .bedrock-note { color: #6e5945; font-size: 13px; margin: 24px 0 0; }
+.bedrock-dialog .bedrock-content .bedrock-note { color: #6e5945; font-size: 11px; margin: 12px 0 0; }
+@keyframes bedrock-fill { to { width: 88%; } }
+@keyframes bedrock-pulse { 50% { opacity: .45; } }
+@keyframes bedrock-answer-in { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (max-height: 500px) and (min-width: 700px) {
+  .module-dialog.bedrock-dialog { padding: 12px 18px; }
+  .module-dialog.bedrock-dialog[open] { gap: 6px; }
+  .module-dialog.bedrock-dialog h2 { font-size: 20px; }
+  .bedrock-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .8fr); gap: 16px; }
+  .bedrock-form { align-content: start; border-top: 0; border-left: 1px solid #b3976d; padding: 0 0 0 16px; overflow-y: auto; }
+  .bedrock-welcome { padding-top: 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bedrock-progress-track > span { animation: none; width: 65%; }
+  .bedrock-answer { animation: none; }
+}

@@ -23,7 +23,9 @@ it.each(['ja', 'zh', 'en'] as const)('loads examples without generation, then su
   const t = qaCopy[locale];
   render(<BedrockEntry locale={locale}/>);
   fireEvent.click(screen.getByRole('button', { name: t.button }));
+  expect(screen.getByRole('progressbar', { name: t.loading })).not.toHaveAttribute('aria-valuenow');
   const input = await screen.findByRole('textbox', { name: t.label });
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   expect(fetchMock).toHaveBeenCalledTimes(1);
   expect(input).toHaveValue('');
   expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
@@ -34,12 +36,17 @@ it.each(['ja', 'zh', 'en'] as const)('loads examples without generation, then su
   const ask = screen.getByRole('button', { name: t.ask });
   fireEvent.click(ask); fireEvent.click(ask);
   expect(ask).toBeDisabled(); expect(input).toBeDisabled();
+  expect(screen.getByRole('progressbar', { name: t.asking })).not.toHaveAttribute('aria-valuenow');
   expect(fetchMock).toHaveBeenCalledTimes(2);
   const init = fetchMock.mock.calls[1][1];
   expect(init.method).toBe('POST');
   expect(JSON.parse(init.body)).toEqual({ message, language: locale });
   await act(async () => finish(answer()));
-  expect(await screen.findByRole('region', { name: t.answer })).toHaveTextContent('Reviewed career summary.');
+  const region = await screen.findByRole('region', { name: t.answer });
+  expect(region).toHaveTextContent('Reviewed career summary.');
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  expect(within(region).getByRole('heading', { name: t.answer })).toHaveFocus();
+  expect(region.compareDocumentPosition(input.closest('form')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(ask).toBeEnabled();
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
@@ -51,6 +58,7 @@ it('renders refusal and truncation notices and treats model text as text, never 
   render(<BedrockEntry locale="en"/>); await open();
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
   expect(await screen.findByRole('region', { name: 'Available question topics' })).toHaveTextContent('Only reviewed career questions');
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
   const region = await screen.findByRole('region', { name: 'AI answer' });
   expect(region).toHaveTextContent('<img src=x onerror=alert(1)>');
@@ -69,6 +77,8 @@ it.each(['network', 'http', 'gateway-timeout', 'invalid'] as const)('shows a saf
   render(<BedrockEntry locale="en"/>); await open();
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
   expect(await screen.findByRole('alert')).not.toHaveTextContent('private upstream details');
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus());
   if (failure === 'gateway-timeout') expect(screen.getByRole('alert')).toHaveTextContent('No automatic retry');
   expect(fetchMock).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
@@ -85,6 +95,7 @@ it('honors Retry-After, prevents submissions during cooldown, and never retries 
   fireEvent.change(screen.getByRole('textbox'), { target: { value: choices[0].message } });
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' })); await settle();
   expect(screen.getByRole('button', { name: 'Please wait 60 seconds' })).toBeDisabled();
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   await act(async () => vi.advanceTimersByTime(59000));
   expect(screen.getByRole('button', { name: 'Please wait 1 second' })).toBeDisabled();
   expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -104,9 +115,11 @@ it('aborts an unanswered generation at 32 seconds, shows timeout, and makes no r
   fireEvent.click(screen.getByRole('button', { name: qaCopy.en.button })); await settle();
   fireEvent.change(screen.getByRole('textbox'), { target: { value: choices[0].message } });
   fireEvent.click(screen.getByRole('button', { name: 'Ask this question' }));
+  expect(screen.getByRole('progressbar', { name: qaCopy.en.asking })).toBeInTheDocument();
   await act(async () => vi.advanceTimersByTime(32000));
   expect(signal?.aborted).toBe(true);
   expect(screen.getByRole('alert')).toHaveTextContent('No automatic retry');
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   expect(fetchMock).toHaveBeenCalledTimes(2);
 });
 
@@ -121,6 +134,7 @@ it('aborts on close, ignores late responses, restores focus, and keeps the paren
   const signal = fetchMock.mock.calls[1][1].signal as AbortSignal;
   fireEvent(screen.getByRole('dialog', { name: 'Experience and projects' }), new Event('cancel', { bubbles: true }));
   expect(signal.aborted).toBe(true); expect(closeParent).not.toHaveBeenCalled(); expect(entry).toHaveFocus();
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   await act(async () => finish(answer('Late answer')));
   expect(screen.queryByText('Late answer')).not.toBeInTheDocument();
   expect(screen.getByRole('dialog', { name: 'About' })).toHaveAttribute('open');
@@ -214,4 +228,26 @@ it('sends an unrecognized typed question to the server for scope refusal without
   expect(await screen.findByRole('region', { name: 'Available question topics' })).toHaveTextContent('not currently supported');
   expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ message, language: 'en' });
   expect(fetchMock).toHaveBeenCalledTimes(2);
+});
+
+it('returns the reading pane to the beginning for each request and focuses the returned answer', async () => {
+  let finish: (response: Response) => void = () => {};
+  const fetchMock = vi.fn().mockResolvedValueOnce(catalog()).mockResolvedValueOnce(answer('First answer.'))
+    .mockImplementationOnce(() => new Promise<Response>(resolve => { finish = resolve; }));
+  vi.stubGlobal('fetch', fetchMock);
+  render(<BedrockEntry locale="en"/>); await open();
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.ask }));
+  const first = await screen.findByRole('region', { name: qaCopy.en.answer });
+  const feed = first.closest('.bedrock-feed') as HTMLElement;
+  feed.scrollTop = 240;
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: choices[1].message } });
+  fireEvent.click(screen.getByRole('button', { name: qaCopy.en.ask }));
+  expect(feed.scrollTop).toBe(0);
+  expect(screen.queryByText('First answer.')).not.toBeInTheDocument();
+  feed.scrollTop = 80;
+  await act(async () => finish(answer('Next answer.')));
+  expect(feed.scrollTop).toBe(0);
+  expect(screen.getByRole('heading', { name: qaCopy.en.answer })).toHaveFocus();
+  expect(screen.getByRole('region', { name: qaCopy.en.answer })).toHaveTextContent('Next answer.');
+  expect(fetchMock).toHaveBeenCalledTimes(3);
 });

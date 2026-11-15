@@ -1,5 +1,7 @@
 # kongPortfolio
 
+用户已确认[AI问答面板](docs/bedrock-frontend.md)并要求上线：像素等待条、独立回答阅读区、固定输入及返回后直接显示；79项前端测试、构建及17组浏览器模拟通过。[新发布正在准备](docs/bedrock-qa-panel-release.md)，不把此前固定b8ca8b0的验收当作此UI已上线。
+
 持续开发中的个人网站，整理项目经历、技术栈与个人实践，提供正则表达式交互工具。前端使用 React / TypeScript / Vite，后端使用 Java 21 / Spring Boot。
 
 在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 手动输入及主题证据修复已通过两道人审，生产live23、网页release96f5109b…，源码76f04a8。

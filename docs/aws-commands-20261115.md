@@ -235,3 +235,36 @@ SDK下载同次StagingReport并核对passed、策略semantic-v2、8HTTP／6范�
 更新README／学习／log及范围、前端、Java、资料、架构、当前候选等文档；文档收尾不启动第三个候选、不改变固定源码b8ca8b0，用户outputs及私有资料／回答不暂存。接下来用户在AWS第一审批审核本次执行；Green成功后还有第二审批，助手不代批。
 
 文档收尾26份／169相对链接／29脚本引用及diff通过。仅暂存11份Markdown，`git commit -m 'docs: record semantic staging approval handoff'`、`git push origin feat/aws-serverless-ci`经hooks扫描；Source DetectChanges=false，不启动第三轮。提交后只读poll复核同次执行仍等首审批，源码固定b8ca8b0，不与文档HEAD混淆。
+
+## AI等待条与回答面板：本地UI增量
+
+用户随后要求生成等待进度、移除占位图标、重新布局，避免回答藏在下方。只改BedrockEntry／CSS／三语copy及相关前端测试；删除大图标，将标题与关闭合行，feed上方独立滚动、composer下方固定，窄横屏左右分栏。返回时feed归顶并聚焦答复标题；错误在同一区域聚焦展示。长问题在回答中单行省略，输入框保留完整内容。原API、长度／冷却／超时、无自动重试、示例填入、关闭取消、语言隔离和纯文本渲染不变。
+
+目录与生成都显示不定量像素条，16秒接近末端后闪动，无百分比／倒计时或额外模型调用；返回／拒答／失败／关闭后移除，减少动画时静态展示。JS没有模拟token进度或增加请求，CSS只改变呈现。
+
+```powershell
+git status --short
+Get-Content AGENTS.md -Encoding utf8
+Get-Content frontend/src/BedrockEntry.tsx -Encoding utf8
+Get-Content frontend/src/bedrock.css -Encoding utf8
+Get-Content frontend/src/Modal.tsx -Encoding utf8
+Get-Content frontend/src/bedrock-api.ts -Encoding utf8
+. ./scripts/tools.ps1
+npm --prefix frontend test
+npm --prefix frontend run build
+npm --prefix frontend run dev
+node .local/qa-layout-browser.mjs
+node .local/qa-layout-edge-browser.mjs
+python .local/check_aws_docs.py
+git diff --check
+node .githooks/check-staged-paths.mjs --all
+& 'D:\software\Gitleaks\gitleaks.exe' dir --redact --no-banner .
+```
+
+apply_patch实现四个前端文件及文档增量。原78项先通过，补上各语言进度出现／撤除、返回焦点／DOM顺序、失败／冷却／取消无残留断言，以及新请求／返回重置阅读区测试，最终79通过。第一次新增断言中焦点尚未执行副作用，改为waitFor实际焦点后通过；浏览器也等实际聚焦而非假定下一帧已执行。首轮320px日文进度被挤出feed，修复标题／关闭同排、移除重复问题并收紧等待卡后，全部尺寸可见；没有放宽可见性断言。
+
+浏览器15组：Chrome1366×900／390×844／320×568，WebKit390×844／844×390，三语。验证进度位于可视feed内、无定量aria值、返回正文首行可见／feed归顶／标题聚焦、长答复滚动时输入区不移动、无弹窗自身溢出、504撤掉进度、示例仅填入、关闭焦点及body滚动恢复。另Chrome／WebKit320×568各1组，减少动画时两类动画关闭，1,000字问题摘要不占满阅读区、REFUSED可见，仅一次本地模拟POST。已查看桌面、日文320px进度、WebKit中文手机答案及英文横屏截图。
+
+最终79项及生产构建通过；截图和安全指标ignored `.local/qa-layout-review-20261115/`，日志qa-layout-final-test.log／qa-layout-browser.log／qa-layout-edge-browser.log。全部使用明确标注的本地fixture，不是浏览器到真实模型或iPhone／真实软键盘验证。0真实模型／AWS读写调用，后端未改不重复测试；既有b8ca8b0固定发布不包含本轮UI，不把原STG30验收套用到新布局。未commit／push或启动新候选，用户outputs未改。
+
+收尾26份文档／175相对链接／29脚本引用、diff、私有跟踪路径和Gitleaks通过。用Get-NetTCPConnection获取5173 PID，再Get-CimInstance核对命令行同时属于本仓库frontend和vite，仅Stop-Process结束本轮PID43856。工作区保留11份已审阅文件修改；未暂存outputs／.local或私有资料，也未停止用户其他服务。

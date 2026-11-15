@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Locale } from './i18n';
 import { Modal } from './Modal';
-import { PixelMark } from './PixelGarden';
 import { askQuestion, loadQuestions, QaFailure, type Answer, type Catalog } from './bedrock-api';
 import { qaCopy } from './bedrock-copy';
 import './bedrock.css';
+
+function Waiting({ label }: { label: string }) {
+  return <div className="bedrock-progress">
+    <p role="status">{label}</p>
+    <div className="bedrock-progress-track" role="progressbar" aria-label={label}><span/></div>
+  </div>;
+}
 
 function Questions({ locale }: { locale: Locale }) {
   const t = qaCopy[locale];
@@ -19,8 +25,17 @@ function Questions({ locale }: { locale: Locale }) {
   const coolingUntil = useRef(0);
   const input = useRef<HTMLTextAreaElement | null>(null);
   const examples = useRef<HTMLDetailsElement | null>(null);
+  const feed = useRef<HTMLDivElement | null>(null);
+  const answerHeading = useRef<HTMLHeadingElement | null>(null);
+  const alert = useRef<HTMLParagraphElement | null>(null);
   const length = Array.from(message).length;
   const tooLong = length > 1000;
+
+  useEffect(() => {
+    if (busy || result || error) { if (feed.current) feed.current.scrollTop = 0; }
+    if (result) answerHeading.current?.focus({ preventScroll: true });
+    else if (error) alert.current?.focus({ preventScroll: true });
+  }, [busy, result, error]);
 
   useEffect(() => {
     if (!wait) return;
@@ -71,6 +86,8 @@ function Questions({ locale }: { locale: Locale }) {
   function ask() {
     const question = message.trim();
     if (!catalog?.enabled || !question || tooLong || request.current || Date.now() < coolingUntil.current) return;
+    input.current?.blur();
+    if (examples.current) examples.current.open = false;
     setResult(null);
     void run(async signal => {
       const response = await askQuestion(question, locale, signal);
@@ -81,39 +98,40 @@ function Questions({ locale }: { locale: Locale }) {
   }
 
   const response = result?.response;
-  return <div className="bedrock-content" aria-busy={busy}>
-    <div className="bedrock-art" aria-hidden="true"><PixelMark variant={3}/></div>
-    {catalog?.enabled && <p className="bedrock-scope">{t.scope}</p>}
-    <div role="status" aria-live="polite">
-      {busy && <p className="bedrock-progress">{catalog ? t.asking : t.loading}</p>}
-      {catalog && !catalog.enabled && <p className="bedrock-preparing">{t.preparing}</p>}
+  return <div className="bedrock-content">
+    <div ref={feed} className="bedrock-feed" aria-busy={busy}>
+      {busy && <div className="bedrock-waiting">
+        <Waiting label={catalog ? t.asking : t.loading}/>
+      </div>}
+      {catalog && !catalog.enabled && <p className="bedrock-preparing" role="status">{t.preparing}</p>}
+      {catalog?.enabled && !busy && !result && !error && <div className="bedrock-welcome"><p className="eyebrow">ASK KONG</p><h3>{t.welcome}</h3><p className="bedrock-scope">{t.scope}</p></div>}
+      {error && <p ref={alert} tabIndex={-1} className="bedrock-error" role="alert">{t[error]}</p>}
+      {!catalog && !busy && <button className="primary-button" disabled={wait > 0} onClick={load}>{wait > 0 ? t.wait(wait) : t.retry}</button>}
+      {result && response && response.status !== 'PREPARING' && <section className="bedrock-answer" aria-label={response.status === 'REFUSED' ? t.refused : t.answer}>
+        <h3 ref={answerHeading} tabIndex={-1}>{response.status === 'REFUSED' ? t.refused : t.answer}</h3>
+        <p className="bedrock-question-text"><span>{t.question}</span>{result.question}</p>
+        {response.truncated && <p className="bedrock-warning" role="status">{t.truncated}</p>}
+        <p className="bedrock-answer-text">{response.answer}</p>
+      </section>}
+      {catalog?.enabled && !busy && <>
+        <details ref={examples} className="bedrock-examples">
+          <summary>{t.examples}</summary>
+          <ul>{catalog.questions.map(q => <li key={q.id}><button type="button" disabled={wait > 0} onClick={() => {
+            setMessage(q.message); setResult(null); setError(null);
+            if (examples.current) examples.current.open = false;
+            input.current?.focus();
+          }}>{q.message}</button></li>)}</ul>
+        </details>
+        <p className="bedrock-note">{t.note}</p>
+      </>}
     </div>
     {catalog?.enabled && <form className="bedrock-form" onSubmit={event => { event.preventDefault(); ask(); }}>
-      <label htmlFor="bedrock-question">{t.label}</label>
-      <textarea ref={input} id="bedrock-question" rows={4} maxLength={2000} value={message} placeholder={t.placeholder}
+      <div className="bedrock-composer-heading"><label htmlFor="bedrock-question">{t.label}</label><p id="bedrock-input-count" className={tooLong ? 'bedrock-warning' : 'bedrock-count'} role={tooLong ? 'alert' : undefined}>{t.count(length)}</p></div>
+      <textarea ref={input} id="bedrock-question" rows={2} maxLength={2000} value={message} placeholder={t.placeholder}
         aria-describedby="bedrock-input-help bedrock-input-count" aria-invalid={tooLong}
         disabled={busy || wait > 0} onChange={event => { setMessage(event.target.value); setResult(null); setError(null); }}/>
-      <p id="bedrock-input-help" className="bedrock-input-help">{t.inputHelp}</p>
-      <p id="bedrock-input-count" className={tooLong ? 'bedrock-warning' : 'bedrock-count'} role={tooLong ? 'alert' : undefined}>{t.count(length)}</p>
-      <button className="primary-button" disabled={busy || wait > 0 || !message.trim() || tooLong} type="submit">{wait > 0 ? t.wait(wait) : busy ? t.asking : t.ask}</button>
-      <details ref={examples} className="bedrock-examples">
-        <summary>{t.examples}</summary>
-        <ul>{catalog.questions.map(q => <li key={q.id}><button type="button" disabled={busy || wait > 0} onClick={() => {
-          setMessage(q.message); setResult(null); setError(null);
-          if (examples.current) examples.current.open = false;
-          input.current?.focus();
-        }}>{q.message}</button></li>)}</ul>
-      </details>
+      <div className="bedrock-compose-actions"><p id="bedrock-input-help" className="bedrock-input-help">{t.inputHelp}</p><button className="primary-button" disabled={busy || wait > 0 || !message.trim() || tooLong} type="submit">{wait > 0 ? t.wait(wait) : busy ? t.asking : t.ask}</button></div>
     </form>}
-    {error && <p className="bedrock-error" role="alert">{t[error]}</p>}
-    {!catalog && !busy && <button className="primary-button" disabled={wait > 0} onClick={load}>{wait > 0 ? t.wait(wait) : t.retry}</button>}
-    {result && response && response.status !== 'PREPARING' && <section className="bedrock-answer" aria-label={response.status === 'REFUSED' ? t.refused : t.answer} aria-live="polite">
-      <p className="bedrock-question-text"><span>{t.question}</span>{result.question}</p>
-      <h3>{response.status === 'REFUSED' ? t.refused : t.answer}</h3>
-      {response.truncated && <p className="bedrock-warning" role="status">{t.truncated}</p>}
-      <p className="bedrock-answer-text">{response.answer}</p>
-    </section>}
-    {catalog?.enabled && <p className="bedrock-note">{t.note}</p>}
   </div>;
 }
 

@@ -1,10 +1,11 @@
 export const qaCopy = {
   ja: {
     button: 'AIで私を知る', title: '経歴とプロジェクトについて', close: '閉じる', loading: '質問を読み込んでいます…',
+    welcome: 'どんなことを聞いてみますか？',
     scope: '経歴、技術、資格、プロジェクトについて質問できます。',
     label: '聞きたいこと', ask: 'この質問をする', asking: '回答を作成しています…', retry: '質問を読み込み直す',
     placeholder: '経歴やプロジェクトについて質問を入力してください', examples: '質問例を見る',
-    inputHelp: '経歴、スキル、プロジェクト、仕事の進め方について自然な言葉で質問できます。送信ボタンで送れます。',
+    inputHelp: '経歴や仕事の進め方を、自然な言葉で。',
     count: (n: number) => `${n} / 1,000文字`,
     preparing: 'Q&A は準備中です。公開まで、プロフィールとプロジェクト紹介をご覧ください。',
     answer: 'AI の回答', refused: '対応している質問について', question: '今回の質問',
@@ -17,10 +18,11 @@ export const qaCopy = {
   },
   zh: {
     button: '通过 AI 了解我', title: '了解我的经历和项目', close: '关闭', loading: '正在读取可选问题…',
+    welcome: '想了解我的哪一面？',
     scope: '可以询问我的经历、技能、资格和项目。',
     label: '你想了解什么', ask: '提问', asking: '正在生成回答…', retry: '重新读取问题',
     placeholder: '输入关于经历或项目的问题', examples: '查看示例问题',
-    inputHelp: '可以自然询问我的经历、技能、项目或做事方法；点击提问按钮发送。',
+    inputHelp: '自然询问经历、技能或做事方法。',
     count: (n: number) => `${n} / 1,000 字`,
     preparing: '问答功能准备中。开放之前，可以先浏览个人介绍和项目经历。',
     answer: 'AI 回答', refused: '目前可回答的范围', question: '本次问题',
@@ -32,10 +34,11 @@ export const qaCopy = {
   },
   en: {
     button: 'Meet me with AI', title: 'Experience and projects', close: 'Close', loading: 'Loading questions…',
+    welcome: 'What would you like to explore?',
     scope: 'Ask about my experience, skills, qualifications and projects.',
     label: 'What would you like to know?', ask: 'Ask this question', asking: 'Preparing an answer…', retry: 'Reload questions',
     placeholder: 'Type a question about my experience or projects', examples: 'View example questions',
-    inputHelp: 'Ask naturally about my experience, skills, projects or ways of working. Use the button to send.',
+    inputHelp: 'Ask naturally about my work, skills or projects.',
     count: (n: number) => `${n} / 1,000 characters`,
     preparing: 'Q&A is being prepared. You can explore the profile and projects in the meantime.',
     answer: 'AI answer', refused: 'Available question topics', question: 'Your question',
