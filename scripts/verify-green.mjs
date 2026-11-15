@@ -4,7 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { verifyCandidate } from './verify-pipeline-candidate.mjs';
 import { apiEvent, bedrockContracts, checkBedrockResponse, checkResponse, contracts, matchingVersion, selectVersion } from './staging-contract.mjs';
-import { coldQaMetrics, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
+import { coldQaMetrics, greenFailureReport, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
 
 const region = 'ap-northeast-1';
 const functionName = process.env.GREEN_FUNCTION_NAME;
@@ -27,6 +27,11 @@ function aws(args) {
   assert.equal(result.status, 0, `AWS ${args[0]} ${args[1]} failed: ${result.stderr}`);
   return result.stdout.trim() ? JSON.parse(result.stdout) : {};
 }
+const checks = [];
+const bedrock = { enabled: false, checks: [] };
+const diagnostic = { pipelineExecutionId: executionId, gitCommit: manifest.gitCommit, releaseId: manifest.releaseId,
+  backendSha256: manifest.backend.sha256, stagingVersion: staging.functionVersion, checks, bedrock, failedCheck: 'preflight' };
+try {
 assert.equal(aws(['sts', 'get-caller-identity']).Account, account);
 const execution = aws(['codepipeline', 'get-pipeline-execution', '--pipeline-name', 'kongportfolio-candidate', '--pipeline-execution-id', executionId]).pipelineExecution;
 const actions = aws(['codepipeline', 'list-action-executions', '--pipeline-name', 'kongportfolio-candidate', '--filter', `pipelineExecutionId=${executionId}`]).actionExecutionDetails;
@@ -52,20 +57,24 @@ const green = aws(['lambda', 'get-function-configuration', '--function-name', fu
 requireProductionConfig(green, account);
 assert.equal(green.Version, version);
 assert.equal(green.CodeSha256, expectedHash);
-const checks = [];
-const bedrock = { enabled: green.Environment?.Variables?.BEDROCK_ENABLED === 'true', checks: [] };
+diagnostic.greenVersion = version;
+bedrock.enabled = green.Environment?.Variables?.BEDROCK_ENABLED === 'true';
 if (bedrock.enabled) {
   // First request tests the real production execution role and first S3/model use.
   // The other five scoped requests keep the total inside the six/minute allowance.
   const first = bedrockContracts.find(c => c.label === 'answer-ja');
   const ordered = [first, ...bedrockContracts.filter(c => c !== first)];
   for (const [index, contract] of ordered.entries()) {
+    diagnostic.failedCheck = contract.label;
     const payload = join(workspace, `${contract.label}-event.json`);
     const response = join(workspace, `${contract.label}-response.json`);
     writeFileSync(payload, JSON.stringify(apiEvent(contract.method, contract.path, contract.query, contract.body)));
     const metadata = aws(['lambda', 'invoke', '--function-name', functionName, '--qualifier', version, '--invocation-type', 'RequestResponse', '--log-type', 'Tail', '--cli-binary-format', 'raw-in-base64-out', '--payload', `file://${payload}`, '--cli-read-timeout', '60', response]);
     assert.equal(metadata.ExecutedVersion, version);
-    bedrock.checks.push(checkBedrockResponse(metadata, JSON.parse(readFileSync(response, 'utf8')), contract));
+    const result = JSON.parse(readFileSync(response, 'utf8'));
+    const body = JSON.parse(result.isBase64Encoded ? Buffer.from(result.body, 'base64').toString('utf8') : result.body);
+    diagnostic.lastInvocation = { name: contract.label, kind: contract.kind, modelInvoked: body.modelInvoked, usage: body.usage };
+    bedrock.checks.push(checkBedrockResponse(metadata, result, contract));
     if (index === 0) bedrock.coldQa = coldQaMetrics(metadata);
     console.log(`Green Q&A passed: ${contract.label} (version ${version}; response text omitted)`);
   }
@@ -73,6 +82,7 @@ if (bedrock.enabled) {
   bedrock.policyVersion = 'portfolio-scope-v1';
 }
 for (const contract of contracts) {
+  diagnostic.failedCheck = contract.label;
   const payload = join(workspace, `${contract.label}-event.json`);
   const response = join(workspace, `${contract.label}-response.json`);
   writeFileSync(payload, JSON.stringify(apiEvent(contract.method, contract.path, contract.query)));
@@ -83,6 +93,7 @@ for (const contract of contracts) {
   console.log(`Green passed: ${contract.label} (published version ${version})`);
 }
 const after = aws(['lambda', 'get-alias', '--function-name', functionName, '--name', 'live']);
+diagnostic.failedCheck = 'live-alias-unchanged';
 requireLiveUnchanged(before, after);
 const report = {
   schemaVersion: 1, kind: 'production-green-verification', passed: true,
@@ -95,3 +106,8 @@ const report = {
 };
 writeFileSync(join(workspace, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(`Green verified: ${report.releaseId}; live stays ${blue.version}; awaiting human approval 2. No routing changes.`);
+} catch (error) {
+  // Persist only execution/check identifiers and token metrics. Never publish the response or raw error message.
+  writeFileSync(join(workspace, 'report.json'), JSON.stringify(greenFailureReport(diagnostic, error), null, 2) + '\n');
+  throw error;
+}

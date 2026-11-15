@@ -4,6 +4,8 @@
 
 在线访问：[konglingtong44.com](https://konglingtong44.com)。已实现 AWS 托管、CI/CD、Lambda 蓝绿与金丝雀发布；Amazon Bedrock Q&A 已通过两道人审并随源码978a636发布，生产live20、网页release be998dc6…。
 
+2026-11-15：输入框候选的Green22英文回答检查失败，生产仍20、网页未变。正在修复AI主题证据范围和安全失败报告，见[当前候选进展](docs/bedrock-typed-release.md)，不通过直接重试跳过检查。
+
 2026-11-14 运维更新：[$5/$10/$15/$25费用关停与手动恢复](docs/aws-cost-control.md)已接通并验收；[旧练习资源已清理](docs/aws-resource-cleanup.md)。东京Qwen3 235B A22B 2507经Mantle接入，[Java有界问答](docs/bedrock-java.md)已在STG24／Green20完成小样本验收，生产现为20。实际命令与SDK操作见[补录](docs/aws-commands-20261114.md)。
 
 费用取舍：当前低流量后端用Lambda，暂不部署ECS/ALB；简历采用[普通私有S3＋实例缓存＋全文提示](docs/bedrock-content.md)，暂不建知识库。脱敏履历资料已导入私有S3并在STG实际问答中使用；正文不入Git。前一轮8次成功模型调用约$0.0134，新候选3次生成约$0.005134，另有首次截断调用、税、构建及其他AWS费用，估算不等于账单。

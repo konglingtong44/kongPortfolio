@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { bedrockContracts, contracts } from './staging-contract.mjs';
-import { coldQaMetrics, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
+import { coldQaMetrics, greenFailureReport, liveSnapshot, requireApprovedContext, requireGreenTarget, requireLiveUnchanged, requireProductionConfig, requireReviewedBedrockRelease } from './green-contract.mjs';
 
 requireGreenTarget('kongportfolio-prod', '123456789012');
 assert.throws(() => requireGreenTarget('kongportfolio-other', '123456789012'), /intended/);
@@ -41,3 +41,8 @@ assert.throws(() => coldQaMetrics(tail('REPORT RequestId: warm-qa\tDuration: 100
 assert.throws(() => coldQaMetrics(tail('REPORT RequestId: slow-qa\tDuration: 24000 ms\tInit Duration: 5000 ms')), /headroom/);
 console.log('Green guard checks passed: wrong target, existing traffic shift, changed live alias, missing approval and cross-run/candidate reports rejected. No AWS calls.');
 console.log('Production Q&A guards passed: pinned facts/limits, STG match, zero-token refusal evidence and real cold REPORT metrics required. No AWS calls.');
+const failed = greenFailureReport({ pipelineExecutionId:'run',gitCommit:'commit',releaseId:'release',backendSha256:'hash',stagingVersion:'26',greenVersion:'22',failedCheck:'answer-en',checks:[],bedrock:{enabled:true,checks:[],answer:'PRIVATE_BODY'},lastInvocation:{name:'answer-en',kind:'answer',modelInvoked:true,usage:{inputTokens:10,outputTokens:2},answer:'PRIVATE_BODY'} },new Error('PRIVATE_BODY'));
+assert.equal(failed.passed,false);assert.equal(failed.failedCheck,'answer-en');
+assert.deepEqual(failed.lastInvocation.usage,{inputTokens:10,outputTokens:2});
+assert.ok(!JSON.stringify(failed).includes('PRIVATE_BODY'));
+console.log('Green failure diagnostics preserve failed check and usage without publishing answer text or raw errors.');

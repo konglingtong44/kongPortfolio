@@ -75,7 +75,7 @@ public final class QuestionService {
                 </approved_facts>
                 Final answer requirements:
                 %s
-                """.formatted(language, facts.get(), answerRules(language)),
+                """.formatted(language, QuestionFacts.select(topic.id(), facts.get()), answerRules(language)),
                 "Task: " + topic.prompt() + "\n" + answerRules(language) + "\nQuestion: "
                     + topic.questions().getOrDefault(language, topic.questions().get("ja")));
         } finally { inflight.release(); }

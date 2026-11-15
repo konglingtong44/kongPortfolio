@@ -1,6 +1,25 @@
 import assert from 'node:assert/strict';
 import { bedrockContracts, contracts } from './staging-contract.mjs';
 
+export function greenFailureReport(context, error) {
+  const metrics = c => ({ name: c.name, status: c.status, kind: c.kind, modelInvoked: c.modelInvoked,
+    usage: c.usage && { inputTokens: c.usage.inputTokens, outputTokens: c.usage.outputTokens } });
+  const safeReasons = new Set(['AI answer adds an unsolicited experience disclaimer', 'Answer discusses its source or review process',
+    'Chinese answer contains Japanese prose', 'Japanese answer is missing Japanese prose', 'English answer has the wrong language',
+    'The bounded smoke answer must finish naturally', 'A fresh Green cold Q&A invocation is required; do not relabel a warm invocation as cold']);
+  return {
+    schemaVersion: 1, kind: 'production-green-verification', passed: false,
+    pipelineExecutionId: context.pipelineExecutionId, gitCommit: context.gitCommit,
+    releaseId: context.releaseId, backendSha256: context.backendSha256,
+    stagingVersion: context.stagingVersion, greenVersion: context.greenVersion,
+    failedCheck: context.failedCheck, errorType: error instanceof assert.AssertionError ? 'AssertionError' : 'Error',
+    failureReason: safeReasons.has(error.message) ? error.message : undefined,
+    checks: context.checks.map(c => ({ name: c.name, status: c.status, expectedHttpStatus: c.expectedHttpStatus })),
+    bedrock: { enabled: context.bedrock.enabled, checks: context.bedrock.checks.map(metrics), coldQa: context.bedrock.coldQa },
+    lastInvocation: context.lastInvocation && metrics(context.lastInvocation),
+  };
+}
+
 export function requireGreenTarget(name, account) {
   assert.equal(name, 'kongportfolio-prod', 'Green may target only the intended production function');
   assert.match(account, /^[0-9]{12}$/);
