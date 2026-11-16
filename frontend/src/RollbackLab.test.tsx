@@ -26,8 +26,8 @@ it('uses the shared node selection, tooltip markup and connected animated wires'
   fireEvent.focus(codebuild);
   expect(codebuild).toHaveAttribute('aria-pressed', 'true');
   expect(codebuild).toHaveAttribute('aria-controls', 'architecture-node-story');
-  expect(codebuild.querySelector('.node-tooltip')).toHaveTextContent('report failures to CodePipeline');
-  expect(story()).toHaveTextContent('report failures to CodePipeline');
+  expect(codebuild.querySelector('.node-tooltip')).toHaveTextContent('reports failures to CodePipeline');
+  expect(story()).toHaveTextContent('reports failures to CodePipeline');
   fireEvent.mouseEnter(tile('Engineer'));
   expect(story()).toHaveTextContent('Inspect failed CodeBuild logs');
   expect(container.querySelectorAll('.architecture-wires .wire-active path').length).toBeGreaterThan(0);

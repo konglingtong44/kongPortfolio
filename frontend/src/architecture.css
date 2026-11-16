@@ -80,3 +80,27 @@
 .recovery-map-label.control { top: 25px; }.recovery-map-label.traffic { top: 435px; }
 .recovery-map-note { left: 30px; top: 245px; width: 580px; }
 @media(max-width:800px) { .recovery-results { grid-template-columns: 1fr; } }
+
+/* AI shares the existing service map and floating touch explanations. */
+.ai-architecture { padding-top: 26px; }
+.ai-architecture > h3 { font-size: 26px; margin: 0 0 14px; }
+.ai-architecture .architecture-node { padding: 10px; display: flex; flex-direction: column; justify-content: center; }
+.ai-architecture .architecture-node strong { overflow-wrap: anywhere; flex-shrink: 0; }
+.ai-architecture .architecture-node > span:not(.node-corner):not(.node-tooltip) { flex-shrink: 0; }
+.ai-architecture .node-tooltip { max-height: 220px; overflow-y: auto; pointer-events: auto; }
+.ai-architecture .architecture-legend span:nth-child(2) { color: #826e55; }
+.ai-jump { display: inline-block; border: 1px solid #a36231; background: #ffdfa2; color: #63391e; padding: 10px 14px; min-height: 44px; font: inherit; cursor: pointer; }
+.ai-jump:focus-visible,.ai-price-scroll:focus-visible { outline: 3px solid #416b88; outline-offset: 3px; }
+.ai-price-scroll { overflow-x: auto; overscroll-behavior-x: contain; margin: 22px 0; }
+.ai-price-table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 12px; text-align: left; }
+.ai-price-table th,.ai-price-table td { padding: 14px 12px; border-bottom: 1px solid #b47b4266; }
+.ai-price-table thead { background: #f4dfb0; }
+.ai-price-table .is-selected { background: #e9efcc; }
+.ai-price-table small { display: block; color: #47612f; margin-top: 5px; }
+.ai-decisions { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 22px 0; }
+.ai-decisions article { border: 1px solid #b47b4266; background: #fff7df; padding: 18px; }
+.ai-decisions h4 { margin: 0 0 12px; font-size: 14px; }
+.ai-decisions p { font-size: 13px; line-height: 1.9; margin: 0; }
+.rag-costs { margin-top: 36px; padding-top: 24px; border-top: 1px solid #b47b4266; }
+.rag-costs .ai-decisions p + p { margin-top: 14px; }
+@media(max-width:800px) { .ai-decisions { grid-template-columns: 1fr; } }

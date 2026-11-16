@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import type { Locale } from './i18n';
-import { architectureCopy, tr, type Text } from './architectureData';
+import { tr, type Text } from './architectureData';
 import { ConnectionMap } from './ConnectionMap';
 import { rollbackCopy } from './rollbackData';
 import { recoveryGuideCopy, releaseHazards } from './recoveryGuide';
 import { recoveryGraph, recoveryGroups } from './recoveryMapData';
 
 const c = {
-  intro: ['復旧の仕組みで 5 つに整理。同じグループ内の条件を選び、01・02 と同じようにノードを調べられます。', '按恢复机制整理为 5 类。选择具体情况后，像 01、02 一样查看节点与连线。', 'Five recovery mechanisms. Select a specific case, then explore its nodes and connections just like 01 and 02.'],
+  intro: ['旧版をBlue、新版をGreenとして、失敗を見つけてから接続先を戻すまでを示します。公開前の検証失敗・承認拒否では、利用者は旧版のままです。', 'Blue 是旧版，Green 是新版。这里展示发现故障后由谁判断、如何恢复请求去向；若在公开前检查失败或审批被拒，访客继续使用旧版。', 'Blue is the old version and Green the new one. These flows show who detects a fault, who decides and how routing is restored. Failed pre-release checks or rejected approvals leave visitors on the old version.'],
   choose: ['発生条件', '具体情况', 'Specific case'],
   before: ['問題が起きた時', '出问题时', 'When the fault occurs'],
   after: ['対処後の結果', '处理后的结果', 'After handling'],
@@ -38,7 +38,7 @@ export function RollbackLab({ locale }: { locale: Locale }) {
       {group.routes.map(item => <button key={item.id} aria-pressed={item.id === routeId} onClick={() => selectRoute(item.id)}>{tr(item.title, locale)}</button>)}
     </div>
     <p className="recovery-summary">{tr(route.summary, locale)}</p>
-    <div className="architecture-map-heading"><p>{tr(architectureCopy.hint, locale)}</p><div className="architecture-legend"><span>━ {tr(c.control, locale)}</span><span>┄ {tr(c.idle, locale)}</span></div></div>
+    <div className="architecture-map-heading"><div className="architecture-legend"><span>━ {tr(c.control, locale)}</span><span>┄ {tr(c.idle, locale)}</span></div></div>
     <div className="architecture-tabs recovery-outcome" role="group" aria-label={tr(c.traffic, locale)}>
       <button aria-pressed={!recovered} onClick={() => { setRecovered(false); setSelection('router'); }}>{tr(c.before, locale)}</button>
       <button aria-pressed={recovered} onClick={() => { setRecovered(true); setSelection('router'); }}>{tr(c.after, locale)}</button>

@@ -1,0 +1,2 @@
+{"kind":"table","sheet":"可选模型","address":"A6:G12","rows":7,"cols":7,"values":[["模型","提供商","调用范围","输入 USD/百万token","输出 USD/百万token","TPM token/分钟","RPM 次/分钟"],["Gemma 3 4B IT","Google","区域内",0.05,0.1,100000000,10000],["Nova Micro","Amazon","APAC",0.042,0.168,400000,400],["Nemotron Nano 9B v2","NVIDIA","区域内",0.07,0.28,100000000,10000],["Nova Lite","Amazon","APAC",0.072,0.288,400000,400],["Nova Lite","Amazon","区域内",0.072,0.288,200000,200],["Ministral 3B 3.0","Mistral AI","区域内",0.12,0.12,100000000,10000]]}
+{"kind":"notice","message":"Cell search matched 0 entries."}

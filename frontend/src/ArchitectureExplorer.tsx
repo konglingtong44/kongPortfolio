@@ -4,6 +4,8 @@ import { architectureCopy as c, deliveryEdges, deliveryNodes, foundations, runti
 import './architecture.css';
 import { RollbackLab } from './RollbackLab';
 import { ConnectionMap } from './ConnectionMap';
+import { AiArchitecture } from './AiArchitecture';
+import { aiLink, aiTitle } from './aiArchitectureData';
 
 export function ArchitectureThumbnail({ locale }: { locale: Locale }) {
   return <span className="architecture-thumbnail" aria-hidden="true">
@@ -34,17 +36,17 @@ function CanaryDemo({ locale }: { locale: Locale }) {
 }
 
 export function ArchitectureExplorer({ locale }: { locale: Locale }) {
-  const [view, setView] = useState<'runtime' | 'delivery' | 'rollback'>('runtime');
+  const [view, setView] = useState<'runtime' | 'delivery' | 'rollback' | 'ai'>('runtime');
   const [selection, setSelection] = useState({ runtime: 'cdn', delivery: 'source' });
-  const nodes = view === 'runtime' ? runtimeNodes : deliveryNodes;
-  const selected = nodes.find(node => node.id === selection[view === 'rollback' ? 'runtime' : view])!;
+  const nodes = view === 'delivery' ? deliveryNodes : runtimeNodes;
+  const selected = nodes.find(node => node.id === selection[view === 'delivery' ? 'delivery' : 'runtime'])!;
   return <div className="architecture-explorer">
     <p className="architecture-intro">{tr(c.intro, locale)}</p>
-    <div className="architecture-toolbar"><div className="architecture-tabs" role="group" aria-label={tr(c.map, locale)}>{(['runtime', 'delivery', 'rollback'] as const).map(tab => <button key={tab} aria-pressed={view === tab} onClick={() => setView(tab)}>{tr(tab === 'rollback' ? c.recovery : c[tab], locale)}</button>)}</div><span className="architecture-stamp">LIVE ON AWS</span></div>
-    {view === 'rollback' ? <RollbackLab locale={locale}/> : <>
-    <div className="architecture-map-heading"><p>{tr(c.hint, locale)}</p><div className="architecture-legend"><span>━ {tr(c.live, locale)}</span><span>┄ {tr(c.planned, locale)}</span><span>┄ {tr(c.alternative, locale)}</span></div></div>
+    <div className="architecture-toolbar"><div className="architecture-tabs" role="group" aria-label={tr(c.map, locale)}>{(['runtime', 'delivery', 'rollback', 'ai'] as const).map(tab => <button key={tab} id={tab === 'ai' ? 'architecture-ai-tab' : undefined} aria-pressed={view === tab} onClick={() => setView(tab)}>{tr(tab === 'ai' ? aiTitle : tab === 'rollback' ? c.recovery : c[tab], locale)}</button>)}</div><span className="architecture-stamp">LIVE ON AWS</span></div>
+    {view === 'ai' ? <AiArchitecture locale={locale}/> : view === 'rollback' ? <RollbackLab locale={locale}/> : <>
+    <div className="architecture-map-heading"><div className="architecture-legend"><span>━ {tr(c.live, locale)}</span><span>┄ {tr(c.planned, locale)}</span><span>┄ {tr(c.alternative, locale)}</span></div></div>
     <ConnectionMap key={view} nodes={nodes} edges={view === 'runtime' ? runtimeEdges : deliveryEdges} locale={locale} selected={selected.id} onSelect={id => setSelection(old => ({ ...old, [view]: id }))} delivery={view === 'delivery'}/>
-    <div className={`architecture-story ${selected.kind ?? ''}`} id="architecture-node-story"><span className="architecture-story-index">{String(nodes.indexOf(selected) + 1).padStart(2, '0')} / {nodes.length}</span><div><h3>{selected.title}</h3><p>{tr(selected.detail, locale)}</p></div></div>
+    <div className={`architecture-story ${selected.kind ?? ''}`} id="architecture-node-story"><span className="architecture-story-index">{String(nodes.indexOf(selected) + 1).padStart(2, '0')} / {nodes.length}</span><div><h3>{selected.title}</h3><p>{tr(selected.detail, locale)}</p>{view === 'runtime' && selected.id === 'bedrock' && <button className="ai-jump" onClick={() => { setView('ai'); document.getElementById('architecture-ai-tab')?.focus(); }}>{tr(aiLink, locale)}</button>}</div></div>
     {view === 'delivery' ? <CanaryDemo locale={locale}/> : <>
       <section className="architecture-foundations" aria-label={tr(c.foundation, locale)}>{foundations.map(item => <article key={item.title}><h3>{item.title}</h3><p>{tr(item.body, locale)}</p></article>)}</section>
       <section className="architecture-costs"><p className="architecture-eyebrow">DESIGN DECISION / 01</p><h3>{tr(c.costs, locale)}</h3><p>{tr(c.costIntro, locale)}</p><p className="cost-unit">{tr(c.costUnit, locale)}</p><div className="cost-comparison"><article><span className="cost-status">{tr(c.live, locale)}</span><h4>Lambda + HTTP API</h4><strong>≈ $0.18 <small>USD</small></strong><p>{tr(c.lambdaCost, locale)}</p></article><article><span className="cost-status">{tr(c.alternative, locale)}</span><h4>ECS Fargate + ALB</h4><strong>≈ $51–57 <small>USD</small></strong><p>{tr(c.ecsCost, locale)}</p></article></div><p className="architecture-fineprint">{tr(c.costNote, locale)}</p><div className="cost-sources">AWS PRICING ↗ {[

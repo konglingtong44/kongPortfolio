@@ -4,15 +4,15 @@ import { architectureCopy as c, tr, type ArchitectureNode, type Edge } from './a
 import { TouchNodeTooltip } from './TouchNodeTooltip';
 import { useMobileLayout } from './useMobileLayout';
 
-export function ConnectionMap({ nodes, edges, locale, selected, onSelect, delivery, recovery = false, note }: { nodes: ArchitectureNode[]; edges: Edge[]; locale: Locale; selected: string; onSelect: (id: string) => void; delivery: boolean; recovery?: boolean; note?: string }) {
+export function ConnectionMap({ nodes, edges, locale, selected, onSelect, delivery, recovery = false, note, label, ai = false }: { nodes: ArchitectureNode[]; edges: Edge[]; locale: Locale; selected: string; onSelect: (id: string) => void; delivery: boolean; recovery?: boolean; note?: string; label?: string; ai?: boolean }) {
   const marker = useId().replace(/:/g, '');
   const mobile = useMobileLayout();
   const [tooltip, setTooltip] = useState<{ node: string; anchor: HTMLElement } | null>(null);
   const closeTooltip = useCallback(() => setTooltip(null), []);
   const openNode = nodes.find(node => node.id === tooltip?.node);
-  return <div className={`architecture-map-scroll ${mobile ? 'has-touch-tooltip' : ''}`} tabIndex={0} role="region" aria-label={tr(recovery ? c.recovery : delivery ? c.delivery : c.runtime, locale)}>
+  return <div className={`architecture-map-scroll ${mobile ? 'has-touch-tooltip' : ''}`} tabIndex={0} role="region" aria-label={label ?? tr(recovery ? c.recovery : delivery ? c.delivery : c.runtime, locale)}>
     <div className={`architecture-canvas ${delivery ? 'delivery-canvas' : ''}`}>
-      {!delivery && !recovery && <div className="aws-boundary"><span>AWS / TOKYO · ap-northeast-1 <small>ACM → us-east-1</small></span></div>}
+      {!delivery && !recovery && <div className="aws-boundary"><span>AWS / TOKYO · ap-northeast-1 <small>{ai ? 'QWEN3 / TEXT Q&A' : 'ACM → us-east-1'}</small></span></div>}
       {recovery && <><span className="recovery-map-label control">{tr(['検知 → 判断 → 復旧操作', '检测 → 判断 → 恢复操作', 'Detect → decide → recover'], locale)}</span><span className="recovery-map-label traffic">{tr(['本番リクエスト', '生产请求', 'Production requests'], locale)}</span></>}
       <svg className="architecture-wires" viewBox="0 0 1070 620" aria-hidden="true">
         <defs><marker id={marker} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="currentColor" strokeWidth="2"/></marker></defs>
@@ -25,11 +25,11 @@ export function ConnectionMap({ nodes, edges, locale, selected, onSelect, delive
         if (mobile) setTooltip(tooltip?.node === node.id ? null : { node: node.id, anchor: event.currentTarget });
       }}>
         <span className="node-corner" aria-hidden="true">{node.kind === 'gate' ? '◇' : node.kind === 'planned' ? '…' : node.kind === 'alternative' ? '⑂' : '▪'}</span>
-        <strong>{node.title}</strong><span>{tr(node.sub, locale)}</span>
-        {node.kind && node.kind !== 'gate' && <small>{tr(node.kind === 'planned' ? c.planned : c.alternative, locale)}</small>}
+        <strong>{node.titleText ? tr(node.titleText, locale) : node.title}</strong><span>{tr(node.sub, locale)}</span>
+        {node.kind && node.kind !== 'gate' && !ai && <small>{tr(node.kind === 'planned' ? c.planned : c.alternative, locale)}</small>}
         <span aria-hidden="true" className={`node-tooltip ${node.y >= 275 ? 'tooltip-above' : ''} ${node.x > 760 ? 'tooltip-right' : ''}`}>{tr(node.detail, locale)}</span>
       </button>)}
-      {delivery && <div className="delivery-map-note"><span>ONE SHA · ONE CANDIDATE</span><p>{tr(['同じ成果物を STG → Green → 本番へ。承認は各実行ごとに 2 回。', '同一制品依次进入 STG → Green → 生产，每次执行都需两道新审批。', 'The same artifacts move through STG → Green → production. Two new approvals for every execution.'], locale)}</p></div>}
+      {delivery && <div className="delivery-map-note"><span>ONE RELEASE · TWO APPROVALS</span><p>{tr(['同じ公開ファイルをテスト環境から本番へ。各実行で二つの承認を受けます。', '同一组发布文件从测试环境进入生产，每次执行都需两道新审批。', 'The same release files move from staging to production, with two new approvals for each execution.'], locale)}</p></div>}
       {recovery && note && <div className="delivery-map-note recovery-map-note"><span>PRODUCTION ROUTING</span><p>{note}</p></div>}
     </div>
     {mobile && tooltip && openNode && <TouchNodeTooltip anchor={tooltip.anchor} id={`${marker}-tooltip`} text={tr(openNode.detail, locale)} onClose={closeTooltip}/>}

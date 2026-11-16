@@ -3,16 +3,18 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { ArchitectureExplorer } from './ArchitectureExplorer';
 import { ProjectGallery } from './ProjectGallery';
 import { mobileLayoutQuery } from './useMobileLayout';
+import { aiNodes } from './aiArchitectureData';
+import { tr } from './architectureData';
 
 afterEach(() => vi.unstubAllGlobals());
 
-it('explains planned services on focus and tap in every language', () => {
+it('explains implemented Bedrock and alternatives in every language', () => {
   for (const locale of ['ja', 'zh', 'en'] as const) {
     const { unmount } = render(<ArchitectureExplorer locale={locale}/>);
     const bedrock = screen.getByRole('button', { name: /Amazon Bedrock/ });
     fireEvent.focus(bedrock);
     const story = document.getElementById('architecture-node-story')!;
-    expect(story).toHaveTextContent('PREPARING');
+    expect(story).toHaveTextContent('Qwen3 235B');
     expect(bedrock).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(screen.getByRole('button', { name: /ALB → ECS/ }));
     expect(story).toHaveTextContent('ECR');
@@ -26,7 +28,7 @@ it('separates architecture, CI/CD and failure recovery, and places Vite at build
   expect(screen.getByRole('button', { name: '01 / Architecture' })).toHaveAttribute('aria-pressed', 'true');
   expect(screen.getByRole('button', { name: /^Browser/ })).not.toHaveTextContent('Vite');
   fireEvent.click(screen.getByRole('button', { name: /Private S3/ }));
-  expect(document.getElementById('architecture-node-story')).toHaveTextContent('no Vite server runs in production');
+  expect(document.getElementById('architecture-node-story')).toHaveTextContent('no Vite server in production');
   fireEvent.click(screen.getByRole('button', { name: '03 / Failure recovery' }));
   expect(screen.getByRole('heading', { name: 'When a release goes wrong' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: '02 / CI/CD' })).toBeInTheDocument();
@@ -74,7 +76,7 @@ it('opens a floating touch explanation, changes it on another node and dismisses
   expect(lambda).toHaveAttribute('aria-describedby', bubble.id);
   expect(bubble.closest('.architecture-map-scroll')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: /Amazon Bedrock/ }));
-  expect(screen.getByRole('tooltip')).toHaveTextContent('PREPARING');
+  expect(screen.getByRole('tooltip')).toHaveTextContent('Mantle');
   fireEvent.pointerDown(document.body);
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   fireEvent.click(lambda);
@@ -95,4 +97,37 @@ it('keeps a touch explanation inside the open dialog top layer and consumes Esca
   fireEvent.keyDown(document, { key: 'Escape' });
   expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   expect(dialog).toHaveAttribute('open');
+});
+
+
+it('links the live Bedrock story to AI and explains prices and limits without inference', () => {
+  const fetchSpy = vi.spyOn(globalThis, 'fetch');
+  for (const locale of ['ja', 'zh', 'en'] as const) {
+    const { unmount } = render(<ArchitectureExplorer locale={locale}/>);
+    fireEvent.click(screen.getByRole('button', { name: /Amazon Bedrock/ }));
+    fireEvent.click(screen.getByRole('button', { name: /04 .*→/ }));
+    expect(screen.getByRole('button', { name: /^04 \/ AI/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('table')).toHaveTextContent('$2.150');
+    expect(screen.getByRole('table')).toHaveTextContent('$1.445');
+    fireEvent.click(screen.getByRole('button', { name: name => name.includes(tr(aiNodes.find(node => node.id === 'ai-java')!.titleText!, locale)) }));
+    expect(document.getElementById('architecture-node-story')).toHaveTextContent('1,000');
+    expect(screen.queryByRole('button', { name: /Runtime \/ Converse|Other Qwen Models/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /02 \/ CI\/CD/ }));
+    expect(screen.getByRole('button', { name: /ApproveTrafficShift/ })).toBeInTheDocument();
+    unmount();
+  }
+  expect(fetchSpy).not.toHaveBeenCalled();
+  fetchSpy.mockRestore();
+});
+
+it('uses the AI map label and floating mobile bubble for model limits', () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({ matches: query === mobileLayoutQuery, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+  render(<ArchitectureExplorer locale="en"/>);
+  fireEvent.click(screen.getByRole('button', { name: '04 / AI Q&A' }));
+  expect(screen.getByRole('region', { name: '04 / AI Q&A' })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: /^AI generation \/ Qwen3/ }));
+  expect(screen.getByRole('tooltip')).toHaveTextContent('1,024');
+  expect(screen.getByRole('tooltip')).toHaveTextContent('15 seconds');
+  fireEvent.keyDown(document, { key: 'Escape' });
+  expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 });
