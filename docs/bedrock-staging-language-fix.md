@@ -8,4 +8,10 @@
 
 本地：后端44项、Lambda适配5项及实际ZIP运行通过。固定原审核资料，用本机SSO调用同一Qwen，6个限定样本（原失败问法2次、技能、未知转职原因、日／英AI经历）通过及原presentation检查通过；不能代替真实STG角色／冷启动／全部未来问法验证。模型输入30,916／输出665 tokens。此前STG32诊断另1次5,097／168。原失败执行8次40,578／661，含拒绝和失败样本；实际usage在ignored证据中，均非零费用。
 
-证据：ignored `.local/staging-failure-20261116/`，安全报告不含问答／履历正文。未改IAM、资料S3版本、费用开关或生产别名。后续AWS候选结果另补。
+证据：ignored `.local/staging-failure-20261116/`，安全报告不含问答／履历正文。未改IAM、资料S3版本、费用开关或生产别名。
+
+AWS新候选：源码`f4b91d3c950deb235335e2dc81848d6f9d15bc90`／执行`586f1aa5-c6e8-433a-921c-d2f745ffa124`。前后端CI成功，BuildCandidate成功，STG33通过8项HTTP和10项真实模型检查，包含原失败问法`requirements-typo-zh`。同次报告passed、源码／执行／release／backend hash一致，实际STG33代码hash与报告一致；release为`f2ac44b04c416531c9c4ea85c6068ce0a55d48999bbd30f9a84e7b1c2b364f65`。
+
+本轮STG10次合计51,359输入／756输出tokens，按此前核对东京Mantle单价估算模型费$0.01466829；未含税及其他AWS费用，非实际账单。
+
+当前停在第一道`ApproveProduction`人工审批。生产live25／无附加权重、别名RevisionId和费用状态hash与预检相同，未创建新的生产Green、未切流、未发布前端。按[AGENTS.md](../AGENTS.md)保留两道审批：第一次允许创建／验证Green；第二次才允许切流与同候选前端发布。助手未代批。后续文档提交不改变本次固定源码，也不自动启动新的候选。
