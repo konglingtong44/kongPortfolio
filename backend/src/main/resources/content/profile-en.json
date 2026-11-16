@@ -23,7 +23,7 @@
       "period": "2026.11 —",
       "role": "Design, development, AWS infrastructure & operations",
       "description": "An evolving website built with React / TypeScript and Java 21 / Spring Boot. AWS infrastructure is managed with Terraform, with CI/CD, blue/green deployment and canary releases implemented.",
-      "outcome": "Live on AWS and under continued development. Verified Lambda releases from 10% canary traffic to full traffic, plus automatic rollback after a controlled stop. Amazon Bedrock Q&A integration is planned next; the endpoint currently returns a preparation status.",
+      "outcome": "Live on AWS and under continued development. Verified Lambda promotion from 10% to full traffic and stop-triggered automatic rollback. Amazon Bedrock Q&A now answers from reviewed reference facts. Two manual production approvals remain in place.",
       "tags": [
         "React / TypeScript",
         "Java / Spring Boot",
@@ -614,7 +614,7 @@
         "Amazon Bedrock (research)",
         "Amazon Lex (research)"
       ],
-      "description": "Support for code analysis, documentation and research. Bedrock/Lex are research/PoC scope; this website’s Q&A integration is not implemented."
+      "description": "Support for code analysis, documentation and technical research. Professional Bedrock/Lex work remains research/PoC scope; this site's Bedrock Q&A is separate personal-project practice."
     }
   ],
   "qualifications": [
@@ -628,13 +628,16 @@
     }
   ],
   "note": {
-    "date": "2026-11-13",
-    "title": "Development notes for this site",
-    "summary": "What is implemented and what comes next.",
+    "date": "2026-11-16",
+    "title": "From a deployed site to bounded AI Q&A",
+    "summary": "AI Q&A, architecture explanations and a fix for a real release failure.",
     "paragraphs": [
-      "Profile content is stored in Japanese, Chinese and English JSON files and served by Spring Boot. The current amount of content does not require a database. React / TypeScript handles the UI; Vite is used for local development and builds.",
-      "The site is deployed with S3, CloudFront, API Gateway and Lambda. AWS CI/CD retains two manual approvals. Lambda promotion from 10% to full traffic and stop-triggered automatic rollback have been verified. The kongPortfolio project card explains the architecture and verification scope.",
-      "Amazon Bedrock Q&A is next. The current API only returns a preparation status and calls no model. Application-failure, alarm-triggered and post-publication frontend recovery still need separate live-environment checks."
+      "This site started with a React / TypeScript interface and a Java 21 / Spring Boot API. Page data ships as JSON with the backend; there is currently no database. Vite supports local development and frontend builds.",
+      "Private S3 and CloudFront deliver the pages, while API Gateway forwards requests to Lambda. Terraform manages the infrastructure and AWS pipelines run tests, builds and releases. After staging checks, two manual approvals precede a gradual switch to the new backend version.",
+      "AI Q&A now uses Qwen3 235B through the Amazon Bedrock Mantle API. Each call uses reviewed reference facts and the current question, without writing visitor conversations back into the reference. Input length, output, frequency and waiting time are bounded. For now, full reference text is sent without adding a knowledge base or vector database.",
+      "Maps 01–04 in the project card cover the site architecture, CI/CD, recovery and AI Q&A. Nodes explain the actual processing, and alternatives show their pricing assumptions and the reasons for choosing a simpler setup at this scale.",
+      "A recent release stopped in staging because a Chinese question received a Japanese answer. I kept the existing check, strengthened the language instructions and added a Java output guard. Tests and real-model checks passed before release through both approvals. The failure and fix are also recorded in the learning guide.",
+      "Next are live drills for application faults, alarm-triggered rollback and frontend restoration after publication. Local checks and browser device simulations are recorded separately from AWS drills and physical-iPhone verification."
     ]
   }
 }

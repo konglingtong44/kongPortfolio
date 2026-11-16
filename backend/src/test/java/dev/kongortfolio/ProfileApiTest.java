@@ -51,7 +51,8 @@ class ProfileApiTest {
             assertThat(content.path("timeline").get(5).path("period").asText()).isEqualTo("2014.09 — 2018.06");
             assertThat(content.path("timeline").get(0).path("period").asText()).startsWith("2026.08");
             assertThat(content.path("qualifications").get(0).path("date").asText()).contains("2021.08");
-            assertThat(content.path("note").path("paragraphs").size()).isEqualTo(3);
+            assertThat(content.path("note").path("paragraphs").isArray()).isTrue();
+            assertThat(content.path("note").path("paragraphs").size()).isPositive();
         }
     }
 

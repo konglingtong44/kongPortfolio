@@ -253,7 +253,7 @@ Invoke-RestMethod https://konglingtong44.com/api/health
 | `infra/terraform/` | State、网站与 CI/CD 基础设施 |
 | `codebuild/` | 各构建／验证／发布阶段的 buildspec |
 | `scripts/` | 本地启动、检查、候选打包与发布控制脚本 |
-| [AWS_LEARNING_GUIDE.md](AWS_LEARNING_GUIDE.md) | 按步骤学习首次搭建，第 22 步为日常发版 |
+| [AWS_LEARNING_GUIDE.md](AWS_LEARNING_GUIDE.md) | 面向AWS初学者的00–06复现路线：账号认证、命令、控制台操作与验收；06为日常发版 |
 | [AWS_EXECUTION_LOG.md](AWS_EXECUTION_LOG.md) | 实际操作、失败修复和验证历史 |
 | [2026-11-13～14命令补录](docs/aws-commands-20261114.md) | 模型调查、费用部署、停站演练、删除与429的实际命令／SDK操作 |
 | [前后端发布记录](docs/frontend-publication.md) | 完整发布验收结果与边界 |

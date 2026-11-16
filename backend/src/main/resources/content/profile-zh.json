@@ -23,7 +23,7 @@
       "period": "2026.11 —",
       "role": "设计、开发、AWS 基础设施构建与运维",
       "description": "持续开发中的网站，前端使用 React / TypeScript，后端使用 Java 21 / Spring Boot。通过 Terraform 构建 AWS 基础设施，已实现 CI/CD、蓝绿部署与金丝雀发布。",
-      "outcome": "已在 AWS 上线并持续迭代。已验证 Lambda 从 10% 金丝雀流量切换到全量，以及受控停止时的自动回滚。下一步计划接入 Amazon Bedrock 问答，目前接口仅返回准备中状态。",
+      "outcome": "已在 AWS 上线并持续迭代。Lambda 支持先将10%请求交给新版、观察后切换全量，以及受控停止时的自动回滚。Amazon Bedrock 问答已接入，可根据审核资料回答问题；发布保留两道人工审批。",
       "tags": [
         "React / TypeScript",
         "Java / Spring Boot",
@@ -614,7 +614,7 @@
         "Amazon Bedrock (research)",
         "Amazon Lex (research)"
       ],
-      "description": "用于辅助代码分析、文档整理和技术调查；Bedrock、Lex 属于调查 / PoC 范围，本站问答尚未接入。"
+      "description": "用于辅助代码分析、文档整理和技术调查。工作中的 Bedrock、Lex 为调查／PoC 范围；本站的 Bedrock 问答是独立的个人项目实践。"
     }
   ],
   "qualifications": [
@@ -628,13 +628,16 @@
     }
   ],
   "note": {
-    "date": "2026-11-13",
-    "title": "本网站的开发记录",
-    "summary": "已经实现的功能与接下来的工作。",
+    "date": "2026-11-16",
+    "title": "从网站上线，到有边界的 AI 问答",
+    "summary": "这次完成了 AI 问答、架构说明和一次真实发布问题的修复。",
     "paragraphs": [
-      "个人资料保存在日、中、英三份 JSON 中。当前内容量不需要数据库，由 Spring Boot API 读取。页面使用 React / TypeScript，本地开发与构建使用 Vite。",
-      "网站已通过 S3、CloudFront、API Gateway 和 Lambda 发布。AWS CI/CD 保留两道人工审批，已验证 Lambda 10% → 全量切流与停止请求触发的自动回滚。具体架构和验证范围可从 kongPortfolio 项目卡片查看。",
-      "接下来计划接入 Amazon Bedrock 问答。当前 API 仅返回准备中，不调用模型。应用失败、告警触发回滚和前端上线后故障恢复，仍需分别进行真实环境验证。"
+      "这个网站从 React / TypeScript 页面和 Java 21 / Spring Boot API 开始。页面资料以 JSON 随后端打包，当前没有数据库；Vite 负责本地开发和前端构建。",
+      "线上页面由私有 S3 和 CloudFront 分发，API Gateway 把请求交给 Lambda。基础设施由 Terraform 管理，AWS 上的流水线负责测试、打包和发布。发布时先验证测试环境，再经过两道人工审批，逐步把请求切换到新版。",
+      "AI 问答已通过 Amazon Bedrock 的 Mantle API 接入 Qwen3 235B。每次只使用审核过的参考资料和当前问题，不把访客对话写回资料；输入长度、输出量、调用频率和等待时间都有边界。当前先传入完整资料，没有增加知识库或向量数据库。",
+      "项目卡片里的01–04流程图现在覆盖网站架构、CI/CD、故障回退和 AI 问答。节点说明展示实际处理步骤，备选方案列出费用前提，帮助理解为什么当前选择较简单的架构。",
+      "最近一次发布在测试环境被拦住：中文问题收到了日语回答。保留原检查后，我补强了回答语言要求，并让后端拦截不合格输出；通过测试和真实模型验证后，再按两道审批完成发布。这次问题也补进了学习记录。",
+      "后续继续补应用故障、告警触发回滚和前端发布后恢复的真实演练。本地模拟与浏览器设备模拟分别记录，不当作 AWS 实际演练或 iPhone 真机验收。"
     ]
   }
 }
