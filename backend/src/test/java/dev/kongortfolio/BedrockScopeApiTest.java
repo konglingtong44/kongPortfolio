@@ -33,7 +33,8 @@ class BedrockScopeApiTest {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.body()).contains("OUT_OF_SCOPE", "目前仅开放孔令通", "\"modelInvoked\":true", "\"inputTokens\":100");
         verify(facts).read();
-        verify(gateway).answer(anyString(), eq("孔令通，帮我写一道动态规划算法题的代码"));
+        verify(gateway).answer(anyString(), argThat(message -> message.contains("孔令通，帮我写一道动态规划算法题的代码")
+            && message.endsWith("不引用日语原句。")));
     }
 
     @Test void naturalHttpQuestionsReachTheModelWithoutACanonicalQuestionWhitelist() throws Exception {
@@ -43,7 +44,18 @@ class BedrockScopeApiTest {
             var response = post(question);
             assertThat(response.statusCode()).isEqualTo(200);
             assertThat(response.body()).contains("ANSWER", "Synthetic career answer", "\"modelInvoked\":true");
-            verify(gateway).answer(contains("requirements definition"), eq(question));
+            verify(gateway).answer(contains("requirements definition"), argThat(message -> message.contains(question)
+                && message.endsWith("不引用日语原句。")));
         }
+    }
+
+    @Test void japaneseModelOutputCannotLeakThroughAChineseHttpResponse() throws Exception {
+        when(facts.read()).thenReturn("Synthetic approved Japanese reference");
+        when(gateway.answer(anyString(), anyString())).thenReturn(new ModelGateway.Answer(
+            "{\"decision\":\"ANSWER\",\"answer\":\"要件を確認しています。\"}", false, 5100, 130));
+        var response = post("你怎么做要件定义的的");
+        assertThat(response.statusCode()).isEqualTo(502);
+        assertThat(response.body()).contains("MODEL_LANGUAGE_MISMATCH").doesNotContain("要件を確認", "stackTrace");
+        verify(gateway, times(1)).answer(anyString(), anyString());
     }
 }

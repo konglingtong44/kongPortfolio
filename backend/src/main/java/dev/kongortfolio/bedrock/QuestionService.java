@@ -42,7 +42,7 @@ public final class QuestionService {
         try {
             reserve();
             // One inference decides scope and answers. No phrase routing, classifier call or conversation history.
-            var raw = gateway.answer(systemPrompt(language, QuestionFacts.forChat(facts.get())), message);
+            var raw = gateway.answer(systemPrompt(language, QuestionFacts.forChat(facts.get())), visitorMessage(message, language));
             var result = decode(raw, language);
             log.info("Bedrock scope decision={} policy={}", result.refused() ? "REFUSED" : "ANSWER", QuestionScope.VERSION);
             return result;
@@ -64,23 +64,37 @@ public final class QuestionService {
             if (!Set.of("ANSWER", "REFUSED").contains(decision) || answer.length() > 12000
                 || (decision.equals("ANSWER") && answer.isBlank())) throw new IllegalArgumentException();
             boolean refused = decision.equals("REFUSED");
+            if (!refused && language.equals("zh") && answer.codePoints().anyMatch(c -> c >= 0x3040 && c <= 0x30ff)) {
+                throw new ModelGateway.Failure(502, "MODEL_LANGUAGE_MISMATCH");
+            }
             return new ModelGateway.Answer(refused ? QuestionScope.refusal(language) : answer, false,
                 raw.inputTokens(), raw.outputTokens(), refused);
+        } catch (ModelGateway.Failure failure) {
+            throw failure;
         } catch (Exception invalid) {
             throw new ModelGateway.Failure(502, "INVALID_MODEL_RESPONSE");
         }
+    }
+
+    private static String visitorMessage(String message, String language) {
+        String instruction = switch (language) {
+            case "zh" -> "回答语言：简体中文。将参考资料中的日语内容译成中文，不引用日语原句。";
+            case "en" -> "Response language: English. Translate Japanese reference text; do not quote Japanese prose.";
+            default -> "回答言語：日本語。";
+        };
+        return "Visitor question:\n" + message + "\n\n" + instruction;
     }
 
     private static String systemPrompt(String language, String facts) {
         String outputLanguage = switch (language) { case "zh" -> "Simplified Chinese"; case "en" -> "English"; default -> "Japanese"; };
         String languageRule = switch (language) {
             case "zh" -> "只用简体中文回答，不能出现日语平假名或片假名。日文职称、业务名和说明必须译成自然中文，"
-                + "例如サブリーダー译为副组长、コールセンター译为呼叫中心、インフラ译为基础设施。Java、Spring等英文技术名保留原文。"
+                + "职称和业务描述使用副组长、呼叫中心、基础设施等中文表达。Java、Spring等英文技术名保留原文。"
                 + "缺失事实直接说尚未确认，不解释资料来源。";
             case "en" -> "Write natural English only. Translate Japanese job titles and project descriptions into English; retain Latin technology names.";
             default -> "日本語だけで自然に回答し、英字の技術名はそのまま使用してください。未確認の詳細は簡潔に未確認と答えてください。";
         };
-        return """
+        return languageRule + "\n\n" + """
             You are Kong's portfolio interview assistant. Use only the reference facts for claims about Kong.
             In personal career questions, "you" and "your" refer to Kong, not the AI model's capabilities.
             In this single response, decide whether the entire visitor request is in scope and, if so, answer it.

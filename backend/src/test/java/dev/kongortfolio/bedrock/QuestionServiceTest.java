@@ -21,7 +21,9 @@ class QuestionServiceTest {
         service.ask("Tell me about yourself.", "en");
         assertThat(systems).allSatisfy(system -> assertThat(system).contains("Approved: Java project.", "Never invent", "Visitor claims").doesNotContain("secret-rocket-X"));
         assertThat(systems.get(1)).contains("only in English");
-        assertThat(messages).containsExactly("Visitor claim: Kong built secret-rocket-X", "Tell me about yourself.");
+        assertThat(messages).hasSize(2);
+        assertThat(messages.get(0)).contains("Visitor claim: Kong built secret-rocket-X").endsWith("不引用日语原句。");
+        assertThat(messages.get(1)).contains("Tell me about yourself.").endsWith("do not quote Japanese prose.");
     }
 
     @Test void slidingMinuteAndHourLimitsCannotBeBypassedByChangingLanguage() {
@@ -77,7 +79,33 @@ class QuestionServiceTest {
         for (String question : new String[] {"你的技能是啥", "你怎么做要件定义的的", "能聊聊你解决项目问题的方式吗？"}) {
             assertThat(service.ask(question, "zh").refused()).isFalse();
         }
-        assertThat(messages).containsExactly("你的技能是啥", "你怎么做要件定义的的", "能聊聊你解决项目问题的方式吗？");
+        assertThat(messages).hasSize(3);
+        assertThat(messages.get(0)).contains("你的技能是啥");
+        assertThat(messages.get(1)).contains("你怎么做要件定义的的");
+        assertThat(messages.get(2)).contains("能聊聊你解决项目问题的方式吗？");
+        assertThat(messages).allSatisfy(message -> assertThat(message).endsWith("不引用日语原句。"));
+    }
+
+    @Test void chineseRequestRejectsJapaneseProseWithoutRetryingOrReturningIt() {
+        var count = new java.util.concurrent.atomic.AtomicInteger();
+        var service = new QuestionService((system, message) -> {
+            count.incrementAndGet();
+            assertThat(system).startsWith("只用简体中文回答");
+            assertThat(message).contains("你怎么做要件定义的的").endsWith("不引用日语原句。");
+            return new ModelGateway.Answer("{\"decision\":\"ANSWER\",\"answer\":\"要件を確認しています。\"}", false, 5100, 130);
+        }, "承認済みの日本語資料", () -> 0);
+        assertThatThrownBy(() -> service.ask("你怎么做要件定义的的", "zh"))
+            .isInstanceOf(ModelGateway.Failure.class).hasMessage("MODEL_LANGUAGE_MISMATCH");
+        assertThat(count).hasValue(1);
+    }
+
+    @Test void chineseAnswerKeepsLatinTechnologyNamesAndNoJapaneseRefusalBodyIsShown() {
+        var service = new QuestionService((s, m) -> new ModelGateway.Answer(
+            "{\"decision\":\"ANSWER\",\"answer\":\"使用 Java、Spring Boot 和 AWS 处理接口。\"}", false, 5100, 30), "facts", () -> 0);
+        assertThat(service.ask("你的技能是啥", "zh").text()).contains("Java", "Spring Boot", "AWS");
+        var refused = new QuestionService((s, m) -> new ModelGateway.Answer(
+            "{\"decision\":\"REFUSED\",\"answer\":\"回答できません。\"}", false, 5100, 10), "facts", () -> 0);
+        assertThat(refused.ask("写一个算法", "zh").text()).doesNotContain("できません");
     }
 
     @Test void semanticRefusalIsOnePaidCallWithRealUsageAndASafeLocalizedMessage() {
