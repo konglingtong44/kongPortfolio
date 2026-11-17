@@ -1,0 +1,13 @@
+{
+  "checkedOn": "2026-11-17",
+  "publicationDate": "2026-11-11T01:30:37Z",
+  "source": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonBedrock/current/ap-northeast-1/index.json",
+  "sourceSha256": "fb1df4dcc681874fdd45bcf5e71bc3e4bb9970d1a591658a2890279eacbfca9a",
+  "region": "ap-northeast-1",
+  "model": "qwen.qwen3-235b-a22b-2507",
+  "tier": "Mantle Standard",
+  "inputSku": "79HS9WT8R83A4ZDA",
+  "outputSku": "C8F2RN2SDE28RN3W",
+  "inputUsdPerMillion": 0.27,
+  "outputUsdPerMillion": 1.06
+}

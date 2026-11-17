@@ -3,7 +3,7 @@ import { beforeEach, afterEach, expect, it, vi } from 'vitest';
 import App from './App';
 import { localeKey } from './i18n';
 import { mobileLayoutQuery } from './useMobileLayout';
-import { qaCopy } from './bedrock-copy';
+import { qaCopy } from './features/qa/bedrock-copy';
 
 const profile = {
   name: 'Kong', role: 'Software engineer', introduction: 'A profile from the API.',

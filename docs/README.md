@@ -1,0 +1,18 @@
+# 文档入口
+
+先看[当前实现地图](architecture/overview.md)，再进入对应目录。当前实现以代码为准，线上状态以同次发布证据为准；历史记录中的“当前／待审批”只表示记录当时。
+
+| 目录 | 入口与用途 |
+|---|---|
+| [architecture](architecture/overview.md) | 运行链路、代码边界、Terraform 与发布的职责 |
+| [deployment](deployment/README.md) | 日常发布、首次部署、审批、金丝雀与回滚 |
+| [operations](operations/README.md) | 账单、费用关停、手动恢复及资源清理 |
+| [ai](ai/README.md) | 网站问答实现、开发自动化概念与官方来源 |
+| [product](product/README.md) | 三语内容、桌面与手机交互、设计记录 |
+| [learning](learning/README.md) | 从本地到 AWS 的 00–06 复现路线 |
+| [stories](stories/README.md) | 一次一个增量的目标、验收和验证证据 |
+| [history](history/README.md) | 旧 README、执行日志、命令补录和发布记录 |
+
+AI 协作从 [AGENTS.md](../AGENTS.md) 和当前 Story 开始，按任务读取相关文件。项目 Skill：[执行一个 Story](../.agents/skills/portfolio-story/SKILL.md)、[审阅发布证据](../.agents/skills/portfolio-release-review/SKILL.md)。这些是本项目的小型流程，不是安装了完整 AWS AI-DLC 运行时。
+
+本地运行 `node scripts/check-docs.mjs` 检查仓库 Markdown 的本地链接目标。检查覆盖普通行内链接、图片和引用式链接，跳过代码及外部网址；不校验标题锚点或远端网页。新增文档应挂到相应入口，避免把日常入口持续追加成执行日志。

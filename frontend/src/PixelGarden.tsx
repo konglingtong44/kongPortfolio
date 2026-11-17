@@ -1,4 +1,4 @@
-// Original discovery garden scene, generated without game references. See DESIGN_NOTES.md for the prompt.
+// Original discovery garden scene, generated without game references. See docs/product/design-notes.md for the prompt.
 export function PixelGarden({ compact = false }: { compact?: boolean }) {
   return <img className={`pixel-garden ${compact ? 'compact' : ''}`} src={`${import.meta.env.BASE_URL}images/discovery-garden.png`} alt="" aria-hidden="true" width={1536} height={1024} loading={compact ? 'lazy' : 'eager'} fetchPriority={compact ? 'auto' : 'high'}/>;
 }

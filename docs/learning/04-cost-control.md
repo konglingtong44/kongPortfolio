@@ -1,6 +1,6 @@
 # 04｜先知道怎么停，再开启AI
 
-[上一章](03-delivery.md) · [学习路线](../../AWS_LEARNING_GUIDE.md) · [下一章](05-ai.md)
+[上一章](03-delivery.md) · [学习路线](README.md) · [下一章](05-ai.md)
 
 目标：区分“费用通知”“暂停服务”“删除资源”。本章部署会新增预算、SNS、控制Lambda、S3状态、日志等，可能收费；暂停和恢复是实际业务写操作。
 
@@ -113,4 +113,4 @@ terraform -chdir=infra/terraform/cost-control apply -input=false "$RepoRoot/.loc
 
 记录账号、控制器名称、目标分配ID、预算时间范围、初始化基线、停／开结果和剩余收费项。`.local`中的通知邮箱、计划和状态不提交Git。维护时保留 `arm_notifications=true` 的真实输入，不能拿默认false重新apply。
 
-更完整的边界与已做过的演练见[费用控制记录](../aws-cost-control.md)。预算通知本身不是保证不超支的产品，费用仍以AWS实际账单为准。
+更完整的边界与已做过的演练见[费用控制记录](../operations/aws-cost-control.md)。预算通知本身不是保证不超支的产品，费用仍以AWS实际账单为准。

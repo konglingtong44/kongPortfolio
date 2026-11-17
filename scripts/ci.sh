@@ -26,6 +26,10 @@ node .githooks/check-staged-paths.mjs --all
 gitleaks git --redact --no-banner .
 gitleaks dir --redact --no-banner .
 node scripts/test-hooks.mjs
+node scripts/checks/test-staging-sampling-plan.mjs
+node scripts/checks/test-review-staging.mjs
+node scripts/checks/test-docs.mjs
+node scripts/checks/check-docs.mjs
 node scripts/test-cloudfront-routing.mjs
 node scripts/test-pipeline-candidate.mjs
 node scripts/test-staging-contract.mjs

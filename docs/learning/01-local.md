@@ -1,6 +1,6 @@
 # 01｜先在电脑上运行，再准备Lambda包
 
-[上一章](00-start.md) · [学习路线](../../AWS_LEARNING_GUIDE.md) · [下一章](02-first-site.md)
+[上一章](00-start.md) · [学习路线](README.md) · [下一章](02-first-site.md)
 
 本章只在本机操作。只看网站时，不需要AWS登录，也不必加载00的AWS上下文。
 
@@ -19,6 +19,8 @@ PowerShell工作目录：仓库根目录。
 | tools.ps1 | 加载当前用户的工具PATH和JAVA_HOME |
 | install-hooks.ps1 | 让本仓库提交／推送前执行秘密扫描，缺少Gitleaks则拒绝提交 |
 | dev.ps1 | 检查5173／8080端口，必要时安装前端依赖，构建Java，启动前后端并等待健康检查 |
+
+启动实现现位于 [scripts/dev/dev.ps1](../../scripts/dev/dev.ps1)，原来的 [scripts/dev.ps1](../../scripts/dev.ps1) 保留为兼容入口，所以上面的命令不变。路径按脚本位置解析，工作目录变化不会改变仓库根定位；迁移验证见[Story003](../stories/003-dev-launcher.md)。
 
 打开 `http://localhost:5173`，应看到页面，项目卡片能打开，开发手记能阅读。在运行脚本的终端按 `Ctrl+C`，脚本会停止它启动的两个进程。
 

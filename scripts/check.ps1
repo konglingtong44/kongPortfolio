@@ -3,6 +3,14 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path "$PSScriptRoot/..").Path
 Push-Location $repo
 try {
+    & node "$repo/scripts/checks/test-staging-sampling-plan.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Sampling plan verification failed.' }
+    & node "$repo/scripts/checks/test-review-staging.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Local STG review verification failed.' }
+    & node "$repo/scripts/checks/test-docs.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Documentation checker verification failed.' }
+    & node "$repo/scripts/checks/check-docs.mjs"
+    if ($LASTEXITCODE -ne 0) { throw 'Documentation links failed.' }
     $npm = Require-Tool 'npm.cmd'
     $maven = Require-Tool 'mvn.cmd'
     $gitleaks = Require-Tool 'gitleaks'

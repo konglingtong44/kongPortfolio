@@ -1,6 +1,6 @@
 # 06｜日常发布、控制台路径和排错
 
-[上一章](05-ai.md) · [学习路线](../../AWS_LEARNING_GUIDE.md)
+[上一章](05-ai.md) · [学习路线](README.md)
 
 这章用于**已有环境**。日常修改React、Java、页面资料，不重新创建State、域名、连接或流水线。新机器先恢复原有私有配置和State位置，不能只填默认值就apply。
 
@@ -147,7 +147,7 @@ aws logs get-log-events --log-group-name $Group --log-stream-name $Stream --star
 
 生产26之前，STG32在 `requirements-typo-zh` 失败：构建与接口通过，但AI用日语回答了中文问题。调查顺序是SSO恢复→按执行ID取日志／安全报告→隔离STG有限复现→修复→本地与真实模型检查→新候选→STG33→两次人审→生产26。
 
-修复在请求前后明确回答语言，并由Java拦截中文中的日语假名；保留原验收断言、不自动二次付费调用、不改个人资料来凑答案。[完整记录](../bedrock-staging-language-fix.md)
+修复在请求前后明确回答语言，并由Java拦截中文中的日语假名；保留原验收断言、不自动二次付费调用、不改个人资料来凑答案。[完整记录](../history/releases/bedrock-staging-language-fix.md)
 
 ## 9. 怎么恢复
 
@@ -159,7 +159,7 @@ aws logs get-log-events --log-group-name $Group --log-stream-name $Stream --star
 | 前端发布后出错 | 核对保留的旧页面目录，按当前路由版本恢复并测试；前端恢复不等于后端也恢复 |
 | 费用达到关停条件 | 用04章控制器处理，不把停站当成版本回滚 |
 
-真实回滚和恢复可能中断服务，先安排窗口。已验证的是受控停止后的自动回滚；应用异常、告警和前端上线后恢复仍需单独实演。详细条件见[恢复图说明](../recovery-map.md)。
+真实回滚和恢复可能中断服务，先安排窗口。已验证的是受控停止后的自动回滚；应用异常、告警和前端上线后恢复仍需单独实演。详细条件见[恢复图说明](../architecture/recovery-map.md)。
 
 ## 10. 维护基础设施与资料
 

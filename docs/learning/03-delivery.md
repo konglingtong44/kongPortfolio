@@ -1,6 +1,6 @@
 # 03｜把测试与发布放到AWS
 
-[上一章](02-first-site.md) · [学习路线](../../AWS_LEARNING_GUIDE.md) · [下一章](04-cost-control.md)
+[上一章](02-first-site.md) · [学习路线](README.md) · [下一章](04-cost-control.md)
 
 目标：推送触发自动检查；生产发布人工选提交，并经过两道审批。CI负责检查，CD负责交付与部署。所有构建在AWS运行，不增加GitHub Actions。
 

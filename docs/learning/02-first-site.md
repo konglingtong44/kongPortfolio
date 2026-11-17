@@ -1,6 +1,6 @@
 # 02｜State、第一次云端部署和域名
 
-[上一章](01-local.md) · [学习路线](../../AWS_LEARNING_GUIDE.md) · [下一章](03-delivery.md)
+[上一章](01-local.md) · [学习路线](README.md) · [下一章](03-delivery.md)
 
 本章仅用于**新账号中的首次搭建**。已有生产环境从[06](06-operations.md)维护，不能用一个空State重新管理同名资源。下面的apply、上传、域名操作可能收费。
 

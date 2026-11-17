@@ -8,4 +8,4 @@ Use `terraform plan -var-file=../../../.local/cost-control.tfvars.json` and revi
 
 The deployed controller's stop policy denies both `bedrock:*` (Runtime) and `bedrock-mantle:*` on the reviewed business execution roles. It does not restrict administrator SSO or other roles. Dual-endpoint denial was verified with IAM simulation; the November 14 extension did not execute another live stop/start.
 
-Operations, billing scope, limitations and verification: [docs/aws-cost-control.md](../../../docs/aws-cost-control.md).
+Operations, billing scope, limitations and verification: [docs/aws-cost-control.md](../../../docs/operations/aws-cost-control.md).
