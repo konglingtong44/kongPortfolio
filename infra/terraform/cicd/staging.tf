@@ -60,7 +60,7 @@ resource "aws_lambda_function" "staging" {
   reserved_concurrent_executions = 1
   tags                           = { Environment = "stg" }
   environment {
-    variables = merge({ DEBUG = "false", MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp" }, var.enable_staging_bedrock_qa ? {
+    variables = merge({ DEBUG = "false", MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp", JAVA_TOOL_OPTIONS = "-XX:-UseBASE64Intrinsics" }, var.enable_staging_bedrock_qa ? {
       BEDROCK_ENABLED           = "true"
       BEDROCK_FACTS_BUCKET      = var.staging_bedrock_content.bucket
       BEDROCK_FACTS_OWNER       = var.staging_bedrock_content.owner

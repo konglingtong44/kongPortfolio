@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
-import { apiEvent, bedrockContracts, checkAnswerPresentation, checkBedrockResponse, checkResponse, presentationContracts, requireStagingTarget, selectVersion, stagingFailureReport } from './staging-contract.mjs';
+import { apiEvent, bedrockContracts, checkAnswerPresentation, checkBedrockResponse, checkResponse, presentationContracts, requireStagingConfig, requireStagingTarget, selectVersion, stagingFailureReport } from './staging-contract.mjs';
 
 assert.throws(() => requireStagingTarget('kongportfolio-prod', '123456789012'), /isolated STG/);
 requireStagingTarget('kongportfolio-stg', '123456789012');
 assert.throws(() => requireStagingTarget('kongportfolio-stg', 'wrong-account'), /match/);
 const config = { Runtime: 'java21', Handler: 'handler', MemorySize: 1024, Timeout: 28, Architectures: ['x86_64'], Environment: { Variables: { DEBUG: 'false' } } };
+const secured = { ...config, Handler: 'dev.kongortfolio.lambda.PortfolioLambdaHandler::handleRequest', Environment: { Variables: { DEBUG: 'false', MANAGEMENT_HEALTH_DISKSPACE_PATH: '/tmp', JAVA_TOOL_OPTIONS: '-XX:-UseBASE64Intrinsics' } } };
+requireStagingConfig(secured);
+assert.throws(() => requireStagingConfig({ ...secured, Environment: { Variables: { ...secured.Environment.Variables, JAVA_TOOL_OPTIONS: '' } } }));
 const published = { ...config, Version: '3', CodeSha256: 'expected' };
 assert.equal(selectVersion({ Version: '$LATEST', CodeSha256: 'expected' }, [published, { ...published, Version: '4', MemorySize: 512 }], config, 'expected'), '3');
 assert.throws(() => selectVersion({ Version: '5', CodeSha256: 'wrong' }, [], config, 'expected'), /checksum/);

@@ -44,6 +44,7 @@ resource "aws_lambda_function" "api" {
     variables = merge({
       DEBUG                            = "false"
       MANAGEMENT_HEALTH_DISKSPACE_PATH = "/tmp"
+      JAVA_TOOL_OPTIONS                = "-XX:-UseBASE64Intrinsics"
       }, var.enable_bedrock_qa ? {
       BEDROCK_ENABLED           = "true"
       BEDROCK_FACTS_BUCKET      = var.bedrock_content.bucket

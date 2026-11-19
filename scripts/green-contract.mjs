@@ -32,6 +32,7 @@ export function requireProductionConfig(config, account) {
   assert.deepEqual(config.Architectures, ['x86_64']);
   assert.equal(config.Environment?.Variables?.DEBUG, 'false');
   assert.equal(config.Environment?.Variables?.MANAGEMENT_HEALTH_DISKSPACE_PATH, '/tmp');
+  assert.equal(config.Environment?.Variables?.JAVA_TOOL_OPTIONS, '-XX:-UseBASE64Intrinsics');
   assert.equal(config.Role, `arn:aws:iam::${account}:role/kongportfolio-prod-lambda`);
   const env = config.Environment?.Variables || {};
   assert.ok(env.BEDROCK_ENABLED === undefined || ['true', 'false'].includes(env.BEDROCK_ENABLED), 'Invalid production feature flag');

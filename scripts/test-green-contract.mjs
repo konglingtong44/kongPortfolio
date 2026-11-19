@@ -19,8 +19,9 @@ assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...st
 assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...staging, releaseId: 'different' }, 'run-1'));
 assert.throws(() => requireApprovedContext(execution, actions, manifest, { ...staging, checks: [] }, 'run-1'));
 const account = '123456789012';
-const config = { Runtime: 'java21', Handler: 'dev.kongortfolio.lambda.PortfolioLambdaHandler::handleRequest', MemorySize: 1024, Timeout: 28, Architectures: ['x86_64'], Role: `arn:aws:iam::${account}:role/kongportfolio-prod-lambda`, Environment: { Variables: { DEBUG: 'false', MANAGEMENT_HEALTH_DISKSPACE_PATH: '/tmp' } } };
+const config = { Runtime: 'java21', Handler: 'dev.kongortfolio.lambda.PortfolioLambdaHandler::handleRequest', MemorySize: 1024, Timeout: 28, Architectures: ['x86_64'], Role: `arn:aws:iam::${account}:role/kongportfolio-prod-lambda`, Environment: { Variables: { DEBUG: 'false', MANAGEMENT_HEALTH_DISKSPACE_PATH: '/tmp', JAVA_TOOL_OPTIONS: '-XX:-UseBASE64Intrinsics' } } };
 requireProductionConfig(config, account);
+assert.throws(() => requireProductionConfig({ ...config, Environment: { Variables: { ...config.Environment.Variables, JAVA_TOOL_OPTIONS: '' } } }, account));
 const env = { ...config.Environment.Variables, BEDROCK_ENABLED: 'true', BEDROCK_FACTS_BUCKET: `kongportfolio-content-${account}-ap-northeast-1`, BEDROCK_FACTS_OWNER: account, BEDROCK_FACTS_VERSION: 'approved-v3', BEDROCK_FACTS_SHA256: 'd'.repeat(64), BEDROCK_MAX_OUTPUT_TOKENS: '1024', BEDROCK_TIMEOUT_SECONDS: '15' };
 const enabled = { ...config, Environment: { Variables: env } };
 requireProductionConfig(enabled, account);

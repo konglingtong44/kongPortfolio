@@ -35,6 +35,7 @@ export function requireStagingConfig(config, account) {
   assert.deepEqual(config.Architectures, ['x86_64']);
   assert.equal(config.Environment?.Variables?.MANAGEMENT_HEALTH_DISKSPACE_PATH, '/tmp');
   assert.equal(config.Environment?.Variables?.DEBUG, 'false');
+  assert.equal(config.Environment?.Variables?.JAVA_TOOL_OPTIONS, '-XX:-UseBASE64Intrinsics');
   if (account) assert.equal(config.Role, `arn:aws:iam::${account}:role/kongportfolio-stg-lambda`);
   const env = config.Environment?.Variables || {};
   if (env.BEDROCK_ENABLED === 'true') {

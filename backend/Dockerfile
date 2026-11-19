@@ -13,7 +13,7 @@ COPY --from=build --chown=portfolio:portfolio /app/target/kongPortfolio.jar ./ap
 USER portfolio
 ENV SERVER_ADDRESS=0.0.0.0
 ENV PORTFOLIO_LOGGING_DIRECTORY=/app/logs
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70.0"
+ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=70.0 -XX:-UseBASE64Intrinsics"
 EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=3s --start-period=40s CMD wget -q -O /dev/null http://127.0.0.1:8080/api/health || exit 1
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
