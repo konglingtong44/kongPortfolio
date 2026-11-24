@@ -81,3 +81,9 @@ node scripts/check-docs.mjs
 [Story008](../stories/008-profile-presentation.md)把介绍时间线、技能展示及相关CSS／测试收进`features/profile/`。共享的资料类型、语言、手势和像素场景保持原位，只调整组件依赖路径，不改个人经历内容。
 
 CSS移动还要看“谁导入、在哪一行导入”：intro样式继续在App原来的位置导入，skills样式继续由SkillsBento导入，两份样式正文不变，避免借归类改变级联顺序。实际前端81项和构建通过；手机折叠相关单元测试不等于真机验证。
+
+## 8. 接入官方AI-DLC
+
+上述安装／触发状态描述此前的Superpowers实践。后续目标明确为AI-DLC方法→Codex harness→Codex执行；[Story011](../stories/011-aidlc-codex-probe.md)固定官方2.11.4，在独立本地Git项目预演Codex配置、hooks与doctor。具体边界、可运行命令和后续验收见[接入说明](../ai/aidlc-codex.md)。
+
+随后[Story012](../stories/012-aidlc-codex-main.md)已将适配应用到主仓库，完成新CLI的Skill发现和hook信任验证。操作、命令与仍未执行的完整闭环记录在[学习13](13-aidlc-codex.md)。

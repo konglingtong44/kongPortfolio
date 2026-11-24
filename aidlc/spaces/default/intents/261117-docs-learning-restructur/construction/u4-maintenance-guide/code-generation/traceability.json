@@ -1,0 +1,38 @@
+{
+  "stage": "code-generation",
+  "unit": "u4-maintenance-guide",
+  "upstream_ids": [
+    "FR5",
+    "FR7",
+    "NFR1",
+    "NFR3",
+    "NFR5"
+  ],
+  "coverage": [
+    {
+      "id": "FR5",
+      "status": "OK",
+      "target": "docs/learning/maintenance-guide.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/learning/start-here.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "scripts/checks/test-maintenance-guide.mjs"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "docs/learning/maintenance-guide.md"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "docs/learning/file-map-inventory.md"
+    }
+  ]
+}

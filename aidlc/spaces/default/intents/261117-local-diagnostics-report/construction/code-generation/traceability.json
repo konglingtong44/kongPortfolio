@@ -1,0 +1,47 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1",
+    "FR2",
+    "FR3",
+    "FR4",
+    "FR5",
+    "FR6",
+    "NFR1",
+    "NFR2"
+  ],
+  "coverage": [
+    {
+      "id": "FR1",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "FR2",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "FR3",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "FR4",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "FR5",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "FR6",
+      "status": "OK", "target": "docs/learning/14-local-codex-diagnostics.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK", "target": "scripts/ai/codex.ps1"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK", "target": "scripts/ai/test-codex-report.ps1"
+    }
+  ]
+}

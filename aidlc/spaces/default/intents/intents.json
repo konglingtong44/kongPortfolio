@@ -1,0 +1,18 @@
+[
+  {
+    "uuid": "01a1e88a-ee33-7402-b2fd-22708b724734",
+    "slug": "local-diagnostics-report",
+    "dirName": "261117-local-diagnostics-report",
+    "scope": "express",
+    "status": "complete",
+    "request": "4e1bc38f"
+  },
+  {
+    "uuid": "01a1e952-f925-7eb1-b4a0-c5b3aebb912b",
+    "slug": "docs-learning-restructur",
+    "dirName": "261117-docs-learning-restructur",
+    "scope": "bugfix",
+    "status": "complete",
+    "request": "f43324a9"
+  }
+]

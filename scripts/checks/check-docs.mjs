@@ -17,7 +17,7 @@ export function localLinks(markdown) {
     if (marker) { fence = marker[1]; continue; }
     const prose = line.replace(/(`+).*?\1/g, '');
     const inline = /!?\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^\s)]+)(?:\s+"[^"]*")?\s*\)/g;
-    const reference = /^ {0,3}\[[^\]\n]+\]:\s*(<[^>\n]+>|\S+)/g;
+    const reference = /^ {0,3}\[(?!Answer\]|Planned Source\]|Approval Fingerprint\])[^\]\n]+\]:\s*(<[^>\n]+>|\S+)/g;
     for (const pattern of [inline, reference]) {
       for (const match of prose.matchAll(pattern)) {
         const href = match[1].startsWith('<') ? match[1].slice(1, -1) : match[1];
@@ -46,13 +46,19 @@ export function checkLinks(root, file, markdown) {
   return failures;
 }
 
+export function isProjectMarkdown(path) {
+  const normalized = path.replaceAll('\\', '/');
+  // AI-DLC audit shards are machine-generated transcripts, not authored docs.
+  return normalized.endsWith('.md') && !/^aidlc\/spaces\/[^/]+\/intents\/[^/]+\/audit\//.test(normalized);
+}
+
 export function main() {
   const root = fileURLToPath(new URL('../../', import.meta.url));
   const files = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], {
     cwd: root, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024,
   });
   if (files.error || files.status !== 0) throw new Error('Cannot enumerate repository Markdown files.');
-  const paths = [...new Set(files.stdout.split('\0'))].filter(path => path.endsWith('.md') && existsSync(resolve(root, path)));
+  const paths = [...new Set(files.stdout.split('\0'))].filter(path => isProjectMarkdown(path) && existsSync(resolve(root, path)));
   let count = 0;
   for (const path of paths) {
     for (const failure of checkLinks(root, path, readFileSync(resolve(root, path), 'utf8'))) {

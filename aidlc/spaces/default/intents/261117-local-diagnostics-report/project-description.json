@@ -1,0 +1,1 @@
+"做一个仅限本地的小Story：为 scripts/ai/codex.ps1 增加只读诊断报告，记录版本、doctor结果和未验证项，保存到 .local/aidlc/，并把实施与验证过程写入 docs/learning/。不访问AWS，不修改模型或认证配置。"

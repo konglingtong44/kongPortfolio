@@ -1,0 +1,12 @@
+{
+  "stage": "code-generation",
+  "unit": "u4-maintenance-guide",
+  "version": 1,
+  "writes": [
+    { "path": "docs/learning/maintenance-guide.md" },
+    { "path": "docs/learning/start-here.md" },
+    { "path": "docs/learning/README.md" },
+    { "path": "docs/learning/file-map-inventory.md" },
+    { "path": "scripts/checks/test-maintenance-guide.mjs" }
+  ]
+}

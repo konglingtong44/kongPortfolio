@@ -1,0 +1,38 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-cleanup-proposal",
+  "upstream_ids": [
+    "FR3",
+    "FR6",
+    "FR7",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "FR6",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/learning/README.md"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    }
+  ]
+}

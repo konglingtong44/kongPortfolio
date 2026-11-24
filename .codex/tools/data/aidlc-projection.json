@@ -1,0 +1,2782 @@
+{
+  "schemaVersion": 1,
+  "distribution": "codex",
+  "productName": "Codex CLI",
+  "configNextStep": "run `codex` (when it asks about hooks, choose Trust all and continue), then `$aidlc --doctor`",
+  "harnessDir": ".codex",
+  "onboarding": ".codex/onboarding.md",
+  "managedDirectories": [
+    ".agents",
+    ".codex",
+    "aidlc"
+  ],
+  "rootIntegrations": [
+    {
+      "path": ".gitignore",
+      "policy": "managed-block",
+      "marker": "gitignore",
+      "shared": "union",
+      "legacySignatures": {
+        "wholeFileHashes": [
+          "sha256:f919e4bac1790bd1a371d371af473ccbc644f3bb80e4569d190c9364fad771b3",
+          "sha256:d2569b56aef154c3c04766ed3263947a2d8026c99546a3006775526641951db9",
+          "sha256:ced6459be00ce352fe298e1ff07759933fa2ebf07a9151ef2f1af995579f7afd",
+          "sha256:007b95fb94d4a2569f4254088f0d70f4f345ff99db34e2784b6d9bc5c169f853",
+          "sha256:25e76c09640300e354ab34e3c67e89d2dfe473940b65bd56c227ca4d5ea92c7b",
+          "sha256:51cb399f2257236cbf63e18cb2e317d75913f1771b5402707a2508cf5f81fa57",
+          "sha256:345fbe9fe620718510ecfe9d478233ccf4a5318522884b50fc5540559ace3eed",
+          "sha256:c2b1232b28a8b5474f7ef8363452f75399366ef227c59d75fa85d7aa2edca7ac",
+          "sha256:42e2a975d46b6fd2a582fa539f6df3260a1f2722dd0a113bd312dff7dc2da204"
+        ]
+      }
+    },
+    {
+      "path": "AGENTS.md",
+      "policy": "managed-block",
+      "marker": "agents",
+      "shared": "identical",
+      "legacySignatures": {
+        "wholeFileHashes": [
+          "sha256:30a9f5f43d87cd29b63e75333b8ef6695f8f4e11909fd6af64e2b6cf0b8cb292",
+          "sha256:47678f42e0233de9b0164eb4ec318a3ba3196074d6ec88f69aa7980bc1f2fd0d",
+          "sha256:821b2149c7c6c2b6592eecd10623823fc5579fc4ae52f2ad272e00c93013d027",
+          "sha256:83c6e5141646dc604c87d80622fc898761a69bd0c9caebb398441bce9f1d0727",
+          "sha256:b3a07e9bb603fb0a2328004fc7cf2294afc670ec6f350a43de9c15d6e27aa04e",
+          "sha256:bfc2adb83e00041750b1d19c9f3167cb7f5f5502a62af83a58d0a2828890febf",
+          "sha256:d8afae6a0813f5298cf873a047664cf485308c6e0dad41dde53d8dcb27dd7769",
+          "sha256:f1deb7dc72a78fe7d39c71ad2fe6c0f41248c03cde7fb36b7a478f5b9233881c",
+          "sha256:f7c55e9917d3801f676fba066fdd78d8df2c36311e8d6e78068965fc7b4371fa",
+          "sha256:457ff3626bf6ff4a0f6f1f7a44a1d2cbcd91490600e2332742dcf655da25b7f3",
+          "sha256:9be9c5cc4a25e5b4c71b3ae35188e1a543504f19cbd5d0a20892777b0904800e",
+          "sha256:bc41aca84970977673af3c0b8212a1f7a4d995a4b47fc7894b1c5b342e4a3601",
+          "sha256:b3d4d0d178a01591629dbf79083b00e7a3ad42f59f79cbfc88d05b7615704a70",
+          "sha256:d9be36630b49183203ae4d97946c243e3b8840202ee6f080c738e0f01343e33a",
+          "sha256:cc3212fc7335018158882cbaa141ac6fd02cee53bbceb00bd185f416fa06ff8f",
+          "sha256:412776ee4595c453511a911e06c7729285bb5338b30584f8570908b273e27296",
+          "sha256:dd650e54fb2e645b6f30002f91f8f6f174fe34550295582f5b6a95356edaed77",
+          "sha256:87563548299dd2a0c1fcd3cde480b612bd1ec767a2550dbc05a6a041a3d7f522",
+          "sha256:c7843449d549d4226be39169a9c31bf89694cd0b0754cb1ee68bdf61759538ce",
+          "sha256:6de1298dfa4c2b6916f66d372b844faf23481c8f258eedd595c1423dab8e106d",
+          "sha256:6d3bf5865f1836575715ea93d0042b9d08bcab918cc9a17a142848fe44e88bc7",
+          "sha256:04d7ca868197529d9839b62c902870157743c93a6c7fd134bcebcccc8a1d263f"
+        ]
+      }
+    }
+  ],
+  "retiredCopyFileHashes": {
+    ".agents/skills/aidlc-application-design/SKILL.md": [
+      "sha256:925403cbdcc81e7f5373c9526b0bdf3c8dff946d0fd5a605cb714fa84674c950",
+      "sha256:b2391aa031b01cdf0f2c8e002692e90a4ec129c6b6e0a831ffa44cc57050166a"
+    ],
+    ".agents/skills/aidlc-application-design/agents/openai.yaml": [
+      "sha256:a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94"
+    ],
+    ".codex/aidlc-common/stages/inception/application-design.md": [
+      "sha256:36bdf3aaccc1929bb546140c8cd2b502b2ebe6043ab5c493d373d7fd62a9e8cb",
+      "sha256:833041e100f23337e23747400cca9f30cfa368525e27ba1007a4ce5bb2ada653",
+      "sha256:b076077761f1f47cc38fb826ffc943c83f27944c77ee7b3a9554f3683f783d9f",
+      "sha256:e7cc52f705c8169752464ea9360d063ee8e7887048efd31d8187e41430332f4b",
+      "sha256:f1fb2fa9c86dfbf14e76866aa0975bd4f74b9eabc285fdcb8d1dd8caaf3a53e8",
+      "sha256:fd20b1f527c7f199f9eaf446a4445fb0d8996417f1d758024b9c2c187b2f73d9"
+    ],
+    ".codex/hooks/aidlc-audit-logger.ts": [
+      "sha256:0202e2092f7b506379e453e5ef5b5bd07fc316148b4bd31bdd0517f232b9f509",
+      "sha256:064eac85c2f71d9832fc93c65a36b22a0af795539b349c9400952d25c66647f7",
+      "sha256:3294da0207cf7d18e48872ffc2efbfb910baacbd4ba18392807a731e9cac801a",
+      "sha256:e10604b787d7feec2fe928d1d04bc9fde81fdeb61f6319d053f9b22cc65e804e"
+    ],
+    ".codex/hooks/aidlc-dispatch-rules.ts": [
+      "sha256:997d19fbfa077da83ba2b5d84feca63825944c0d65800d969dd9d5be6579ca9c"
+    ],
+    ".codex/hooks/aidlc-mint-presence.ts": [
+      "sha256:3615033b37181ae24647943f09c07f80f35034e9627165b27ad792bf06faf9bd",
+      "sha256:ff7556c56f6bebe0bc447be6632ccc34d14bb68b11220ad8e36bfd0bc37d2b90"
+    ],
+    ".codex/hooks/aidlc-runtime-compile.ts": [
+      "sha256:1046f4cf12e7ab0c5392c179977f04cc428eb4e51b7ca9bbfd8752e9019fde3e",
+      "sha256:8a54c7bad431576d829597ecfa02447a74d13e09d0fb878fc37a69e0486efd6a",
+      "sha256:f1bb53cfefb4d9be8b238dbcd080001dc8d68a5a3c120459b0eb73670d63c965",
+      "sha256:fc754dd871fb86b94ca870b486dc0ed2f3bd842168ffa95655f6dfc2d93c7838"
+    ],
+    ".codex/hooks/aidlc-sensor-fire.ts": [
+      "sha256:2179630ad0aa148f9399d6eaa12dc7a0587138d78d38d93a5ea4635fed6b56bb",
+      "sha256:3719faec3a6b4a4941d7ac3ba08d79091885ca515647847e37b96de0f4842819",
+      "sha256:c88f3c8817ad5864b895185858d9006fb81ebf50644ac3f160a8bbd10c0a0a51",
+      "sha256:f3f0a2b244044b8a75fc1752f8410971d5a0dbd2f9b9c9ab690dd1357679f930",
+      "sha256:fe4d6f041236d5a3f04c6dd7da78beb9afaef02c0543ba49e77853441a714d79"
+    ],
+    ".codex/hooks/aidlc-stop.ts": [
+      "sha256:00cfdd6fb288ed3b1317dd0b1fd7b5850992683f9d1fea96b8eee3b3695d3cb5",
+      "sha256:081508c923c463642fe3479a9ca295cdad633da8a3c9e2ab0ea7da099dc15118",
+      "sha256:3cdb0888452c13c1706490be0c9b4948ae0a73d0fdc09ff1aff8ee00b1158fe8",
+      "sha256:4aee4a7bc1d8b6bc9ad50513630e2f3d37ab44e7cea810d756a0355c881d07fa",
+      "sha256:69382aa803504cc187a91144a8019c7ea076945fe3ea97b1b35519383e84f24e",
+      "sha256:695aa2846b994309a8351e03b1c000e56f789de206d09eb8dae9ec39a5fff2e5",
+      "sha256:71fb8ef269917355b6bbd37392df751947283e54af6fe437552e24d6c63253cc",
+      "sha256:954468c6cd679566bbec37079988be12c7f85dc22eee0ef0bbbfc2f33e44d3c6",
+      "sha256:975fa7b00516435b5b0430b5d57d68ab5cb577aa30c1ff68cc42ac5cd4cda439"
+    ],
+    ".codex/hooks/aidlc-sync-statusline.ts": [
+      "sha256:35a7c593e6f05768bc92ceaa9596f4112aecad8c8820a5e9f7b32eb090f9871e",
+      "sha256:549109978d1f335cc1ac530a1381f06b0d5dab29edbeff72565563d8cc66d682",
+      "sha256:a0f1328596d686193f93c7ef94d21c90a77f85c1f0483b336ac6c4fe11e176bb",
+      "sha256:a4b15da95f73613596739360075971e69a692e06677c90bb8473624024887b8d"
+    ],
+    ".codex/tools/data/scaffold/construction/build-and-test/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/construction/ci-pipeline/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/approval-handoff/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/feasibility/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/intent-capture/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/market-research/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/rough-mockups/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/scope-definition/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/ideation/team-formation/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/application-design/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/delivery-planning/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/refined-mockups/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/requirements-analysis/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/reverse-engineering/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/units-generation/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/inception/user-stories/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/initialization/state-init/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/initialization/workspace-detection/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/initialization/workspace-scaffold/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/deployment-execution/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/deployment-pipeline/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/environment-provisioning/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/feedback-optimization/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/incident-response/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/observability-setup/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/operation/performance-validation/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    ".codex/tools/data/scaffold/verification/.gitkeep": [
+      "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ]
+  },
+  "legacyManagedFileHashes": {
+    ".agents/skills/aidlc/SKILL.md": [
+      "sha256:03828317ae465102a7532de9b53e074e0b458a195c7e10f498eb4493eacd54d9",
+      "sha256:045c0f4c676cf88d2af76d05c930e1e8df33b10a7f23b139b906f738d0a38aa3",
+      "sha256:050c919e8fd5eebc28be1324cf6028152da80b5b50380d9e40a56b63a620811c",
+      "sha256:096b3777011a6350e6aba7526fa0980b0c7581f687679c03bf635fee7babb6b9",
+      "sha256:0a33045617a495f36ab3821dab366381c5ea20482bde2626c401372571fbb83d",
+      "sha256:22c6337b9af861423af335b5edb9ad6f4361e294dac678464d4a22fef3b27d44",
+      "sha256:22f1823d9216cbbf5de4e6fe6251960320dfc8fdb65e86850037fa95b817f2fa",
+      "sha256:23075038904719815a3fe44b88e2f32fdd8dbace31e434c1691c9ace8bec09dc",
+      "sha256:29d26d7629026863f0c7b95f2bebed1d5669718ea79323be89c0d6b82c922b49",
+      "sha256:29edac289e5b897e8dc6c1dc97f2c34bf25d878a15c0820fadc685967d74260c",
+      "sha256:2ccafa5f410800f96395b70a0dff39a03ad2fdd37d94eabf82ae3ae64b742dfc",
+      "sha256:2de9e90bb50a058b17746dc1b57aaf7200c0024eca8f360075a7cad4bdf026e8",
+      "sha256:33bca29ba18faf456f56671083df796d8721af07857aa0ac72de3637de1ef09a",
+      "sha256:388feb64a0ca3364670f9ccc01538b475b8c934c3b309cbbe82ebbffa9f47183",
+      "sha256:39471d3dbf744c2cd64ac45e01301c499c4c38869c3c9e2e33a6e685fb3bd351",
+      "sha256:3eca50799921cc7c247229149c51e4c1eb60aa6c6844a1f314d21bae8dd399db",
+      "sha256:49e2ba8b1c2aa336e8484c7913a7fdce29f8e4f387b3b9c36ba7eefa1395a96e",
+      "sha256:4dfe0e4b03128cb9627195a10566c82b02baf82185d5a83f5e241af440879fe4",
+      "sha256:5ff1e750672091bdceaec2e752ad94b746361274584ddcc2a41570f8fbcdcc6b",
+      "sha256:63cbe3edd35c4547ac3f643a7d61bb3db605de2ddbe070397ffefd827ec7ae21",
+      "sha256:676c5b7224ba1518112d2380af0de83a7142b1bec3a005c31ad59c1efdd94c94",
+      "sha256:6b974f17a5abf87b32d15584c5bf0841751eb9b347ab44efc70a2d404bd362c8",
+      "sha256:93132399b17bd689bcc0f1e4e9c10753195eb73ca8c290f0f65acae2f3c2c488",
+      "sha256:a79c6223df01f826ba70c99a8164a8ce2abb62401b20897c7883e9bf012ccc9b",
+      "sha256:b5cc7d02e70ccd1791e230764667bb34dbb9bbae2f725a8a414b471199ea0e71",
+      "sha256:b63bc2bd19751aa7fd065e9776c2a9f9a8e928c1b12373253a54fa67da1a8c71",
+      "sha256:c00e765b5d7b863e327b09ff93d654fc31a76e98119f71339af15981454c316f",
+      "sha256:c5caf8d61f9d0fbbac5d51acf3e4baf0c46e40d10464770ddeea14137a8597e2",
+      "sha256:c765b22458a6f049ac7a73852c1a2ad996122db147c88b4f78eacf507f34c03f",
+      "sha256:d079d88bfa42741c98edca15efb99cbdd778f60a0c4979f9329c2a46ffb2cd55",
+      "sha256:d08d5ab54482432f1a92c3beb7e190af061516fd76cb10a6880e11c5490c3937",
+      "sha256:d718da47c1760de25613296edf4d73ca31f1b650ecf4c976267eca80e37622a7",
+      "sha256:d96cf0d1fefc3c2f81b227d4ae3e6ff0d20563505b1198f6aa25c48ba1fa06f8",
+      "sha256:de3ae7a680881047d8fb16c56e67e6ef634b789d2d6f7db9bb98e4b11b09eac4",
+      "sha256:e05a54d8d09d9b575b404b7fe8bd8b3669553a025b2f8609a76b3b56623dc381",
+      "sha256:e3b578bd36d03a386736e75f351a2cddeff213d49d06666e44d39392fc0643d0",
+      "sha256:e4640d3c213d6c53c0a78f96df9bac7b8d8d20cdea7faab4a9bd7c56704eb3f8",
+      "sha256:e49eb8098e9eaececcdd1d8063cf4a35c7262da8e40c9bf9546c1fc36d28e53a",
+      "sha256:e769f6943edc5e3839c61ec0796f6531f0a31bdb1a3d676e5803e784a752736f",
+      "sha256:e7b8ad4c3d1a2fad60736882ace8f20551f551bc896031e5b84ae7e6cec3cffd",
+      "sha256:eb46ad0a62d06daa6e15cdbddd58d4f489e2906168f10727bb33b2406ed95a22",
+      "sha256:ecd8ed294ea12158817c105bea37994290cc06538610d3a27abcf04fad343f0f",
+      "sha256:f5461f42f11beebf8251f6f9e51379e500405a849aeca7ee8d7370c1c28680a4",
+      "sha256:f82523c592e1d6bf1d98cb8e23a3d31b701aa8952d3c79906194433f3fda75f1",
+      "sha256:fa828f79d1876e0186ad4d33e76238b374f3bc43aa6c9dd1d8c1a77d5e12dd1e"
+    ],
+    ".agents/skills/aidlc/composer.md": [
+      "sha256:db58864d375fcce4fc069ddcdb99525ac4859c821136cee660176a8addd4da7c"
+    ],
+    ".agents/skills/aidlc/tables.md": [
+      "sha256:38fc1b0464842e96957a8f5b355e2cca4364fa953603071709f9f7806b280c7b"
+    ],
+    ".agents/skills/aidlc-approval-handoff/SKILL.md": [
+      "sha256:033d91647193a83879a4221b89da895b89153bfdf297e29c3d854771dd02af19",
+      "sha256:59b9c215d0046fdcefc580a98372817e383d2d69d87dc866f47781d92f5a9e33",
+      "sha256:acc330d7955a8b58d04a1728f27b93fd8a583e9586ffb9252913f98977812b00",
+      "sha256:f110cad63ec1297a8d983ba5d294c75b6cefa4cc0d5ac1ad842f8f5a1abd97e2"
+    ],
+    ".agents/skills/aidlc-bugfix/SKILL.md": [
+      "sha256:166b97cfe930050f137213091580bcfff30a5f305eb6b67df81a0e887f1b8184",
+      "sha256:324c2750a7b3d46dd12b1ce5d574542f125c8707e5f09393ad691673626d7884",
+      "sha256:3385fafe8e56898bfbb79c1ee4f11aad9afe8e15e1dd98e02c97ae7a05e63125",
+      "sha256:5df6576de5db8f311b5787bd9cd5dff8a35e2962a289ae0570e2a88071665f37",
+      "sha256:7d7ba699896e85e5fb7ecb3cbb0e1588442a05e6baad329caf1db70223acdaf0",
+      "sha256:95faa92717605b9a7a452d3e68e3bb02484af2cdc8df1c541cdf143c31af315c",
+      "sha256:c0ff32563be4d2ae2cacfdecbb07dbc82eac4736b33e94ef485ee9ea639beed5"
+    ],
+    ".agents/skills/aidlc-build-and-test/SKILL.md": [
+      "sha256:041cfc8683f40667d067ac3f5b8d1029a04f1c67764ca6a99eaff6c076f197aa",
+      "sha256:a96ab21d4d16a04bde681626d75ed0fabd8ceb972f021ae771d362dbaf7f338f",
+      "sha256:b4f30d4a030e7416153adac57c1b709aa96d8e3b52655b9384fdea0be36b2432",
+      "sha256:e3c96bcf1adc997283beb1f866f30341994a13c509169dee1852652c63303e01"
+    ],
+    ".agents/skills/aidlc-ci-pipeline/SKILL.md": [
+      "sha256:1ffed675e745f27ce105b8e030426f031713687796f5aad26cc5604aa45d2e53",
+      "sha256:7fa16113a66ea66346a07e185669417ad58ce90b042f6f950e1d2436049eebdd",
+      "sha256:82866509b2412c7db01b38877d954b0a19de36724d378c8836027417b3210ccf",
+      "sha256:8f91bb91521d2b581b64be9a9fc2d81d274d4d3e01b3d9bb5db78cd1d4e4a3dc"
+    ],
+    ".agents/skills/aidlc-code-generation/SKILL.md": [
+      "sha256:98dfb9a21724f341a560f0a5f42ad3f1191ef1717df5e0c4c3da04958905ff96",
+      "sha256:a9951002f0d3c5d40269ddb7a68f7af0c782389a027aba9279b5bb25a3df2b06",
+      "sha256:b251da6a774198b63bd51878b28cbdf94ac3096191be7e4fbcae731710c09aac",
+      "sha256:c23b5778b4c82c4633b8704e39f112b2221920a02b75b05c9cbeffdc8676bc46"
+    ],
+    ".agents/skills/aidlc-compose/SKILL.md": [
+      "sha256:5f568f6efc5c4e75b12fc0434a11cfb2c4c92311b1d3160a5920025067e716bc",
+      "sha256:c0a365a24ff1d728fcb2e4b8da55c8745e07f18c8faec13bafa0bef963ca1394"
+    ],
+    ".agents/skills/aidlc-contract-design/SKILL.md": [
+      "sha256:3425213621874c3abe744d410cc360b8b94459f8a3875b20f9d39fa23f83297a",
+      "sha256:b1393421d047b33d1d9efb2efd736e70d6e255c2a861b2638ef89cbcaec328ff",
+      "sha256:eef4f32290d9493a16459197bdbf1e578981c39aa1b20a4d255fb7f95cf117cd"
+    ],
+    ".agents/skills/aidlc-delivery-planning/SKILL.md": [
+      "sha256:0fa2a8f945aed91df79825ca69a28df69c3c8f2fd47c89e72a920c5b05456827",
+      "sha256:39fe264b89c3e935cd526c5340f0d756067dd4c75497e8830d94dbc26e1b38b9",
+      "sha256:dd7fd1b66e2648d2c10c2f00ec988893828ccf2c7defb059f92e8ce0c6dcbad2",
+      "sha256:e5f73197c673d012944da6085f10f87f6a1bcd7b5525073b307c265a786ba86d"
+    ],
+    ".agents/skills/aidlc-deployment-execution/SKILL.md": [
+      "sha256:42b858bd354be1019b36160f1c82474378eb314eacd3b831779aa0f6dde490b4",
+      "sha256:4f3a86f8ccc2c25fe3d3fb79e7edba5e00cff46e9c6350da1db58283be9da35c",
+      "sha256:77a311d1ba7a58f7fd7570d7e2e17b24f48e234362aca7a6ff121b25aa68da66",
+      "sha256:c3acf9b057c70f43e06629de981f05e31700edd8eca71967777d8c292080ff5f"
+    ],
+    ".agents/skills/aidlc-deployment-pipeline/SKILL.md": [
+      "sha256:2f6cf9285ebf5b6528c81218fa92bcf7252ed10c57126d04b6805e3b311423df",
+      "sha256:3272a66397340ff479e3d07b50d7ccbed60ee9d83f902e8d7bf6c0ac2be6ae53",
+      "sha256:7466154cef0e649ae7659fda999ecdeb695ac7c869dd14c0055feb6468c3bf15",
+      "sha256:b4391c5fde373c5c9aa1528c8a8b997674163e07f52c96714ee0bdc7255ef16c"
+    ],
+    ".agents/skills/aidlc-domain-design/SKILL.md": [
+      "sha256:262b01c4cb1ba825dd6d5c1c4d3cf3231ce41b94a32923de4dacb8d8061312cd",
+      "sha256:7822319fd19a6d4d699f7c5e48cb287f5c377499f6c29f6eb76dd79b219edb72",
+      "sha256:fd3f92b533dddefbda8e034dc0731095530f2bd712327962e6c7049e6fd22892"
+    ],
+    ".agents/skills/aidlc-environment-provisioning/SKILL.md": [
+      "sha256:6be19e244918c640b4106747189072bb5edfa6b8f818c66c1c8ffb93ec6f1bf8",
+      "sha256:adbab4a608c9ec8dce86c983c7820f8248387470810ce1a38efc3c34616121ce",
+      "sha256:c221fc0acb9f349434b978c7db1c59a4af3f8abe766688720e114b3bfc358ca3",
+      "sha256:f4741f621a5312cc4b59b65fd94f3632714c74ed34c849186552801c2dba68a4"
+    ],
+    ".agents/skills/aidlc-express/SKILL.md": [
+      "sha256:c0e024ceda92add7ebb996047697910b10837875f26ab98c08d5b5c4b15fdaa2",
+      "sha256:cd565a3ae9e5983748ef4bb219c6743191723d9a110b52dab536a6160864b409",
+      "sha256:f7cef4ee53407dfb52d8b2b8aa8a8a8cd705f496d6154d5afd234a835fe21f79"
+    ],
+    ".agents/skills/aidlc-feasibility/SKILL.md": [
+      "sha256:14c3bdb3ffcc340128001c2c3652bd2a7ca9082e892d399fa275d2e6c459cbc7",
+      "sha256:7f162f186a0883f580bb9585a1553f6702150e537a09e1ded3aa6abea1592561",
+      "sha256:df5b53a1ac075f8e0258de034cd50c459a51b1c5ad50a328a397972e5a906243",
+      "sha256:f0e8f4b7728d72e8f13659d02b65044d120c80cf21d2886a9038a6e077617dfa"
+    ],
+    ".agents/skills/aidlc-feature/SKILL.md": [
+      "sha256:19bd25d424cbba44b3395ac5b3ae7cb25b663b751baf4992304ffc8789732827",
+      "sha256:264ecfaf5ebeb9511a60345e3e9d58739a3890a1095a10b5bd46e404af06a670",
+      "sha256:58e570e5f6804d5ea3074b7a10a6ee7cb1f76aa46379aca1054360fcfb325a08",
+      "sha256:691168c6e8fb15d52a3f6bcf617626c2b6c665ba48c09e70f289151e9998eb05",
+      "sha256:95dd9476f5a3355859c697db1764fc5869932ca6363cbc49c90a36da393f83ed",
+      "sha256:da02219a377fcd4b91ac939fb9136cc18c227bde65767ab3d88c985accea8372",
+      "sha256:f4bbbf50bc3edd4481d8098c6dbb64eca42576e53cc42b6fe66c7ff4c432af29"
+    ],
+    ".agents/skills/aidlc-feedback-optimization/SKILL.md": [
+      "sha256:26fd492542df23ac4decaaa32ff5fefa92858a3287b940e8d9a3054f958bf3bc",
+      "sha256:6eb963ca6bf4bd3492c4e4eb417eca96b8be51a8559f76f7d0e6230483a82655",
+      "sha256:c94d5f404260739ced3c261da0ae0c33e53817a5b14b1655e00bf1bbfa74b467",
+      "sha256:f6dd546c4e138503c029195d9306e77d511207ac5a31463aef8834793079d794"
+    ],
+    ".agents/skills/aidlc-functional-design/SKILL.md": [
+      "sha256:14ef33c635e8cca028cee95c796f64d590f818b2bb69d27e95fca828968e0cc7",
+      "sha256:3795c308f20b3c7aa77ecf3d3c170fd6e050364faeeac4fe18dccfcfbad528f3",
+      "sha256:8f14fcdae5411f7d5e1f88289576113fd09d1b638214ebeca3ba6ae551d07c5d",
+      "sha256:a61c8f8600db32147910dc7116968204adff250002456964302192f5ed0c6fb7"
+    ],
+    ".agents/skills/aidlc-incident-response/SKILL.md": [
+      "sha256:52647b153a3035eccbac43c891176abd03974ad9fcdba3c65bc05216876dfafd",
+      "sha256:c5a613e2ca0e22a6b848569fa85082703c67e9a73f62c01298e249402bcd3350",
+      "sha256:ed30220fc319567e5dd55a3e66dd6d1f233cc3dd8d99197bca43c98b02db1b5c",
+      "sha256:f10b9cc01157c0f3f36cbdcfcc3f5a3d121f6388142325916d8701ae8df8fa87"
+    ],
+    ".agents/skills/aidlc-infrastructure-design/SKILL.md": [
+      "sha256:14e2e1f3c8423d43b55f827a0ecab1499c08ba5497ff1288d28f8e061225bd5b",
+      "sha256:590da0c75c0930e4b581a6d795f185c36ea25093539e146a781ba4a4369298f8",
+      "sha256:88150195a48da75bace80ebeb4331989b303883f8f80ac6bebbdf7bccf1d032e",
+      "sha256:bc54c0d8cc9635a9f73900d09826353beb2b681749b95c523c2bbe4adae744d4"
+    ],
+    ".agents/skills/aidlc-init/SKILL.md": [
+      "sha256:0485a89717ca4b26b737af0a023997174e9c81b64f6d77d23af5b1ca9cadb52c",
+      "sha256:0d703280bc61501b81b4f85026c0980074b396c66a15a4d1fdcdf6bf21380daa",
+      "sha256:291866db856b27dfd33a60ce75a45d02c548d006a3b47024c99dfb3534370f29",
+      "sha256:69c88b265e1f51d0d87f2ab013f51c51823dbc5f629962e83e1acbfc81586120",
+      "sha256:8c67184c55d08336f08ec5cbf3f37c979a7261660f272591443fde19a47be104",
+      "sha256:9e988ed645e313a9dbe87723a7f07a79cef1f917eb17d2fcc29a48a56db3c0cb",
+      "sha256:e8918b674ea836b49cde0c9b55a62b617344d5f056b08d02e41361a6ce58e1c2",
+      "sha256:eb368d91f4185e966a4ec7abbf6dddf0c0271dab4fd475ec450367de576faa3b",
+      "sha256:edbdaf6f8db85e43a20522bd34d8828d4bfed9678938aba48b1cfbe6953a7b60"
+    ],
+    ".agents/skills/aidlc-intent-capture/SKILL.md": [
+      "sha256:26cbdbdd1baba7e90a4b1940368fbab4c89db4391a942d802e71e7b8190aaf44",
+      "sha256:2dc52da77d6dbf6896beb77720a0b048fa0ebd3ecc426443600ba82c55d2a7a6",
+      "sha256:c6a87c78e33aa2ca85a8666c8dcab7b70331066e69ec90b436999d703d37c101",
+      "sha256:d936112bc60e0d1dca57f57ae7cb185e103cd167414467da49483c8252a2d67b"
+    ],
+    ".agents/skills/aidlc-knowledge/SKILL.md": [
+      "sha256:72b0f56632697c97baa20703989113e1e6c19cd55aa3dbf7bf362e3e03c5594f",
+      "sha256:7d83d23bd264554539eb34935b499884d4fd545dc0f51fb767eee48de7be181b",
+      "sha256:aa3f11098f48cbbde4eaa3a523cbcbd088a545033b61cca0df16a216d938adb8"
+    ],
+    ".agents/skills/aidlc-market-research/SKILL.md": [
+      "sha256:39cf67208d2616e21730384c3dfc7680a6afb59a91857496aa79e6c34be30cee",
+      "sha256:4c6ef954d61b3e666d829452a970d6624241f96d919d6652512b88b1276b5617",
+      "sha256:6d3f2c159a441a1063ef6234d4333bb8a79873e819ec6ab45fd0f56f0204c587",
+      "sha256:df0a92dcbdebcddbd338a5ad96f675351030e5d082b9f04d3b704c86d696a46d"
+    ],
+    ".agents/skills/aidlc-mvp/SKILL.md": [
+      "sha256:25cc94d44df407a4f716b13b81d5bbb602729913667121821086ab9a2b0df135",
+      "sha256:2fbafe59d3cb365b0ed49878a65024615f0d33b8c5851211ce7499958c8fa4c9",
+      "sha256:5bd0c154380893e305dce0806ca063d998c98999a26e7c4d8ea22cb7f8a7eff7",
+      "sha256:5c92afc3afd1da65ddb1c4a14d740614397b57c44d37f03f1896df7914fca87e",
+      "sha256:7317896a4d3962bf58f7cc9bd60f7f9d42bfd8ee62364a7c920f08872a4bd927",
+      "sha256:823f92a1a7690f43685ff593b3a5ccc17f33a40c01c8d8b1c6da7b8a2589e3ba",
+      "sha256:be82c1ac8feca5a5763c7c6278bb8a7fcad8abf28af308e1dd607edd842b8907"
+    ],
+    ".agents/skills/aidlc-nfr-design/SKILL.md": [
+      "sha256:45c819660168847895fff004c4c7f08a293fb8c68549565e8cc7ed5acbf0f701",
+      "sha256:91d73d5a7f0ad92ef0bcd671d51044997718c36c6b942f882bdad9644bd54a8e",
+      "sha256:91edd57773d4606777231fd47db833e43ec67d13066d319a4a32f090a053a346",
+      "sha256:b749397e77bb7e148f4353b6d1ad2b913d72a0982b5df962c1bcd32b86648949"
+    ],
+    ".agents/skills/aidlc-nfr-requirements/SKILL.md": [
+      "sha256:60e4a639ba168a1f22b1c1e89b299326703e47be29a9f6db2fdda0fe80264bb6",
+      "sha256:8011618ca7ab93f9fb4794822409384100c02ef1e1b669ee7ac840fa9ddcdcef",
+      "sha256:cf616864d7ec1ac8a04213c5744256d43d655eed8349f31ab029700e24b9eb13",
+      "sha256:d240e9177f3246fca34d717273cf57831cc3862e65f4f576662bca4803d0b0d2"
+    ],
+    ".agents/skills/aidlc-observability-setup/SKILL.md": [
+      "sha256:231d422e8a0d731a57a54cfe65655b4756467f62db3388fb3223f4365e93cb64",
+      "sha256:55f544a554a7d4cc3fdbc4c0ef5e95a37ddd4651fe328cc603aabca72f7a8ecc",
+      "sha256:712a46ebc3fbf55efd4d4cb330ab82ff639a1cb4d3ec4d8ef3cbb20095d37709",
+      "sha256:80fd72a23cc5764e9db7ee137e6d7bddf0db5b91091a2a2e83178a7890d9144c"
+    ],
+    ".agents/skills/aidlc-outcomes-pack/SKILL.md": [
+      "sha256:1bab0cd39d05f2e2f2b049a1a6238d0a246ee23f9e569442ba30b8ae262da7c5",
+      "sha256:9e017d3106f9a6fc8a31e761d5fd9e478bd724d00bf4e88046c96b6d25e69969",
+      "sha256:ce63bbb8fb6ad5a71b3e6997eb26072d991a7d8e16691b12f13b97443798aac6"
+    ],
+    ".agents/skills/aidlc-performance-validation/SKILL.md": [
+      "sha256:0f55207d06f4280ba3b65e4a5a270091053684dd47de5b85418cf0530811432c",
+      "sha256:146b97c8d6e22a4b2f89367eb83a4f3c94d6d0d654695adbe5fc2050d6e68e11",
+      "sha256:852f813b9beedcae9361596fadd66b5e254d5fc8c4b986400e3a857878133bc8",
+      "sha256:cdf49f748dfc71d22f81e16e3503700a1d11d660debd599639cfcc78ad8a8249"
+    ],
+    ".agents/skills/aidlc-practices-discovery/SKILL.md": [
+      "sha256:1537ba1a99107604c8b82bae4d68894c58b504d5e5625b314f4275197b702ba4",
+      "sha256:be4459f1dcaa582aa68ad70b1185d0fff94abb03cb2c940ffea12de5f4c27a0e",
+      "sha256:cc9d05b529f9aa09eee57cc62b208e9fd5a1cfb3bff8aa94827242b86cae75b5",
+      "sha256:d010af40519ea7b99f56281cbaa6b065dadb764ae1dab4ab391a99ce2575fbb3"
+    ],
+    ".agents/skills/aidlc-refined-mockups/SKILL.md": [
+      "sha256:3f07798457817573749d2bf3854a48571c2ae861e9dfd5f182a40add6bdcbad3",
+      "sha256:a58413834059d7dafad1ea41e9b47bc3a790e0332e2c2c274b6a4a39d3b40c4f",
+      "sha256:a5f9ab571c74a9e1110f4b4b0ede829d4dc72eb9989ec756176394be1558d9af",
+      "sha256:df3d83c4cc3e3e5d3ad32afc8c9811f8e878ccd66b23661c4c173e0621407797"
+    ],
+    ".agents/skills/aidlc-replay/SKILL.md": [
+      "sha256:495d2794d7a165b0bdebf54002bee2fdd2f1f8b17ea76a3934dcc077e41ff730",
+      "sha256:e2ca8ca3b990144a20140c8183dc14b89d9233c5e4379e18e658f39a373fb67c",
+      "sha256:f7913b3cdf5606ac527546698947714967146559d02c08822576cfe28ef2231b"
+    ],
+    ".agents/skills/aidlc-requirements-analysis/SKILL.md": [
+      "sha256:664e9dee51bef5e8084d7c8b63bb223c56c9685ca83969e85e69d85d0eb1c904",
+      "sha256:7a3b0d4d24d49ffc47d0456c36fab0707de0eb328ae17d60a3f48241afa29e77",
+      "sha256:99a50ba70ab25c0527cc98615b94517d2632387737c22c9d17b390d87e49148d",
+      "sha256:cffbd29ed56c3daf4b491793bcd976283c015f3d632b1ea9ec6257235a64622f"
+    ],
+    ".agents/skills/aidlc-reverse-engineering/SKILL.md": [
+      "sha256:2088246e58e972cd896d2ef777000096f8de486854564efbc820e57d47a908d7",
+      "sha256:631d382318f32e046d292c1eb72393cf31bb4960ca03600c22015ab4f4ecde15",
+      "sha256:a1eb5825eb4ffc2fa75b2a2f606f0126140c484e5d21d9d8eb648e94e02c89b5",
+      "sha256:a8cb18c6792cc6e009a76c1e1ba94847f75c2af304283c159b5643beb9f7f36b"
+    ],
+    ".agents/skills/aidlc-rough-mockups/SKILL.md": [
+      "sha256:1318dfcf583a4cb68745df5c1a8b30d6fcf520e99e2cadb1c90142de097f6a83",
+      "sha256:2a12695c910313ebf71d89126a851cfab2709ed8e3b9b017ce01774ea556e859",
+      "sha256:3571b078c2231be03e1538cea7072756e13ff7131a303fbb7b9a09ff2f849d27",
+      "sha256:74dbb791d6fadc781bc26a78bbf7176a28ac93ce41aadae56ffce88128fa84c2"
+    ],
+    ".agents/skills/aidlc-scope-definition/SKILL.md": [
+      "sha256:75fd5cb6d48c3109e122cea6a7291c615c5dd2c91af99fd3d52107ba0abe5216",
+      "sha256:94960e7f1128ee85318c28192b03901b413d50ac709b72e6aa43221ba55a5204",
+      "sha256:a19f490bae8a2f5dfd3b7f1ce42929fbddc517df21fcdd54796aebe478dfc9ce",
+      "sha256:d0c3d0532c92efdbf0e66cba964617aeb48b0eeae5de68afab4ed7d7bfe0fe88"
+    ],
+    ".agents/skills/aidlc-security-patch/SKILL.md": [
+      "sha256:2b3e1fed29717882daf24b208bdb09b6f0d68f4b0773fd8fbc511b94ecfbae06",
+      "sha256:4bfcde26bba7dca0d9a91b6cf55a2e2af12c6b2241bf59bf1aebd2ea03179d79",
+      "sha256:631a74090bc4d515fb734ee72ec00722b0cac8447423c05fb7563dc9a7f19cd0",
+      "sha256:63dcc8c4664bd3bb9b272a7a5a97043b62315e7bf16287fa681c4eda6a3794c6",
+      "sha256:c0cd01491199ed3e5772248455bacf90510644d556b2b53aac699ef656c17f56",
+      "sha256:d5c685b7b31e7c9c24f92c468fe1b9e33da6c500b235cbe266269253b7aca797",
+      "sha256:d764bd1811d4853cda35a3672d66f690db0536648e420bb6a3edfaa46c247540"
+    ],
+    ".agents/skills/aidlc-session-cost/SKILL.md": [
+      "sha256:1032e13d9d8ea55e6ba3bf18fb6eb091c8a14a0e7355cf5d1f6669cbb5d9dda1",
+      "sha256:474143fc1f7f3ee2257f1d2d0562153aca3fa070dd017a7068063f2317097d21"
+    ],
+    ".agents/skills/aidlc-team-formation/SKILL.md": [
+      "sha256:19ec3533d0346b6110f525ccc2526fdd94785f831ea54ad37721605823ea8aa7",
+      "sha256:b818e87afb687091f0d2f0e11ee317ebf088786983348def4ca6adc8fc176427",
+      "sha256:ca4afb29a8f648ea037b749eb948b023d5f4017001990c60f5482bdf753b87d0",
+      "sha256:fe23e4846208177d4b406b64c60b65b4b63f27e8eb2e0f106b5ff01aac512c80"
+    ],
+    ".agents/skills/aidlc-units-generation/SKILL.md": [
+      "sha256:072b3c300b95db7f616789649d1c1ce9d63d5c5991e22e0ebac979286017abcf",
+      "sha256:73ccfe7d24bd674e604b5941011564c0b7beb1245ae4ca64d4b8bd2ca41445df",
+      "sha256:cf6eb33ace0df4ae63790ea1e0c98fb46f4323f77ea70f8a32d6ff34fcba94c2",
+      "sha256:cf7b9cffa35133b981e5210def8031fcf039bca036a7058b8d2cbb478949f3ff"
+    ],
+    ".agents/skills/aidlc-user-stories/SKILL.md": [
+      "sha256:0ab35af64afc6f5fb6fd2edba34399c77f2132cbb068b439d205cca24ec5d7ff",
+      "sha256:2e848a4fce6ebe3f3a4cc5ea5b3f17bd48ba6887239a84762e0602380369a360",
+      "sha256:6af71c768ce282d2b3fe1222734c8d0f2ab1d6229caad6522337abfdb6cb62d7",
+      "sha256:9d514b4e56bc4f3b25b0a8efa0f4ad0934988b473f5401a37a5150ec9f971c37"
+    ],
+    ".codex/agents/aidlc-composer-agent.md": [
+      "sha256:0a94d8f9939f6fd13142b00d74faf9fff3ad13349a4f7909198b376fa19e0833",
+      "sha256:29eb9fdbfedd84dae974adb51139f2c18d6e9640c58d97c8d115edac6b41038f",
+      "sha256:3378a5d7bf56a9d92249425a6b100a2eae65e455b85c71d9cede5c81c778cd81",
+      "sha256:365d2ee408fdcf2111d600d76e6ce14a26439ed109c8f12b32c8f121e97fe540",
+      "sha256:4283183ddd97ed29beddcc1b201fb4fadb452f761e7aaee8e555753eb7b80ecb",
+      "sha256:46a4d1ebfce1377c3657e28dc916309930189b2730cc32b7ff5ae36ed539df01",
+      "sha256:5492571272f81dd7412eab2b11ffd174c641d4b22364937eec3db5a73180d618",
+      "sha256:67cb806123802d8f8ef2f0bb39385d3df13bb4d7e7ea1abbe65af6de5abe2174",
+      "sha256:a38d42d145a86c65c4828f14794dfa5a61109180f2c7c10fde3b8dfe13f9f0a7",
+      "sha256:aa43ea3a418eb86bfaf64b65a92f12c7c058c9e4539dae552fd9d0e3bf53d2e4",
+      "sha256:b6c563be802ebfa46baaae809b1042426d625af4274ec7afbb3fffe6c3108d62",
+      "sha256:d4a48983449dd145fbd66f2872f055ff1f4116e0b7b80dae0b2b68d45037aae1",
+      "sha256:ed23a31bd8b31e37769b50a62dca8db3facdecc32ccc4c95ba9ffa3a8489be68",
+      "sha256:f4b483936951444f11eef6a79ec7df06449cd026eec287004c2d63bdaf09adaf"
+    ],
+    ".codex/agents/aidlc-composer-agent.toml": [
+      "sha256:01e9e5f36f6690b593503b3a25a46d8bb9a7c42628e6ee1257c42a72106cfddd",
+      "sha256:0ee742a5a0c87a683fa548383ea23c7a3ac155849c79619ac473939f49635353",
+      "sha256:30fd785f36891d06e16920f0ab2fc24269ba14974a4cdeff6324becf6ec70613",
+      "sha256:3519361062d76040b988aa5bd923ab3e967ab0d0a06b3b35882741a060b80962",
+      "sha256:35264ee745a47a831162dcaaf750dc3db52be2a5695076c0561efc6b6c427917",
+      "sha256:64ff53a98a6504f0760b2cc243f430102fe78af5c50fc486c5e32eb4258fc653",
+      "sha256:a087447b73a99f7de6f7d7d8ebd7701b0cc91f076aea89a4d0b229aa371ccc36",
+      "sha256:aaebe4a165183b044586f2d4d2f920128ab960283a2e2cf7bbfc54aa9a2ca60f",
+      "sha256:ab0c84f6e9d1da6ed9532c67edc5c7c4f4ba05b28e218c0f8fbfac4ba01a25a6",
+      "sha256:c1541151466b6a0b16691563b3d9556b6395fe814f09ccf3b42e5ae9252e2d77",
+      "sha256:d877ec218f4a36eeea1fdd9925617518dbbdbb9e12ae8e43cbca63ae67af7fa0",
+      "sha256:e92147947f42444804f921e688d42bdbd490a239cb84518bbab138f816c4476a",
+      "sha256:fb8df0c4951e5df9e15cf1e47919bb506e185c1ca530dd11e14b3ca4eccbb4f7"
+    ],
+    ".codex/agents/aidlc-pipeline-deploy-agent.md": [
+      "sha256:0e0601981e39b8adf0f60df0faeb94c68e8c0db0420520c898166f679aca2b4c",
+      "sha256:17d4e3e5ef98341d6b11d30e66d69f3a095fea83621f176655339223c99fc8ad",
+      "sha256:722b2ac9b22b20ac476859ce43d3d9ed88eef665617b05e5673b7caddda131ca",
+      "sha256:7db20d6c2de96afe03afcb527888f5f35f96de57c4f9326aa9d02e5a7669beb6",
+      "sha256:7e555d1211e222d6bcb45e69db66e8e339fed06032d0daed83c4d5856c337413",
+      "sha256:8bc2700852137c8c7b691135b929bc6afef2c23fcdf98a3bc3cb117fd6f807fb",
+      "sha256:c1d37ee711bf6c10c38e5645eea90612ed0f880a0a4ed3cb3e4ac77775140785"
+    ],
+    ".codex/agents/aidlc-pipeline-deploy-agent.toml": [
+      "sha256:59a42b47dd9a506e8b8dabb49a3e8f01813e7c5716425a8aeec9df0d75257af8",
+      "sha256:ad9a2499153d62bc19b91d72ff877c2d4475a09d371aae35fc9c49854cfa34d9",
+      "sha256:c01a8751877ca23a0c49da799ec005474f1cb743115eb7b16a3dfc534daa8a5d",
+      "sha256:cda1c5dfa8e7a4b36bf637cada09ada84f7e1cae916e51c5302ef311a037172d",
+      "sha256:dc5ff787d7a731c3cbb31b6a45f9439a46d2abfad9c6754ced8a0e711be58a28",
+      "sha256:fcfa71c715c37dacb4c9a536d8cc5b9b8aacdfc2b0c8ae41aeccf74191d72c60"
+    ],
+    ".codex/aidlc-common/conductor.md": [
+      "sha256:04e57824328a16821b51471512ef015911dfa168236fb65cd96df04dfd61e280",
+      "sha256:0ece72ba3f7f1bc97e327e7125cf36e14712ee903c601ada326e380b97ee9579",
+      "sha256:213592e29fd0a8aa8c566711aa6190ed754f9911596a4941d2199f7ff7800cd6",
+      "sha256:2d6d0d1a50b0e05216a961fbfd50c768073b30b0b8c2fbe1bcdc5e7625ff631b",
+      "sha256:47fb649f8abb32a0b24dfed86202a70b2d0da4db261442c98955ccb3b44436f9",
+      "sha256:812ccb471342cc10f8b64440a5bfc95f7662a05fe3ca09d1a2695044fbe2d9a2",
+      "sha256:907e3fa24bcf5f3b0d1cae8f70dbef7aadaf335a473eccfb3a0bf586121f8acb",
+      "sha256:a9bf6f3637bda67677f0ff77098d358dcdfcca07555ba298c65a00d3f76badb3",
+      "sha256:da1f01cd673821ab2c5226c12e9008164f52ed562f877a5f37bc42c8b53d6986",
+      "sha256:dcf7c0437e393c3fd0cbbeb91600dce1607432c40e072914d84b5bfe27c8cd65",
+      "sha256:fb49779a66716288186e81f112138249a51ee17173870f347f93f6843995948d"
+    ],
+    ".codex/aidlc-common/protocols/stage-definition.md": [
+      "sha256:08a460ac424329fa8b8a95d1645951302e7d75a87491a833efaf13d8ea8fc9d7",
+      "sha256:22c416312125026c4b40cdfcfdce16e05edcf398b96042b7451dad5442e353d6",
+      "sha256:413c46b63770548f5589ec6517840c7209f443cfe912febb6117da2aeb8bd0d2",
+      "sha256:415404b87456e4dabbc598057db30e25f735ba9d556c9253af45433951124739",
+      "sha256:423689ad040c0cad9ba8d0ba0cf7aaf4fd3b6e4993c8e80492bdba413b8fb438",
+      "sha256:5fb9714df47e00b2a311315ee4f27f96d1af8d46deecb789876dd22975962797",
+      "sha256:724578d0e5cf1559a3bd0bcb73f4f705be1435a57b6a66301a246e07dd47ff7a",
+      "sha256:8ed987b138b9918835b8ad2a7c2d2c5de3b99f9c0be31326197771ff497aff20",
+      "sha256:9e4ee9305d933e064472995b0cf7e50b41a10580e95cdf727c77f1702d8a0ed6",
+      "sha256:aad98764b3a6624a41604fdc54269a497d14ff9727fae5f2b5484b5cd8f848d5",
+      "sha256:cd07d62dc90eddf35b9002fa1cf4cd5bad9fa88ad9b71eb23a5bea6c438b9ce9",
+      "sha256:d4f8124a4a951fe44a62cba10ce78c0b83a842bac0c1c16a0a2a29dc5b0685de",
+      "sha256:e41f8112c233a6e5ae312a5de9b2ca31fb5ce62fb063bb9e7dc227b1a6ec8e9f",
+      "sha256:e7fc6cecc589ac214160c42994c7f048a1c41dd9c6a97682af778371237dbca4",
+      "sha256:f37a8c9625a96bcde8faaada481071708774d300eb72711b4ab578b964e12e02",
+      "sha256:f8fda1dbd92b8b7ef509bce88883fde362bd2a93653bb854a8afde6cae0329b6"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-checkpoint.md": [
+      "sha256:2c47e477ae2a587aafd8c7042f8427ecacea6c2ce13e984c3f993691dc77a714"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-construction.md": [
+      "sha256:2734816ad67978986f5656ba0b27a682be8e82e79177da4d58dc42235a049ba5",
+      "sha256:2cada65c20d8d9a7f2b108117a910c75389b49030ca6ff52b134df20db478920",
+      "sha256:3d53eef12dab98a9eb1c96fc8c56a4dc42b4974b717cd09e754712f90a797473",
+      "sha256:4e946e4efbc90046f55abd5a5ff9d73e0de97189b0d616b7016b853371ceda76",
+      "sha256:8b35fb6b6f7a231bf7462518dd9a2132602435cff54c0b314bca77adc7f388f9",
+      "sha256:a97a35f891b906d29db2c1f4e24864d66b44774999ace6f1c8f3a611e307ea7f",
+      "sha256:caf47396e934aadb93b5eda5277a385d176150f6adadf4f8afad10ed3543458c",
+      "sha256:e76065b936917bc9821add1e07eb90abee3d81db2b773a51df39f486eb2f58f0"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-ensemble.md": [
+      "sha256:448df4caa45a5142e9c826b31d8fb24788e8eb16f3477e655b815ead81363860",
+      "sha256:b84b5611f9d0ba3a53bb96e4dff2555b3b58ee636cbf0dae3d8baab5c38de5d0",
+      "sha256:ce2e362fc8d604ba532a8b67aba441b2888b6019003ab956b0bf8ca8450bb3c7",
+      "sha256:d39ddad36d84b12a26a4acaa7a59305bb7d0f2d117a2e915b5e636f8aefca2cf",
+      "sha256:dfd5ebaaec8c3be9362d16851daf73373bd9efefd4e0ac4065de10b406c55312"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-learnings.md": [
+      "sha256:c591f2e698866dfd53c2d66d229879fc1c0c6b4ff08e3f12e103fee2ef5a73db"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-loopback.md": [
+      "sha256:3c176884ffb3597c140b58a883bf463046ea57410b419a6ba26c1470faa6eab2"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-recovery.md": [
+      "sha256:1556d8bf72d788344645e57d3e43d495bcf9d9814c2fc17ebad3c97a6a178e11",
+      "sha256:6db6fcad9cefd40559077bc25525e671a1995aa1d317f32c0a8018c95223c2b4",
+      "sha256:8841a1fb4cc0f4f772b7e2100a050bfc3c3e4620c37e6792f84bf0ccf81078cc",
+      "sha256:d3ce9581d21605eb80368cf7b3008a49ad6907773f1d226296d6b6ba1bd6cd49",
+      "sha256:e562b69b9f52950a25f0a34f22fb37f96e75a3e5c30e2fea350d51bdfacf954a",
+      "sha256:fc74e1c346814f215597427d1125b80b408daffbb73bc6056c3a5c837dacb7b1",
+      "sha256:fd8f89a5f3b81020b2091857ac425ab9862b919a2937ad29402cc9eccfbc2a97"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-reviewer.md": [
+      "sha256:06dcae7fe8649006660037a2b5425fa52844c65165c57dfedd0780fc4ebb381a",
+      "sha256:0c133c3ad8467427f97ac5238330c682b862bbd536aceb8ca85748a5e19a5071",
+      "sha256:3a2551679cffc9fe6a867dc5d4af46b9b1552831f00b27f87f846a334d095aff",
+      "sha256:41336c8bfd00fa16bae3b2a0f81a991bbcc8d6fd8e663424c0ee39c07dee0342",
+      "sha256:5bf282501dd013b4d4e5ebe5d7f9bc9ff9e856060faffb50707bec4917091268",
+      "sha256:5ed96cbf691117d827d884e4377d47960c912fc35f0d9d21d36e08c9247c2521",
+      "sha256:6829eff96e405e784720916a5c6ccdeab7f496d7cd872317e4bf1a28271f1436"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-sensors.md": [
+      "sha256:5be1dfe1f99256edb598947259e5c0e35749f6607fa6eae226bd3e3a20368bf1"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-summary.md": [
+      "sha256:1e47f44a06afcc5e4e299113b1d189cf3ab636da6bd91d039ace034714f50878"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-swarm.md": [
+      "sha256:55dabf6408d8ac66f854b793bf05d60a722a1ba8ab24f73022f49bfc720c26b4",
+      "sha256:b1c2b2a48a69e0565029f4749a3f10937eb2049c28f4780fc8ba2ea33c48b2db",
+      "sha256:bdf24453baf9636b5b9f9004e5429c5c55b6822f8820dbdb0ed3e53099c1a233"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-wave.md": [
+      "sha256:4a95796de147b1c5a9ec021d2c3719e350c88eb9f3af4ce14c3f3cf583ef3600"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol.md": [
+      "sha256:00059d048d6b1270e2f5d15deac96854b51085e171231a1d166d6e9889965084",
+      "sha256:0516ac95dfb663bd0f36fa19efd0ce28717f9366dea47188b118fd39071693ad",
+      "sha256:054e2a9364337add7932239eb0bce2142ef0d1d704950f36a5fbec0d31f5bd78",
+      "sha256:0f3e050a972c8a44983b21c7b94b066b690850d7c4a7f6934adacee6ba6c6ce5",
+      "sha256:166244f75ee195adf9353e77ba1e537715f33400ceb1a1b617823306e85a3564",
+      "sha256:1e69bc5661aa4178c28245f146568a05167b45b46bb0da8c8d32aa505f45c1ad",
+      "sha256:231d21f162fc1b2053082f4b2e4cb9f626990f28e0439033b89bc22ec4c5f9c6",
+      "sha256:272673a0dfbb7c78e7973b378afe8b541d17b9756640e93ccc2835b2716e0101",
+      "sha256:29b2e8c4be4cc7c8dd21e8bd8f763601379f6f558a14fe872991d70ef2f00f5d",
+      "sha256:29c7f616e19bedb1a0f5b8eaf593e40d0e0523a7e067636d3e9d14a60cfb8f79",
+      "sha256:2fc9ccc2ad084d568c5f02816aba20b57d2ebc8a20e17c4eb43c5ecda36b213c",
+      "sha256:3d414d552677a833f0d4e571597651c32ffba431d5ab7335e434d2afcda676a5",
+      "sha256:40c8a25bcd89ad90109da0befeca1361c270f3bc86b01563f1fb156c9ba892f9",
+      "sha256:4140cd50585cbdc1233fd36d8a5ada5b7cc92e96879c4881b58dea064038ff86",
+      "sha256:41549b5696e49d079cf96b9cd4109289d1d4dee7c4a6e5679e8295bdf7b3da80",
+      "sha256:476bfbe1ebe4c2e0b7711dcf1ae5b25d1e32371d2fd14041942286fa0034dd07",
+      "sha256:47e74a31ae4ac3dc9bb1db5a7cb0114f5c8999e72e82b4018d3db721c98a7607",
+      "sha256:5be3f20e4873d6b712444705a092a0e9280fa0a64ce1e8094d912854e7b6c050",
+      "sha256:5e809874cfe48a5ed9eab3cd8b4f7472f0d2b2ee5006279ad82c4204f5a6d073",
+      "sha256:64cee52d9e8b39efe93b20ff95d58b3500ee0d5f54d5ebdebad05b34f716c5ae",
+      "sha256:670aada240120cf5679953e54cca52bba2f9ae29838c681961f811b77cbb8bb2",
+      "sha256:6807d5bd2749ebfb05d3e8c41e83d484c2a380fff6c81b0b0a5b0cd1cdb76f3e",
+      "sha256:6809f10c0a5ad8a3b6fc6590cb9bdacf3c0fe466b9aaff3615b627e6c5dba5cb",
+      "sha256:680e40017d54fcd7e811cb3da9bc96312729eac3dd2594a82259933c42d44551",
+      "sha256:6dcc6334462ff40be35dec8decc4f5380510057866a9a5600009dda2e8ec7247",
+      "sha256:7ecb62054d9c52d2be7832390f4008633c0db4c3c2fbc8b7e09d5b831a96aaca",
+      "sha256:802f37b087d8fe8dfd6488e2442d0d2569f8b8076e363a3091607bfc7752e618",
+      "sha256:8226e5d8fe3094365871fb8891d042e44b61b7d861681dcf887eb5c3270fe042",
+      "sha256:8b58bf73d6ef3518297af05d1dfa77de09d4971ea79b7fd154db1388492f6efc",
+      "sha256:94bcb8fff626236f85d47a9c2479d381c13e942b432e427ce2085e0ab540c17f",
+      "sha256:9692ca3d653e558134bbec33de9d070ef36b961663a7c58bf10122673a236062",
+      "sha256:9e398e86c0f87f9244deee2a4332c1a7bc05c02427ed22ab51443f1928c7963d",
+      "sha256:a9567e52b2bd45ac43e6f9a4e307831b825e4bdfaa1cab4f78388dd378f12a33",
+      "sha256:aa66607ca9d08eb4341781a76bafcdc17bf498a0250c270d167a0080a6ec4340",
+      "sha256:aa6d9eddf7859be8cef28f3fcdb136f984e0d8290a4e6e292bdfb1dcb9b79450",
+      "sha256:ade57b79a3f5b0fdd0da949f11eb7eb107cd9d44fde1845b700cfaa491a2cf4c",
+      "sha256:af79821a5ccfa9faa88c0011fd702c5e4518beb22cfcb603049a75648f799e12",
+      "sha256:b4a4956f2d7d445686d40bdfb66c1bfa87ea6143f90f584ad20aaf4662cea122",
+      "sha256:b6914c2c3851ade6bc519ef3e655274f1d9663dd7879586d3f7c62688698339c",
+      "sha256:c6ed038664faca4958a92cd012258b5a30a770428218236869f5e9e016968532",
+      "sha256:c6f43779b805f35a9b60e99175fa00eaeff868f112c37c822b9a6ec19ef63507",
+      "sha256:c768781b108a4ba2ee308894623c7e87e1531f0345592c35a5b6adeecca62c32",
+      "sha256:d46b29edf385f637482dbf7a67fbf39fb6efbabcf86ca9d598a097259df2ba94",
+      "sha256:d48c7281ac4f6faf66e2fb94c219e57d1e7406f2bf830fbf0fabd441a1302cb7",
+      "sha256:d4fd2c5d37507847b99bab1eeac71c809af3b5de2b3838b2c27c4e8f18bf1e42",
+      "sha256:dce71fdf447f58b9a7c1720193d2b103b2bde4d955e31ba720636aee3eed39b8",
+      "sha256:ddeb02b6204a45bd61a2dc6c23af6f857efcf5754d7878aaf792784d74c8c078",
+      "sha256:e40e0e5754d7c84c40808a47527ae9aa0d28292609a1d5e2432f974e61860edf",
+      "sha256:eb766a7cf504936c6d88d86984366e4fcd58016d8cf036d8b81db6b57eb678ba",
+      "sha256:ec38b82b8f339815674edde16bf92a64da85015175383c5517bd31374099de9d",
+      "sha256:ecbaa3b422dadfe2f4345059b1e783dce820cf17dc164714a1a6dde67b462888",
+      "sha256:ef850415d50ccc2a0b922047656d4198b82a1610266082e8a4580c886543d229",
+      "sha256:f045a37e3b82c76ef1e6f3d729f54a6c13c8b83b120ca69e40d175471a8dcc0a",
+      "sha256:f0ca868ca9008a9a491dd5b0102b419970172bf9e4844aaf963b11b398c9c215",
+      "sha256:f803e1cf2b9482ae089e5685e26543852d7179403d8bbbba8b9d2b5cd32a7f78",
+      "sha256:faa27a03d28244744863383233ba4b39210e48f94c1421be76f7dc3d7ba11e24",
+      "sha256:fe28e3a4101618e17b87b07785d5c9022ca5b44ca3607be7597d163889053819"
+    ],
+    ".codex/aidlc-common/stages/construction/build-and-test.md": [
+      "sha256:22c40d6b0043a987089006f98aff3a61b48e20b2df042035fdb170e8026cc057",
+      "sha256:2461a604ba67ccece8d079dccf909672ac29764e487dd9bf41777f968330c881",
+      "sha256:66dc97320a4e708d2d794e011e33bb63718b3040f5235a7d9e4b4e1b70285c33",
+      "sha256:6d3e180b070a19e68639d1180fad83d9c18fdbaefe1356094b259e14c62fe8d6",
+      "sha256:6e6a566cc7e33254146d33c8196dc432ea83acd56729fc7dd8ac22ec9715d6e3",
+      "sha256:7cc95a39e957c64baf56f7ff17c19f1b46789c9a06fcb44adfbb3a7e5984ccfd",
+      "sha256:7d3bad653992ea03f11a78f85c6418c7013371ce4ee641914c0d7ae27c46745d",
+      "sha256:89454dc1ff4f46afa3133ea2c238a3dd4e4ee6e3f1a8fe637b2a03d809931f22",
+      "sha256:8ac830d7dadfb11a757f01198b892b6e6414a5d73978048d04669d63315a0aa3",
+      "sha256:98b08d91a5d2a256e339345c3a5e927c65f17161723d9e46fb7843bd33dc41a4",
+      "sha256:9f3129056ecd0c360ea22815c948de7a598a846ccf8d1a78d352e94ccfea523f",
+      "sha256:bbcec352b1914e9bf5e4cd8901f4439f96acb899fd8f48ea004963d7540ce3da"
+    ],
+    ".codex/aidlc-common/stages/construction/ci-pipeline.md": [
+      "sha256:03df6bfbbb07dde1858f4e8accde4d6015f23c27fca305577adb351a0cb17888",
+      "sha256:24d9751342d585dd65a4cc579e43954c4051943e3d319eda45da3757b66802ac",
+      "sha256:6060519168adde5dc813ecba8306df6adf4ebf52958eadfc50c3ad35f7eefd1d",
+      "sha256:63cedac68fac9040010fc4ada20cd861276c27f1e4d35dd2c251978a668f2888",
+      "sha256:6680f4c5c34aa4292884b3312454a98637f46250bb22635e6decae9078e59231",
+      "sha256:706b2323f3dd54c5b2eacecde5dca66897fe41dab7f4c343a47a367cb9e3aa42",
+      "sha256:7c94be6583e2980c13a30c892480d3f379e1f51f24ca0acf2e1c68e28ec28fc2",
+      "sha256:9a25d25bb1b4b262d8da00512141f638f8006a73083524c62fcb3c70452518d0",
+      "sha256:a4bb48b92b57441596dd4aaef3b0d8b5f874a054d0181055b23ce1f179b8dbca",
+      "sha256:a8f0128103705486f2d4748912a897dd8eec2b019afd890b15c583af083078df",
+      "sha256:f4642905b197f24846043f3ce8e1574840539770acccb2a00f99572346dd39be"
+    ],
+    ".codex/aidlc-common/stages/construction/code-generation.md": [
+      "sha256:004e934c048aab401638cf1132028d160debb87b22a8d8c8deb073cb283dc1c9",
+      "sha256:01de3999f425bb702e691d1e6a779431af4f51fc3244567cee22025b6fccf1f7",
+      "sha256:0d1ba4674dd7b88bedd56f269deb52d8b041340ed7d6868c60077d4b2baf1ce9",
+      "sha256:2729ee1e756d84fbc3d008e0da5ac48d7440129ac30a917a0ab2e6878dfb05a3",
+      "sha256:2c2cb100b9b316625038994740265da308c411cbbea5f0da9cb1064a3182de3e",
+      "sha256:538ddd88ab29163e841d6e4f3fad3ba787cf295cc38aa560e338c03a63ea42a4",
+      "sha256:720c07779c827f7cca4eebbecb066117a96a5a7fa5131959e7a90a4a82e82eb5",
+      "sha256:73b3f8b59af063b015c94497a7a4d4836ef37f609db21bdd822e214b8ea4ac62",
+      "sha256:75b68c2012f712f66cce159f8095036b4ae61ac8a90f3b3cea95c9ab2e3022da",
+      "sha256:78d9cd7390b080f31398253a7407dd9c837c7fe03faa94d0c90514f939e79350",
+      "sha256:8d6d09903d235bfac9e4a60984d03620ef3c1179a10a7a938bc54767706c427d",
+      "sha256:936630f1ceeeb5928c1d6ad300a619b2952e001a893b36fc79b7bea2eef9bcdf",
+      "sha256:ca0346387ef11eb9f7ac0515c91ffa2868bdff99d18ba02a1ce08dbcfccd8311",
+      "sha256:cad02ba1d0486a91682883b233646e1b45dea907f612a5f1564fdc854cd848d7",
+      "sha256:d52d4f76dc9302c288e944b16d9b026cd328566373357457d23830cd88f42654",
+      "sha256:d96d248298867614aa53f2267ca648fb0e1d215a53bf00ad6f919169bf7f2ea8",
+      "sha256:f510ac01a8e68285e746fbc3905ec9bae8967c40951b9ddcd042bfeb52b5d799",
+      "sha256:f6fedf0c87936690a72b1973c23da7a7b5fb6e16d3262f943768368ee1ae7668",
+      "sha256:fa8f301af895e39bea28324ace90e2e55a270e7194cbb79e5797b4ec934063b5",
+      "sha256:febd825e7f42bde135e8e32b82540f5c12680ad895149e74c1d44eb8feafd502"
+    ],
+    ".codex/aidlc-common/stages/construction/functional-design.md": [
+      "sha256:101d6536fd1054630b14230bfdd7d2a12fbf6c5e4c532384e55f74eb98aba94b",
+      "sha256:1715733e82da4221499d92247ee48a5937be8b9aa744bf1745a721dc85ea9dec",
+      "sha256:190683a3e849c32de2d81611ba53d82fa295bcc7d7933d5ff0660b3412cf5a74",
+      "sha256:20be32ecbf56a2d56c7ea6c671ec87adc17535de960a92c4d7fd1343898c63e9",
+      "sha256:2cb9f84f132539951473bd78635b6fbcaacef6e817f33b8f64e1b0978e289583",
+      "sha256:36b23d3ebcbfe43fd9bebcdcd346dea21d36900f011153f6607bcabed309e120",
+      "sha256:4e55ef0c88fe95610132dd06ab7ed0a2a218d3f792a00f0e4b237f41d4065e6f",
+      "sha256:6a0aac086b90c2b771b471d4b7b406bd3f15ddb47b6a1084c967713230c7d551",
+      "sha256:98fc5989f79a7cb480cf2b2584170a4eb45ffe404038f13e0da3117fd8dc802b",
+      "sha256:a0bece62093579b965c6c0a3eb9f6bc7fab69b7e1a3afcdca51d917f52ccc9db",
+      "sha256:b64cd31035a687faf3b4321d23dfc50caa523d0850ffb1ec685621def2348fb7",
+      "sha256:bb7fa4b5f73144b928cc3688a27ba44fd6fd951a4c28f0b6f528566d433ae4da",
+      "sha256:c4eebb41561be7839b5cf6df9bfa77e868fef54d5442027d5c2dd531e1d9a403",
+      "sha256:d1c3432f659b9bf1f8a3dc93cfa157fa4b537a7a8794546507f5dd07dc307fab",
+      "sha256:d3cdcbee29faa2666887a09685a248e539d0e55f78b388bae84363fd1cc4c2c3",
+      "sha256:e25743e559521c0012e4a22d03a7dc94b896b82055172e90d2d5eda04f27ac7b",
+      "sha256:f99ba4c639de6fa15c1028614a8202e9a46a7b0b46a2300af2754ae025367520"
+    ],
+    ".codex/aidlc-common/stages/construction/infrastructure-design.md": [
+      "sha256:0d13832d0f20492d40496d5625990d14b0585a365713b8c009c8e869fd02245f",
+      "sha256:23d31db04ce3d44ba7dfadf4889fcd6cfb48fd6c3e2ea3b5ecb9c35f8c5ab4d6",
+      "sha256:6e450371cf4c6a5866a7e6c5db719a1bd6d41f3f4638d25dacf40bc6a8edc5f7",
+      "sha256:741dd556d7e98a414e37700eaeeaa9ee5f4df34a66f2d524940318420dd6ceb6",
+      "sha256:8eb32b554eb5ec5f963d4d505b7ebe941c7b9ef39ed066aeba77b54ed73c20dd",
+      "sha256:909423079ba10745ba13bf0af5ecb59e389aed1f789566e04c863dcf4f06afbd",
+      "sha256:9d8477d385d871a4cd1c5a8b4c121125d6159a52556fa2342fe5b5789b943a70",
+      "sha256:a8c90706fb9ff5afdb01f1b723f68d87e88000fa61d316d716f206c5fd1f25d3",
+      "sha256:b0ea4dd15cc8ec9309e206b5652904b0de8dd9fbd9786241533a9c71777633ed",
+      "sha256:b64ddb8003ecbf2b86ce42dcafc71acfa19801937f9c12af8c61483a4db8472e",
+      "sha256:ba6ab24ae70169622c6638331a8b10d7f57c54f95b2d9bdf0a8be497fc62db63",
+      "sha256:ca5da9f21282d13f0e50b92f47b87c8740441fef5843e19e3e05871efd3b1024",
+      "sha256:d41abf21150dec315746d208470f73796219425b650ab00b9020c55cf61102cf",
+      "sha256:e664b84471d7aeabab66ea1363fd35b3d4eb4807fba4e091b889b6e327c37ba6",
+      "sha256:f8078876010365a9d17894ea096c5a05dfd56af3b2b10b4e5b0dc0c19398f762",
+      "sha256:f9b7613a713f4626bc80d425d006139a5ed2871aee5c0a12288084604d349fe5",
+      "sha256:fcd7818ee84ef72ca0bdf2965909180b0dd557709d82b321fd3298297ab28a3b"
+    ],
+    ".codex/aidlc-common/stages/construction/nfr-design.md": [
+      "sha256:0fe84093606977f44b0626ca2379ae39fc547d9768d2723c620fa7a80dc561f1",
+      "sha256:2520cece2794706c9eba73a5518b3b7002ceb1159eca7c9181da6559523a49b5",
+      "sha256:2e56ef33bfe2231f59580d596723fdd080e85c83c271d2edceb149412c804bed",
+      "sha256:42f204033451624e7b60f3d08aaeb3dcaa92a106dd288ebcbf22c4657bf20b66",
+      "sha256:534c753e201497d76ea6a2c5d84cdf04fa1e55b8f4c631c0bebe0671cbbcb66e",
+      "sha256:53e4b3edc4929db22d7004610ddbb5d2645f961049367d96efb26e08abe49c25",
+      "sha256:545bc62959f012345cb3c0d0ab52fbc812de3f1a2c1bdeff15fcd2666003f18b",
+      "sha256:86c3b5ec3157423fda397473b35f138b321315437b25c5578b439cad7ef1ba69",
+      "sha256:87348fc707cb50f009b82c45e3fc27a9eac925636bc3aed501ad4f74aa91638b",
+      "sha256:abbef3c636376d3bfd46829f0dced296dbee70fc58a231a10d1b16d368701d2e",
+      "sha256:b836c821f4c626168e1d372c5c9baa2681126da71dd9b293f9f6bff7588caed3",
+      "sha256:bd88ba5ab4efe4e255bdcbfc91d08f34edca397882b2dc1dc0b1dcdc3af86253",
+      "sha256:c591c255dc9083e82fd88c8e0a0cd6beb3afbd2c607b23c6e170d9bf9e21b407",
+      "sha256:cd1ea8b9831950709320bdfdca9d32b22211fb2be2c3cf979be57994c45fc449",
+      "sha256:da742d562d77a9462e32022dd3320143c4caf4b495036ff85028b8de607de902",
+      "sha256:e0de56e7ddbd87cecb18cf266414be4aa7adf42f30b11bf995a5367b42e5082c"
+    ],
+    ".codex/aidlc-common/stages/construction/nfr-requirements.md": [
+      "sha256:405ca7796aeda919e909f4834d30656031d39ab06e8d3f076342398f6c75bc8a",
+      "sha256:4f5ac5ad4b644bb0013c3b1215ed57154124fbadcedf224785a5d31df6839f98",
+      "sha256:512577aacd4005c1f8b96eb2d3607489e9a3e8ef3e9f5de5c4ddf5f2b3715ac3",
+      "sha256:614c8d87e4a084506ab594127e1d060b23b7c3dc2b3c983c23b325590b8141ee",
+      "sha256:740d64a5c2774f15634d029d27d3eb45c21a59cdcf0d9f8270a5e0247ccb3ead",
+      "sha256:83d50d06db1ce9857e8093764b1f2e238d98cd6445b7b0a9995bfc1de1196dd3",
+      "sha256:8b6a714ffe042616ac874fa1ddc5a9499be3c205108e9c26994d29842b116d53",
+      "sha256:90f995b5394fa380dfcfbdeabf77e2e78f61905619dcc6a29bbfbc43614bdedf",
+      "sha256:a07c34e2e4066f4bd15369fbf1e092d6ed2b93db56f4292ea330ffd87ac3bcbd",
+      "sha256:aa7ac31af42504cb2329e22d9fb1de85a3e6423658659048972e86ff67662bf6",
+      "sha256:adf6899b376f25c54a9eb1b253d1361291217dd516e41e64782dbf861ed1acd7",
+      "sha256:b578b62af48912444aa70d0d90c0417786f22711366dd76fb417064ca2ce8088",
+      "sha256:b8aa91b77cc19b541c8a06f29d91dba0ae31c1d2fee7f94b01e101f568405534",
+      "sha256:cc733d12850d30db5f79b4ba085a294eec40e8ae37bca857e898f89452911ee1",
+      "sha256:df138277c27141bac8cacfa9bc695bef1b4b6419651573bcd44b22aba68db824"
+    ],
+    ".codex/aidlc-common/stages/ideation/approval-handoff.md": [
+      "sha256:09937a9b6d2480d65890ba303340ca61bcb5591187f85112d644c37cecfa17de",
+      "sha256:33d85178c3c99b0f9e06d2a7ef96f46af5add2e68f79fd027228671fec703607",
+      "sha256:462da3d394532b2395990273e5a6ffb3e8744e98926372ab5e39fafc8395a96e",
+      "sha256:5caa99c1361b0cecf5681a5794c562b54121867aba9a833c3c298c1484403e31",
+      "sha256:809953f135cd62502fd31989c4dac68d62a59775dddcdf3f51cf5e25a3648e0f",
+      "sha256:8e5471322c2c41cd2e2c6328901ebf6b7b05234a2a3d41fdbea307eca2f3afe4",
+      "sha256:942d08296c37126611464a929cbd7f6c258853af082a9bfc61a48df753eb4883",
+      "sha256:ae3b625db017f0f57eab7b6e2b1de69bb9b13ea9519bf5964df2b3ba5a78e4ab",
+      "sha256:c8ded9709d651340bc7a6383e3ce6a4d2c871fff746233298f98172f4d2e1cee"
+    ],
+    ".codex/aidlc-common/stages/ideation/feasibility.md": [
+      "sha256:01421613b80614e9032c11f5dcdf49a75000e2be28827a72eec8ee1c9c3e9973",
+      "sha256:170779c473427e7b4772bc29a3da23a9fb0ac3ed1158dde084ff570042209801",
+      "sha256:370c584c9fa586cf4bde044358d03e4931271e499edfe7b01d232f484acb5310",
+      "sha256:5cd28aa30629f60a02fe3e69ab09ff7fff4f70d5cff7c4f4c53998206fd2000c",
+      "sha256:9c29180e4ab049c806f6d1230482048ce9bf8689da3b3a35d0a288c2200c01aa",
+      "sha256:9d68c9254ca15cd6cb42aee13c39437adce4feb06047097709bb58ff710f8de8",
+      "sha256:a365c90fcf9e5c38f96d2c789b4c50ee09b307d9420f8b5774d1137fc1829b5b",
+      "sha256:c3597098dddc5e4f58049133c91de8d4ac52ebf4d47a8151b6a105177fafa4ac"
+    ],
+    ".codex/aidlc-common/stages/ideation/intent-capture.md": [
+      "sha256:0213a516e021380a0ad8de64f5246895bb31e78b2e35995b05085f3fd40c4605",
+      "sha256:0859b52a33d54e43d505d611fbb42f18ba84e5ba6b8944af5a0664029e31ab00",
+      "sha256:3d4908a9dba21749513da04459376ec0c8fd666985642d9ddcc6c64a482d73a8",
+      "sha256:58cba526bc85f0fcf068e96ce32cf534bec30c631a8815e924b178fa5a085942",
+      "sha256:6247a5cf924e4150357d97d7f89b8eb13d949f7afe6447163198205c8712e9b2",
+      "sha256:63bc32bf0225c728319a64b147cab1c407715912d0bab9ec333007967452d2dd",
+      "sha256:92ddd39730db555b47989d8b67f31c1954b4c9f7d869102df4715155d01318aa",
+      "sha256:9fc9b79156b1d06aaf5397b0be6670e542efb6caa1c0b5d4bd625979ad56ec62",
+      "sha256:a11ec54b9c4dc59af81b2d3055c58723e97e0ab7268cfc142f5376735f63cb49",
+      "sha256:a397823b8a0e07882ea66392dab8896c8ddc210d19c1111fad2578c201e7251f",
+      "sha256:c39b89db6eb1f65d651c5111b1c2f90eac1d21133e7696960135df1f67bcd948",
+      "sha256:e56da9fd647f7b15ed4166638023ea235304b7f27f2b22ff2fbf29e826c0b202",
+      "sha256:f0f922e1e4140db36c375417223db9dae591018f22ee11e5132e9fa40561f4ab"
+    ],
+    ".codex/aidlc-common/stages/ideation/market-research.md": [
+      "sha256:2100f073e5017b53eefa82bcfdf5d12189174e6050d2b1e53dc1178aa5e3512d",
+      "sha256:697980447360c36cc244dfddd7c0b8711d7857c0ad39383592813e8f2afde9d1",
+      "sha256:803c6137cb91afc86d8af4d8b744164e272fcc8e85eb958a62033963922394d3",
+      "sha256:8a110580b8d58c5ddcd4a56e2b0ec42f38d55e9e0ed35cd8a5c527af7bca1683",
+      "sha256:8d30900f7806eebdf9f1fbb50a4b794411b19511c2af0808a098b453963ce364",
+      "sha256:98ff18260ac2d593a19e039520dc83711a9844d824d80e5f6afd439a02bf6827",
+      "sha256:a935862768a2a6bd4238a89a30278ad9d72d05b98ef88d7a958136ce5ff54837",
+      "sha256:d98d2900c52f68ccd4e596e8fa16c3811e5370fb6497346400e654d7762ab2ab"
+    ],
+    ".codex/aidlc-common/stages/ideation/rough-mockups.md": [
+      "sha256:137246d489c671df649bc088321dd3a302d5039a93f323beea7f3fa1b5fc5441",
+      "sha256:17fe22dff1037e1835c3d54aba27738a6bf36513c32e5c564b420b52eb1316ca",
+      "sha256:4a32a0d1f8483743a380c3605451f51f49d999ecfa304c5027e9015839039db9",
+      "sha256:5d16fc15fe8f642bd8a08146f4b8cf0a3b82d980ab6edd9b84399bc0dfdca1d1",
+      "sha256:6444d177cca6f77c694f8c14e019efa63f8b0ce42a96e4ae00c2faed0b4fdf58",
+      "sha256:a6a88d516c79dc9f3eacd9df3cfe4bc57b0dcd0959197faaef69c07fb423717c",
+      "sha256:b3414aa0db23c97d2a176b501ef6cc72ea2de42f291d1406e099c43c2d134446",
+      "sha256:db775897585140caa61e2fc1b0256cd739f7d0a4af20490bf2f3e306766faeb8",
+      "sha256:e6de62fb3ad19627c27ddad87d9b40fce78eaed64c71d080de969b0c146ecf24",
+      "sha256:f5e589dce4d2afa94e630e8f62abb02934076c26fad4855dc7c764b55f3c8a1a"
+    ],
+    ".codex/aidlc-common/stages/ideation/scope-definition.md": [
+      "sha256:2770f1e7387ed632a8090b528c0f5c9d10ec50c0da9f76dc76b80f0438a40116",
+      "sha256:44ed8f64e1e4dd65123f25f63f9a71c7382ed04385a1912111c3f705322f12df",
+      "sha256:6b5304dce62d6f8bd49530a21053990f4bad01377296f275555bad3374c4197a",
+      "sha256:93a31807d0a487325433c0dc7e3a4a9a802657d9dbceed63a6c470a8e7712c84",
+      "sha256:9e85e0187c2a5fc243266559365486420f3043888477e6ed7fbe66d2202182df",
+      "sha256:b99bfad1d3ea454e41bf8b64ec6928432a480b4dfbc9aa47a8794a34c99607d0",
+      "sha256:b9cefa5210e898f122355ff04fd18d734a1747ffd69c1e36a093643330303183",
+      "sha256:d8b0158099f88fda9e0eb14e0b313d2a72c9a36e13e76568882343a8fa292fc3"
+    ],
+    ".codex/aidlc-common/stages/ideation/team-formation.md": [
+      "sha256:3938a3ad48beb0346424e97071e1f1105d60d731524962c759e36e4f554dac79",
+      "sha256:46b964629518237a6bdabad358c232709b1f94acd00d4753801e88c4f39a78c6",
+      "sha256:abe221e2a9a980bf6617f638ac42def567475526b3355db1b80d601aa758bda4",
+      "sha256:b4878a8f22999ee30af16bbddc774f934789839042a2c620d163679ecc307c8f",
+      "sha256:bd093efbbb6fbb52686ddf00aae85d5a2c7a85fd599f1eaf9b465b7fb73dfee2",
+      "sha256:e437de8c5c5dc2ffdb1bde31ddfa517956eed7718c071ba6060b534bdf9762e8",
+      "sha256:e64157cb25e46ae691d4bf6ac20f6491288b1abb1cb0efcb7db1caa7b6b8eb59",
+      "sha256:e92f402d355ea7c441356e54c998fa45e2f235c933d4b0a58d9fe109926a4988"
+    ],
+    ".codex/aidlc-common/stages/inception/contract-design.md": [
+      "sha256:23dae402b712acb45dda0004e0eab3bbb3b2ffe0df1bbba791ca38f3166008e5",
+      "sha256:494dd8105d5c4145d95b329f6cae955a0ddc4f1ac7b5802a3e08569a6a5455b6",
+      "sha256:9569eb3c1b1431dc80e859806c59371a14ca29a69f74640346a3945a744ab380",
+      "sha256:a2c80ff46970ddf76cbc1819b89808574316b423dddfbd217981326501de1fa2",
+      "sha256:b7112a8c315cc1b0d01d8964ee50cec8f5adfb66fb7c140d13550591cf88c620",
+      "sha256:d645b9ebc7c6836f1770b1e80b0b8a6b367b866f85c175b548c91e765b517e87",
+      "sha256:f776ab901a5dec2bda319929a4db7cae5011ca4d5b03929e0bcde44e09a77f39"
+    ],
+    ".codex/aidlc-common/stages/inception/delivery-planning.md": [
+      "sha256:00e03805c88f273af0d59151b4a4b9974d466a53dadb661a82a3b14765836e09",
+      "sha256:0961dce8eec9165cfa3d55a5b6626e643ac277d7f05b4a08d1985d44248ddec6",
+      "sha256:0f3fe33eccbbb421ad2924ac27995ad7b6603394c7dc3a1628755de80126a174",
+      "sha256:1d04d74878d102bb916c601f7291bf159b439dd42d814d2bbcd7eaccc4c9d556",
+      "sha256:36d7dd4526e4b276a8961db2cb42e65715c82f8799abb2204ade5640bafab2db",
+      "sha256:5bad8e9b6829ac11d5fda731d78cf125ea44bc62530b27cf98a5804f6968db88",
+      "sha256:8857d6191a1512a407369e67588c286713b881d8f83e7736e998c6b4f8dff095",
+      "sha256:88a06655b674d303f018a6c5b173458b3f485258eb9cbd05c5018bcaa6501031",
+      "sha256:9d96cb8cc2923897abd30d9df1fca7cf0f01a587dd566497d6496b4519ca12cb",
+      "sha256:ba53cd9129f309796459713504e4517ac7127a58c42b82214f1ba75b010a0499",
+      "sha256:ce1d44eef856674ebd670e29eb2381d823279c9f45b28430a7b48d43aeecec35",
+      "sha256:de07975026daf0d90ea02672ec1a3634ffaeb935fd48563d2da9d5a019fd0fe7",
+      "sha256:e278b26f5ed36d6e9e081a7bb6e9d67985178d6bdc959eb3ed6362fdb0d2e1b3",
+      "sha256:eca899cdde7a777eb411f94e3eb79d3955825ec1b9307d47a88c84fc88e320b8",
+      "sha256:f830d00edbea83096ca5668764d6bbf61397be3675d5496ea9227120c24fa353"
+    ],
+    ".codex/aidlc-common/stages/inception/domain-design.md": [
+      "sha256:6841b3095a10fdf8c5f9db1bf20165acf66e7640e5a8c60578c97890bf0bcfe4",
+      "sha256:6ddd54c7ae6515df0fef8a925e6e59f2dbe197ac9b99601a7c2e84dcccf37ace",
+      "sha256:7344567d314cbba265d3663480841b9856293a8e36804b5192bca30af04ca8ae",
+      "sha256:adc47ee0ad72f17e8a9428650f3246af0a0a1b7f7f77ae4942d8cb00cdc9c0f5",
+      "sha256:c3f0c12e0ac06255174ef06555123144a27c2771ac5565058e4c65da3eb89322",
+      "sha256:cb0e152c81df7c093b56ef3a45c2efef8ff917a46f370bc9d3407e439f6608ef",
+      "sha256:d4c5e5106fe489e5dfe23fbcef98fc4c56cea9fe385e30e0987b662867802d00",
+      "sha256:edf66d3b427633dc73d540991411ae0adaf3f5cd268f25f5887c6980c372c0e5"
+    ],
+    ".codex/aidlc-common/stages/inception/practices-discovery.md": [
+      "sha256:1e821d47eef05096d9308182249273cc78c3561c51680b6e77328a0e203a1e1a",
+      "sha256:360ec4793e517ebccdbb2063e8d867599e43d67176e266620d37b838ae74c653",
+      "sha256:391b7f2cc474aa9b72bd7c7c83ede01f4945eae9df82d4625b1efec592e4748f",
+      "sha256:4f6dbe27ea4105af3567846520c0e98cd81802c9b64bb86d6391fc5460719b8b",
+      "sha256:6582c2eef061a4239430e6cec659422b83745fc52d3e499cf1863449f1c4f74e",
+      "sha256:66ebefe776a97b0702307fe278f4517783b3e4b7e5e6a9b294cc9bd980589ffe",
+      "sha256:8243a8b20548b46d4abb570bec8f6f9409c8508009e7f1a5aa628e91ec87ae84",
+      "sha256:95f96fe74aa94e04fa6bf4e2b724458f7aa6c9580b7eaccea7ff8674920368a1",
+      "sha256:96fe25532fdde12c0a28fd20edf857dcd7d27ec38b0874bcbfbc98baf34bd368",
+      "sha256:b5d1f50b4e9352fdf7f656bd1c9d28f7c595ff8a904c646416e1e18d3578d860",
+      "sha256:e10b7eb7b622bf4c148ed89e52f97b37c47df9f437125b15b573aff7ce4c14ff",
+      "sha256:f3a1eb35698a9436ed6cdcbdf071602358101364496892b714456f4573c7171c"
+    ],
+    ".codex/aidlc-common/stages/inception/refined-mockups.md": [
+      "sha256:001ac81c3a1759abc83683789351bb2f5ea4213b70dee055b971114c82637efa",
+      "sha256:2bec2d8013ec2819ad5408b81c4461652b1c7df37125f71ae7ae78774f86eff6",
+      "sha256:30a4c73b53025937df8c8a14e58dc15930a5d50b35a12bd0c7494415e7291aec",
+      "sha256:3a622fbaf6c4dff30c63bb9173150704beea7e14c8eceb335361dfe44b790cd5",
+      "sha256:7a4865542625bb5ef5206d05d32179467eaaa45d1b78c84403edaac60d800257",
+      "sha256:9fe627d6144fda75b1fa911c7af17083b7925b5c65459ad697871b640e13522c",
+      "sha256:bb58ebdd2a34c385797b43a861a3715fe19e9d963dfd370b24eb9ba71b2dcc8b",
+      "sha256:c1386df1cdc0f14fe3277e33714dddf88ee6ea966b5771219a1bbaf2536b7f68",
+      "sha256:c8e852556158e76b04c318c5b264a4cb20fd9e65bab3ab694b5394bd80e66c56",
+      "sha256:cffebde4136d326b3dde41869695d4c39764fe17142e7add138931be4f2dacea",
+      "sha256:d816a87f16b191dbf86eca06dfe33658bc77b79e6812e30d59f640fc47d5e7dc",
+      "sha256:ff89f3b9440957be0d8a47d156ab0872d3b197433a8fb7824464a9d0ad0c3d86"
+    ],
+    ".codex/aidlc-common/stages/inception/requirements-analysis.md": [
+      "sha256:0c06655a4b274abededea37401e6265d3a3b709d507ab8da6a804a4fdaaa0785",
+      "sha256:1a7c0a98d738d4279e2875313c82b355aa1134ac28b9ea7044aab31be1028429",
+      "sha256:1c5a41774ecde6cc0e51fb0adf66235e8976f3b2ad2650082dc63d0f11cbbd5b",
+      "sha256:2d550e33aa79f8e3659a7e1fa571abe633cdf7c12b3483be1c5b9aa47dc009f9",
+      "sha256:3a195587b2ce420336f6131e2fab10449de7b0a505963d568373cd915b0a9061",
+      "sha256:470cc19ef8fd5a1ff4c5775eceb11c13f83a5795183e40515aed9f540e334142",
+      "sha256:54932f6670c38478a8e1982d93b3f073e9d631b0a9c7aad6d1bc721b1451b04b",
+      "sha256:5cd91569ab5e4664b40968d0ec20385a64b1c31889c8ceb52ebd799adb8054b7",
+      "sha256:6a67cc3208ae1dc0f532236975843ccd1579457c36e7c48e98cc0edb4e9a20ee",
+      "sha256:74e72dfb8e379b3de30854a9670c546f19a6d293b5a5c2c35c3d2d84cfb6d9ed",
+      "sha256:9d9a35c3eb0251f5dfd8cfff94e87760449f3c4984d5a8ee10d198ad3e42684a",
+      "sha256:aac2abb2b8370d3b599b1893dae4ab7de75421b72f61608ce7b6bef1704d53b5",
+      "sha256:ab04082c83c339d5f6079b35c1ce492d740f0643717df854453065ba7bfcf536",
+      "sha256:b9527553e033ab668baac8e3dcc9461b2aef4c1013a26f41cf4d6038236abe70",
+      "sha256:d4a0317efa1948f0f66388c315c7264062078df726faf0f2dec64748787b113a",
+      "sha256:d90a54aa6715aeab82f84e3bcbff53992d2239f345535868dd35f930e429c930",
+      "sha256:f46461d66f2bebd40a05da63c3c9d2afc3fdc537dc90beb7de3be38d0a5c4d80"
+    ],
+    ".codex/aidlc-common/stages/inception/reverse-engineering.md": [
+      "sha256:0bf56eae505ce49cab1772a8d6b7df2b21c10af6c62d20ea08c447d60f65b88a",
+      "sha256:251e96f8780c68b201e77abd2fa85790acb22ed80b880dd268476c245ce14608",
+      "sha256:32bcd16d478b06f38d22ec16ed364b67a7a9c71797ee45634ea696c3cf22f45e",
+      "sha256:3c2db8f9bbf04c776b1b399ccfe9c8890fd8c7bb878bf01362b82bc58a37384b",
+      "sha256:58f42992b328d83d2b53a3f4158bb07affa0b7462ee68c7cf49b7c3928b6763d",
+      "sha256:5f907789107c6c5e6101ef651ff6f3cc799f0286f455c6f95dbec434a4ecbc1b",
+      "sha256:75c7763528920a516fbde7538cc90c9f0fd00634062f446820353b1c800131db",
+      "sha256:7d13e1ff4906c7d495789beb3cc9b76481b263bd540f19f95da101a047316823",
+      "sha256:8a36925cff456d11c514e345b047b776efd5c06d4e5f23b6e5f9a7c192599474",
+      "sha256:d3b669c33208f8f80a50ccf75fb9a461979d4cdcf680e614500409c336bcbc77",
+      "sha256:dbccdd1b7b9af01970cbfa11675e74e5afffa39078e389db7cd99bd1d914dd6a",
+      "sha256:df779f3143fffb41a5a1bfe2a4f6466b0945b69c015d42d25d13e0a948ce9b64"
+    ],
+    ".codex/aidlc-common/stages/inception/units-generation.md": [
+      "sha256:08af2bea8ca361f872db9fbf0bb4652a1295270fe46c03855ec4795aa5efd0cb",
+      "sha256:1c7c5732d74400586b5a24946b7c1dc764228145c657c6e2380c1ac37622f61a",
+      "sha256:2d5508d90ccd1bc832d4492549a152261b41230b59dc32e5bf448b9baffb0115",
+      "sha256:30a4f321752d9f5ef6d84415618716a916a34f0e3e1428bf6f9e09855ca69693",
+      "sha256:6521c6e9419f2f4f7bd3209df49fe85cb869fe4187febf33e1e7da7a681fbec2",
+      "sha256:67117960a42a1afcb2f2caaacecbbd8138e5ccdc35101267cc65f63bd17899a7",
+      "sha256:909090de943018d94c0fb3f90d20c8741b75c5b8c3a65dc181f1533ae4154171",
+      "sha256:95e3f2a6a8ebea7ea6ffe829057a192acbab5f32b2ebf1d9f72a6c3827f33d2e",
+      "sha256:a1a8a21b2b2c1d94e95c85909c5e62e76ad3772ba30297321659b8c2148ea1bf",
+      "sha256:a68d74a8b748ef6bcacbba0b521b6cc4d7fa967bdd25a55b028e14c12643f916",
+      "sha256:bfb04057c44b92bc36c1dc46d486dd84a114705a9ebd03f72c7d4e971ee93116",
+      "sha256:c75b099cfa4da01c5c909f88df9df9bd296add123d5916d2434f78ba8f92cc80",
+      "sha256:d515637bcf83f3352fea204ce8fe63eeae21d4edb4513e9a378df3bf9d5da3a8",
+      "sha256:dc50ea36216a9be796e37d26023ecb2df6c15a26252c65a9afd14a5c094494f5",
+      "sha256:e2f603fcd1f7c983ee04f799cb9321735e7762a458f2ea201002d821454912af",
+      "sha256:f724fb7ce3cef1ca6e5fec63f6d724a4f3785335d50f930e2cb3a8e0522aeb3e"
+    ],
+    ".codex/aidlc-common/stages/inception/user-stories.md": [
+      "sha256:34437202e3eb873f98b522cc25f742ac5d846f6ba2fefeb7f60ccc252aac89ee",
+      "sha256:37687c9f8deb3efa90fe1d009ce3dfbe052e2d1f2a4b493e5b782a4f8fa0cf1a",
+      "sha256:4553b27486c895cca7596ef388608687c4b1450a1a028d1f348a55e2a7ec0c46",
+      "sha256:5d91e4760958feced6f36bd14cccf13a4d3664f2f7687f930c1fc02daa899d34",
+      "sha256:5f034a1ccfef843750e79c8a872e3403b16a93b6ca1639d453c2ce58bb2d361b",
+      "sha256:73534c5e61565a7fb69fe0fdcb651252740c9c7379d16eff976d603449bb63c8",
+      "sha256:8d54c8ff6a48e37f3a8413d27708cd161c6ca24782abfc6d001012981c9a47ac",
+      "sha256:9e995dab61040b83678caed6fb7c19a16550123ec2900115a6d136cbaeb3e4f0",
+      "sha256:a1abeaf7c9cd018efc49dffdb18406dd29c71465ff576417b9c2d9cb02ffbb71",
+      "sha256:bbbd5e2cff861ca4f6b39c58e9d39cdbb9c4f5bc32f05f8e4f84a5f68512a488",
+      "sha256:c5d47a1977963e48805e6839b5cb8d586232533d97df60ca7cc0f932ee70aafd",
+      "sha256:e1a4d0d5568fcec4e7ccf165938d15a7da22db0973ca8527e71342e6738fce5c",
+      "sha256:ecf40a8355d7fbc9e5aaf576abe684993462eece866217fc62b215c315717046"
+    ],
+    ".codex/aidlc-common/stages/initialization/state-init.md": [
+      "sha256:04206bd9c5394801e2f8e37062b8597c3204d2be1d9750a3352f86165b218714",
+      "sha256:196b8d1fba8ce2665fff0fb8bf540f82a199a0c55ba20f6e41a99733b2a2d373",
+      "sha256:231276169b75ddec64e459407609cf99609aa2c6379e8f309b09571f1c51a7e2",
+      "sha256:29a1245cc23193a2d077677b445a8bf405a452f25fe26c9ad07af3575de52a8c",
+      "sha256:9f21d6b2043dedc542e8fdf5b0c60512b7cf752a0db0a3b1fa52c9c3788637e8",
+      "sha256:a5cbd2e156718dc5f6ec7c7a78a8cc6f0cc6ceaa780ef4d0f004b134ad449186",
+      "sha256:c2e0e4b6f145aad0d6b0c88c6fb486f10b175212fc74b167b0d3b388c36de700",
+      "sha256:f75b16e0de19defd4218f56a5670fc45bee0d00bef2e4eaa569cbb3f6b1bc8ab"
+    ],
+    ".codex/aidlc-common/stages/initialization/workspace-detection.md": [
+      "sha256:038fc35ac6f265a4a06ee7fc103890bd020c25ba66dd1377e2feaa8676d93dbc",
+      "sha256:22b98565f67372b3f230688832dfb67e1594c47f035f35ac22a7baa351ba1630",
+      "sha256:3823fa91d349882795ee9ccdf7eccf6e6d4375d60f0cbeef6ef0894513c558ee",
+      "sha256:5c94d0a12dcde0e7f2efa91625ca4c13591e01229e082c5f127f99e0a4647416",
+      "sha256:6dd01a2346fd222bf5304a069e46734b4fb6d30866a5433764ed4e5ef491c66d",
+      "sha256:7d53523f153ccca825a8d7bfba9dd09f7f25af9fd7c74773bc08d7df29de806a",
+      "sha256:c2c53c9dcdf28dcd7086da4153112a9055aa1cb4396bfa1970c49e7905cc0668",
+      "sha256:ce15321c2da7dc3533b48a9be0d8f87fbb9bc93c91d0ab133387099ba477c8a3",
+      "sha256:cef2d3d33536ca56c34ad02d1cc092f70e157817e2f9846bb0e7416097a14140",
+      "sha256:e5061bfd88e116c434b5d6b890b6a2b96b148d9e619aaf9a2c7a2a0639e7e01c",
+      "sha256:f21a3d40b7197ff2a82888994aca5748f04d0fe967835bc59aa6b183b44da1e6",
+      "sha256:f38a031cdabc6e03b4f8528df08a7d0caa4e1135c471d252a1a2da27213bb418",
+      "sha256:fc50bf72af6435deb21dbd4909f659931c5c65bd1e02ccca2cc8c93ba0d98d5e"
+    ],
+    ".codex/aidlc-common/stages/operation/deployment-execution.md": [
+      "sha256:07fe096774544adf8940387f3b41e5387f66131b75211815ce35b6444567fb23",
+      "sha256:15209be031107067c4ccd0121903864feb8d9f4bd3ff7f5601410890dd090999",
+      "sha256:4357290ec8e82f4c46bcf14d93a606a3b1e1eca8f073dc0fb7573d6b9209d3ea",
+      "sha256:4e1f0f2e1ac791ae0e1c4ff078042d753eb8d815c9d7389c6dc86ad4702630d8",
+      "sha256:563175fdf2aaa0c28963fd34df6485e9f32c60255ad3817d09cac039d6233929",
+      "sha256:6aab87e12c423058b933672ea569a04e8498766054898b42cb513a95cf028416",
+      "sha256:76d901713301de1638e43314402be1e66e0cbd8702c7b6d931c0a2a4bcd71eec",
+      "sha256:9787052f0238d4f12ea564a826914ec9b25055629bc1a15fc5e8174611144919",
+      "sha256:c3ab6679b6138fe76a66c1829dee554a9ed72d2ff0487d347ca138f4444a881f",
+      "sha256:c4bf18ede40881d99f6382434750374a558232c8fa4e37351781c565b536e244",
+      "sha256:d54ec85a6a063799e10fb15f12b6379c65fb1924dbb48498fb49067ee8bbbab0"
+    ],
+    ".codex/aidlc-common/stages/operation/deployment-pipeline.md": [
+      "sha256:19412c4b734b84de05181db66f991aee0920405a358a35cec94bb2b9fbfcc2fd",
+      "sha256:1b7b87f0e611d387239dbd8af8df946783753daaf9db19de7f1c4a94d4835b77",
+      "sha256:24c082552648369fc42d1a31990b9c64bfbd7c2b764d893afebbc7adc36f7c8c",
+      "sha256:4606a51f8f1db3fd487b4f440b68516cfbc478b9e8076e6adc8b12c54b8c39b0",
+      "sha256:67242f02ee802f2531d989ffae22f4d28c307639c2b6ff800a603336dbf963b2",
+      "sha256:72d3750922957cf2aaf95f8dcc2adc16f0ac9ce8fb9a6c6e82ba092987303a51",
+      "sha256:905349060adef3c67155ea4b131a686ac308d38f860f6292b56b632d3466f44c",
+      "sha256:ab71956c00ae0f6789a26d8fde85a9507a636c3dddfca637234557094dd0226d",
+      "sha256:b0d75ea1e3ace5d12fa8f4d22e020b17f18d01f85e50578aa4a20017f64db9ff",
+      "sha256:c582376d59cc78e1792f45fcb36d320eba57f8bc4b7534cf5afc64167cb6de8f",
+      "sha256:cef784473b9b040a25af4720a5c1b6dd5818e64f7573ec9ab74b53964227b480",
+      "sha256:e102cd5f8c62eec69c06f54f8352426f067aa59d26972ee8a8d800dd961164a8"
+    ],
+    ".codex/aidlc-common/stages/operation/environment-provisioning.md": [
+      "sha256:035c06cbddbb5ec903fff8f372047b83655b58714871c57e386997988922fa38",
+      "sha256:2dfda49ee78f403b78124de53adb9006c4090e3af9bf2e0074e84c8c4ece03fe",
+      "sha256:39e8d0ec04077ff718caea0b85e18210325ddb1e03d75d1d518830923560a7ad",
+      "sha256:885aee91e938710e58dc52618cf843b8ca9974b1b0fdd18ed117cfd9fc1862b7",
+      "sha256:8f864e5cc0eaf47f477dee1d66889064f17a4c888a532c5b9f3e62ccbccedff0",
+      "sha256:9e45bc00647a2c78536ec5cb2d2383d83bea83d208eb3d0542052633077ffe65",
+      "sha256:b165eef7e2168e9f7b777398638e8df3193857a12c08280e02acb99cb77946d4",
+      "sha256:b1f72f98a5c228131e2689843c7df64c856c059f787074c68c729085f8da578b",
+      "sha256:b866b7b6b46772cd6846efaa87efc72870078dbc836e3716e6ae2eb6b9202216",
+      "sha256:d771f6977ebd7110d1e8cb80a119e7c1b47c110fd4c0fe6b6053e690260773b0"
+    ],
+    ".codex/aidlc-common/stages/operation/feedback-optimization.md": [
+      "sha256:192e54dab74d50e5349ee1c2b91776b93da66005c60a7ad2a546515336a0525a",
+      "sha256:2062613ec1258f4e5ead0e2ecfc1dada6a6319d4828909d757a631552a6b8939",
+      "sha256:42890b4746bf83e17889a0979cd2f09c24cbc5da3c12bb0a1d7f06401a2c8eaa",
+      "sha256:606f680ffd09b3cf7d6041e52c0d4ed4d70533539f921f7dfd55b4621c4904ba",
+      "sha256:77051132617604484b12696e5307dc645251c8926816f4b710e436ba6300e65c",
+      "sha256:d03fc7aa9c4432cc4c84b7b36da5229ebf17e4d68fc43ccbde127093de6f3bfd",
+      "sha256:e762d94659e3f3b8defae9ff0a8f49f5e68ba26b61d779630f970496b9219a56",
+      "sha256:ed4a57bcce2df4c73b35bce94cd5c24c9e42f550f15e9d21b4fb3b2e35031dc1",
+      "sha256:f79c0ec55374444c417f8d6fef8f99d4679529ea84d7beb31e39d24f4b468f30"
+    ],
+    ".codex/aidlc-common/stages/operation/incident-response.md": [
+      "sha256:0496b6cdbf08d15f3d51ddbdde43d52b00c34709f011c624faa56a37039b9ebe",
+      "sha256:1a4e9c1fa1020362ca7c4b70993e5661272438df2909038c363b0cd5c6019b99",
+      "sha256:1ac608f63b2e7d42bc341b3b2414cf0bf1ce1dfba0a856d1c08d7440d2a471d3",
+      "sha256:22ad3b038c15bf80d41cd0de4c0ce6f869488aa322e43c7b3810653a0e17348f",
+      "sha256:22b0568f456fc4c4cda6b8d0320cbf0845dfee85908112ad4f508505416a968e",
+      "sha256:59fe297d5c493b5a2dd58bc7002251b16841740bf69b7c8bdc07dbba935fea95",
+      "sha256:5b7e82b77554e352f871cc732dfd647dac5c3399f2b3d74f03b54a39d3a36b23",
+      "sha256:a7b29718373dbf1173ae1d28a708438d8734dd21236693a56debd2f16faabbf2",
+      "sha256:af134b397bd968d56df042d06ef86367e10a5678e2f553c67b7ed9d35abf18e9",
+      "sha256:d435282c59eaa3f48330e71fe6a013d6e461580cbaac2e6b9016c9ae896c91ef"
+    ],
+    ".codex/aidlc-common/stages/operation/observability-setup.md": [
+      "sha256:30c0b13bdf193d362fb47871ac25e16774bd66bce6c51f5c9ba1eaf0cad8841b",
+      "sha256:482feb52e040101697804a839da8cdcd7293121abedecdd313c41b169a08dafe",
+      "sha256:a0b88b0402864ac642d4a00639c7544ba99e40f3457b51515ba64228d4144b41",
+      "sha256:a905606ae1e1f174c4aff5d89a3b969fea6ac46e84f91c5155ac6c2b930cfe1a",
+      "sha256:d24bcba5ae9bf8cea76f91afcc41b658f99b56d93a9c32fa40131eb0a4cceae7",
+      "sha256:d465238064bfb1a8a509b668be15d155a7883dd8cf55ebef935d6e662f9450d6",
+      "sha256:da3663dde00d8d04273189e0ab0e323ed721cdac5aabc85306b7f94b9e00be2a",
+      "sha256:e6cbf3ff00cf03d6a5a433575018e4409e452ca42018f2f58e3fc149545caa6e",
+      "sha256:e855e26d25b682a48904a80e571cbef263d276ce48cf83fb724ca1595ebd61be",
+      "sha256:eb937c34e84db363b1610b423df5afc77e84385de4aa7039d25ddfe6c20b7302"
+    ],
+    ".codex/aidlc-common/stages/operation/performance-validation.md": [
+      "sha256:0fb5c2f50fd4a23b32cebc95f654de7b2199f8b08081b8741400a71ae0c04a1b",
+      "sha256:68f89896cdc07a700b5a755793146239b08396ea7f9e38787a0aa79b323e1afb",
+      "sha256:6b311bd50356d1719585cc52d878e2cd2212c2c7a8a81578a06d007063b4f621",
+      "sha256:72f4527fd9b60e7f2023e491fa6ad83d002cb63e6b8c40f85af8d09f2f4c2c89",
+      "sha256:8977e792252740fc680e831e8133ce2ac3b4ca4093c3293189612e86a58a866b",
+      "sha256:c214b9199d53a4acbd4ba23a12461bf66584ff363e8a2987f49df20c3c60c44f",
+      "sha256:c4e1876d810f4004ad507e856d2e6e12fd1f4ca16ef6f4ab1e4f373cedd0e1dc",
+      "sha256:eb5b4b44ff098d466a25889b6abcdeb06bb5c0c499a81bece64247493e7e34aa",
+      "sha256:f0235534fa9185107646c276f9ab5f6c1f4961f9658664eadb1eeba708f22877"
+    ],
+    ".codex/config.toml": [
+      "sha256:38f8506271c061bf5b692338cbe03ae9e9ffa7ddc8e2735c55295d51c8ff9df9",
+      "sha256:4abb52ddee08a8b9407806121156973764480f8094aee01a071f72572ba352a6",
+      "sha256:991e318397b60ee943948c8ac8297fa1b34ea071974e5a15c2e94f1413480384",
+      "sha256:e0b6ac55fc050e0bef95e7f8c311e3bee87363f12e0585d8916e228007fab026",
+      "sha256:eec1ce70f04329d24cb4a5825a5eada366bdbb3f245966ea641ed3b172d2f69c"
+    ],
+    ".codex/hooks/aidlc-codex-adapter.ts": [
+      "sha256:0250d62b43ba2da9367528f16c0aa10f355f86ef01f3aa84a3dd772efdd1db7e",
+      "sha256:054f7ef166197f50d1f571e4b9a661c61eaabc225c21cb45989c08361689f96f",
+      "sha256:1a1ac28437d12b33b6b20b72cf726c2e145addbad575f383d91399c2a760ef66",
+      "sha256:367c8dc0f57e696b0cf53c9e17eb2edeb40a4444f2b75f4d6e2ab35979eb251f",
+      "sha256:66d03d8a7d7508387dbfcb9179bad4a1b2a220a4abb278a85dddd3bb087e6f4d",
+      "sha256:742229ae7994194760d57ed9907c0e3a46df8f6fd67490bb84d95462ef6b5a20",
+      "sha256:822e708184cbf6aac8df2b6dd992230085d0c7cec9d3e2ced08106a24bfcec85",
+      "sha256:8977af1f6dbeb229fe5514aaef0b4738cb8786ab3eb0ede5a977edfb1d05a5ad",
+      "sha256:8cf886923fc3e08df93232171bf77fa839a2b8f65b1124f3ae2385c4e191d5db",
+      "sha256:8dc34e5781eca521fafdc508b27c393d5645efd42214920507980ec586a14ce1",
+      "sha256:90a6534a1abb5671bc6b0f743b58261e0230ef6072993100f583b884f33bcdac",
+      "sha256:962d3235ffec4f8f7a181a9609e0b57cb92fae527a81fa04c60763ee23f54b74",
+      "sha256:a0e289775bb211f3aec59275de2d05a189d96642dc7f8ac6037cdc0f72406492",
+      "sha256:a39c8c18fc6e385475933f708714345eb99b86fc1c453027b9fd78a7c0554913",
+      "sha256:a843412a96865db1c5d5c2dfd617aa07781b05b1826e18a8ac58077c79de3d90",
+      "sha256:aeddcadff6060ae01ad0cb1698ea628f22447a64e67071e292c97af975bc933d",
+      "sha256:c4046ae8cdc086f8c32ee93741a2db9aab148d9e2f507382dd79ec591b052999",
+      "sha256:c67acaa347bf116e73c2f3c5147c93d242e41a1c8c3d0716ab1f1ffb6158fccd",
+      "sha256:fc617357f9fb729a46a91ec516de43b6694286525b51c54517a0a90bbc2a0150"
+    ],
+    ".codex/hooks/aidlc-rebuild-stage-graph.ts": [
+      "sha256:137cd23fb88f7e179d368bb6ef20af227b0453f3dca9e667086aaa6e821c1b9f",
+      "sha256:379395ed89a1ba9e97dbf6b8d8f9f81bae889c2df6f76cb90931bb10e6e12cbd",
+      "sha256:7075c58aa20d3aba0724da686b23ba84e2a36d9bec7bf913546078ef99aeb757",
+      "sha256:a5c7b8510b7dcd938f6c76bd4a2cfaa1e469063c537021abcae4e82747d542b6",
+      "sha256:eee66fc88d7079abde32add7428f8f9620bfa5fa9769ae4a906bbe7c9d2a5c91",
+      "sha256:f40f9959d000b9ef5771471717192948d64f214871e649ba26121b3be41f2dee"
+    ],
+    ".codex/hooks/aidlc-statusline.ts": [
+      "sha256:06ee9dfefe0a9c3991358071b5abaff14f24864df3043e18a3c24342d455cb4a",
+      "sha256:18a934f26fe354e18e674d6db7de63b24922e1901a7eeabe1b0a510d332582bb",
+      "sha256:19fca5cfe70218a108a3c049c2a7c09100992d6560784842fffae8d13fb417e2",
+      "sha256:3a5bb57cd8a78cea3fc92a445c72ad4d6e470d8ba684ae9a9465673302313934",
+      "sha256:556600fd505f0a3fbfbd8f4d07216bc94d89f3458d155bb4c37b8214ff0806ae",
+      "sha256:93e869641b2ba901bcbbd575fae720f37dac89d2335e0b0f65e3e92454c70e83",
+      "sha256:9802dd0df676db2e686c8d2082adda5fe6ab28ee9db9811709f32ca101e7280e",
+      "sha256:cc865dc7e8ff37ee32db7e324481fedfd93a9f9eb5ec17a9d106f9057765993d"
+    ],
+    ".codex/hooks.json": [
+      "sha256:36aa1456611dd3627ba4f9b99ab1847a9aea17197ec57aab1b48b0d794e8b646",
+      "sha256:58a25d3f88a08974f778ddee6e0ffaf6265a966bf6ae8eca64ba5750be1d2f60",
+      "sha256:639f34aa8be72962febb0bc27f61759f14bd1a7446e0a186a5b5566b50366d31",
+      "sha256:67e0be87aee004a9d7ae3e0ddb440ff747227f16aa4a22e67e42e7a489dc9815",
+      "sha256:788fd4bc0f9806e039c96256af480295c6004841c78c696767b5b07a3b78f400",
+      "sha256:971780b119f5ea9818487df504943dbdf48fea56b05e40acc51f7e18eebeeac0",
+      "sha256:a0fa5b29421d690cff296e082737b128a5bcb548e3bbb8b4a8afaade0b87ec13",
+      "sha256:c885d50a4cb2f3ae5a33c15becaf55347b62d89877953de94919e876c9f1bfa0",
+      "sha256:d76ac4be7ddebba61a583497d15806aa08258991003421c4663d859995412019",
+      "sha256:d76af756ba1c20ed43c681962616bd0c777e534b0ee282044fd259e331e8ba08",
+      "sha256:f13c62f7ddbdd80970fc7af66ad3fa14a6e5fca713b4eff03374b25b7082b63b",
+      "sha256:f7681529d377cda927adfed34abf3dfd13e06bdde7946c4771997365fc2f394e"
+    ],
+    ".codex/knowledge/aidlc-composer-agent/composing.md": [
+      "sha256:441460b9b633101aa600bfb66d9de8a766dcb2d8851692485c33316d6ae19380",
+      "sha256:7cf2b940c8a43ee9275f4b8768d771cfd7651a791c61979258566ac6c389a33a",
+      "sha256:91fd05fa88ad2254b90294a4e945024a542425505e451a717db88e92b1a492ec",
+      "sha256:e085e0b3ef7102f507faebc7676dda9a25954b056ee10c5781a0bdc721bce8d5",
+      "sha256:e8581bdb7636c473d7de907071ecc2a29cdda1af42654e8b3cfbc40061d7ff67"
+    ],
+    ".codex/knowledge/aidlc-developer-agent/re-artifacts.md": [
+      "sha256:0753ff9ee0916d10bc7ab2ce1b85c5ee0868d41722ada50460188b903facd685",
+      "sha256:126c6b2ef8d8db186e9de45daf41161715abc0f5f439e2ea86538ab9395638b2",
+      "sha256:49d409c8852147120f0a05d6952934467a862eac2ca80ac1090cb4e9c94e7a21",
+      "sha256:8c13c63a6a8cc25e15d1cfa39528fb8b518bcd4163fa7f17ae124089ee88e2bc",
+      "sha256:da99d7277d833ef694c7dac022e8214b53a6dd8ef0638efdef083509fba8714d"
+    ],
+    ".codex/knowledge/aidlc-pipeline-deploy-agent/branching-strategies.md": [
+      "sha256:138156d8da2a5944f444563451bca6925927e34f841fe376a0415e9da9d0b322",
+      "sha256:1af08bd1735b29936ca5c659685b674eda2acba891d55c247ab4623c63a67780",
+      "sha256:6ceca3ebf0f1af5d5484a82c0fff4b32c1b8d08ab20188d759a546d0a67a7a44",
+      "sha256:cb90ffeefcfe05232f09db8cd9635f075a8dd115d948108cbf66251c98046673",
+      "sha256:f8e6a5108c4b94e8bba3250cc16bc75256a8817dca7e8e995a8ed888b1ddb043"
+    ],
+    ".codex/knowledge/aidlc-shared/adding-a-repo.md": [
+      "sha256:d9064abafd880def68963bf13ba9be4965175bbd1b7b8e19d4aecd0a2bc31c87"
+    ],
+    ".codex/knowledge/aidlc-shared/audit-format.md": [
+      "sha256:020e6ce364053a685ddc8725e42c95e9a4ba2eba617631e0bfa61278e1801dbe",
+      "sha256:0441ae585475398884540e6649b2f4ecd8a1bfe58801765b67782d4916109f5f",
+      "sha256:0e7e999f85c6d3fa37145350a453f43430b7e3027197facb36a0a33bbe6b0fa0",
+      "sha256:1198a3605c89f48ccfd68b343e5a0715f96e1ae21c4b74dafd1da2d850d6c465",
+      "sha256:1952c43ee228b8280f14672e2434a6469006edf0d29b5bc615cf52db9ace8b50",
+      "sha256:1f5451e9566b6e8fd3782fa0d463e1eb29f7a7cc72bcd5192988b48472a98f6d",
+      "sha256:201a94f361ac626b8fd22e0915fd605b6b0fb5760adb7c9ce69fd1d72914e1ca",
+      "sha256:26cb1bde8fb366cf5ff026fd75163ced5839a0c30b2540c9c92a4accdad94713",
+      "sha256:29c2963b559c3eca5d4439b9fa0bda376f6a0453b65288f36e7651add46ac717",
+      "sha256:2ed51c9d96acc94806d08de04924e7dad93d15e4d228ce8559124e6024ff72e0",
+      "sha256:395ff8f1edb86989fcfa9a0024a9b752a8c5cdeed5704f1932a5190f3ef8d4fc",
+      "sha256:3d846d660092c086bf7eec8b30d101b764617d71604cd2db4807bdd4f9a6a5fb",
+      "sha256:41325805497453b275335b2af2b8f24a44e0b0c5bcadbc4c02016f050651afc2",
+      "sha256:4bf0b26a41e468d49b9031abb1e5cab72012834db7f90dd4a9dd3b246c27c8ad",
+      "sha256:56526d785dea2663e786c1b0bfcec1907093ba3da64f4f3adfd82cab46821411",
+      "sha256:56a06fecd35ba27cfd838066c5bb2e8e43e5819a4bd49c413c040625e6b81f0a",
+      "sha256:59dc2e3c91ec13442d78bf5513e98e3c0255a311ed342a1851b791ba1c49792f",
+      "sha256:5f719480991e75c7573b8b154325222a8b79e15eab30420105d1f079a6fa1028",
+      "sha256:659cf59fbbd3983d55d5f16981495af42aaa03a1276cd251aa0f8e30084e3e0e",
+      "sha256:72bd4de76092d59ca55415a3f1683feb056bbd218c860dc792a3ee4eba3e734d",
+      "sha256:73a2ec7f9ba14b49514dba79c7058e3f4eed8cc157c2f171c72f69b9b7089db1",
+      "sha256:82d2032d1224c01ab254f389f35ed591a4f4f38945e8eeb7ee690350ecade58c",
+      "sha256:848080e653384a2e69dd5c8b1eb84f6152689271b7cd437569241bbf4e50c4f6",
+      "sha256:8613160c1d090292c25d10a76fa75b762a04552b1be36cdde2dd6b842988142f",
+      "sha256:966179e92d78338d6153945ee622d6aa2f2b4da01e4ac6325975a0f7eef5c8dc",
+      "sha256:99d9304d6c14f49364534d1202880a6e0c89f01b7e3859fda1b6112640c843aa",
+      "sha256:9f986875e0abc18a0b8c6da90f339b40e6e46bbb9a246e7be435422356b48db2",
+      "sha256:b68bdbd16a39a742387d8d03b3e36d7ede82a04504a74eaa20793b1b0292babb",
+      "sha256:bc1e8712c163ef2ad473156291724ca619baf5ba3744e0828eb40517d592c460",
+      "sha256:bcdf25261d1b0147840034b699c2b3500ed553d9b54a88636e81c949e6498e0a",
+      "sha256:c0cb11050539d3a34a4a09addceb403b287ddf4dc48b2853a460a1af85f3c9d7",
+      "sha256:cf404bb188d525d55649d38e6ba7fc94791f708e49dea87add9f6889d5b5869f",
+      "sha256:d3d0d0318d021086af0ad1426bbeaf67ab401f99e6ee0240c992fd8ac48ba04c",
+      "sha256:d6d0f06816285df6d9ae4483227027205cbf44552b818cfc12368cb51c27cd15",
+      "sha256:e282821672423515eddd32b0fc1265e61e54d370f7f41bdc0799e3469d7dda04",
+      "sha256:e6f0aea1219bd65474da760e15ea1b20636e9feb096a9f5a4efec6631250bd4d",
+      "sha256:eb94a43f9a093838943b31ef1fb50c428ed8ec1c670ed7e93e0a24d09584269c",
+      "sha256:f070904e72cfcae2450914287f21284cb47cd5be765d9df83b15e653daf1f78b",
+      "sha256:f2932816e8397fe52d19d2a77c0eff2bc5c8ac560697137c8da19ee25b367686",
+      "sha256:f6682b0eca0e3410865e0fa528631bdcd1f7cceda81dfcd80212fa49129d8cf2",
+      "sha256:f957feed58caebac12282640a1775ac27adb72b68b7c6ae8d55f0c0d750dd631",
+      "sha256:fb9fe9a33e07f32f03d0d83227420c8cd698f526bee104ad3b4d0e823e456abd",
+      "sha256:fef387dcaa76f670e1077837b8ca86723c114506b0887d46d7de2b98e7b444ab"
+    ],
+    ".codex/knowledge/aidlc-shared/state-template.md": [
+      "sha256:0541c0190fd06cbf5ade5b99ee584320db686ba73addfbfb6a9aef2b121413d5",
+      "sha256:1b815faca1617eacc50f58e614429b1f34cfffc6bcb4c7f67af3df8404029638",
+      "sha256:1d8cec2b88896839aa84ec95e12c8dacf1dfd7b3b82b305898aae36ec997c001",
+      "sha256:b3df80f2a8a3d0c596cd25a9708ade7f27f8f5ab0cee85b8f904e48d7217707f",
+      "sha256:c13bc1c44f44525cbb015cafdfe24d90fe9d73688e5658e552529ade12dc96ca",
+      "sha256:d0675f183ee0d352c374b100e940b592e06229256b273cb548a7b4547a139bdd",
+      "sha256:dc699541638ab4f3fd192bb259c91fdf59e46904c7827f11eb2dc50533d6350e"
+    ],
+    ".codex/knowledge/aidlc-shared/worktree-info-schema.md": [
+      "sha256:2404f022993ddce532d63ca6769e03c7d5b3e12da611e4b3e9469491dfeb9e99",
+      "sha256:a3f4b81c2a799db58399c3bc5eb880977987d378c62e90c248c0dbd4254febfa",
+      "sha256:d38aa3f6e75fa44d2fb690ad569a3d96e72a65270e2500b5a13848d19c9716de"
+    ],
+    ".codex/onboarding.md": [
+      "sha256:dbccfa83807a7fd8385a918b9e909c0e63e5b5cef1248855467b3cc82fe8071f"
+    ],
+    ".codex/rules/default.rules": [
+      "sha256:0e7fc6d787910126bc5c1abc0068eee719cfa04513b096b153f12b3d81ee4462",
+      "sha256:b205ddab200cf0ab7279f8315b8569418335770276d21996e018a1585a660e4c"
+    ],
+    ".codex/sensors/aidlc-claim-sources.md": [
+      "sha256:103d30557cd5254ea9c88b2644a859d544ece5b18d764aeacd03e5e07814f582",
+      "sha256:1c2bf7e2ca295868b543aa035ee6e1b458800972dc9f01607081d8aa0bfdecd3",
+      "sha256:51e6b6b85c3de1d8523cd7648a8fc93a28ef211aac8cfcba1a40454aa7c340eb",
+      "sha256:be1ac0466c16766a7370d002b1e81abbc2312d6bed68ef8a0003b69cb7cee4fa",
+      "sha256:efaa26954b903f1d50001248ccc9e2e1d598c0188a58ba575e8a9060fa6bb493"
+    ],
+    ".codex/sensors/aidlc-linter.md": [
+      "sha256:47e6dfd2d1afe6aa9544ca16346c7123b12b2b902577f00fbbe2abf9496c697f",
+      "sha256:55e9960e13cca2f29bd0982bba9c0d8e20a1f5079653e1f6873aff09435268d3",
+      "sha256:bed531fb3fff3372a59a4ad9785b6802a13baa933075803c70f7c5872699d6fb"
+    ],
+    ".codex/sensors/aidlc-required-sections.md": [
+      "sha256:22924a0c5b923d20d7034e57d34a2cf9d456b2d66d7e1619158dbf3370fb00a0",
+      "sha256:6a30e826b6beec16009761042096e9f6af3c961f853a4c9970e5f01c1529fb2d",
+      "sha256:8b827e9a936f3e88d3f7f00419593e9d8ebf19b3b3b82760d1e03cec513b1c94",
+      "sha256:9e3ac5e3e6c826c4cf6a7a3c63f603fe6e5b5ce359087b876f39f151047d0317"
+    ],
+    ".codex/sensors/aidlc-traceability.md": [
+      "sha256:08a3c7fa30e72205422ce04d657e4b15beee49396645fa3ae801b84baac81c26",
+      "sha256:269fa016aeb8615068f2f88dc627983ac643f21071e29898dd409d96958fb141",
+      "sha256:eb5bb703ffae64c18113da89c84899ca7de7ce927ee7a97c60ad37c7df1d295c"
+    ],
+    ".codex/sensors/aidlc-type-check.md": [
+      "sha256:4e8a3a4bec4401bf74380c411a8d016a4d8aee03e2d1cee0eb0263261485ef08",
+      "sha256:728a4be061c1ec25fe880705ab3f0422013e39ffaa0133169cbbf1b3e6a7138c",
+      "sha256:d1354812f49d548d9cc4f013bb99be2046dd35e559b659840d4616279ed1c696"
+    ],
+    ".codex/sensors/aidlc-upstream-coverage.md": [
+      "sha256:4b0c3f61eff02311fbbc2370279102790f8c5506d55ac0f14b364b4fc0ec03fd",
+      "sha256:4d2d6872484b61e53c6484e8e5484bc2e7198468393119fdb6fda3bc78827af0",
+      "sha256:748fda254be2b904e157dbbf2c199a90b1b621ea374312cd1bd01252a0d16c84",
+      "sha256:a0c2697f61ea068e269d42f8bbabf5ded47e82726fe4721b5ef164c34c6f0b7e"
+    ],
+    ".codex/tools/aidlc-command.ts": [
+      "sha256:68e204d67ecee598862eb7b4fe66c66fd801df9c5dc9815cc6bcece24606442b"
+    ],
+    ".codex/tools/aidlc-runtime-paths.ts": [
+      "sha256:7c0c04a16b75cd83a39cdc9704c1086f316f8ed5300bf271340cf35bc7a8ffa6",
+      "sha256:8337c3b01d37b237ac56113e3a1da9708cade93b8e313c76831375bde5f5050f",
+      "sha256:a7c8c46befdf389d98adbef9f4bb535fa004dc17e6b8ff7429d6d6bf1eb37b46",
+      "sha256:ce52f544a944a562949951fb47bc85974cec4d3f20d1c5e15232fd9c04b5632f",
+      "sha256:d3b3d6d9bb18fbe738f9798f54d30904120febd8da65a97345d4fab3d39f79b7"
+    ],
+    ".codex/trust-seed.toml": [
+      "sha256:06386e2e2e051afbb6e118f51e25372d951d555c7edaa6b39ea8135a161579d2",
+      "sha256:28b8e3cde7bc4625207603620e4509eb53e2fc72de1b3f40be18135ff679f487",
+      "sha256:2d1a7aebadd6d9f03671cba37aa22c13f85ed430a423812348289bc5848e9d29",
+      "sha256:4d2bfa909d9c8d81347a7bfd24032fa2f293130cc54dcd2920fae605820d77e3",
+      "sha256:98cccb9bb0ec39ae9d3e6e18e7808e42a23109d5f66e933462cf6b61a3732d52",
+      "sha256:9f2aecd79d399801da1dd189c01a2dcce2af8fb5e83ad97bd4c07527ca3a9832",
+      "sha256:bd558209529cf3265172ac529b07c5ca4976ea8630d3173b3654ce34b1390586",
+      "sha256:c6ee948f11831662b77efc78e40f9e1d24d2c8fe83fd099742183c0ac32133b5",
+      "sha256:c86cdaa772dfbb128bef4d346c33def08cb16dbc18b0dc0ee4e2e9b7ce182423",
+      "sha256:e9bd5ab9955d0af1aa062991649ea7760ea08dfc1d0b38c7f6af699df827d106",
+      "sha256:edd3c9dd067709787180cb433c868a90317d9f49ed1e87d000c8656003b296c6",
+      "sha256:f067df71a77a9c5fd6246509f8a5db4b200b0750a9029ee98c1fe9eb9a8ed10d",
+      "sha256:f9f19746bae4ce34556b15d0a04d6c39ffe94928eb6a660556ead0d6af535af1"
+    ],
+    ".agents/skills/aidlc/question-rendering.md": [
+      "sha256:16bf63eb18704ea456daac170a95be1fc86943686c9991f212760c83bad14dd9",
+      "sha256:45e96eddc29c13fff8ee564a03249cfce4bb8624f600718bda34cc4f8fedcb29",
+      "sha256:a2096cee848c10e8c4d141583be58aaa7309e05f2af96b54bfb9fd95a49c39e6",
+      "sha256:bb052622f5b4868064526e369da3481030b399d9173dcaa8cd7d898a002b6e3f",
+      "sha256:c1bc6703db77951d7650f0e46672d656e2fb386d588d632448df96eb8d3457b1",
+      "sha256:feff0f3218f2217e23bf7f78c2caa69fad1fb42d9fb3a704a303e3043a251d6a"
+    ],
+    ".codex/agents/aidlc-architect-agent.md": [
+      "sha256:0e7308a24e5a738922ac2ab23fedb1cd57c893089226725315c0f0b5c7057f3a",
+      "sha256:1af973db22ec0b1368b5530f67a1a9ed131228002fd59a941305e264fc7902f7",
+      "sha256:68173d835eb34898eae2dd8d1312154df4433329f7b3b057aa4f9f82fb1ba336",
+      "sha256:69f8fa69638f9a464de1630e577d0e673bf71058b34413fb5feffe1e7d94e435",
+      "sha256:6b2cc01b034e50c8665a2d033e84f3d77f3fd8d41c4daa8377496926dd5a3e1d",
+      "sha256:6b7609be5ea352025c5bf6f6dc68d74be6eaa5e42ec31adf1ac679d1ba239b54"
+    ],
+    ".codex/agents/aidlc-architect-agent.toml": [
+      "sha256:124a89851959d1755b8e36af0a0df35c029d34a5d1ad8b6472f6c6a45c632f88",
+      "sha256:125478770aa09b44a4b47b751362b3a47a9ec793204a354282ce8a546548a7a1",
+      "sha256:341c246320382cf07289d5098ca0bdc4c06db59fec34c2564e3092829eeb0c15",
+      "sha256:c83861e0e53a353193923c5a9d4dec29c99b16df808fb5b504eabb0e2e11d30a",
+      "sha256:e44827a8ce85e367d3696f6be918656c1dc46c2c656e6646b79da81d8c0877b3"
+    ],
+    ".codex/agents/aidlc-architecture-reviewer-agent.md": [
+      "sha256:017dc01b142456bea1769e2c93947ef0782884c3cafd7e93c574efae40f7b577",
+      "sha256:13ca8cbd5628fc89a7406f565dbd8daf0e996730a802dc9a1fc5669fe06e34d5",
+      "sha256:1c725b897f190b1f8a494fc4486559abd4d25fb4b4c8f4299ae2e0f8681cff03",
+      "sha256:3331a903323725f9400b216a5dadcfe126cfaa2c455c9fbb0e251bed0ac9ed7b",
+      "sha256:4bcd228e91d7ef1eb2c577cf9cdb6075046ba834054d91127b417d168d3d3359",
+      "sha256:573de67ce89d3ed6d7aecdaaaca1f55fe2291eb3dcbb1f3e144d023ae5beb870",
+      "sha256:57f5cf8f458992fd967da8390faa46bcdcfd72c36909d919658d000ca0a46c25",
+      "sha256:5ee5e9ff719e3bbd9ab3dedc056dccdab23b240c49dfb49c6acf9d60932a0402",
+      "sha256:69a1d01587e2880613163e2aae865a22943654e659c1167a668f7a550a5da0fa",
+      "sha256:69a95d33b0e3d05b8c22c5bfb7073eb10e4cadcee5294f4616ea787c5ec6d246",
+      "sha256:85ccc2bacd8c4add305ec2db225d95a9ca91c4857dcbdb1c9809d2c5d190bb30",
+      "sha256:921d19d0c27cbe0040646473ad1b9187447d185b774194955ef708f9a18bef88",
+      "sha256:ccd073cf45d4879c873ab3c2c151515c3b04a54a2317e0a14aab636f8c81cc77",
+      "sha256:e9e33fd5622abb691c622d47fda19249ad73d5667e77e99896348d8f8d9205fa",
+      "sha256:fd0f6fa5749a0045bbce2d77addab353a28aa276cf75cab17dd13406f7438cd2"
+    ],
+    ".codex/agents/aidlc-architecture-reviewer-agent.toml": [
+      "sha256:0a20acd75453c77946d8d4e416ce937c12602e914376055a8c448226107445b0",
+      "sha256:19bcefb49c1682c6db015119f4160f9f6a55e9677940eaa6dae2fa83fd1cf22f",
+      "sha256:2191ec3e4e8a8241d94e86302ef46bc3ac3719c871a3db013de0f2b9a82bbed9",
+      "sha256:2b021c63e9f0e62c17b60843f142a4e65ae87c803adb56ccbf6afd63fb3f5e72",
+      "sha256:88c8dc6c11a33a5cc1fc554d2fd21a0b689d2af821b51b73b6e887f9f0e0bf06",
+      "sha256:93534898b6d0eb4d3865e4d96c4e1ddc42f3ccb09a87992e65bb0cb3bc048a5a",
+      "sha256:ca44c10339da0cb134d739712d99e6466cb8d3f3cab920f8ed45757932ed0db1",
+      "sha256:d3e98a8e5f8d7e49088c3870d05b2526f93d9874d6f4bc068b21daa7844a58fd",
+      "sha256:d586cd56c5a1f782cff39b9267362da18ab968072ff86ce7bac6d015f8e558db",
+      "sha256:e203a5e808afc7cfa015fc22465ece4a9f9b03402d8c208a7d08b05fbc13971d",
+      "sha256:e84381ce66c211675c9de5b5b505e28c0655bbd19ef4bd9cd3215f4dd9df86e8",
+      "sha256:f8e0303a9b46571a260e203d816e78b9024ee44fdbcd5d7e032202a63a3bbb2e",
+      "sha256:f9950334b56dccbf219a70f02ebd5fa8603154d22d7099f6683a46bfd1eaa265"
+    ],
+    ".codex/agents/aidlc-aws-platform-agent.md": [
+      "sha256:300793adc05cbc4fe212aec1faeabe455b8821e0dcb71986b78ea52664eb8a3b",
+      "sha256:5cebce5a09e1b52389eb8be3288a9c07d2e748ee7190f6d2ee681f8368b9fc62",
+      "sha256:75aa1b9c60cf7259763c41c3cb5c6efe66eb51d3041330e3b37369d0cdf38be6",
+      "sha256:a97c1a784cada8f5732e8fdf027c81b55a6cd310cf4380f5f169426ef77fdacc",
+      "sha256:ef82990cdd629cd22f91ecb1a21f92dc1c8b3affbc81fbf900affb868daa3cd4",
+      "sha256:fb6100c423b9e79047e877ac6bf9690eb67134e982b68b6ebcfea71654e718f1"
+    ],
+    ".codex/agents/aidlc-aws-platform-agent.toml": [
+      "sha256:1a15f8127cfdcaece835c976e77b8e1ca5888e35edf97703f4c36a22fe1b83e0",
+      "sha256:22c80cd7602f55414f89305e75f9b4003a7169f4c86f644dc505532b6b68dce4",
+      "sha256:862944a6c75f1b5ce97c3be1c6fee15892c7239d5a974124f3db3083ec6d383b",
+      "sha256:9a6fab2c8fb69e932588118f9e5d10ff11b5b26557207a43bea8c5793c95e87c",
+      "sha256:bcc14aa08c1035f24745ab20b1f3e1677d69d2be627bf02fcb468ab654c9a2fe"
+    ],
+    ".codex/agents/aidlc-compliance-agent.md": [
+      "sha256:6c15db4f9fdb965db611b1ef383978e7c6eae51fc706b64ce076eb4ce93b7ab1",
+      "sha256:7441489dd051eb0f1524f2540e93ff3967eff95c16a4de782c9e76c8d62e3092",
+      "sha256:85853a09600362057bb03b8e36d61f83eb2c9cec5c1467ec04fef341447ca105",
+      "sha256:b3990736675107d025af43efaba3f873987c1246394100b9b87a9eeeb430b5e1",
+      "sha256:f20b7bccb7ceba5f6c189e244e1ddc8b22203d1cfba958e97dcd2f3cbb5a551a"
+    ],
+    ".codex/agents/aidlc-compliance-agent.toml": [
+      "sha256:36a7eae745e6498e0537934ae60be0d9760df7b3272f55a5416eee7047972c9a",
+      "sha256:9721f41ef676184d099340bc2e15963ea1d98762cd12ec122bb710443bbef5b4",
+      "sha256:b5ab271ac67ed2c9f013c59b098063d70d7fd89c08315695b350aee79b9607e6",
+      "sha256:e2d42a362f67d8747644f1d9748489ac4a26bdb3ef159ab89de10d2277d5fe28"
+    ],
+    ".codex/agents/aidlc-delivery-agent.md": [
+      "sha256:1d73eeeb84f0c8a14337fc0e7bc3908313429be7280e7f0d56f6f204230ea72b",
+      "sha256:3ebbc57607d93600c5683a20324489b5bd7bbc8d84704d305a59be2c8fc2a05a",
+      "sha256:abbbcf66705629441bc1c66d410ad791961d3c9af36b26d0a0f69213e8878946",
+      "sha256:ae7fa03e2acb881726ffc33e24e3a8c382234c0c3460cbaafb91b3a3ec79f7df",
+      "sha256:d160ea71b8b7f4306bdb9605ac0dedee252cb3c2a0841d850469a85bf286c1f3",
+      "sha256:d86aa3e656d4fd61349e35c3838d88ffdf1ff62d5cc6f983f2fcf3861ddd66bc"
+    ],
+    ".codex/agents/aidlc-delivery-agent.toml": [
+      "sha256:179e04b0e9ed9032aaaef4fb8ffd24248c5a30643b6f815b056ec11285a24139",
+      "sha256:50310a3977cba82d2946cdd6dd0b137c055f8f4865ae69deecadbe3582e36a23",
+      "sha256:72dc563dda788d3b53828d3e8df536133201da4bf48ce9a80ba0c06cf28447be",
+      "sha256:9d022127ece664840f82596add62bf0372f4d3d67bc0ea916f3d08c8b92f2f27",
+      "sha256:c57ec29fb1cebede23a5ac824d8dfa7f44924ee11b5f1940999708aefd21649f"
+    ],
+    ".codex/agents/aidlc-design-agent.md": [
+      "sha256:198df1897f1d423582fc3bbe60e030d6b1aeacc3d569cc23cca56fc48cd1db1a",
+      "sha256:1cb51c5384fb8d0e41d4de495837bc717f8eb1b15b7a7e52322d4b5a362741eb",
+      "sha256:419bf421d1394aef80d3a124b73a26748e7d5a6172e61284739426e123e313cf",
+      "sha256:6f6f4c69afd8cfad858b74cb3846ada735241457829d9822e4150b52ccb1fda1",
+      "sha256:707589f31bfc0ca34b5f1d15d5e9859b057076db18df1c16f44a72a11c6b22db",
+      "sha256:c499415f6fd7fba87b2891681fbbed50a93d121f58818b7e88fe79cc6a08d2e3"
+    ],
+    ".codex/agents/aidlc-design-agent.toml": [
+      "sha256:490ecca07c95670c1c43e84f1a7da24a81e865e09bbaf85d370d71eae9de5519",
+      "sha256:49d60c9948d27f506bff1c0147091b51c8471875c5a4097503ab33f5432351ab",
+      "sha256:7d2504137471b2d50bf6136176e356610243f97c3039c78d21f7e372cdbcd494",
+      "sha256:c19ed01dce40bffd13282f20b91fa5539a1bd8acdc6d5c19b6370513fc711887",
+      "sha256:f79884f5be561d4d97e75b58f80244390ec303e3976dbcf60605b103e797879a"
+    ],
+    ".codex/agents/aidlc-developer-agent.md": [
+      "sha256:012f649278c71684d6b869ca7f15f9baa109a49605061703d520f7a551143c50",
+      "sha256:0489c33806f0abf2ef42c88d4b10671770c6ec40107c8d11d8789facfffe5009",
+      "sha256:46b57e1ae5598eb366a8dd03a7fb273e22695f5ea21c3157affd9eea11a56c53",
+      "sha256:7e248c7577269defb381b7e91e91f571da084790660f223bc0f3051ea7c507ad",
+      "sha256:c5c873a307c7ec031f3bb960623f86288051084f79328206ab7bb689e2356f24",
+      "sha256:e12c6d1fa9a62d88b8c2b15eaf7781f25ace434702b2eb6aee7412238330df0d"
+    ],
+    ".codex/agents/aidlc-developer-agent.toml": [
+      "sha256:15e4666aef4d2452a9cc74c1292954bf45f87c675e0a596f5b051a0e236758d9",
+      "sha256:6562f096ae52235c8b774b233f653b0ba99998228ebbd9ef68f22fff5f72a2b0",
+      "sha256:7fb59b77ba3a4125b2400a314d44a3fca34f659a8406efe0564c0e524f753ab9",
+      "sha256:7fbc38c61b62390b7cc795d947bd2df9eb22a4509f29d5592bd981b87a0e5c76",
+      "sha256:af0d8203d707792f3681585c3e4c402d07f384238daf7b0cae00e8346864bb40"
+    ],
+    ".codex/agents/aidlc-devsecops-agent.md": [
+      "sha256:453c54bd5081cf04c2e8487f520a923f1664585517ffb33022c8cb3b2cc76b98",
+      "sha256:5388e790a7a71a39cc638f49a12c37fd8af48cad458a3f3d451b75c8fea8a7c1",
+      "sha256:8cf266c074dc280c2cdafdf8f4bb6e30caf4064d0a2838f57b98b46d98d27f1f",
+      "sha256:971c30a9fbebd70aa4777d7f6d6142bead7df86203197694e77aafe6a22295da",
+      "sha256:c7c0abfbe2ae38871a0aac2a67bfd21a2e1eb394445c568085d09a8453a7b582"
+    ],
+    ".codex/agents/aidlc-devsecops-agent.toml": [
+      "sha256:acf89687d7463ba2cd084a00b74ba8ad4186cac2ff47e7afa1097c086fc7b893",
+      "sha256:b3ecba0dd3cf2d6ae20d85b866f36f7544489acd5544c26eb2a33e48254fe0e9",
+      "sha256:bf1f68d721b727ca91eeb12d3adbe7db401f9e8be62fc64828d62316e2df5229",
+      "sha256:f7020cbb2118079656c92aa7be15e8428b7ea1ceef69fd33c146445e147900b2"
+    ],
+    ".codex/agents/aidlc-operations-agent.md": [
+      "sha256:0e7c37efbcb345d419fe0bfddd3152923b91362b80ab5b7e2e12728b06b62747",
+      "sha256:55d961e46a60c8c4353f46cfc4de5ee8781c3725513bea239c02548eb2c44731",
+      "sha256:8423308cd4482e0bf2fb0c856dd0e5639a516f8a8ecaa9934638828eb0397caf",
+      "sha256:9e177f2a9dc0235873dcdf304b997decf5e3013e4c9394d9e1895a75e1057031",
+      "sha256:d890ef1d472d6c487ddbe4c69f3517f698736cf3372d9ab85b64139fd0eb9c9b",
+      "sha256:f81395322d072c2ef1287723861d5249048825ce51877beafd79d0b0e9dc6e43"
+    ],
+    ".codex/agents/aidlc-operations-agent.toml": [
+      "sha256:2dcbb3ec088407f3c1d93d8a17249fbf9d77db29dbc8ce7a0ffb76c7d8e267d2",
+      "sha256:76dad3b182c7005d23260114ae7ec9a7e137f04d7ea76ba90be84f4dfbbfd30f",
+      "sha256:83fbee7b9f01c917de6f52ecf31becb2d7beff4be8240f5868bc728fcb3e237b",
+      "sha256:8b950d11c8d6068660d8739df4af08b343ade7a3a0c63c1cd266640e30d2f8cd",
+      "sha256:a58e304cab15dfc02aa7a7bb932b4e1774c020d836a84829c8a65b8ba8d69528"
+    ],
+    ".codex/agents/aidlc-product-agent.md": [
+      "sha256:0839e02f9c2ad0c0fbb96319938ad1b2608d252e7380515f0dccebddcaf7299c",
+      "sha256:1964858206aa2329cda59071cd71e1d18169d594bfea6923eeae1465809540ce",
+      "sha256:2b2d176447ea2f80906d34f9246f3754b4886989532918d55bacc90ce42310db",
+      "sha256:9e1063ab21bd14490aed8b08fcae944a751da9577296e87aac29a1ff050a0876",
+      "sha256:f6b2fe88590367969b4d48d26f217fa4f640d4c9a702099777f9659ff284f4e9"
+    ],
+    ".codex/agents/aidlc-product-agent.toml": [
+      "sha256:761b227fd77391ba31eb750c82733e9dd042a0c5800b828d86e076306c2241e9",
+      "sha256:89915f9262fbd6e7cc820f40d4d1411bf888ea5edf47f08d18dfb1775039af62",
+      "sha256:be928e967d67e92803ecdb1153350d83dda2472aa1f8fed49b65023c8c364ae8",
+      "sha256:f0f3cab44ef9fafe4fed6bc02e34b20360eeb488f5ed7a50e16e620535d4605b"
+    ],
+    ".codex/agents/aidlc-product-lead-agent.md": [
+      "sha256:0fa472bb175f93c2b4dad51ce7f7a499dafb32ecda8d9b73da39e9fa74651960",
+      "sha256:1d5fbf7f070e3e3b39012cc952ffd6a678812bcb06a6eaa649cd367f89cc1793",
+      "sha256:32e9b523dfd7b789baaa23640d99f32c7b2a3116d88df4a32b645a7bf2f432bd",
+      "sha256:3bfb01ecb27a1a77b03799145b683a505f67b7442be4366e56f1e2e29c1e41c0",
+      "sha256:425e58b2310830d91e15e195225e60657b4221522b093cc25643888ae06ffe50",
+      "sha256:52e6594a4121aa85976bd7280b81f4c437857793ebe87251702b4e8b74a3e18b",
+      "sha256:57ba2b70208936e296045fff8c6d8643d254b566c5ca1d40f45cdf5638a10844",
+      "sha256:712ae7f5df8b51ca4a168a9a341e2cb90db892a6a65aacfcca7f66f8d123df76",
+      "sha256:81673eda68096a6015b833e45032b69200b50eff0b13236ceec7eaf1fd9520b8",
+      "sha256:c6a2b41d1051bf758ed7de1300798f63025e5c59b6a4dab3df2fdf1e4a8f3e02",
+      "sha256:f051fd24dc71754e5693a713f22d773b9415abce2bdad40e0481af59c0b81ec3",
+      "sha256:f0d30126173846e1a70a911c106e9078829a69e14f578b8e56e669f82f7ffc2f",
+      "sha256:f2de2401197525904d49af80e577f8e0e0e41e3c91c6b7b1df3062f2618d9ac9",
+      "sha256:ff67a99cedf33508fef741bf92cbeb57dadaa5ff2f8c753f4ac53d9af67c6bfc"
+    ],
+    ".codex/agents/aidlc-product-lead-agent.toml": [
+      "sha256:1685a752af1e60da7172e17a924992feea49e2d54afa7ba6e49889e0578c84c1",
+      "sha256:234d6677e98ee1acdc2c590844828b8cb06de274cbe58974e033283cc245c0e6",
+      "sha256:30f3a17d15aac92aa558e128bb993e7792db1491df4b6ed3dacdb4c20130e91b",
+      "sha256:5586f377f9758cde054bea3a714ced148bd8624556b2f99bdbfd794e163869bf",
+      "sha256:682341213512c2452c97f3acc0819507f7c93531882c9b6198c479f44d89a1a4",
+      "sha256:6d1b037ba8ed1dde13e4da17e9c07f5089c0a132e245f3214f9c9730a23986f5",
+      "sha256:9cca4d5f11df1104f3908da201687a46f7e0af33a31fd372fef797713db937e5",
+      "sha256:9e2e2d3bae74d1b950752e86e48ee7ca59b064b6ac2814698572e5184a25c1b0",
+      "sha256:a6bf2c69c4e6da77cd5aa163218798f133d15356489bc6deed6d1b1517ebb91a",
+      "sha256:ad06d8d91f0cecbef490522467f83c3fee4e46bad5fc58c66b706bb2053fad64",
+      "sha256:d232697d49adf17d2920d1f0fa2c9e6b3a8968ede065d9802b6a223fdf8ce2e2",
+      "sha256:e186e440e06c1dd7b8c6ca336791cd5f9eca9ce2e7c480b26fe46d75b8fa3f2d"
+    ],
+    ".codex/agents/aidlc-quality-agent.md": [
+      "sha256:4534c8eff55e0a9f64197b8ce44993d0c1ff9a32005031d4437df0751a6d91cd",
+      "sha256:4ed4d0b4a2fe88ae3420360e011e471e82c4f7d3d1f1fa32735651371593dcd0",
+      "sha256:a1566bae549e1cad84d4194e7f60fb56c344057eda8c091eade0385b6adfc81a",
+      "sha256:d37d6063174f949fd648491aa1209719e0a1c2fc9062c168f1c5aecea7fe03af",
+      "sha256:fe5dcee441fde4633433e15a708ffd986506a917a0f4de5c503331ec49eaa930"
+    ],
+    ".codex/agents/aidlc-quality-agent.toml": [
+      "sha256:07eb39cbbbd6eab25c997ead66512dc049f81c1a47fed96ae8ea003afdceb16e",
+      "sha256:15d3ed6239499f19159bda4a8a93971678f5e29a510455acffeffec98b563361",
+      "sha256:363b0989a008d658d763892244614f03d76d4ae83182e94328d9b04a1b67ed56",
+      "sha256:4b9a801a48915394e33117c7a9e25175df62b18a6f4d61c4056067e1fbb06635"
+    ],
+    ".codex/aidlc-common/protocols/stage-protocol-governance.md": [
+      "sha256:b5319d6812df2ce5652b160eca1897062d760f510308cb64740200799b23ff44"
+    ],
+    ".codex/aidlc-common/stages/initialization/workspace-scaffold.md": [
+      "sha256:15d542f2290029c8a65770f077f1f1a34d67b61f0ae9e36add434251857fc7dd",
+      "sha256:500ddc5f8dae365809262fb6f72f5289edeef6a287bbf11c91e7f9f87cffb8c1",
+      "sha256:5b17cd5a8b4526b3aa078c9915f420292515eddc1a80e48157e70ce1db02c579",
+      "sha256:629ef21bba7e41c690ee077ed35e6f86fb49af360221731f3f3505b433ba6fec",
+      "sha256:8173147cc05bf93a4594b2eca10f5deb3da041d6174b7db92ad86b3b1aa916b5",
+      "sha256:be20d47745ffd81e56f3431cfdfad81b60ef801c70fabc80a21a2bf8ef03551f",
+      "sha256:c880a2c16c17fc7d08947912130977ff73837f9200a4ab48f5168ea23bf525be",
+      "sha256:f52d57b1ecf8cf6a7fff675b5318ff1b7d7e10da3dac6a5717eed47617c90d2a",
+      "sha256:fcb457978b61c8f12ff2e6822acb81a1a7bbef86c809cc4071387546561d8b01"
+    ],
+    ".codex/hooks/aidlc-continue-workflow.ts": [
+      "sha256:12c23a9586ece69b24d67d7f2f8631c003387170849249619260ff13d40fdffc",
+      "sha256:2bd2ea9727a878385c91a0215fc279a8db37088eab32a04136056d96707c108b",
+      "sha256:36c888de1ff02ab28072a9f2f3a784a430b90079233c41000ed7b16c0dcbc78d",
+      "sha256:404afb6bcf02fdeb6ce819a62fa0511087d4ae80979aeebcdb8d7de8940ff095",
+      "sha256:43e7d83a3f441705c9b6a196975f22f99aa77eeb53d22b691dfca195a991bd36",
+      "sha256:690cef095212f870a40109a5fa3260d21bf3516ae58b00b02b5c6685ae3cc252",
+      "sha256:74c61bb966f091481459fe6c65152fda26ab29117f9f1b89822b7f4c25a90bbc",
+      "sha256:80e31662d248fe7b9090151fa51ea6391e721ccde6098a247e8ddfc309aaf02a",
+      "sha256:bc1d67e265068bb07d15369ca82e5951f935c4fd1a17c348d796d2f51170b4ea",
+      "sha256:e670b3949d0462505e0c9734b2084ec30c4c7de29b16a9a54ee3295116450886",
+      "sha256:ef33bd51e202beee787005305d423f683228547be05b087cf4d97e36796d4ffc"
+    ],
+    ".codex/hooks/aidlc-deliver-stage-rules.ts": [
+      "sha256:008a1bad8843539c71e9ccad52255ea2d1111509132fc3774f2e71435c3610bf",
+      "sha256:1da072d06040a5f34505d9065a336414ce79dedb79c551c7edc98a853b972809",
+      "sha256:3e1d3756d93a17dba76d00286a928c8b1498ebad4f07bcc47eca88d6ef68af33",
+      "sha256:61e532cf1d0e9392c8078e90ba9c978f4f5c060758a97a914290bc920003c303"
+    ],
+    ".codex/hooks/aidlc-fold-usage.ts": [
+      "sha256:4dbcbac5ce9ce4add41f5d09d1ce6c6f75552cee0f593fb1bc4ba99d529bee93",
+      "sha256:7777a270c2ec1d1683e0200b2f577f1d62a7b424bad5139cf69027e6a524fa38",
+      "sha256:d19c78f3662dd3cdccf462e156cd00b7f1ff42c1be69c04d867331d1a5ae1f54",
+      "sha256:fbbf2954aabbec80741b8d09e1ddf44e150864311bc116b4128e87a18e34eb8e"
+    ],
+    ".codex/hooks/aidlc-log-subagent.ts": [
+      "sha256:48c601f989bf047c44a1254634759aca5cc894711df293460ae7e9dea5569b0c",
+      "sha256:db27dce40319564be9451960eb7a2ae38574c671d883fb380d013f3244f6ab5b",
+      "sha256:efec352a0eeb2e67f70a5e86f0ce93c62da39181a5648a55b8fe2f9c3ed525f9",
+      "sha256:f6ec8d889ff148e180580354fd107926d4c0671f0666a03092f4cbff7fd79313"
+    ],
+    ".codex/hooks/aidlc-plan-approval-guard.ts": [
+      "sha256:68a5d611a391139f9fed5c73921f69cec20a70657ded92917d7e92ee3adafd8c",
+      "sha256:7aa90cc151884d39e2b09fccc024998641f6855f70eeb4942f90cc91f7dc904a",
+      "sha256:809d2e6ccb77f72afddc78a70d83ff6e73f29f6acb941fc50f5c05e1d60836e6",
+      "sha256:9687b5291ffcf933f2e16e2dd4cadb0db98637e1294cf2f7110f5d3fccfc7e6e",
+      "sha256:a3a5a7e1d113bff47c14e93a346250977adb53303d1890d117cb5fd32ec683d1"
+    ],
+    ".codex/hooks/aidlc-record-human-turn.ts": [
+      "sha256:126596639b31383be93b951cc5da2f7d2441d867d1e4154009c6a249d6fb7046",
+      "sha256:1863cd19d2e10031fafd5d6a322863e46a4697b54f59f46fd4f7d343ec6056c7",
+      "sha256:3615033b37181ae24647943f09c07f80f35034e9627165b27ad792bf06faf9bd",
+      "sha256:f8f452332e7e0029744e8157f8ec7c33d982ae48e493cb449cc12e8643a01c36"
+    ],
+    ".codex/hooks/aidlc-review-freeze.ts": [
+      "sha256:1b05b40dbd7dbb47dd5cb8826f5a8aa2fb851d6d49c8b74913542719d79609de",
+      "sha256:1f0ceb5b556d879437697e63806afc8d27938a48193a69b38248abb686c0b296",
+      "sha256:49bdb43e5ce4270ad83367d7dbf8160c9149a4f987cf3ddebae15f21c43ec36b",
+      "sha256:55ae63852bc2b75b0b4c3d8c6fc727d32fe97366d4a5fa825b6283423fb480c9",
+      "sha256:cd89adbf11cfc15bb9137fcf00f45079ae063ab05fb9712ef422b0e04818a9ed",
+      "sha256:d172e04d4b06b37a7c688f886ad2fcf625b409b964b6dcf96e1a8ae0bb50bb5e",
+      "sha256:e3cd31ffcd9cabe3927999a6618ad0b00b97f39b36639255e7fa28758676dc63",
+      "sha256:e3fb3f61d5c5e23ed4d1b94f5365b3515224cb8ae39098b4a296d8e36167faf0"
+    ],
+    ".codex/hooks/aidlc-reviewer-scope.ts": [
+      "sha256:053b29bf76c5226f65445249f1455580db129b483cfa52e8f0966ecba6b32e28",
+      "sha256:3dab9d7bbf68ecbf72e91ff67812497205a72bd429bcf8ca59cc591d77f993b4",
+      "sha256:4f79c5e13bfef3a2bb2a4fbab12bb6a55331dc901d323b9ad6fea98a1a67d0fc",
+      "sha256:7159c1e3ce3b4e64e61cbd7c8c758e22a1c8ccc11474b8513307924e425d2277",
+      "sha256:b4ef0550761ce6c946941153b98d50c825ef6a4640820db2d69dcf5b25b548af",
+      "sha256:c0457941e0c72f577a29dba2cb6b51584e06930c9d76736c50a3c663853ecdac",
+      "sha256:d7d0e771365de47f4a5f2fcfa01f98c8deefaee1d0edd4d4ddc33304dff9f65e",
+      "sha256:eecb146049ba380d3542363b81e6af3c6a3842c0707749ff190375db6b6dc8e7"
+    ],
+    ".codex/hooks/aidlc-run-sensors.ts": [
+      "sha256:13ff56b00bea552772a0469f7f1d1718d2d7b3cb8ce1edd5962b02cb9f1d96f2",
+      "sha256:40d529efceee4e49d7d5d49953279c05c3aea91a5ff590175d5b7622f6410010",
+      "sha256:7c2e349886dacf0ba634d5ca077779d130db3b6e015e3604d205385e8123e184"
+    ],
+    ".codex/hooks/aidlc-session-end.ts": [
+      "sha256:3627f42c32e106fb5aa7743dc08669207e0c12f9348a1dd337fdc0ae30c65307",
+      "sha256:594d8a0d66623b4a995492e72ffd97a62f3676fd785a741bb2716f79aaf59bcc",
+      "sha256:5ce0a5e79c86f98b2218b16a0957dafd5c48c2c65b815485069f7cd3d10fef56",
+      "sha256:6010393be62d12f99f349f9a8783ff44993a9e5f418f5c884b1e1bc7b8fbe83c",
+      "sha256:ee06d19ac35b0940a1f28d6f88340dc70266c1b859298b6a0f3750fc2f769fe8"
+    ],
+    ".codex/hooks/aidlc-session-start.ts": [
+      "sha256:2a282dcf6199857e9ed769c4ed415c99f917e789ff04b222539fbb8ac8b2f88b",
+      "sha256:2d5baa7e46c99d08ac899158a2a5084abe1bae3b22425c2a19a5f3acda3e356a",
+      "sha256:561997537c80b0cf9e2a870848cfc644970dabdd2a32f7450cee17d7fcf1b782",
+      "sha256:6bd5174a8782f49a02758404702f248223f04c3541c9f8d6334983b60208e373",
+      "sha256:73762d8ea859aaeaf311687905fc286b41b08ca04862473137295e6a68ee966b",
+      "sha256:980ce7d23923b49262883e6d2f1849a695591b91d390deb17d074034abce84ba",
+      "sha256:a924b519dfaf892dc5ab5a1af551d404015d250f8b09bffb06950b2df2fef72b",
+      "sha256:b0c6ae251bfe81b0a7adc8e370925734829500ffa1691fd4710f6412578839be",
+      "sha256:badcf0480c7d42d2c7f6a7a1c7b8f6afd5faa57062a373eeb6ad5878f7e65842",
+      "sha256:cb0cdbec4e67222f000bdf20b34130aac9548802d7e53ac65b0a95f22271b9d7",
+      "sha256:f916db841a5399b07ac6ebeb2f924aa1c51bdbb3da880ff20af5067c405b2c6e"
+    ],
+    ".codex/hooks/aidlc-state-transition-guard.ts": [
+      "sha256:15db2bf3cdc7b0bf4ccfa64ab73b169a5aa0cf840a9eade314163f28151566ae",
+      "sha256:371c6001f9be91ed4331d6b7e75068e5d1cf1185ae52ec7eb44987f0ffc9702e",
+      "sha256:4bb1f891a97eb017af8c67a70932ab7eefc5f1684bc8b295f1b496e7cc9b16c4",
+      "sha256:8cc76400f4a95562c2ec48f56a4c82224fc4ea4495a31d09fea0c7a816237e0c",
+      "sha256:92055d8721644290a65dc6cdd52fcf09390feb27f7daea831b3053b21a8b7304",
+      "sha256:c0bddd782a12cb4aab7d6a9f4140607e872f1ba08bba03d323734dd478e24c9c"
+    ],
+    ".codex/hooks/aidlc-sync-workflow-state.ts": [
+      "sha256:127e43d23bd8ff28d3e6db9d6e516749de65ca0d17d92fe52c713fdd747c948b"
+    ],
+    ".codex/hooks/aidlc-validate-state.ts": [
+      "sha256:0a3614632a286c4bcae7e3eebff2cb06f751607222e5980979c52fe31c05d125",
+      "sha256:10e3b701c6e00615733097dfd16469fe5dc5d6e43210ce09269a03de041e7a95",
+      "sha256:79f5a9d08cc99afd13ff236ffc96ee4381e19cae0b113a7a77d77de9da7a7b26",
+      "sha256:fb11958d948b6d1349d6120b3d7f20787dbba95f0c7beae9bb890690615c72b0"
+    ],
+    ".codex/hooks/aidlc-write-audit-log.ts": [
+      "sha256:07535390198f476efb744e0e76781f40cbca9826c57147286224104ab2d1523f",
+      "sha256:a86a53ee7bc8921c3cb39acb3d7babcbe47c1f8e4e39720c3bed0ca3343a16cc",
+      "sha256:b6b6df63a154f6a0c7b7bd2473212d419955bf14adfd32a7989368440520eed7"
+    ],
+    ".codex/hooks/review-freeze-command.ts": [
+      "sha256:9c82f05ec41a72f7e182f79d381d2320a01b5b22df24e0b1d1ff8669be793f1d",
+      "sha256:ef85d009280c2dde17ea61b9cd8fc1cc9d44a44eff15e08b0048c19877ba2cdf"
+    ],
+    ".codex/knowledge/aidlc-architecture-reviewer-agent/reviewing.md": [
+      "sha256:0a9e6978d152a5bd13c14ca6bea2070890419333e51af7e9db09bd00ad690b45",
+      "sha256:162d384962ab8724c9c05479d70f5e525fe93cf27154ba4d56602701f4fe2e25",
+      "sha256:62bf1a5ddbcff9b059bbde4631dc540a527dbc727812eabc51e1d749ad341a24",
+      "sha256:802a519d3a153c3fac994f4b01d68f659f1dbbe75656a1d9d6d5ffefef5bf480",
+      "sha256:b41f68aa5cf60dfc9a5b9c3a1560af12d16fb96a6526b23bb609912760d5d018",
+      "sha256:dc25b160774d94d72c32f998185b4b7a1b700a70b86ddf0351b869c94d72280c"
+    ],
+    ".codex/knowledge/aidlc-delivery-agent/workflow-planning-guide.md": [
+      "sha256:3ebc912b41d7ea41d443cf2879c8cadbdcbccda777e80ffb8ff70b1d946fdcc9",
+      "sha256:4cf9e5dd824ff818a66a6832b84a7c380ffbd6c19bc5d26fc951b26b4916af1b",
+      "sha256:efe950589fa349e135b3cfdde3e65cedf5927bec92d185466c7b68e939f80462"
+    ],
+    ".codex/knowledge/aidlc-developer-agent/code-analysis-guide.md": [
+      "sha256:9a277562315b9cd01e8f1bd99c432ffcae1a0467c6914cdcb7bca74f0a39e56f"
+    ],
+    ".codex/knowledge/aidlc-developer-agent/code-generation-guide.md": [
+      "sha256:d893013765635c374eeffd3d901a380048a61c0be9538a1411a7173bdf28125c"
+    ],
+    ".codex/knowledge/aidlc-devsecops-agent/nfr-requirements-guide.md": [
+      "sha256:16d99282fa44c965192d26ca3b8639c448e4a08bacec9f13a9eb86344c58c193"
+    ],
+    ".codex/knowledge/aidlc-operations-agent/nfr-performance-guide.md": [
+      "sha256:bad8292569ef5f2a4f8165d13c363ea4bdbf0293718515b7b9d030b5074ba9a1"
+    ],
+    ".codex/knowledge/aidlc-product-agent/functional-design-guide.md": [
+      "sha256:5dded65b9023fa835a399fabb5587133abe2286421366fb72f09ee8c33e8b1ff",
+      "sha256:a71ba14528c4095f866425c807bcffec4fe285aeff312c40722c1922a1d5d591"
+    ],
+    ".codex/knowledge/aidlc-product-agent/product-guide.md": [
+      "sha256:d7466ca5d5dc23684b56b7c966256392dab3a73563d7c82396f7944f3e45384f"
+    ],
+    ".codex/knowledge/aidlc-product-agent/requirements-guide.md": [
+      "sha256:cda16cdaac57be8d2303062cacafce846fbb0e19d66273c683af0a70e9ec2173"
+    ],
+    ".codex/knowledge/aidlc-product-lead-agent/reviewing.md": [
+      "sha256:06547a2717b140abc0c5e5b13c33dbb9b1f12b93c9ba503d57a418ddf2e38dbb",
+      "sha256:7aa1546cb21f0bc96bb1db9e0f8f6c699ec14def4ecc5ff8af5c8248bbe5dac1",
+      "sha256:d8524c5046ecb6140908fc5acde049abee1fc991b91f0bcec0580ae8a890c2a6",
+      "sha256:f7576a27f1bcc462ec2a09c9ad6a6945a1ea05f39d11f0c39c30016c9e034c85"
+    ],
+    ".codex/knowledge/aidlc-quality-agent/test-strategy-patterns.md": [
+      "sha256:e840aeb913f8f9e45a87a7246c9bf697314c940c6fdb0c1af3cb59c0b7166f7e"
+    ],
+    ".codex/knowledge/aidlc-quality-agent/testing-guide.md": [
+      "sha256:af45291ed21f530cd42469104ee85c0920305288a6f222c03e65582c631baecc"
+    ],
+    ".codex/knowledge/aidlc-shared/ai-dlc-principles.md": [
+      "sha256:170f6f2d3d0a295235d329f36424ccc283732072581bfa4fae42cbc439a0ca45",
+      "sha256:544cb9977f47aaea11c4d838293646f8171bc1a442c33e73180daa5904c67816"
+    ],
+    ".codex/knowledge/aidlc-shared/brownfield.md": [
+      "sha256:9fe4d24392a39f5edad08bf5b17d3aec4c9ae03304edf418a4e7d1716d91dcab"
+    ],
+    ".codex/knowledge/aidlc-shared/memory-template.md": [
+      "sha256:10d9559bb7a90c4d4746b96938361772b693ca16673f02ce7b6c1be69624fc66",
+      "sha256:a9c770481f2660b3efa92538df41f75f66150bf55d571f150bf0ce6fe2f624a4"
+    ],
+    ".codex/knowledge/aidlc-shared/rules-reading.md": [
+      "sha256:1c932063a0108e44e70b7290ceb9c8f5eb16f5176e22f49af73dd1d49715e062",
+      "sha256:2456dcebb07d3fbcfcfc17f8db777bbe13daa99fcbfb6db04e0f7d3009a56a7d",
+      "sha256:542463d6bddd5995ae27d5ec3a6022fe0268a41699afa14ca561a900376eae28",
+      "sha256:b6b9bc02f7b4706102650330a9aa78076337a0ed65700a788d7000a90a7c0e39",
+      "sha256:b8048e6756c00a3da6097c19c08d3129b22066d80d5226eb2b10e12224e3bd4b"
+    ],
+    ".codex/knowledge/aidlc-shared/verification.md": [
+      "sha256:33533a6e0d1e53320d9430bbd5b61b23b3120aa3b65af0f8d53fc292ec245eda",
+      "sha256:394f50345a8ba04b17e2183669843b5baa687ff2992289bdd353f04b5d0bb849",
+      "sha256:d51ab589c5d687f93dc41db73e658cd68f3084c889a95150b2f3d54e1a75a698"
+    ],
+    ".codex/scopes/aidlc-bugfix.md": [
+      "sha256:4da8a68eceaa7baab5565307b5e157d7deab2f7de86196414396971e5a0843dc",
+      "sha256:9e4f674a7081ee10a2eba6164a644ec9952c33ca65675bd647d846cbde5ecd8f",
+      "sha256:c70d097c4a13483b0b04921a7f1d260762aa7657b2b6df86d95432fd01d32def",
+      "sha256:dc4bf0c364eec76cdfff95dfa8d871158778c44349a132d7a4d052a61745c94d",
+      "sha256:fffd06ca2a461a0c553981198934d77d44a623a85e64fe93aaa040a8af6a244a"
+    ],
+    ".codex/scopes/aidlc-classic.md": [
+      "sha256:26137b9f8043639753f036055727afd8b6891f395d20505a4d6affb78450bdae"
+    ],
+    ".codex/scopes/aidlc-enterprise.md": [
+      "sha256:38ee0c9c6808549b31f7f90683077fd219effd8a69fe150c2ae103bf553059f9",
+      "sha256:83eba9cbb6fbe12b0ecc93340fddb0c0fee2bd5de0c5412acacb72498c98ef82",
+      "sha256:dd7b8d1f055b886dfe123f20824528414a8ce188ca40bda92ef56d64a62d3351"
+    ],
+    ".codex/scopes/aidlc-express.md": [
+      "sha256:de1857e9e62061d7c4c75564644c45fa950266d3472f4f88c318e07091f411c6"
+    ],
+    ".codex/scopes/aidlc-feature.md": [
+      "sha256:3df685cb30bebeed9415571a4854e45efef7822c19745b20351c8c48fc2f9a30",
+      "sha256:7a6e7e6759dd522d4c65900393ff6307e54de4056983181a22fd251ef8b5c0c3",
+      "sha256:887068925b48090c81f87ec3b7fd427f7ded7441a200bd812008c0fa10950c1a",
+      "sha256:de390ee4950657195e3399429c922135cc757c227aca325815e46bf5e8861e11"
+    ],
+    ".codex/scopes/aidlc-infra.md": [
+      "sha256:46bfe366de36102a84dd5fe4e8862bad2a53e5fcbfc38b0cb4202a6c25d6d3aa",
+      "sha256:67d3b3bc494218eaef78eed6aef1b68d428705087108f329d28bd2811e17e409",
+      "sha256:ba29d294defdf2fce0dd2e6467dd57b5663b6dcf175c1f78c4863f4b1fe64bae"
+    ],
+    ".codex/scopes/aidlc-mvp.md": [
+      "sha256:82cb88b7a099ce62b1d79111f0df95f13ae2dfe41c55f71e2ea9e7615e61e78f",
+      "sha256:d97cf0d246e3537a1457ad7e0d141828cb7e10d74c82aafef39df827b2e3f6de"
+    ],
+    ".codex/scopes/aidlc-poc.md": [
+      "sha256:2692501b02931eeec031f9c4ecf0b48093551cc8773771794d9b3b4e18de36b8",
+      "sha256:38f779e8395824a71531a086c36d0539cdfbf7e88fe41f6f776a2ab7ed5de8e8",
+      "sha256:7ed73c7fb71a8025eb6f0ccc9090930aa87c59b72574c75ad7e94d60a327a0bb",
+      "sha256:bda1abc2b8127cdd05de4c8b85f29729165ede54adbb67e873a4ab3115a2c917"
+    ],
+    ".codex/scopes/aidlc-refactor.md": [
+      "sha256:46b334d28f93c8cbff890d5eca6eba8aad9327209f1c1e79cae4adb6a42dbee4",
+      "sha256:7e3961c3077b5c6d4d1047932487b48a1df1c2309d6a0d736cbb4293d1a2b16c",
+      "sha256:84642ad10d57dbce26d1e6c30e5992254aaf46c0fecc94b7776597c42dc20f81"
+    ],
+    ".codex/scopes/aidlc-security-patch.md": [
+      "sha256:4a69939a5cf27af68a9e00072c0140f8f69fa014046ffa04650faa1e35b08c5b",
+      "sha256:64614c6f36b7940122f8ba6dec058e45491884d916599bddfcfe4e76b416bf62",
+      "sha256:afa2ae45df6d3bb98e12c4e1218dc8b303978fa6b4598bf5002d71b1534ef293",
+      "sha256:b25a8f694c32e3ce64dd73d65f0acd5017863f788551d62b73e75ae6278dd7d6",
+      "sha256:b95368d1285d5f97de584fba3d8803595937cd99917b411850836d33bfc3277b"
+    ],
+    ".codex/scopes/aidlc-workshop.md": [
+      "sha256:1d5b17aba492bba2291983e5d2835fa2ba849d08f134e9e6559e479c3e8c3134",
+      "sha256:699418103741d845ed7533aeb6ef46ebb06f1e36f2764174199280587cdadd67",
+      "sha256:72ae1dad67370c076b8ddac4fa09d8f8953b90c82a5fc050f57011fc7b5c288c",
+      "sha256:dfb2bbdab220fe215808de1408354f41a6adb54a002c22baa62bc00af64bb76e"
+    ],
+    ".codex/tools/aidlc-artifact-resolution.ts": [
+      "sha256:a2bdcb1fe49544e7892222a33c223476ddd290060a8be3dce9c9ce4c00b4ad45",
+      "sha256:c46d53aef12ca436dd3a423ce74bcaeadac1cb02c17fa8628cc60d28833f9cb1"
+    ],
+    ".codex/tools/aidlc-artifact-vocabulary.ts": [
+      "sha256:15934fa250d33bce29e8de773b60d683da651f2c6010a4d7d623f245d3b50d50"
+    ],
+    ".codex/tools/aidlc-audit.ts": [
+      "sha256:0540471e22075fdb9640b0d9772f54cef7597a3024f6fe1f7b7a21839e2aa948",
+      "sha256:05d511bbfb107d6f28c22328c69be48e956a1850c55700594d978466380de4f8",
+      "sha256:2b6d01d02f688192fe9defebd1b4b568b5988b700e9611b6286bd80ab8fa50d0",
+      "sha256:2e741a0c0df06db42368b06322c8adb1a0179ea5e5be18c8e5f758dab1a2a7c8",
+      "sha256:420ab8899bc155113ef2409de46ebe0a0c9bee25b50e50050d48a4e625eb79fa",
+      "sha256:488377c7f4b68599fee31549f399b2ac8e95bc65640747c9c8eef8c978523894",
+      "sha256:4b699f71e3e72fb102edf42b0628996f3a8082aa8ff2810601cb4746ea795867",
+      "sha256:74a2b7000f3b2d36f13c31db74f7f52c65d51a7a6093cda26528a8d5796c4ec0",
+      "sha256:77f18d992ecd2bbe154e8842b1bb2c84b48b83c532175123fdcd3e869b537e6b",
+      "sha256:80487fa51480d6d8c6cdf7377f8e9e0257e00ac2fe6b803c3815730d18cb8972",
+      "sha256:8b0bcca7637199955b5a86c4faca08ff3a20c058343eb8dd7cac014b968fa909",
+      "sha256:9483965dda464f6c7535da36b24300af47b3effffc08ba63605e944ab5c63868",
+      "sha256:96c9823746d7d765cec2dac60b6d41818cf03d8c9a1e86ef2c8f224e40ff6b94",
+      "sha256:a535f46b5cd841e613745abbe4144e923ab805a4c3a3cc4ffa2576c75f8cf5da",
+      "sha256:a537d044719a8e0aee7df4d9ab7b45020128027bd4603ce670ae432f1a658252",
+      "sha256:ace7327885c08eebb4f2dd91cf015af5eded9cd0855633d72e27f24db6d19e70",
+      "sha256:b12822ebb2a8c415b09de82b7a4c1ae5da749e76c4a5b72a574aa3dad045d8f9",
+      "sha256:b94edab24adb28671177756aa770fa3017ba41667166ee27e2272a7d039c1988",
+      "sha256:c7f2702900db4e87c4379b89d1caa9dbd590be1921d2fccac721e85ac48db129",
+      "sha256:daf5c7b09840bf84631c9eb715f702abc49c863141c6dd9cc50c2fb1226186c8",
+      "sha256:e7e08d442b2273eb88f0cde69053be31cf738e8694f3943f718e134abb6c8d12",
+      "sha256:eabc5c1cfd3a0e28f78edbad0b2bf2d34fb9b84d14031bc0d98d747559f9eb3f",
+      "sha256:ed41a6938038b7b7bdcc67d48860d75a57ec62b9e3e78b974486544b09fb18be",
+      "sha256:f6fb76d92d89e663db3a45971d263df755ca41bb8db541235d135a1c16cafcec",
+      "sha256:fbe9a01c961b80c7d2b73d0fe21879c9565b5919850096e46f8c8aff0963852c"
+    ],
+    ".codex/tools/aidlc-bolt.ts": [
+      "sha256:286226b24edafda3e2b7d1db563a9dc46a7aab03b7e930a4703aaba0cea3e5b8",
+      "sha256:877d2440c11f151178b70ff91efa4cb573e3e037a352aba4418215f740916525",
+      "sha256:a57dd35add34c958d89d708a1734451ea35d6b9c2ef3abe140f5d54a2c3657ff",
+      "sha256:b5a6929c520e9373117a648691dfe07d2fd92e02fa670f8294e2d7efaad07f24",
+      "sha256:ca88170318e2d11e4ac86ccb8ea9c070a2dc12076a3d86789cbaecff9d082c48",
+      "sha256:e3d9f52f4d6600c7b435167470506bff0ee85cbad9376e474046db6007e84913"
+    ],
+    ".codex/tools/aidlc-directive.ts": [
+      "sha256:07af95f77733e167153b5f9fa92ed2daf8cee4c94d821e92caec7b0f2b03ee82",
+      "sha256:0a560854f96c9d6755a50a1b69a0310ac592e1ab353c0704ad17043b56d7b925",
+      "sha256:2650e25b62a447917fca836ffceaa1fe48175aff6f595d87d7d359d6f27d24ad",
+      "sha256:2689ff6a13fc9a6de8b8d0fb778280d75dae3613ed2fbfd327f1e7110e8db5bc",
+      "sha256:367e2c705c83a131a30b3e1d2f39156169d72ef443b7e6c6f6d89b5a78952ebd",
+      "sha256:38e93acd6de74da85dc4ad6d74a78c02e98f9a2391fcb26cce1babee5ad8dd65",
+      "sha256:3da51ea17be5d54c1d271f1075cb931608f8f0169065150186dd2727c1a6bd5a",
+      "sha256:4672ae881704b9b160d4b4a848dd18d5712a20d622ed4b72862057f927b4da80",
+      "sha256:4c534b5396cbd04b9402bfa7009b71940ec7a042d2165177b093994ba8f284d5",
+      "sha256:7184e7885e0286f9065665e87a160b08877b6fe609dbc768b9ab0b62d7b32daa",
+      "sha256:740ffcebfa6c4c91879ace0325712a1d2901efe5bc963e38abd8ac920b9d9774",
+      "sha256:75dc2811f5a8ece95c56e65d55cd30f94d4f335e41da0545e856f19640d55f49",
+      "sha256:82026bd0df1753df027371deced7d9b5a04d4c160026d6cf7445d9964a226b93",
+      "sha256:a2f0a6c58edf726773c318552ba536da943e5aef9cd3e0255ec71be15e531a32",
+      "sha256:bf1f45281dfdaac94de1758bdc7e66c38f769c9dd7b38027695deac59054f8bf",
+      "sha256:c331de5406beff208bbe4479149ae11a2b0fe1d7904917fe0716e7c7272eb679",
+      "sha256:c3e64e403c16b16474aaf69d0270138c24c9cdf2805d622615830b2cabb5873d",
+      "sha256:c9386225a75012684526efded327f7a4c1d632818c3915189c458c111432d7dc",
+      "sha256:c9ff604a7c72e7d2160095cbbc1760e715d92f5afb6277feb017fbc72086bca2",
+      "sha256:dc2f5829d1a0815ebacf7d2b76f6a2bc563ff0f9a1c3d7d9729940bf0c630d1a",
+      "sha256:e80201951ec6004f024af247e4983c0c9b21638318280f25194fcf507a94f693",
+      "sha256:eb5e1b36b8376a0c52e4d4cea842eb6f45d87327b280b77c70e49e60e7ccbe6d",
+      "sha256:f6cf4f4b7804e9af771edf0a44b8056f95cd191628fab98549581328bc0cd5d7",
+      "sha256:fa88393f00b0c2fcd3988f65a66abfeb216e02e2184e7812593d5940e034dbdc"
+    ],
+    ".codex/tools/aidlc-doctor-bundle.ts": [
+      "sha256:024ad764a8de186787428a819b2444a68b0e79ff55cd1b64870e684e35e6364a",
+      "sha256:0be98678a168bba365b0e302d8257049e8513035eaaf9cdd1e9344a3324ffdcf",
+      "sha256:54f6cbac2356cd7a25ead74edcadd2ab4e6029329d20876b4c0d9a7b4c37d317",
+      "sha256:743ddae190f0c4e6f031a1f2b8c67839028caffab03db23f1e62740d92162c78",
+      "sha256:764ff4602779cc8d746592fe7ed14e81549be050f0e8636c8130d54b4c8cc74c",
+      "sha256:8a3c2d8ecc134806b1fa996ffa6d567fde028aa45f5a55874fc8f25054371883",
+      "sha256:a0d204612536b693f448e7b1ff4a651afc8f040f6e112b876c2415b893fa4a56",
+      "sha256:f0ae4efe1f1ff1e68cc02b3272d8f28d08718f59d1e7db69bd8fa2951bc69002",
+      "sha256:fd9eb0ea6b384eb1d7a50e79b8e21b6d097e50d79edcd1be923098f87e93dd70"
+    ],
+    ".codex/tools/aidlc-documentkb-schema.ts": [
+      "sha256:49183f8f24e4c30031fe32e58aedb0f373ea120faa568fb15e2c702b95e32858",
+      "sha256:bd820dc546aaa0a78dd02d48b459046b871672820d8603781749b93a675ef8b7"
+    ],
+    ".codex/tools/aidlc-graph.ts": [
+      "sha256:19fcf23dba22f6f540013efc6c8237bacc71ad1d4afae6111eeedaaf68240f31",
+      "sha256:1ffb7f305ec57f9bfda85fabfc24ad7c94375b8fee67faadf533f1de595af5e6",
+      "sha256:24192624ec65621217a5b561e0f8a2aaa179a7a554842c7f46f58ba5c4ae76be",
+      "sha256:2646d4e63f2b2f7495beedd117c552c26fb9688bff01457ae3e1aa16b7df9f03",
+      "sha256:3081623491531f989228bcaca41f369c2381f7802d33af684622334fff42bfa0",
+      "sha256:3af905622eae7ce51686b8aa3f74e0317b36a894285e6370846c5fdda9227010",
+      "sha256:3bd2fb13ac02f3a75d7f096036aaca61311d5e51c40fa3f14891605645318ff8",
+      "sha256:3fd3d0135281dbff6aa69a0c1d195cb73cbfd27ffa5534c76dac08ab82f3b283",
+      "sha256:46afb96a8c3859e505df112866852e05f34561b9fd70d5820f93999cf775d9e5",
+      "sha256:57af95b382ab3d9e1205915b7019774bff3325ae4cddb21a7b821d720c90b3ce",
+      "sha256:57de4f8a8cdbb5deed79055c04e97ead3e9ef135bad68c9c29e6b3d05ee4a13e",
+      "sha256:5d5ae048d5952a39e6b48b0575a01983269c88da812a1d9bdb448fe1eddd1056",
+      "sha256:6c93ea841658635afb24df4bd52497eef191b04a7c338c7f43087132816a5b2a",
+      "sha256:859746e63222afceac1e901d72ab09a4fcd346d22dcbe3e78388cb54a8c89e61",
+      "sha256:9b090b33dfc9296782a1b91570f6a82aa1d1a5216dbc4ba3da8b72a9c856a483",
+      "sha256:b8ef5bf41b7317bd125e8ad0aae65eada85ebd57c1cd57751cf8a4580105ac8d",
+      "sha256:bd1e8f50b741705a036a6567a07849a602cb57edd635f4bda80c312706699d8d",
+      "sha256:c486f3488169a88f375cc82e9a608df0504e7c52e7095b2f199b373433d1d416",
+      "sha256:d0d9a375530dc6c015b43cd08ba296808d4c1c293fa5588e71867ec7ec23ee55",
+      "sha256:d95b63f4657df14cbe3d2c5926e671f3ccdf4e798c72b4f8a69125b6e46e2d8e",
+      "sha256:e3124da4b02b7f56df855094ac597076329eb096edadf2964436608f1e13c60c",
+      "sha256:e6e318768c58feb4c590128b47202814e406870ea233c09841b99285de60670b",
+      "sha256:e73929fc67c8e2a3934b222a74c99a84021c002007e3b14793789931828eeed7"
+    ],
+    ".codex/tools/aidlc-includes.ts": [
+      "sha256:26367dbfc58be439e06f071abcce66f70f069aad8af2540b508db73f1e0a8bb2",
+      "sha256:3dd127977a75ca5db374bb11765dec12f03179e66dcaf2cdfc7ae3dc31b57825",
+      "sha256:b6293f71343b99bd58dedb7e8850fdeb6fa930a1d877c6115d857f39ff07afca",
+      "sha256:d6d0a43d562de0d5b3dfb956058800112852157341a9befe200c83238998c46c",
+      "sha256:fc75e85eb3221a37a97cc62f4b6d2a867a69e1b433f0a8f9f6a0d9d9fa348449"
+    ],
+    ".codex/tools/aidlc-jump.ts": [
+      "sha256:3e30bf5b3e687aafca5c89403b155f50fa10ea1296e6e1ceb13373700de918f6",
+      "sha256:6a389854ac545129c4482d27afea1a25a4e1b2f6a045977fcb951a6ff0b46724",
+      "sha256:6b75e875fdcfc5409f765c4c5f870670f062d60e1ffaddc7e94e3af161a3bf5c",
+      "sha256:6e4e4adb268a10611d99a012e72223cc8b70172a465f52bac043a96a854ea162",
+      "sha256:7597acf9b52f4126a81d31c432c1f27568ce449514157774b9fa66b88a8e5eab",
+      "sha256:9ef9864d5b51e6856de5da7396d96510c1a74d94dc4af04a9f3c10a76be34da2",
+      "sha256:a451bf6639478078fb1c7095c08fff5a3c5354745779f0bdb17433fd7283c338",
+      "sha256:bd1c34a26f374026a535ba3fe309a2ab6c321ca86976046a3404c036a28e95e7",
+      "sha256:e2939f270ad5ac92c39cd7e70995dd934bc5384f33b20661468252d0b9fd31d3",
+      "sha256:f4a68c48b77c0c3d6a8545abf0dd2c5e9bfabf1f6c1c23471f14594a8b4382b8"
+    ],
+    ".codex/tools/aidlc-knowledge.ts": [
+      "sha256:1a9e08c43505fdf224fe6c6b75947937e0a668de34bf08695e651597a55f96fb",
+      "sha256:2483d278f66909d7fd2f8ae760359748b308097ba7fefc3be19970526ce53f02",
+      "sha256:3b9b803de0aaf1291e58d05cf46bfd865bd88143fc18c7f2c55265d52cd2ffc9",
+      "sha256:74c97a2895a2684ef48bcc6405ff394690e9a95dadc2af775602d22bec996c7b",
+      "sha256:7cd4d72933c4bbf77fddf50a28e4ef2a901605c09bcc78ae8b82257a96588293",
+      "sha256:86317d501f957f1639907c3b09063c44d6ea109b1265fdb08885190b92751e80",
+      "sha256:a270b664641c382782c4a137672f12e5d3ce189ff9fa435c24200748b1b8c6bc",
+      "sha256:b94976db6fb17c1bad64c889f414939264f104bc3020901bf63b916e6650e8d3"
+    ],
+    ".codex/tools/aidlc-learnings.ts": [
+      "sha256:2a44de87459d3ec340d9e0a85427accd9d26121286efea59cd16e6766af4b76d",
+      "sha256:3ffa44a9b22b277cb26fd4e26a3a576a107392a23dc475169f1090c7046217da",
+      "sha256:620e45853c17fc5c47f72bfd1fbc51b66f7f24327fd23043d73c28deb7816b3e",
+      "sha256:677d4eaa17b71aeed284788a16494e3db535048df5e2c56b02f8a96d0a7db6f8",
+      "sha256:68162b96c79a49ce68cdf3a05b2dd4e8da16f523aa28c6475a96002a17c7d0ca",
+      "sha256:d100ab93c5122f046fb74d0eb56e5a8fc0c1dcac73bd7b116e46ef91e5e01089",
+      "sha256:d71a023869c12c886cffdd3c3ba4a57d4fe0e0e00517d0400e9d320ee38cafc6",
+      "sha256:deabb7d27005da7a1429193d22edd9a4ca81a4a45caba5128f94e06f2376f867",
+      "sha256:e99cbbd9349360cc5ce04a308fc0153eafe15d835ca3089cc3ce50f1b9697556"
+    ],
+    ".codex/tools/aidlc-lib.ts": [
+      "sha256:00639c031facb1ffdf45b06c6f7af4a9f567b457ce03c50866b66b1b088b1325",
+      "sha256:0824ecdf25977e9aaf9271fab20775ca58fa0c43d323689bfea0c5cd75e619ed",
+      "sha256:0a571a76a9dea9331df1b1c741f5b8aed3a153f6fc34b915b819c93a60dadfa1",
+      "sha256:128e9792a6fe4d9d9fef234fe7aa750ec6c9fd218508710a7967a574f2c1c614",
+      "sha256:12c10861cbc5701cf399d422a63e3be28a2fdf823589e16858bd0aaa48899932",
+      "sha256:168bdaf39493dab444925ad7070c4914d2b8aa8ad280d5179ee191ad86535999",
+      "sha256:171988cb73e657031d17e9e2d4a4e8bcfd4322e0f85aea8df9244837b80fe7ba",
+      "sha256:1db727c60910f4749044e473cffcd08bff60ecd5dc030081aaf48af305fa54e9",
+      "sha256:2027a580382e5b403ff0288de5334211d98c074c41370007039f6c6e5c094e7b",
+      "sha256:20f1ec0c4b297940cf2255d45f4c676ea9cbb7452ed2e458f7fd873f2a1221f9",
+      "sha256:22f942602e7a54cca57f98eb50edfb582a7778fd0547d5f8f3dd6565e1a13991",
+      "sha256:253f1f5787db622f98a7240227169dd64c628de1ab7a19429531b54bbd48e376",
+      "sha256:2561c234df27fd3d7ec21f8496a48ca68a1ff45702c647842fd69c21cbe10705",
+      "sha256:2b2959efc4fe98cc0b54eebd1184d3410ab035272829dc0124e85acaef8cafaf",
+      "sha256:2c3a8e78d73b427c58434460ee851c96e6576daab67e9f9bca37afdf457f9084",
+      "sha256:2e3f868be01e0182aa0d0a43922ac3a37908101b105161eb7f0dc0109aa14666",
+      "sha256:2e9eb09c5ed98ba052d379d916126386176ac7d8dbe7a0ab97c4fe5fdbcabf60",
+      "sha256:38f0b1033ea315d318835ce00237e1855d76c99b5d2dde067e4128578caa2888",
+      "sha256:3b0ff3dda8abfbead8ff7e4a61b2ce334d1d3e78977995d1bd249668fc99db09",
+      "sha256:3dc21c79b3138c2f3073981e197b4ea66e65b3bcc2947dddbaaad6fc35af9c76",
+      "sha256:3e1de3084baf45fbd22bed69c6170414029c03dc159647cedff88b142cd29216",
+      "sha256:41122fee16834534fc15c71ffab2d3d327193640ba7dba76c2dbe686e9013c52",
+      "sha256:4120a87088c8346d3ee93da5112d173abdf69cab4663e58842238bb18c127bf5",
+      "sha256:462391d35da75ba4a6dea3c509d88b3caeebef30368bbde5cf2e8b8251f84e2a",
+      "sha256:4895b7cdc895e6403ddc90e565e78403ea2c4014f67559f2db07fab5f68201c6",
+      "sha256:49f8068495afed16008ee134c1870d81d3f814afd7a08b6051c2d33efbcc0464",
+      "sha256:4d57bf707a128a9ff4851c79aae114426121330c6d60a196f5b277082d061bea",
+      "sha256:4e03a90ae96123d4d69b74e12722136803951425033aacab967bb4d43b88e905",
+      "sha256:4ee322e60a2d0b57ed412e8c209c90571db1547f37fdeab592e1e42398277002",
+      "sha256:4f93d3661f01bfc4db5737422bb70f9f2850eb49e5276599488b0d26250cf52f",
+      "sha256:5657e22dea7f4cd5c8b82574dc6ad92c3726765c98f6e9cc66af62e775b1dd09",
+      "sha256:5f43b969c65cdf7f1cabcacb7c8b488d7e05a0807cc72b2bf261d20427e4e5fc",
+      "sha256:639b4542cdd88c93f2f509d1740d961ad28ad7abc2d530f47c4dc926745382e1",
+      "sha256:66a8addddf295d481221641d872308b2f51bf98149b613c7d3ddeeb48c2ef085",
+      "sha256:67566d20ed2a7a9a654ba86ac915341b1dadcf32476dfeee04d6fed2c08b8dcd",
+      "sha256:6773864ad58748af3447cb40d3e7ce09b74f973aa377250cf6ad6392f4ba3b10",
+      "sha256:690dfa4869b76c88c6c8bcd1134c8180614f1e380871249dc5318c56970d72f6",
+      "sha256:6af82546d3fe0c8bd237e07cbdea1188ec696fd5d3d7969aa8245ecffc84017f",
+      "sha256:6d880240b0ee6d09b13b2c054d34d29077d71ea6f5f188920f1ab54c687a4f1a",
+      "sha256:71d37800efd76c6a421459cdcad5773dadbae6acc8068b37056f17c0da79a0fe",
+      "sha256:720599cfa888a74be1d6ef3e43995551819aadd2b7e1272c7f5eae788f5455e5",
+      "sha256:748835acbd63693468275859b2549afae7d58cdcd398a2c0262bff8157bd8c3b",
+      "sha256:760d1bd93272f3ec3ffcd100d8bd286e010e978d4d6964c3298e674bf02c1509",
+      "sha256:7a68fa00918165a4aad37c9e0166dfdfe967f944c13d40e25453efc957773ae9",
+      "sha256:7b4b3e99118a308af1c5ecb9feefa942aee1c524e90630d1418920549ef3cb87",
+      "sha256:7e4bc863d0e31a91ce374b3efbb76e5bc0ea1d1399f3d3c9b20901cf18ea6279",
+      "sha256:835ff15b4553fd3f22ed0a3659e8c34c8bb509a2ca3681051de9873be443334d",
+      "sha256:840fea326d93bb9058a2d6b3d0a4bd8077699cb3df0bb0f7f1c7052b409eac50",
+      "sha256:8736ebba2ee04c2282dcff7eeb131c88b8c5a17a25f9aa5d2c8be19cf465199b",
+      "sha256:885455cae48c7ad1f1f6c36d7accd3eb8f8003b36b47f0ebf0c6a561bee0226f",
+      "sha256:895c04733894e92a80551fe3b7bb755e18eb458e38b0394c87052c5243b9b9f7",
+      "sha256:8987de20f9e7e2d0ef378a10d1ea2ab929cc07e6ada2222212af6c838580c821",
+      "sha256:89edc0f4356e0cc642fd47d679197d89b8bd6c6453ab452e27f97faa1c9b1be9",
+      "sha256:8dc1b9418701e572e380211b594c122d090caf5f832d9095b70a42e82c282c9a",
+      "sha256:8e6285aa04134baf61b634837ec78c4c077ee42a4ee675af70c2d6c41341c627",
+      "sha256:8e6ce67e9d049439a2ffe20875f7ac8b6cfa2c196531b4390696bc0839ef9af6",
+      "sha256:8f0359c9245483be97b867251b85b4247f31b7cdb9b7b83f1dcfdd3cff286615",
+      "sha256:952ffd4e2bbd54c1aee4ed346f7f3e07b6722559a5d1dc9175eea9f751b347f0",
+      "sha256:9c0ce66ccfd179fa0b0499a4bf07e8f889085278bfe097f007c62b49139e0978",
+      "sha256:a156df498cb8c96446cdb6d821c9928a179e7b1a6e274e3046f22f8ae506903d",
+      "sha256:aa7ab78392e4a3fe10f5acba7f3595eefcca29dd91da7d2480cb03ff5b3cab2f",
+      "sha256:b06b2dd5873abef0ab27fdacd4623db2fd6740aef3c80b67fdaee492dedd467c",
+      "sha256:b1c199850c54084d873b561c5c2ea29abd3aa3f1d03f86d29ad29fdf7f7f23c5",
+      "sha256:b25440f678915d8bb7f1ec3f94ce95043586176ee46aaf0d9c1dce73183081a5",
+      "sha256:ba4e2259cab97393279cf9c1c63da24d8fbf035cb153e009b41d3e0c8a78d97f",
+      "sha256:bbe7266c6e668cbb9365823775b5d772e151cc75342dd7297a9618678bd63842",
+      "sha256:bda7260e671c92d6a2ea0b997ec79d9a4dad778179bbe46a78e6ced0174e67aa",
+      "sha256:c05912969de5be11388874f8fcb8a0c5a28e12fe14e483672e16b42c04760888",
+      "sha256:c05bd70ca88dab4f1ece94e7659ba520038fef3aae6f5a2eab056890114dfc36",
+      "sha256:c1ba9bafd687b35a87502ae2396b8a3fa74ec7c497ce0a83815e3244456d26e9",
+      "sha256:c455b5e3aff3dc7c891fadb760fa5b276a53208b885a972f1f9204857a5d0fd9",
+      "sha256:c48840799b4162cc01d3f154ef885bed19fa7f425128ad6e4db5395713f44b9e",
+      "sha256:c60c3245b970df76f313c87eb56feac038ae694774189ca7bc3646848bb8d74f",
+      "sha256:c9c6fcfdfe124cae75d698f44e704a3c2d7523bfccf16684043ef9d5ef781662",
+      "sha256:cc907c1de4fe92b895c893ae2ad03806ffd82bfe57c5b33f9f06b6c9f49bee20",
+      "sha256:ceca4b3adef0aead33096f813b7c88d6f723d85dc41d6056b3fb8a73df5cae6e",
+      "sha256:d078f383800983433f0a288c77ca083f204904098a6296a42af57d31be8157ef",
+      "sha256:dc7536df1836bf7786281f7c2617b39c18f10042f07e48ad3764aabb9a57d2a7",
+      "sha256:def2b95fb0fc73b09a29e743452021996959ec5e0bbfe290900326403cb051b7",
+      "sha256:e0f6ad7872b2aba1ba4a888903aa8b80fa3fd1a7a18c9b0984988eccd37674c7",
+      "sha256:e4f273e6ce3a6a1b0e2c893776b8cdb8e5413c2530fa4e96289edb541c703d2b",
+      "sha256:ef39e5f804d795334838bc52b038765af82e2e02bc5d37b8fec34806b1d2285e",
+      "sha256:f35f49fd5e2f2a28b2db595566379f2f7133a29ada5319e6a35a28d3b735ae13",
+      "sha256:f37db9b60639832ef324b7d0334d17db863c4f247daf8c63fc864ac37698dbba",
+      "sha256:f59225a9d5817934f05e2498116bd5e3dd1379b3049a1b4923c5aff93d827073",
+      "sha256:f5f65177aec6386a30be7de9937be7e9c00dd349bcc54877d907d4ca546e3810",
+      "sha256:f62ead272f3712d5c27b20b54433ad9ad1ac72d0ae1042904e120db322c33a83",
+      "sha256:fbc149b5c87599ba4cfc90ae0b7a9e7db3c29d1c97421aa63cf8c340c962ad91"
+    ],
+    ".codex/tools/aidlc-log.ts": [
+      "sha256:00e9ff7d4acb0671a69aa42f9a95a2c65107015f76949e7981394c0abc30350a",
+      "sha256:1678370c8d631a74b6b348cbd895ba7aec1d292cdc18cde15864c3d7e11b004a",
+      "sha256:216c5aab5272c4dd73d15e5e742a0b0c123ff29d91d2631265aa10280d062728",
+      "sha256:24ffdac0fb154351ca4647ea23902b3beac05c44f9264b8e2b50e5f245026ec4",
+      "sha256:259abc0eb32de871728ff7d0ffdcb9cd2f7dc803542ae9a970487d38a70d5bd5",
+      "sha256:35b6df8b7d65c21bf8271e2d76f098a753d5f0c044c202c2d752a6b8935dee35",
+      "sha256:4f70f35cac9557e0624926333facdc4b22dc61dbf50b44acbb8b79fe39725b48",
+      "sha256:57a8059df2a2080f67566aea19af9f5909e91215a098bb6314fe4addb1e70dad",
+      "sha256:57ec0760e593df8ddfba268d44a18fd3576b647c18f21cbca8959f194fbd9fa7",
+      "sha256:68c5bf63764bd3ea876cef828cb93a4c67b5053c06f417d43a872308715eee3b",
+      "sha256:6b2fc47cc42a988f7729e235564e7f5244552f645b4ca11c124365bdbaf9bfbe",
+      "sha256:6dac4dec145cb555dda0ce0dd0f53e3c595a9d910df51e3a9dac908a1c58bd11",
+      "sha256:6fc943f50570d74bd2792a3ebca2ad1d4f4e934b25650d64e6b9bfcc089b63de",
+      "sha256:7bbee59b3de2292c5705b2735bc68a3f4d193fb89ac8af498e1b39b09ffa09e0",
+      "sha256:80eb33f12fa7fb2569fb24078972ff48ca25813af89132bb85fb74639a47b944",
+      "sha256:85a57136ca4135924579ef20d7039240360f070e97063208542f7cd71f285eb3",
+      "sha256:9ad5ac2ff255f8059ba8b3b17b2a6d401fe9a686bfe66bd8248d32d76a645882",
+      "sha256:a7ee5ddc637b6be803e7f6e991b41cd0fd59674914c6253bcd05984061f7a8d5",
+      "sha256:ac774c2979505afd296a01d8a916af20e9355453177e98b3fb976286c79e889c",
+      "sha256:aef4351aec9b79a6d1c7803eb2cd1755ca5defb69697843a77375e9b50cebd76",
+      "sha256:b4c7d539b6dcc9f79bced5e449e7bd8cb11d233fe53380fddd3aa14ae5e29999",
+      "sha256:b7dc3eca21153c75cc33dbb326181e80b32fd442cafc741db47ec312b6dcdad6",
+      "sha256:bd7d0d068662e293c50ec3e06b62a891ccbc7da56becb9ffbb19770355962376",
+      "sha256:c1260005a2a9a2b8531ad8f9b41c02b070a6e82ebf00b43f853a7fece8231e95",
+      "sha256:c4646210ee3abefce043c52c0b5b36181d4d69f342ec42cd22f1f97efdf2da91",
+      "sha256:d7762e7aff8f412dc8c0c8d45779f0a4ac493f65deb7d165ba4c1515a8905cfc",
+      "sha256:e6bec265059bc246bf164ea14fd41e73ecaf59bec1a51b433764f7c4652a5fc8",
+      "sha256:ee1e7ce7bb1228004ea9aab012e251956c180268ce0f14ad680c89761c918437"
+    ],
+    ".codex/tools/aidlc-metrics.ts": [
+      "sha256:02c8281ebfbeae361f065f6380ba30b14e0d271be88c3d887aab10d293f8abd7",
+      "sha256:687a61cf87d742a1e5bb12da905bacfa55600ac98a47a9f1c635f9a95f319eff"
+    ],
+    ".codex/tools/aidlc-orchestrate.ts": [
+      "sha256:01b0a95dded919e47baa42f8b76d1ef3f7f8dc8abc112305e4da976fc8b4d176",
+      "sha256:165ef9f3a31b91849ed37b846a80a2a7d822afbc2f3cdb298a56f8be9a15cf1b",
+      "sha256:1bbf5a66b9e3250a858e59ad4d4bf140c6cdb6f6e8033648c1cf9642b2325bc7",
+      "sha256:1bd2c18f8f33d62a1f8a27071e735aa1cc9bfb21c08a095ae5a6a3f10d190bb3",
+      "sha256:1c5b1ee742957a2f54c5832b20272e9c5b893c50ab4408e27cc73fc345445a7b",
+      "sha256:22e692a624598966fbf8520fe66a5717dcc639b3a146a0bf9194c0fdb825d83c",
+      "sha256:23976664f2827ef8a976f55412dea8f2b1e2dc228b203582dec89559f2fb1806",
+      "sha256:331c5994a69893d5b0d5622334fb2f3163b19214f0b72a55a739042b3a275c4b",
+      "sha256:3c485c322bbf2576fb4c4a6ab40a345b6aa99d8705423bb8764dc9c9ba327e0e",
+      "sha256:3f28399925f9bd24e0ca0fa110c88037df03685847cbb947960f7e890cfd029c",
+      "sha256:40aeaed4434d7dbc060dc3c9c808aabda2d4ad4efd1c2b14d5f05cef7fd2f000",
+      "sha256:421ce904f75d60209ac24083bf6fca23c34e446a306aa2093721dc51a6b14656",
+      "sha256:4683f8c833bb1ccf790407ea6bc0fc761be51582fbbcd3f14b69051711b332d2",
+      "sha256:47073e88fdaa9f33f51775d01ba01b043cfee08fb3aea10377e91fbf60fcbd63",
+      "sha256:4af73bdf77659c1e1e5f81faf3936b70a65f5a0f25af56612dc18f62086b73fb",
+      "sha256:4cc82356d8f8c68ba501ca3d860a2dd90a3a42852c1af3666a345cbef8a0a880",
+      "sha256:4ce95f65857327b42301ccac16c46b35156229b3425023e46206bd98b8bf1bc1",
+      "sha256:4fa05092d68bb5fc37374fa8960e1f04d16530faa1047362c716084ac3d788a5",
+      "sha256:53ee65fd6b2bfe643966fb95a44464c0c15e30fec1d29e27b34eb2577b4ee77e",
+      "sha256:55c6042874baa0dc368813c059298639b09a4d4f79be1f551653a2edf046e9cc",
+      "sha256:57ab99e63d071b60c0e39f6b57817f2235e622963b0fdac8fd775cf1b2b739f6",
+      "sha256:581519ed4a1d58254b0ffbafd3520e446dde741cae21c4f3539ff8f2db765a22",
+      "sha256:59d8072a081d81e0394ed0a47f35c00c53a305e5de1f2692bb7ba71846fe641f",
+      "sha256:5a88ab6d6dc3cdd6005a99a4e6b3fa4b2fc3ffeb1ef2503827d17c79742e2270",
+      "sha256:5c2b43699879284eb7470d34f78bba4f37b9c37eb0e319dcef78814175651532",
+      "sha256:5d6a61d1988ed391521d4d95238a7be4966c7c77fa4dd1bd49451c4eb464c583",
+      "sha256:620ced3025c4f29deeec7e9f80d8a58ac10451dfef7201324fc641cebcd096b4",
+      "sha256:6d3f354caf5148dfbeab808bf626390974a08a43c13cc9d09f0dc55a63c55503",
+      "sha256:76d8245fe18c72b57d3ce7fb47d2527b1f0f4f637bead71cdee4155fa27b0e16",
+      "sha256:79c8ba5c38f9bbd118db20bbae2e9cf2ad5e14decf5afd6e01e64ef36c8aa2b4",
+      "sha256:7f6b56d23dbbddbb2aa170410721fb8e8b59c88bad0115ecb770ddf793517f39",
+      "sha256:899a879a99ad4d88d97055f35a48a1ecf57155ff40e2ded4be210ee9a026975f",
+      "sha256:8a9ff0eb7d1a4116ed8a7b9e99e2550189c5f240e359f5d9ae95c71317eedabc",
+      "sha256:8b974a460a3f78e13224f902812e153f5d113e1c5a6dc4a10de7a7b87aa76917",
+      "sha256:8d4a870b8a120f2c28105c60029b39a31571da21e9aae746b95c79692b18cc53",
+      "sha256:91f6f4d4bcbf90c1049421c25e0b1fe89871feed062f89220badbff17f068553",
+      "sha256:9d13c891c7be0a4b3ff5550bc47b6d68fbae6cb21770066c89e421ff73455f41",
+      "sha256:9ff294d782902919d8f46c25aeb29d1536c53da84e209b5913cc9ece0402d75a",
+      "sha256:a24af11eae9ab3f3a31c043794407fb9ccabfc6ffb502d005c9732acd9e2305e",
+      "sha256:a4759daa296fb6859dfcc3a2422b11f1aa367742ce1bac214d12b0585550cb7b",
+      "sha256:a7aaf8ce0cbf3a9f79cf78188a97263481fefb8ab899340b834e65131d4bbe54",
+      "sha256:a95b152ff2ac0b35776211c4f35531de7fe3ccdfea360a6459f75349ae920c96",
+      "sha256:aa698ffcfc9b60a7270bd1ec1d50d6372f5655174766cb1aa1eb17d84243ddfe",
+      "sha256:af84c5da6b40cf5ddc277c8e5f067e1832f8ee453175b23c4caf0ffef4663582",
+      "sha256:afc00e502c1a59e95a48f43b469f7c10dce5e38dc20a036912f22fac30c10d93",
+      "sha256:b14b7328c021950775b0199694ef1318d62644effd7be25b819d3fd122a1fd4c",
+      "sha256:b1dfe9132418cda69afc3b9ab2309442a64a8edfaa6d7c24a6425af45526a0e8",
+      "sha256:b2479a121d56d3a80c41abedb46ba1d5be32b25c3c24a83eb877b083cb6a7bf0",
+      "sha256:b741e77690b6fbfd48022b354478d9ab699b2540abecade23cbdf21dcc45eba5",
+      "sha256:bbc411fc260e2d065e9cb7b9557e3c2481d54becb6a38d8ba9d3038d99a4f883",
+      "sha256:be0108773d2b14b16611cb1d77aa33659554610e4a64c20aa713bc9991794518",
+      "sha256:bf26b784af9646536e5f2e7fc7a76771ac4fc6e90c5b2b645a0a1e4b18f2a218",
+      "sha256:c0d99c3687a29dc689a1a0156136989a4a714e80a7928e09c7e566bd2244f0fe",
+      "sha256:c99ce500251eab776555bc2ec96e7cd68300a66f037e33b91033eadeec15855e",
+      "sha256:cbf8ad4ac2dec02ef14e2eb92a5855a03372e3c5c57ca87fab5016a80af49528",
+      "sha256:ccc817e66bfc4f911b26b1296bf453d96ac64ca4820cb27bd8eda96d7b483d01",
+      "sha256:cdcf347418cbec2c441ca611e1f2214fc64abc6f2d912de316cdfa4422c3068e",
+      "sha256:d2a1266e72b1aa85178214977dacd98e0b178a07dc34edf405e404489a626630",
+      "sha256:d4fc23d3161b4a675d92ecc36c18ddb191a66814dcc3b122b644071ebc89ca6d",
+      "sha256:dea72bad6a91c593874054fcd1d9afe55e55dc073a04ba20e62ccf1f5bbc9365",
+      "sha256:dfb2aa25fc634bbc5973e21b58970687400b812079365e4766aba03939374a64",
+      "sha256:eda14f39a3290a823f95496bdd62655258047a999e4b03e9af1481fe16d9102c",
+      "sha256:edb5f9e037fc7a8738630cba047c3ac36cd39179b92436e1dd0b756302123b3d",
+      "sha256:f10d340a403c898315bcc63d8b84b94b0adda597503cdb2d53b8ea3c722c530c",
+      "sha256:f2217b9abc9df7a33368aa7efccbd917622cd7298a042bdf8b4954298ab2c10c",
+      "sha256:f4b08a08701a75534bf124eb6c5bb4593f36c7d3f939f4c09186f226bc986b0b",
+      "sha256:fa0b32b19c986db997096dd3ccd346ba1a9074a3ff9e108d3d8bbfd10362a4a3",
+      "sha256:fd84d36e34d375aee26757d48a42d5b002d6f0a8fb05a94e96d3a0ce4ef282c0",
+      "sha256:fef985a19a3c79d348f6058b87bf5c113d406150ee453b2a9f902b203b0bb54d"
+    ],
+    ".codex/tools/aidlc-plugin-build.ts": [
+      "sha256:61eb300da9dbd7963766051367536ca3c8daccc168738a01bc7642fa315628cc"
+    ],
+    ".codex/tools/aidlc-plugin-emit.ts": [
+      "sha256:1059beaa3ee60d39d62c9ad58b6d59c15117cfd12ca0eb15594c57ab7126e09d"
+    ],
+    ".codex/tools/aidlc-plugin-test.ts": [
+      "sha256:06d3e944d2d0f83caabed415c10d381fe00a054a981f31999c47d84fc0aa4fc3"
+    ],
+    ".codex/tools/aidlc-plugin-validate.ts": [
+      "sha256:8f24c1fc2d778bce76fbc5ff0234c4c43f5c50f9547a3b33b29b0a247513f03c"
+    ],
+    ".codex/tools/aidlc-review-brief.ts": [
+      "sha256:9e5829592cc05493299d25f956d8ce25ee9db9a69ace8fb27b4f210c545ce23d",
+      "sha256:a163f5616fdb9c6a7bf45a8ee748531f79b956515e733dfd0a7988070d16f7b2"
+    ],
+    ".codex/tools/aidlc-rule-schema.ts": [
+      "sha256:0ceb6ed00675fa990b5663d202c2943946b5538067c242479e5719889a457646",
+      "sha256:c5cfd6032933cfb976f57ed3c81ec57b0e764ea29f8eaaf5ed00388a3f8d6de1"
+    ],
+    ".codex/tools/aidlc-runner-gen.ts": [
+      "sha256:1b52fb42b97a55fec4772873424df923b46ab22eca547a163074d32fd6df05f6",
+      "sha256:5dc239c696ec7f2fc128797f0639d3c05f841082f8566790fc07d703354b3fe1",
+      "sha256:6bf6262ba335fab8532378a9063219506303ced5ee0a516e32eca63725ea32b1",
+      "sha256:8215c8483e5eb4b7ec98f466b65cb9f98c157af9928ae61ad44173d989cb0a61",
+      "sha256:8d9966f2d6271faba1c0ee48b15506677f3bddb56ca631a1093e5565e9750d2c",
+      "sha256:928aa323460c4bfffcd5923743de8c8e4edadc593aff017822ccba83c2ec4dbe",
+      "sha256:933047c48f46a66036fd0504b90222329923f23d8d19dc0a249d06eeaa958fb4",
+      "sha256:9c871a858f7ca4f57c9bcfb843d8b2b9a3e8170f2d889c5d331f7b75cdc6adc8",
+      "sha256:b81da7d53bd8d0df5bed0d76bc067d8f9fbafffc15a25821f73276480878400d",
+      "sha256:d03790bd0071750420719e9d1eee6a25a2c0a2d498e5b0600ff292d2490e8be4",
+      "sha256:dfd6198ce57c261eae8934bf67de25e7985dc094cb8025c8327016449b57a97b",
+      "sha256:e0615916129c62b6b1e1cbc91724a303b4a064413d5e698c4d5abcbdd2a47565"
+    ],
+    ".codex/tools/aidlc-runtime.ts": [
+      "sha256:0349dc0c2cc70693f713c8dda29c570e520780f57a6da72aa24a10b2561737fa",
+      "sha256:083eb9b69a34dbd85a4dfe0e1e931356d2ca3309edb725284428e84b29f7a5ea",
+      "sha256:3fbcb5942982d1f95d3f4eafc1717f254ddd3d474a3f11d7b6579a4b33a26621",
+      "sha256:44291303a09b9b82520feddee9ffd5302547634991ea4024b4e0e4c7afd6f5ea",
+      "sha256:683ade420f43cb12f7b0794dee4507e1faa1c513c96af427f5283430c9063029",
+      "sha256:7feb1b907dd6e8edaa1dbb6a424052a72bb9d9096947b3cb8941c5593f2b2240",
+      "sha256:931b184103f9aed804ac07a9c21b278ff9561387a5cf5e2b4a96ccb0f188f36f",
+      "sha256:9ee22ac7dad978697b076e352adc7d199b136b32d337dde9de5ecfb86de0518f",
+      "sha256:abd4c5f80a5c024cab39a520a9598035141438db45a08eba873d635062995a89",
+      "sha256:e4a602ee935d10b01384222eb340d265441ef094fd3d51773ed8ef40bf0bba83"
+    ],
+    ".codex/tools/aidlc-sensor-claim-sources.ts": [
+      "sha256:229baba277490cec5f3f17a675b0eca772d9b1614aaa1a8270fbeb13860f14b4",
+      "sha256:4af3e04777d8605f97e45f3a28c26a603fe6ed1806c66d6f0f1c924c806b814b",
+      "sha256:5d2e5d670bf023e8b6ec1bad14a6a68521184f6a1f630c83b670346aa1ae1118",
+      "sha256:d120117fd758e5048d01e04eedc9a2cad8500302582ece1bcc0ab7f32d351621"
+    ],
+    ".codex/tools/aidlc-sensor-linter.ts": [
+      "sha256:22ffefb0acf8f605d7a78ef0d5609277a132513c9bb28272d9dd85e3e76142d1",
+      "sha256:63d4305fe00d88fa09962c59bde7a772c50bd862e3fc16bd294fb25afb1163f6",
+      "sha256:7dc8ead3320fe6c121caa50288d5b75db7b1257e2c2fa59dd0cd6927be21850a",
+      "sha256:c2209125fb6aeeb127b8724152eb5db6cdef7167bba06ef04efdbcdbcf64d3c1",
+      "sha256:e8f8dbd4b6020c99fa41c736e4744d1b63f985f5fb7c80aa6772f1d75994041b"
+    ],
+    ".codex/tools/aidlc-sensor-required-sections.ts": [
+      "sha256:623bd29555957f7ffdd9ebc3ae5b4fe96dd808b44cdb129d8a3dac93d73a729e",
+      "sha256:75fb7853ffab08ee22fb83a3b5728d536f7b79b2a8d7b6987fb82ae71dc9c21e",
+      "sha256:c8fbc79db2900fb057b2dc9c15a9cea69edf0e470e6ef2d4de1b3da34c3321c0"
+    ],
+    ".codex/tools/aidlc-sensor-schema.ts": [
+      "sha256:019b1cc67f7a5a1e7b20fa8ddb212fe476ec56fda09c35662c9cd9a8500ac77e",
+      "sha256:972a42f459abcf2804c36ae7ee75e76553415b89ac4454f254aed37324071f7e"
+    ],
+    ".codex/tools/aidlc-sensor-traceability.ts": [
+      "sha256:0c46165c9d42a3eaa038ecae508408202f1ff8968ffc772461e90d8340bc71f4",
+      "sha256:90db9c179699bf5b43935f842aab3ad8b498822f372302e6572eb01eba57fb85"
+    ],
+    ".codex/tools/aidlc-sensor-type-check.ts": [
+      "sha256:41de75ab3645aac509676164a7b4adc0302f524fc5a05d573b48d577a59aafbc",
+      "sha256:96ad899c9c282a03c6a296d83d8a69988955329f6ac692ba2fc52a648c094e6b",
+      "sha256:9a6d97b327d23ad383e6875c4a5025700d04678ff7e837c317ca7a7e5ae3ebb0",
+      "sha256:d342e1e379e2e9295be0b5d0efdabf8171a4c47783de03cc622a07ceacd234f9",
+      "sha256:ded8cbe0fb80b8c57290f1543d60eca1053af56e2b876cf8bdbad4323af03a3f"
+    ],
+    ".codex/tools/aidlc-sensor-upstream-coverage.ts": [
+      "sha256:2fcfea972248c6cef0ba8409511bbab95c00b437cdbce91b1078e1b0aeeddba4",
+      "sha256:788a7e28532f88053cccc6ca1efd1f9f0682b10f6e3d74f84930d4c2cf2fa939",
+      "sha256:a4f088dd9899d327742fe9222747b8f9ca8b86f2d4b285abb3333f87fe7f1d6a",
+      "sha256:e4c44675c42a97d2fb45a641feb936bffd8471e39ba737b24a673924f2155669"
+    ],
+    ".codex/tools/aidlc-sensor.ts": [
+      "sha256:0d040db045f580b416323d4acea8416d4849be66503b72e80a6bc61835e85581",
+      "sha256:2d4b3224195672a8e23d7d81db732b005e00f0cdbc8341c5b0cc24d35f913ac2",
+      "sha256:6e733d4edaceffe798230c4eb31cd1bed435da412db3c3dca1cabfa0ca08b78b",
+      "sha256:a300a2c7340f998b2e09796050b67f255c6e0fc7890cba6c427d08cdcc5b813c",
+      "sha256:aa626361fb4d22f9607fd6f23ee29d62dd28adb38d5f75d31cba3f3fe2edae46",
+      "sha256:ca5c14b27da4e11ec62cf50e39b2d5b9b4374715bfd97f44e83a8eff447357fa",
+      "sha256:d848f5c607e4ab3b613d108d3a0a14d58db38abf0e309ad57e69a37d4189825a",
+      "sha256:d976d1eae9a61facdd9984c0330f26913ade7bc4b9dc6b2d8d8910ff51b8429e",
+      "sha256:dafe8142023a4a83a2c3090ac5c6218d0c0bac4c506f1a8ca37542624d4e5c39",
+      "sha256:e331988682aab7a5fea17495fcc3b32e1c463d0eada2d019acde277ce08e4335",
+      "sha256:e50dd7609a2068e72c2de4dcc80665a2b00be14bda2ff92651a486dd2010a744",
+      "sha256:e72dd216aa79660b224a8d606d0edad5c2e48a49c806f4dcb3295300b24e50e8",
+      "sha256:f710875a0355e0443e562056ecc4c47241c49eaa2238c3b75c84af4717cb6eb8"
+    ],
+    ".codex/tools/aidlc-stage-schema.ts": [
+      "sha256:2ad7c55aabd1eb6005cc9bdbb10819bb50717037e140714b03df9bb3fd122f71",
+      "sha256:493def43e0d0f8f9158730e33321c6b1364d93b2b40c2693794994fa3eec5ba8",
+      "sha256:55ac579b6c386cb270a73a1888e1ade1029cd586cef409543f1fc3118d18cb9d",
+      "sha256:567a622a34b89660b25c5be81b59471f4bb0e5c366ab69d67dcbd0cf6fc9dc6d",
+      "sha256:6460a99f0a19c5bf052ed8f0ce8041fb38383f30c09e9904d55cd96be934d0a0",
+      "sha256:764e81ec2c67cc04ffac55fdfda1dda043ddc42e6d659b7c245707d3ff05b155",
+      "sha256:8112d4964fdba5a21195d4b895efcadd916410c27d839ca00f68f6aecc5273e8",
+      "sha256:94de9a80381b2e4e6325069e8c0dc607406332642a5877b461eb6c99803e06ed",
+      "sha256:b259a72af2d5dbc494ec6221d76ab92a590046b89b0b48f32962796dd0d7771f",
+      "sha256:bfe6125bb173bbe7020a6b4b0f65553bebd2d274383ea8bb5305a7fd1039e85e",
+      "sha256:cf854ca81cf6c70d441573d8b77f2193e98240a2b418efa340478c859dadddaf",
+      "sha256:d080b3e66d9841c311d550d798fc0b5ead950d6fbe21828a654019e8d94be57a",
+      "sha256:daae746afb3d264b72c166a93202865e40ca67dbddb74564ed0ca26de0390231",
+      "sha256:fcdb13cb88f9caa1549e830c322266f40831e445f71210cab9adacbea4ea7efb"
+    ],
+    ".codex/tools/aidlc-state.ts": [
+      "sha256:09b9562ed5cfb3e1008861753ff3011e27c81b56b1102f3cdcfb4c591fa02f0d",
+      "sha256:0be772a928dc4fc024c913f6055edca8a5a15297f2c850ca0559e1b9294fffbc",
+      "sha256:14067db24eef2d8f3ae32a7e99b908629da549c1faf2682243d3da1b6896314d",
+      "sha256:1444add17bf5458c1287222f044a3b5c5ddaf50a272592411d9e944ca58af236",
+      "sha256:16ba444a4d2d3f29d7a5c1682a9a5752322770c9d5ba0454d40bc9dba5120d02",
+      "sha256:1981b82d937bc379027a1515407ff1df4ed1357abb0228b1f9a93b6ea5eca2dc",
+      "sha256:23e51279b86106a6f95f6055e3827f9ada0ae9b06da4842c3b7a17c8def8acba",
+      "sha256:2465035ec4aa3d208431d2457d48db5e09a7229c8410b7fda4c175a45dce18be",
+      "sha256:2f956b0f7c54bc77f5ab6babff2f90b127f561069d2ef09a586b69db95236bb5",
+      "sha256:30c6ca1196223d41391dac2db6421a5cb4082b596967038f3db5637fdbf85ac4",
+      "sha256:3587e1ff22ac3c2f6814fc2affa18ddb0dd723eb691e36a35699ba4c96778a21",
+      "sha256:38bc51413af24b955852bcfa8dd69b5153c893f828eaac3e9eb795562f553bfc",
+      "sha256:3b0500fbd719bee0c34cb8b2e11d51e587e86e5ac4821f577ec46073d316716a",
+      "sha256:416a2591db4a8b32c9b49bde0df01dec17bc7bc359ccbb23353085aafbaf9ee6",
+      "sha256:449216b7fd66099b95e6e9eacf580721695e16eea8189ddae9ddb26c50de5f33",
+      "sha256:488ed6d14985a7f8be1d85913a47dabeaa63e9e193bc5fba0ea6fc91dc998a9c",
+      "sha256:59d02535ffb4d6f9833753ae76591e48969bae1f10799fa30ec0583f472e31d1",
+      "sha256:68181b57f4399c8f254ad0b49d6f72fef4b7206d63ae77064a932b50cce15303",
+      "sha256:6a5555ee537db9ff54f1c3057f1bcd9cf968274858bc724295dcaa16e12664ff",
+      "sha256:6d4488b95f26813f23a2c7051fd631f4ff88689af9801562805be8bf25d45fd1",
+      "sha256:7ef71daec41b0e3538b30067343ca2abee9c8cbf00c2797bc2f0758a11fca392",
+      "sha256:818a31527dd27fd424fe5490f47b8cf51abb6a803d63decc4d016e6bac64f56d",
+      "sha256:82613c8bb0a305cd656e1dcc28bc25ee8fb4876fc4120dccb1db843b0c7712ee",
+      "sha256:8b7f3269e550635ac3d50423f6fb6e278d6edaae8c21e2358b9b9e8a8b8a7601",
+      "sha256:8bfb11f914c637cb7d15cea541773ec99ece20ccae2ed22288c0bb848a79ceda",
+      "sha256:8c4e926fab08a2f731a32fca7d6548ba2077a92cd6fca667304fa076229c8ca3",
+      "sha256:8cf30c151adfb136b2659caca9afffe89d14a633ba1818c4bb214d6cce9e8966",
+      "sha256:8fe34f834632665eab37a06d77a59320b9083f52b7ec9c5e0fb0ed54027a70ac",
+      "sha256:90f9538dfb01c213a452ca3d87e21adf4b22135552685973ea2b43c694f9cc29",
+      "sha256:99cb1d15f159d526b7da14a462d1503e403d7b5ce7e16db734ba146f98fbfff2",
+      "sha256:9fe60a12981f722eccddd32b231f316ea80c4144043823ade1e8b1063f30f3e9",
+      "sha256:a2043515f7afb2a8bcd18dae7609fb32585f4f76a7650a511c8be50701942e1d",
+      "sha256:a2960194ec80d5e6be349b3d30b9bbc519782efaca7440adfc92fb9dcbb4ce97",
+      "sha256:a4fbe3aeb8fda8303cb2c1d6c1063b9ec6d3ee5228c1200fec334d98b5553918",
+      "sha256:a4fc2ea2fb132a86ca3c8d76c15c67f27057787d7604f69f26584bf4ff80e508",
+      "sha256:a8e7157cefb8859fd0650f8e141001a87079ca970668e86f0d24119049e43e4a",
+      "sha256:a9e27db4407e2531fd9ec279c90e8024fadc394e949ac2f590621cbc35a41a8d",
+      "sha256:ab61f9817726153ed69cb4c9cdf5e6d4ae0f72eddd0898eccaf52873b9e47ae3",
+      "sha256:aee167fe7866d56bff56b3005d3434c4ad914f4511e9b60846786d21cf21b2d9",
+      "sha256:b1f3533b45c783756e6d4ccee45f58ec9ed96e3178eb2c7825205bda70c8c16b",
+      "sha256:bb3f69aac59877826f329b9d74da4cf833402fd666c9236a5dec1859d60cf751",
+      "sha256:c279678f953291147339454eda2d0dc8d386a492357d0c8ad3be9978fa1d0482",
+      "sha256:c3da9be1bd28d5ebd29fcc96210ceb51fab803eda41bd04999da08bacb2f370f",
+      "sha256:c722c97700ae99c7859d14c9a5618242cc51f805772ebbb0bc65e9927e4db495",
+      "sha256:c7ef7cab6818446f256c31e124ff906816699448d87ec5cc11ae9e39cdd4d00e",
+      "sha256:cb0bf1e5c7d0ce56c97d983c4f492f4fd3b7fcbaf059150c93de4cacf8cb7e21",
+      "sha256:d35ca40976005f16edc29ddaa20e36274fe78ddae3358c60aa31d1ba303a0835",
+      "sha256:e4029af2bd369f261cc4d0a855416596bf2cd661c645f2d040d435f64e79fa26",
+      "sha256:e4b58a56c154741ba7fadc83bb40858d9e0be1570337bf6f323c5c5587b1b474",
+      "sha256:f15f4986a8bae4ae3cd0de09835146c599d0895bc8123f8fa215d7bafef22ce6",
+      "sha256:f8be4b0d23eb742dfe34bc95e8a6f0d646ec3e25143792c017f11129f240f2bd",
+      "sha256:fa62581ef63f7b284a0f90ad436d6c7a7722ddf8e8bf21a324b8f88f3be4485e"
+    ],
+    ".codex/tools/aidlc-steering.ts": [
+      "sha256:4362ccc0b4891082bb7e45059aa55944610cf978ba495bc31ec296eb67e52ba6",
+      "sha256:919087833f0fd50aeefb58f114579351f9cc54273b7c02570104e37a0b5441b5"
+    ],
+    ".codex/tools/aidlc-swarm.ts": [
+      "sha256:059239e0250d26f8ae7bdabb8af0fc522cdd7e71151cc7c68712296118e8c611",
+      "sha256:06e3635ef0d70fd3352079502784174c147f65891e78c7c50799e2674e9cd488",
+      "sha256:0a38b5cedb5d5c9d8061da80d0bb5aced5c9d1b82618c29f2a913173097fee89",
+      "sha256:1be40a19cb0f70af4e79e0d5012fc2b67925b70e1807f190aa78026e63a2aabf",
+      "sha256:1c2e64f31225b5b0ede1076caf874478831b04b17271f03bb5342bc95dfb93c3",
+      "sha256:2c2c0d18ebad2645c388d21c6fd060ddbacc1a5a35e3ed8aadff1772c71cc86e",
+      "sha256:2fbf6ee33cc6227ad1c67649ce135072a76ad8b16cef8928ac526912ec71da52",
+      "sha256:3e8a930b417b5da73cbe2f6a3249245c45f0d8fab142df1ea6ece8fc3d39faa9",
+      "sha256:4345024e7f8af7f2aad3409c0c86dbd559ce4a8006e1cdc69255513dcffd9670",
+      "sha256:4d8a90db45bee55a44d16cc7c8bc1714ba4b077479a92e589051a2d317ba9612",
+      "sha256:6ed4721709d97a3cc47748ce3b0b172be1b76dfaf531c3a829a1f0f2cc887fe9",
+      "sha256:93fa0034d8bd15b45c05b13e389698ba3438b794c50503f076c5b7fdac9007cc",
+      "sha256:a4bdfeb6fd1e85801030a8e608c8cae14ca1161bee05bd52ff24d288f08fc6fe",
+      "sha256:b63bcae0f8a7356c943e459729fca54cf48502518e8ae9c8a3b3ceb7b813e114",
+      "sha256:bc53ad2ee128afc3247a63032a439b87a8b5b0e056ed1fa0ce09827f37489a0a",
+      "sha256:cf300ef1a05abaebdd437f60e5eba697109b8596a8e52e56bfd5965d13964c84",
+      "sha256:dc336bc7808670e84ba6ea7160dd6801a8eb989aaaf16bf8a87e52debebcb17a"
+    ],
+    ".codex/tools/aidlc-testing-posture.ts": [
+      "sha256:06c7e642e146bf77b3c1081f2c735ce5c1296bc4c47c22c488a894d2789a3db8",
+      "sha256:4d2588151f2e612db40b9321b8a88057a6c8a4bd63af9ab082de52baaca17409",
+      "sha256:624c10859991727e09b78a0d0875d348736eb383a3a01cc3180a4085d24d008c",
+      "sha256:934c680505493b4466cbb1c1111f7d8c6bdce564ea9f2f463081197c6ad9c4a7",
+      "sha256:99528925754da70e42106a35b52e5769001539042d07d0eecb5e0aa256196cb9",
+      "sha256:c06fb41743d9c10c5d50f88530096db8a1a5e5c8f61468855cfbdab39ee2c4f0"
+    ],
+    ".codex/tools/aidlc-tiers.ts": [
+      "sha256:0934990f9bdfd207632fd8c73e95923cb776d6c78cc3d939240cb8f71ec055c9",
+      "sha256:37e391e7768a52b1f010b4906794ab9b8873ac4b13eb71e198c7978bce07a09b",
+      "sha256:642e084ab44de9592a7b3393d7fa78e72dc3d4bb6d3511a8deee59bf6acf71b1",
+      "sha256:6cec2c63d851858933c2e379324d5aeec6320fb595870f4cd398a170d2e7fb6c",
+      "sha256:7ce9782779d93b8be11f974d193e973b5753c32def80547d8896537e6e5dee0b",
+      "sha256:864651352f3983a6c39351a455b6409a03518e1d521a5886d71157811c725813",
+      "sha256:9b1c5060bff8a911f9cc10dcd2018fd97cac6dff3d150ddc5be7700a96024ee1",
+      "sha256:afbf1f8c7a97ed1fc4df648828c3c44ecc3acd1fcb1aad6aa086281d86ede864",
+      "sha256:be979c33370ab83c8292a0537accf8a3b095b768c055f596c29a855e7ae9c4a2"
+    ],
+    ".codex/tools/aidlc-unit.ts": [
+      "sha256:191e818668fbf9c467691faeb21b9f640c5c136a95ba705d32c114c48305b778",
+      "sha256:b3135d58a4c251d5cde906d2c228e9a136a4d6596eee4d7f138172b5784bf141"
+    ],
+    ".codex/tools/aidlc-usage.ts": [
+      "sha256:3ac96c8790edab3a4de0a25dac2709cf3ab9906da8acd3b66507c2ffda364563",
+      "sha256:b036db00c9c6fed8c448c614f6f09a1e4f6846e3fce4d18e2b7d13769e97b582",
+      "sha256:b62f14db958cfe26927f7823f17db36cd7378d0b12df4a97a17b6fc71304ef61"
+    ],
+    ".codex/tools/aidlc-utility.ts": [
+      "sha256:005a1097dddeb620a0edc0ee7620ddbac0e8dc1e90178fd5228b62677cddf965",
+      "sha256:015fc43ed1b3cf46691dd406a3d781bda39c431549c045884b2bb25ae032d8c8",
+      "sha256:0f1c8ac0ba696dc3acc41f50dc06c698bb1cd6d5be545413cb295b425fa1c869",
+      "sha256:103c053101bd7ae44c047a970f4de28b0827bfc7084951580d0e7eb547cfdf78",
+      "sha256:140c486901834db6b7b4f8dc2c86332624f1acd05e9d8a961e8041c5f93ef548",
+      "sha256:166e7bf182107cd82e827a02ce9cf00b5b9262a09c52b190bd9bf8f8ca439d05",
+      "sha256:1676a50f53de5be5b63589f0a564af9eb5185aa7236e6b0eebe803e83d964c98",
+      "sha256:170cd3e29b6aff40489f47f4cb7a93b0d8889e178898a7c79f11eb318a44b222",
+      "sha256:1db329ac3d536a5fb921f767000327fd2999eac4ec1592a071d6e1f703791b1b",
+      "sha256:2121f266f57569d9a26c894c9230396f2857b929765ecdcc4bf5746d31394457",
+      "sha256:22cf23f638483b3b8bca6cc1aafc0c8cafb647b3deff8304b4cc2a93ded47910",
+      "sha256:28730cdc71f46824fd324f03778178821266e552d11dfc998d77c847032a8488",
+      "sha256:2cc4d949ea0031b2922091eaea378a150b87febed8f2af48611cc6933db63d0e",
+      "sha256:2d8593fca42d61409aaa055833cf153e6d178bb3e7873a40277394deac0ca94a",
+      "sha256:3038b879bda50a6b12dfb8d0db316b077b880614a8826c0ed141b3998444b25d",
+      "sha256:37610bc7d6d11326c87c60c1b6cabe00b25474b147f3a903781b2b33e1ca2477",
+      "sha256:3d93b65f9af602e54f21180a79e72cedec0f0b9be0cd7e2e1399e0acbdb6a5e3",
+      "sha256:4283ead2666816adbf5ea39cbad0a2e0dfc444939490296975bf525afd71a177",
+      "sha256:4ba917d5ff98ac1bb093e13898d08cf3d0c2373aef4154daf1e3abdf46aa4c7c",
+      "sha256:4e8be46e130f4ff087ee888aebaf0cf73ebdc0486d3f16f6ca7e7958db17a3c5",
+      "sha256:559891847ab053c74359e3b065efe3b3b2efe769250af4b7869951a09992ba5c",
+      "sha256:5b7a231dac9b21e2ee108122ef3a00cce5a543dc2b08808d66ca029180d21109",
+      "sha256:5d38f83661c9457d38f41f4c9f3221190ccc4977d6e99a9a68e0304167d12a47",
+      "sha256:5d813b0c1e3d5e54fffa8dd846de6184a3324d06d6db11ba0631a54a5f09704c",
+      "sha256:6e9fff40ceacbcf519167749f40ae1910279641e5ba4bbcf9ecfcec8fb886e80",
+      "sha256:7bd55dc3a5b0bad2bcb7d252fd203077bcea618c1ee11d38bbf0b2781ed13787",
+      "sha256:82642ab796cafbf3e245cfcea61cdf759843b4b83f593bbe4d89f14ee2793861",
+      "sha256:8ac9a939da197beadb3f8e64e03c730ce6a8130c2ec3795b3ee57ffbf1d3450e",
+      "sha256:8b8f727662ab1a8f5b59ff6f01b75b87b8fd8f86b3c77b0f9de247b76e1b8efe",
+      "sha256:8ec928ef50b5b7e4fdf6b9b1369d61f25ee4706fe05fc46992cae487e27d3bfc",
+      "sha256:9154bd343199c7a0a65edd9e7d7dbc69b45ee08f027bb9c95d54138207f1aeda",
+      "sha256:95381b7d38376325579a81e3051627b50af64fed3e4e4ab5365ad073b1f1ee11",
+      "sha256:98868860d791822fc0827685f1332d5a640174c10b9649770f32bb9939e038be",
+      "sha256:9bc690b25daa9f0479468ae888cabce3fd80b362b23ec08e7cb4b6996b84e77d",
+      "sha256:9c4c83887aeaa675d1212caf053b20c1e3b21f03b13b43552b1790954e808088",
+      "sha256:9cb2d6e3370310fe61953c132506e200fb5c8330bcfc4adedac92fd01d38803f",
+      "sha256:a02142510252df7e850ab7ab2a95dccd4f8cdb5557ae97ac1862c06217655cd5",
+      "sha256:a28027b9c3a39c854c581dd630ab2ce8c46f9d44ebcb9fabe1ed67b5e1f172f2",
+      "sha256:a3a758a52df7f03838b53ef264c679fbdc3a228302d8154bb7a7eedd702b01cf",
+      "sha256:a3de4f37311818736a79e5d0be29afef9b450450010b2dad9954cf52ecd81004",
+      "sha256:a583068dbff343eac3ed9130f064b058c8f521b3a55b3b4bedd2629e28c8c42a",
+      "sha256:a8e02566b43e457cc461a0e01eb625c16844ca8aff6d86d7dc7c3448ab6d0d00",
+      "sha256:ac352fc7c888d87167c99c726f94da26905c5d2334f91d68b6ea6e6c3b6cbf32",
+      "sha256:adc11a020c296e13d5a450e65e860ac3c5dd3efd62f5c5c64cf967df26ef3d39",
+      "sha256:b0eed00cdcbda10660c7d3160af85d432553d4638b0dd24d55308e8b5a1809c6",
+      "sha256:b47dba6cec1bb74e8a601649dd42aca1ea133920321d987ea10f86db0829ff28",
+      "sha256:b946c22f44e13aff92dfdf4fc8bacc83dd659a3d1e0b2e9d7fbca2e42cc1c0a6",
+      "sha256:bd594ddcd08ce238f0312b541e17da83e68d3e7b4f227263b5d4a0d529cd32d1",
+      "sha256:c0a27b957f121d45c47f104eed1f7648406fc4756679e2edb71679fc046d4458",
+      "sha256:d4101cc935ad81915f458c25045937df96ea38d7a8bafc3963596995ae57909a",
+      "sha256:d807a48a24a1b8506cf9fcc147f97cadcd20c27e0dc96e3e6d8b78d5b300f2ae",
+      "sha256:db69417390f56678644778ea7558beec5d5a81d95a869c1c2528ea4751f93fde",
+      "sha256:deae35b4f73151f0d597e272f6945b07329ec0385b0ee9809771ec585a36d370",
+      "sha256:e606cee51a33594f4c08dda8d5a05e64f7271ad1e01ab488ea34065654c94003",
+      "sha256:e867827af47c031693d9e0116bea6123fe17267264d4e152f7ac463a621b0e30",
+      "sha256:e9545978053568764bf402f100b5cc8cc05f506b54e18ae9953f626e92cbee58",
+      "sha256:ed85164e74df5fbdbb1e8f7a134ff4aa4664de11c8ccdc243df644c689eda044",
+      "sha256:f54cd024c7bfa16e00118450964e1241c2a1a345d7c19a2cbeca4e54817d2aa7",
+      "sha256:f5700311a047908e56207d502a7cececfa1419ade12a24b0aa123dabd6dbcaca",
+      "sha256:fcd6bb56459dc04fb1873237774a7fcec12fc7b848a1835d60ea27ea09b8a483",
+      "sha256:fcf1276714212e9fad529c0d6a94e0909959dcc815384c6c70d63a7ea53d5cbb",
+      "sha256:fe2a07d6798193a6c184c4ddc2fb76340a7dcb5000bb793e76da5bce9ab0a389"
+    ],
+    ".codex/tools/aidlc-validate.ts": [
+      "sha256:832819d8c8f583d3f36e376b33f22d2dd7b163618819b47692a00cfec7c29c1e",
+      "sha256:941a9af97419354dcd4db08e17c6cc1a43337e0e69d00b09141c388bb70e944a"
+    ],
+    ".codex/tools/aidlc-validity.ts": [
+      "sha256:81d6941311e57a17621e6b4fe09953223334978edf12d67bb3319e84bb35c5ba",
+      "sha256:9e30b9ad40b2744314b05622acbb0aeb069f5d94fb956a74630e4ee3ec74c055"
+    ],
+    ".codex/tools/aidlc-version.ts": [
+      "sha256:053398564cb1272b29966c03f36d9969b855101ff68128bc76add918fe1370f5",
+      "sha256:05b1d0a49f74a8e767cd1beea1d9d6b461d1ea3b5a738a06bc3d2ef8e0682990",
+      "sha256:0635e6340a93424b28d180ebf6fa2f598924649bd2eb8c1fb4810a655155f307",
+      "sha256:06c45a8ef626bff84c45ebd3c280502eeafcb3ab4119f6c67f89f95574af9ddd",
+      "sha256:070f28ff06c3371514a0a457d29d271c7352782bd44ef15194c6a1c8c8122624",
+      "sha256:071c6ce604b47d029ffec49ed4368949e7aeabdf5796495883b1446ea5057548",
+      "sha256:0721d00222ec63c9ac56da4291cf4339092a8cdc940f3af0536ec33b68bc290b",
+      "sha256:07972abb42ec7498de7b8a275c2826e643c807c9cc27728f98a4e33e449afa49",
+      "sha256:07baabb9d3139977f6216fd43892ca43ebd38366172fe2c4f8133d1d81e5225a",
+      "sha256:0bffd227d47e0ddf2e48a27ed8c499dd22940d3493a1631c1ce06005b2e8801d",
+      "sha256:0c69b6027becbb7ca96a1fb8c5dccabf7bd7d95f5a50012b6705881c7d477685",
+      "sha256:0e0693b19be07e85e3b00a58b580fe17dab109587f51b0d2da5ad64ce5a05d56",
+      "sha256:0f281d2c788f8df6bb012c228e731c09322fe7c432e369e021c19958cce78c14",
+      "sha256:0f9fb9036235f115d7b1f32e06d403b50f48f1d542845d74eefc4ac7cf9d9a75",
+      "sha256:0fc40a98b915adadc900cd7cd09eb0e67491fa6d7a47b43c0a106bca545abda1",
+      "sha256:1644f46e369a4fbd99561075dfbd56aab2bfa13fe112c79270b84a677e894c0e",
+      "sha256:16abd962e34e234d02e1d30cb84e2f126e400040bcdf97bbfc79c67775679603",
+      "sha256:17d6896ad527d12738321fd88b940b510ce0f550363301131f107185d75af3c1",
+      "sha256:185ab24edbb18b5bace2e6167b96af607d2e365abad31aa509e148407e7135e5",
+      "sha256:19e7283703479e7541059fddd3ab2d9de0b5463277a3312f7470e74a7b9cefbd",
+      "sha256:1bc6f1ab09b746a6665d86ef03895116a0680f368418b10f25e300bc8763500b",
+      "sha256:1c2d70930fb52e80eb5c2e039e1411b54b3c5fa1665d0ea8c7547970591d1bc5",
+      "sha256:1c53667a515b7f79600e184b8f7180519bb491c32a40fc7bd66a83458b45dabe",
+      "sha256:1e23fd90879c8f9f3ad1b619896df526328147c4daa883b3fd46c660da4a2e3d",
+      "sha256:214d9aa8f0d2ded6278476d2a3134d3c99c736e2099c9f60f8fc25d9bd12e381",
+      "sha256:21fd4ef5327bfe6f4e04f51b697db69459c1cb249ff6610b7ce24bd06f3503be",
+      "sha256:224254e2acadae639374c9f3e51e62296e3e44b69fa0c832801d2dc48af95d16",
+      "sha256:22c2c7af224babc0fed5a3f66faaffc1b3e4ef758ba9e13f86ca6644b3675245",
+      "sha256:23318c56e490a39e9c5a9de9a59af735c790403d3cce6aef67dfdd55aca4e068",
+      "sha256:23b9e1f962b12d5f3572b512b1908e8ecbad6c06ecf7255cc5fef95d4a91a1ab",
+      "sha256:253edde215fad9bff99fcf52b7b4adfb74215d00070388fc4f037adf5f875f94",
+      "sha256:2571d33e7fd636fab6198facc6e26930f943cabc909a415eff458f406df0fe82",
+      "sha256:26a80c102e86fb89746dd395949f4e76ad7c4badd8997b1db075637003587139",
+      "sha256:26ad9a5fb58609f5c448b5dc927e74672a4368f8d81f279e2f01806ff0140d1a",
+      "sha256:2823a6196d33505f41cb25da0c3a681c9c13bf29fdd6ee7a0110d0a0ee622f61",
+      "sha256:2862834d0686e738fb95cb6e6ee2976c7f49a287ac7ec341a3619ed81e913053",
+      "sha256:290cda24373dd94dedc973dd61862dad60cbfe69b065f5eea56917e5cc91dc90",
+      "sha256:298b21ceff4c47da0487f1700fdbd5a6d19f3aa69a034bca1408c06622abfa7b",
+      "sha256:2a495c5d8d982b9a121cf5a79e5cf404b1263012ef4ce3732eceff8d5f7d9be4",
+      "sha256:2b5b708ab242bda3b704db622c1e5c2cbe310021c3abda26925601f307ecc390",
+      "sha256:2bf0ef9aef100d5b95679bbf066187c24da52a5e28a26795a7db4864505e797c",
+      "sha256:2d6501a2f6a7fbe62e61e50028485b952d6f330c30def0ec1ab145bdaedcc11c",
+      "sha256:312c578819ba0c8074d1e5a40d1573d19192e2d08ffe1a3479f49ed64cc50837",
+      "sha256:336ef5c5f7293af80f027949f4d0a0cdfaf9348732d7827685d994ba7c199db5",
+      "sha256:34f6312212392c74a601351c4f746569201f493aa7729d6beb087ee3f4d332b6",
+      "sha256:3524d0433df995ebfc51d0ccd2c91b5bc33742e1cdc3b7ca83464f3cb95d7cfd",
+      "sha256:35fa313484b6c212aa77a763d890d052bef45c1d669226a25118055bbecdd7e3",
+      "sha256:37ac1b71f7e1c69dcbf243620eb1d1626f97a86de78b7effa4629b0094b83365",
+      "sha256:38bbc537b9244c8e10d4ba5444da158ab291df66c630ec10aa0966e9a3f58cac",
+      "sha256:3abf85ccd0b2b41691a90d6e7925fb72344a57b21e740bdced8c9855ee07df0e",
+      "sha256:3b253f10c0fafb7133abfaa42bcf1413a13ee951a99fc79e06980155dd35cf69",
+      "sha256:3c90f0824883cd71099e0381eb0bdf41419d4ec1b7d2e813d715d95a2e89eb6b",
+      "sha256:3cf734a480307df7c2acc8b963ca27c7d3063c4fe71caf86b310d91d6e33dba2",
+      "sha256:3d69323f679e23ec3d621d492afd9fdd5ea32aa51bc3522e4f780ab16df91c5b",
+      "sha256:3ee6e5b3da2d8537eb8a5c4ee86c31bf06e0067a1f4be0e6227974372efc0bdc",
+      "sha256:3f9fd5b8c0d05bc6bb5277b826cc0f988a5e271a0c34d159925023590a7d9f9a",
+      "sha256:4004a91e33753c956263792355459afd334b4e31077b2f32140c8a32edbba7c4",
+      "sha256:407b95fd606fc577573952776ac3529966808fa84864cf7b798b8c4a9cfcf273",
+      "sha256:4171bbabdb577788b4265369f00204aa58580a8ef5dc5f648104b486cfff5282",
+      "sha256:41f2ed9999445d2b2f9660272d72ea8d601b707463cff7abe947b9644ae90266",
+      "sha256:4382c01ef8a122589a7834703b3ef5cee07601c1ef7628e77ea1e360145d3bc1",
+      "sha256:43eb223d4e39adad078c8cf0f413b0dd5701d1f757eb6b173bbacfbb2a50b358",
+      "sha256:44ae4bca89306758b6f9617c9012a10e5902eb863b9c03e36f5e362858613420",
+      "sha256:44c225f0ccb1b9d2a836e8f4d2422f2942e01d31005ff138a7f0ba16d9f6c6b3",
+      "sha256:4f816768064857652b50efaa1513992ce8ba6fe4c74264c853b45d0921b195d7",
+      "sha256:5061d7594c091eae64019320e1626563cce7029fd93b36a3a64e6027aaaa002d",
+      "sha256:513148a9de1976dfe57dc410b92f8e99a869bf1211bb29deb5381d9ed3c1da10",
+      "sha256:529bf4adcfa703842d267891368a3c430cabf17e48ba21229eabb49b099ac73e",
+      "sha256:52eac9a4c202df7a432377002d1462298902c68a3d7892d234a748932f0c5f7e",
+      "sha256:598abea1204e69c2a44927293b9e1573c588062b53373871fece9caf314b832f",
+      "sha256:59e03c16452df9a233de6be26e45fe78a83beb0e10172f9b93d359bc15082bee",
+      "sha256:5a396d22925aa16766b186565b10285e61b8928ec65b849ce5a0e78de7d0c5ca",
+      "sha256:5a55e8b10210f4fc470737a8c086aa7832f50dcb247da52a3cd11d60f668abd7",
+      "sha256:5aabd4824c4805e9361ed03c5bed3aab2a9dbbf1545d9865d7e20fef46517995",
+      "sha256:5aca55864fdf10cfb2862b2059ba6d485018cf729ab58907e19cab89050d6e03",
+      "sha256:5b10bc7bf883406027be297e07c96d55c0ae467df710d94b152f5dd4345bbf15",
+      "sha256:5b3b51807b8a250d3c43b4db3fbc5f8f8786fe2bbb7c727f1791f349f3ac7122",
+      "sha256:5b8a609e3cef084c47fc391378a94735197a579209488f604285ad05ff23ffd3",
+      "sha256:5bd8dd990eb32e9f5b7924ebc082e5c4f5553a00ca270a5d84d3bb3a3c795e8f",
+      "sha256:5c3c3c37286fd1485f070c0e234580f2cf79d338095656a5407e3ed2690ed1f0",
+      "sha256:5d5bfcc62d2611614c35b0158aaa8fdb2608778d74f690cfabf8ec0d8fa60526",
+      "sha256:5fcfdfce122869e64316a91015d006725ce1407d9c2ceaec876943674fda01fc",
+      "sha256:5fe6418b2982fc8303f019dc72741ae79ba6db975ba2e760a1e64c7eae53f446",
+      "sha256:60922b0c931264c6ad524a66dac257842076cd54ccfaf6e3bf209a7d337cb413",
+      "sha256:617410146c980b37d24986b3ca93862bd810a8a6e3c42efa2284b012b3a452d8",
+      "sha256:6221ce79321785f8234f8f78947d07123eaa386b1e8107de0c0035a2c9ee82cc",
+      "sha256:678bb3ebdbca674232f4c85a825524abb89473c6fe3f4a7585b69f375cd3df19",
+      "sha256:67b82c102d597030c3c6073c36f39c6933ab30e1ccc77c4a8110fa6bd24f543f",
+      "sha256:67ef21ebe152f434b063559895283bc39e665977ebb3f18c09dc0cf90d0bf6fb",
+      "sha256:6871313d56bbc20ce52ee76ea77501ce2caf45e94da39929cb0390f4f072228d",
+      "sha256:6c171b2c884052f05157d6d09414bbc4dcf487c0df2deb5791f0278b8cf0ec51",
+      "sha256:6d45f70762ead27894e64a41d8df292d87f86d95eaf81bffc42a93e1bc416064",
+      "sha256:6d8c337b7d7471956477f5223c82b79a24d2aec604ecd97ff075e871bfb5704d",
+      "sha256:6f27d79fffa262799d8db43230af5fac6579c37c00b730262145beb0d66c5686",
+      "sha256:6f494500e402a8862f88cefef2ea840b555bbe2bc664cb35436aea14678231f0",
+      "sha256:70587614da9ab1bf0fcc6a54acdc1590fdd44f64dc136cb3d785b8cb52215132",
+      "sha256:70adc5c1ba5284226959b4db5748ab2e747cd1ec3f0516c9325f787fc3e97c66",
+      "sha256:71db2fb6b66698c18700665221f648850bc26d7b89cd1cf49964ad4e02b9dc72",
+      "sha256:71dd4b1629ca4bf11d2d867a3a6d0037ee2cd1c7ec1f0d08a3c5cab138115969",
+      "sha256:725ea4d371c7962511384cb2c51f10afbeb51a8ac1a7b0d55027089bcc1742c7",
+      "sha256:727dac17e34762758ff9b796896305f5a61aa4acb23276fd0496b7d21fe890c4",
+      "sha256:72d0ef7a2535579448de9fbfc95dddbf3ae4c9866c23eedf4c78239e2f5787b4",
+      "sha256:7452c99a983de18d33f0d96e3b826d3836d69114d72523079f02c0b7d6c6f6ad",
+      "sha256:753ed577e5c6d4e48bf612c61f7eff1db4974cff8eac5962d46a1bce990b1969",
+      "sha256:75430baede78aca98d9e385998b8b870b409fbd5fc056361dbd61bd9e8728054",
+      "sha256:7880a3b9d6936e76139ca5f72f8b388fb03784cf8a244520ee01eed4e92ad5e3",
+      "sha256:78af418fbce06021dc0b10498b82f5e2a100dee68e9314ec7caa9cf43697d53c",
+      "sha256:78d9402062b8dd26263aafbeb2aadf138cc620ac24401a1693040b03de6eb6fd",
+      "sha256:7c7a7c0423684b8192f362e8606701db3dfec650edf9791e839f4dca0581549e",
+      "sha256:7d447a66ed17839b89d47b3f6a7785b222a4800d26782881b1c3b91b4fa70db2",
+      "sha256:7e2952040ea191a76f8575cd5d9f0749a4686ad6e41307dab90ea96af9d4e408",
+      "sha256:7f1ac4614c542f231d0d2728939bca83fc2af455b2bf089a7ad4376bb33a81f9",
+      "sha256:7fd938d13ab27c549c33e28c8f6e7aca2ac2d495275551f0bb2016ca85c43b92",
+      "sha256:803caa619eb9f891f6a5d700ebe64ee76cbb43c4cc12e93ec755157e4ca644af",
+      "sha256:80898ad8a30142caa2da2e64d8796a9bf62da56a95591f8a80f34d6706b3d107",
+      "sha256:81022d236ebd6703fb1d6bc8d23b829370a8d7073bf94145931e0a55d475df10",
+      "sha256:81f4942067170893476380fcd05245bd38c3e8cffe8c26237abd7d85506b7ce6",
+      "sha256:8553017890c227582880caeeb0443e90144539d8e4701b3299937113b90f85d3",
+      "sha256:8573a38fa0ad7386880ec5873301cde46c22826deab40eb88c9476889b81e698",
+      "sha256:8769dcaf31536a04b63cc2849cd1dadbf25e3be37229870d3d2352eed398f8a1",
+      "sha256:8a2e948e6b2818ac1f4c069cd9c6e9f2a038ec6250c7f60d90e6b03385e6e278",
+      "sha256:8a64d2b25f7d187bbb5adad328da62f417054eabe5d21a230dd46fb55324d74c",
+      "sha256:8b07daade4e9d14d89b209e130f3d0121e12ecdcdcd51a8b24672e96a2e8bd98",
+      "sha256:8c00c1a0333b58b4fbeed215a029da0e495f77e99ba888422d145bf077e0ff9b",
+      "sha256:8c2a6bfcc8ac6891f41be6a855670349d49485eb7716e61d4a5bfd69587d8296",
+      "sha256:8cd33547a9d6971b7c8423f7605b1a1725c722e608e5228f585c90065d90b85f",
+      "sha256:8cf0b97d7e91478095c49f6e6f94cd058b8af0f9eb060252d6d5ffccb6097466",
+      "sha256:8e630515867bb4c2c682f658e88e1cb4a50e482c15c788377471887eb066820b",
+      "sha256:8e96f239b233412ae70b586a69c0086290645c9e6299a23785a3a6473e2fe577",
+      "sha256:92678fae2fdfe13c765234b087db909fced5f1925ce9e0c158bd2deee33e96c3",
+      "sha256:9619c6ce1cef95203a103d80627c9cd891685972dc8ed76069279deb0a348527",
+      "sha256:9915e37eb786ff61055b4b81051196ae3689108c3e4ccf74fc0388ec9d0bfd4b",
+      "sha256:99d8ec99698f66f9cf4b6b115f08a9533fdec3bee9566ce5a4646ea69823a4a3",
+      "sha256:9a749f2e5965e55bb2943b838bdfff5d4762625eb2eba862f63ac43e957a6815",
+      "sha256:9ba164ddd8d3ccb6e3539684408b8f6ea50f566739e10392c281cef995d9172b",
+      "sha256:9f134bb357fea1c187f8a0779c224be247c0ae6377b6c0d5b2240647be3a034e",
+      "sha256:a0afd793b5cb3238d7c030b9195746a3d176a82865b6ff88e287234d1a547f03",
+      "sha256:a85d4502cd336abb8a2c9dee7e4bf076d63760df354b957d9bcc8c617af1dab2",
+      "sha256:a90747c26d69f45ba4aa7fd889e8238839876379f0271d577cea86c997acb06f",
+      "sha256:ae90aa339f284cc07c5c5f7a83163ad59e1ddd5682c7b736119392aae22cb6cd",
+      "sha256:b0e90c0c03adc8eaf1602dec7612a52a59ec7b325ff7e5a6e7c3e892b15db405",
+      "sha256:b109a4a770e4d0a8ad767613c0511dbdaa35f73eab43ede187fb71da509573bb",
+      "sha256:b625af83060bc37642afc683bcbd1fa652582f24cd8480c445d16c1af5947d3b",
+      "sha256:b69e6f49b9dbd2ba8b210260659614f95f0476afd18b7e437e57e29255445df2",
+      "sha256:ba2d09f8926f2274bd35bc0416c23eaa4fe42fe9e0ca74ab31b87fe74529f531",
+      "sha256:bb10582771cbfa4da3983a883b6fa7981b6660ca00a07dd3d5c4120ed14a111c",
+      "sha256:bccc5f824f2412e7deefa431dd5fe56542522967546133126eb29ee261cffe2d",
+      "sha256:bebafb658cd4958b16f9682b1799954c4c750df41648d1b05f7323c02581d52f",
+      "sha256:c052130ef368e46832250831995412af711b8a8e85529a0f9b5a2d70ff5bc240",
+      "sha256:c0e3cd421772caf7773930e95e13b0c7215075eafe515af0b3ffc1fbe27b3b8d",
+      "sha256:c3e6f1b0e7bf278d5d016db4101966e2a887e68f3eba9e22813c4f9b59ed42c8",
+      "sha256:c3fd9786bc573fd6af5532f17270687bb6c33ba348e89cb078d5ad4e54b9866c",
+      "sha256:c57f141b34dc4bf4c1da06601c2d0878da5a8b73d27b36ee33d971762b3ded99",
+      "sha256:c7b08fe3cd239253881218abadd4242f15270da8b9ae38ec1f763cdff5e872ba",
+      "sha256:c9e16cde9a0fe46687044642026c16a5806bcb93540009c136a877b644a5ea8b",
+      "sha256:cb31e06b51936795f2047e8877c5d958ea483eb53589229d0024919ee1295be6",
+      "sha256:cba369dc3e8c4ca2173bc17ed948851485e91800c4627bd771100baa650f976b",
+      "sha256:cff26140b10979521f8848d161070c4da3a22dcb7ca5ffc732c54ff728b37672",
+      "sha256:d35564770205489bae96fcb0d4b2d819b20412380fd585dcf230e29bbad77c99",
+      "sha256:d7aede2d0da0160a93442ac06015d4678cfd1aa0d0d636eb8524942b63b1f632",
+      "sha256:db03ca5fcc0b3355e429bdc537ace3d1609e3fbe40439540278b9226a19cca0e",
+      "sha256:de5711b23c0b924569f5d868d307cbbf8cc5bf95597d93873b2988d89892b0aa",
+      "sha256:de84553b22f6487815a5b55d5579cdbf0b2a5df70d1b500e14883df8890f2464",
+      "sha256:dfc9602d13d8107771029f774c76445ffc3f2a48420f030f97df0c3e29c16f0e",
+      "sha256:e00954125d9310f0e0ec3d2fcb60c5a5e98c9465ea978f9433046dd5aee5e954",
+      "sha256:e0bb7ff9f46ac77cf5bfebe609912f02be011c9575e73a95a6d86352552b3d7f",
+      "sha256:e274b0adb7590373379b1385c39221e15609523f3fb739489109a58b1992d822",
+      "sha256:e517716c6bcda2d2112c1b011cdfe66554063eb80e74cef2dc82d1f4c0666d54",
+      "sha256:e6fb15d2e8cf09f358570b03d4d89e2ebe11ccd7d3a49e55c61b8c6c2e3030b9",
+      "sha256:e7b7e9ba9d2561022f0fb60a98b3422b082c0c197972159b21a1ef88a15f7cf3",
+      "sha256:e891cf0b21e56e0ecbde5e7562c3a86ae321885e123bdacf6ff2fb3983b6072d",
+      "sha256:e9b663778293ed4a4267ab41daae58b2df52998234743aa770d199299c89f14e",
+      "sha256:ea8e7758d57208627ba37eada2d1026f55dbe9f2e9041158c88973f6b054e74d",
+      "sha256:ee6c09e703e0565c5fb5cb0106cc6fb2f751e9d56c149d92779d6b0639204642",
+      "sha256:ee8176ff07a9c40b16881b774a026fa0ffe6aed4424cd670ee040fe44d9373b1",
+      "sha256:efb0d0571204e81d9ebf505369dd641699a6d8b8a425be10c6c50aa46a45fe44",
+      "sha256:efc9614b01b251f71bb5d963a5937cad0b6720c07b14a7f59c99b998124887d5",
+      "sha256:f150014ee256c176a678386a7e92fcbf8def5ed6e357c9bfce874ddcedfd6cd4",
+      "sha256:f2b81136a24c3ffb03db66eac7832a51f28d2dcfca71e35834ad1d3427a587c2",
+      "sha256:f4328cbfecfaaca6fbc035939b3b73c5e0c5170bae30fcbfe7958e1dd918b139",
+      "sha256:f4517ac89ff653c0f2955486b43d9e6b3b8eb87b2e0d5cc0299c03e80493b939",
+      "sha256:f5bc629442a7ddd4652546a67ece99e269176854fec335485520a13f46df9816",
+      "sha256:f79383150b7428de3c7abd8c6fec12bb4e91b60e0fc3efdb401e1ba30321fd6a",
+      "sha256:f8123b41b2626ff2012e7a7a6a8726b6dfed6f25591118c0a0ea3e3a9deee663",
+      "sha256:f8ce578b55f1622f33c0f1f0d28d116d66f43817402dd087cc524162003ddca2",
+      "sha256:f92637ca320bed1fd30a9dfb24b8b6e196008fb0d97269a0a1c0985cd9d258a3",
+      "sha256:f9a3b1ef15833489f6e7c0d2ba64da8c6da0698a013acf26e7c2677ed9114212",
+      "sha256:fa1e50b7c18d9a577637650d159fdb19a9a047c29dfc0038be120bbaff93a428",
+      "sha256:fa850def4f30ab93df099bafa85ff1c336884bcb1b255681f64d2d439bc96680",
+      "sha256:ff73f1cef5d0abbb1f380c5b5077770530c771bbb20b77d77ce2b87b2f39f13c"
+    ],
+    ".codex/tools/aidlc-workspace-doctor.ts": [
+      "sha256:92bbde984e0949ad9bae0c186b2a0cc3f7c6e5e77463fe986698897dced93602",
+      "sha256:a3e437aad20eda22aad8b170ca1fabb0f68deb6cb1e5bd8b526d4ce36dae1e02"
+    ],
+    ".codex/tools/aidlc-workspace-manifest.ts": [
+      "sha256:b9f12144f84e71a0f0e0647bf40768eb32f61654d824b4d57b0b20945e095f66"
+    ],
+    ".codex/tools/aidlc-workspace-sync.ts": [
+      "sha256:6e5be903e17774d20cf961eb2c993c2cfa2a115d9c10fa9aab4dce40f849f2e1"
+    ],
+    ".codex/tools/aidlc-worktree.ts": [
+      "sha256:4b8ef5b1eca02d1bcd605c4f043a71c03138c4302e78ef45521ad5c66b12ffa9",
+      "sha256:669cf7c191330256b5945d2e628f830093e25ea2fff4accc632278abe6012a01",
+      "sha256:ac2c2b2cda78c462502484e091ff92f1ff7cc618b2626d07618d1b4323f1320e",
+      "sha256:b8afe27fe8d16808c904498fd61c47303a8a3ef687837ee68caaee8b4aa07ab7",
+      "sha256:d023a7bd3a30138186206e133a2b527c6bafb4ad4cc09981e929d68cc9eb891c",
+      "sha256:d07fe04f1ded20e35ba0b70b0a8ee9da0e8d19d0b3afd1b8d505b6ba0423d37d",
+      "sha256:f33b4867518fb508627a122561147476341f76cb5dd768c4bea88d6428757d18"
+    ],
+    ".codex/tools/aidlc.ts": [
+      "sha256:0b06cbd059a3384df43af3a219b9f59df546aedc92e4794bb7755ea1495e42ef",
+      "sha256:0b9bc99bba5528ef1532012da3d91e8c480f125ed1419197c67e962d067e321f",
+      "sha256:0be20bf8aa6d6f9a48829fbe53bce6e23e4b29a2c06fba3249ab20811374eedc",
+      "sha256:26315011b5af505057f6b9d0eccb48bb63fca2df00b633c26fed1864b644ee47",
+      "sha256:26545c5cee35a8b7bb245c6f8a8dc1fa25fb2eedbde04cf5d336e53cdfcf1e55",
+      "sha256:2ed3e2c907f5a7d2c0a416639f2dc455939f74d4af0c79804a31d0b55cfd66ab",
+      "sha256:458c2f700acf913b002a640a07b9839eb313539be6e45cd70d6ab1951330efd0",
+      "sha256:4eaa17ffebd7a439e8bc2b35fc84c034b36a98f817fc4c6026ab579c65fc345b",
+      "sha256:5720fa3cb70d4e70686ee1282df36a940a92fdf4e88920f25c4068ad86e5dc86",
+      "sha256:5fba2c82d74fd279f778c3abcafd70c61b5f3220f0b89f66b9ffff547f4d2753",
+      "sha256:61d64179efb10be64f3fdf570e2c80ad90e1efb9ca1ad9f8ced43ddacfa86314",
+      "sha256:885a991cc4f4102bc392f06e2ba1ae7d9885f81f25a1a7d07163829f64dcb44c",
+      "sha256:8b5a45b95485381f52a15cb0c005e3af2793b3515015f1f61098b8b3955780a3",
+      "sha256:9eb2146bbd71c935b1164974d9fb4574c6161fa0ffcb5b53ac006ff34791a693",
+      "sha256:a2ed7936e864e3297c1590e99a085b24ee802eeb6ec8448bcdcda6bf4c54b685",
+      "sha256:a825679fd22f0cffd0d37954925eca4e77ffcecc298c7e19a6acff675cbde9d0",
+      "sha256:ad1b612d2fd4fb0f4817c04616a3f19e7d8b82fd3bcba793eec27d0da9c80187",
+      "sha256:cb841f802bb1679592cbae71e2cffe3d465852f5afa7480766aaa1eeefd4e010",
+      "sha256:cec5ca0c82610b8646482fbcc601449015c4a1fc308a629627bf65ababb43574",
+      "sha256:d634cff11fe3f72579a37c48e0d5662dfb7e56fa38249d902ec09996e3832bbe",
+      "sha256:fd135ab29e57f8524da48631699ac4761a9fbfa8192924086eaca157f36222d7"
+    ],
+    ".codex/tools/data/ars-priors.json": [
+      "sha256:b97e8e32f135ebb2133c6f59be14ba7e65bc2cc1f45b03dd77c621bfce9b4efc",
+      "sha256:d1b3c7b759b62588f55c4c4ff389d5501c0b6a5f83fa5f7526e20fea4369e738"
+    ],
+    ".codex/tools/data/harness.json": [
+      "sha256:3b7e387b3fa48420a92f2049c81538a107cd55c34d5011a72856e1cb07ddd700",
+      "sha256:e532f391f11868fa6d55126a6d71ef2744a9ea77dd9ecb72db5de49067b00adc"
+    ],
+    ".codex/tools/data/memory-seed/org.md": [
+      "sha256:4b54f78abbfe334c0efff3cb04467f68f34567cd4540782b66e5b7f38a8986c8",
+      "sha256:4db764af9cb7e35305e81513e47eee1d4d5352d135078beb703d5e8435f85bcc",
+      "sha256:58baeaa068350d6b33e4cef19ac1ffce32e9e74c06900756c5b5c1ddb767be45",
+      "sha256:84c1fbd05afe2c4bb3cb2a6fe26c45d7e7da0698b2c5324b0bc126646db3b32e",
+      "sha256:a2865a9e0b8e6d3488359ae75a6e12aa5961f3a250a527aec1407f200e2c6587",
+      "sha256:a939bf457e015b7925619e16788dc72e12ff1b0430b8a12bdce4f073cbcb0232",
+      "sha256:ac073704ca727affef8773fa0086bddfade57789d62d600d6b84b5bfbb2c0d0a",
+      "sha256:b29d9d91a1fee6c0b9783aa3aa6c803f22b7ab8355c745f174479ce6314f878b",
+      "sha256:c9f678ff3dfee9ce806d1a545346d491eb6e221e6225ca6efdf070ac53ba9b73",
+      "sha256:ff72cbf1b08bb9c71851f7a85e54de92b49577422feafd403be872b3c4713a63"
+    ],
+    ".codex/tools/data/memory-seed/phases/inception.md": [
+      "sha256:a23a5931ec6cb06dd9b49d905f001694babc99089e97da0314fc9920fb3ee64b"
+    ],
+    ".codex/tools/data/memory-seed/project.md": [
+      "sha256:48a0686495d791abaad4512f8a33497947138edddf1c6b35914e51f64099b5c3",
+      "sha256:8fdb302740a412b0f79887c84dd5714680f621b2ce3351ae241559880ea2bd66"
+    ],
+    ".codex/tools/data/memory-seed/team.md": [
+      "sha256:c065a3f8811764025aa9bdb5a9c51628f2724e57fc5ec0caa0973693e08d2c3e",
+      "sha256:f6b436fce9a309effc6a5c7b43ebaefb7d89aaba83fdf367ea2ba41d09f3e16f"
+    ],
+    ".codex/tools/data/memory-seed/templates/.gitkeep": [
+      "sha256:9cf930a165d4d24fd80ff21a9c7df39419a285e035fbe669bf5460ad0921d13c"
+    ],
+    ".codex/tools/data/model-rates.json": [
+      "sha256:05b7376b63f583b46e495f1bbb3666d85260c74058555664a05fb2a2ffa35bc5"
+    ],
+    ".codex/tools/data/plugin-hooks-template/aidlc-plugin-compose.ts": [
+      "sha256:bd2bd44a5ee776918503ced0ef9729728de7838b578e255aff52168704ef6e9f"
+    ],
+    ".codex/tools/data/plugin-hooks-template/compose.ts": [
+      "sha256:33f627ecf519a9faebc200c3c488b672c2e5f2ede68186e473fcdc9d5880ad1b",
+      "sha256:459e243cddbe1da5e260e1f9b47641b4dbeac35bba1e57ca402bf4fc26f73f9f",
+      "sha256:5fcf5284ae4acd8a0024ec5bace9301e2fae57d030e59bcde397abf23d73339b",
+      "sha256:906fcdbb87ed188da14d1a77742b96b8eafabd69329f2ac4ecac331dc5a86132"
+    ],
+    ".codex/tools/data/plugin-targets.json": [
+      "sha256:4e76a75a9505440ea3609ce4aabbed7ecc6033a79641a4f2983dffea94d88155"
+    ],
+    ".codex/tools/data/scope-grid.json": [
+      "sha256:2b24c6b3b861f9d2c3a3f9fd2e2bb34c3d3c0e37ddc06ff96145f1d40d3d7c16",
+      "sha256:326deb8be9e027f832adf21f37e89c3fa86e531840233852d7be5d9bc5ff67aa",
+      "sha256:83ba258a19838e1a330aba38d55e4421738cc533d04a15a2a4c8c445c5ab29c0",
+      "sha256:86912783da0a9ca46c939881a32921f57779800e4957ab6483ff408a1c65da65",
+      "sha256:dbcbd5db852f3b625d2da884077e76b5a6f6d42b4d8a46dfe2fdf2550d13f654"
+    ],
+    ".codex/tools/data/stage-graph.json": [
+      "sha256:0de02c6cb65d685bd8d3ad3bc12dda5d0005c7906c895316e762adad2ae4ac4e",
+      "sha256:0f4dc74df38aba7076fb8d9444d91c4826b5af2e2d49feaef087c1ff453e62af",
+      "sha256:2578bcb6c2ddb6949a70bf36899c619867bb1e3a5e481e21eac2782eff610d8d",
+      "sha256:415a80452cfb01e7bbeed0bb6c9f8cd4efbe7d19955b9ea97ea41fa33fe3ac49",
+      "sha256:481ddc1eaad3a0f9f96ca1f7392e2fa32528108accd54e26b1345dba1f0c5ca9",
+      "sha256:57f3978cedf8a63067ffed8141a2c954d0b96ba9ed9b967be7d65aa5652f60b7",
+      "sha256:79e5750b368417da8978a4ae74ceaa8aae64ccec0ef0cb60d66bda4d6507d0e6",
+      "sha256:812105c4f7154c7003390a212b187bead8570f90a6af574e0a7875161601ad8f",
+      "sha256:8adb9f5b17e7dbb561368792cf867ff4deef610f85c308e8c9101c99d4e20a88",
+      "sha256:9e495a2f122eb5a044eac1de8b2b4bbd8fad200816d947f2801bef9263a1120e",
+      "sha256:b2ebc28308f09baf72ad571ae3e595f66a4f16538485e56fb880c27fce46776c",
+      "sha256:b80f2509baa6a084b4705e2a091da85412fb7dca97a1b2b24ab986ee4d2085e2",
+      "sha256:bc66f9e7ad5694150119e3cd03d21b312f6aacf25ba5e21f82e9b646c1711349",
+      "sha256:d534f9ab7eb991faffc3da140fb85c1e65a74c531cfacc833c2e288d6c0354ba",
+      "sha256:d7464e8bc05ee8855fe69b00be263fb4519c067b73c08fee9b8a8ca015d4926a",
+      "sha256:df220f12e4aeec5616fdb41d0aa4fb26fc019d3f9cbf6060029dc009b6d07397",
+      "sha256:f31653becbb90da090d5fa33df1b095f73edaa653cea6c6db95792ef41d0fee6",
+      "sha256:f41d076b1d901fb5b73225e2d04581641ceab717343a272bfe453bf3fb3cb209",
+      "sha256:f84831707de6f25ba18186df2268439262bb598e5a2b71581fb3ff7990c230ce",
+      "sha256:fb8f8073093ad189020d03c93aeb0c9cf1819529f82606a7f9764c098738bfef"
+    ],
+    ".codex/tools/data/templates/.gitkeep": [
+      "sha256:da10c5820101c36f22cdd2930e09d1ae4d7a8d14871f1e225ca670566afec968"
+    ],
+    ".codex/tools/data/aidlc-projection.json": [
+      "sha256:ecfdca9fcd7eb6a61cffa1c9e2a03ba6b8c3b3e6925eff1f5063cda63bb70dda"
+    ]
+  }
+}

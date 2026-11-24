@@ -1,0 +1,18 @@
+{
+  "stage": "requirements-analysis",
+  "ids": [
+    { "id": "FR1", "kind": "functional" },
+    { "id": "FR2", "kind": "functional" },
+    { "id": "FR3", "kind": "functional" },
+    { "id": "FR4", "kind": "functional" },
+    { "id": "FR5", "kind": "functional" },
+    { "id": "FR6", "kind": "functional" },
+    { "id": "FR7", "kind": "functional" },
+    { "id": "FR8", "kind": "functional" },
+    { "id": "NFR1", "kind": "non-functional" },
+    { "id": "NFR2", "kind": "non-functional" },
+    { "id": "NFR3", "kind": "non-functional" },
+    { "id": "NFR4", "kind": "non-functional" },
+    { "id": "NFR5", "kind": "non-functional" }
+  ]
+}

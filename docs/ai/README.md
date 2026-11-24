@@ -10,6 +10,7 @@
 | 语义判断的演变 | [自然问题](bedrock-natural-questions.md)，[旧白名单](bedrock-scope.md)为历史 |
 | 最近保存的发布证据 | [生产26](../history/releases/bedrock-staging-language-fix.md) |
 | 用 AI 开发本项目 | [核实的技术概念](engineering-concepts.md)、[重构路线](../stories/README.md) |
+| AI-DLC接入Codex | [目标与启动入口](aidlc-codex.md)、[学习13](../learning/13-aidlc-codex.md)；2026-11-17 已核对主仓库配置与 CLI 发现／信任 |
 | 离线问答契约评估 | [学习08](../learning/08-offline-qa-eval.md)，假模型结果不能代替真实语义质量 |
 
-开发用的 Skill 不属于网站后端，不随前端资源或 Lambda 运行。完整 AI-DLC 工具尚未安装；本轮仅借鉴其按任务保留意图、验收和证据的做法。
+开发用的 Skill 不属于网站后端，不随前端资源或 Lambda 运行。以下是 **2026-11-17 的接入核对结果**：AI-DLC 2.11.4 已配置到主仓库，当时的本机 Codex CLI 已发现其 Skill 并登记 hook 信任；截至该日，首次模型驱动的完整 Story 和 hook 执行健康仍待验证。这不是今天的运行状态；本轮文档整理的阶段和检查见[AI-DLC 工作记录](../../aidlc/spaces/default/intents/261117-docs-learning-restructur/aidlc-state.md)。

@@ -1,0 +1,50 @@
+{
+  "stage": "code-generation",
+  "unit": "u6-approved-cleanup",
+  "upstream_ids": [
+    "FR3",
+    "FR6",
+    "FR7",
+    "FR8",
+    "NFR1",
+    "NFR3",
+    "NFR4"
+  ],
+  "coverage": [
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "docs/ai/README.md"
+    },
+    {
+      "id": "FR6",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "FR8",
+      "status": "OK",
+      "target": "docs/ai/aidlc-codex.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "scripts/checks/test-approved-cleanup.mjs"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "docs/learning/cleanup-proposal.md"
+    },
+    {
+      "id": "NFR4",
+      "status": "OK",
+      "target": "scripts/checks/test-approved-cleanup.mjs"
+    }
+  ]
+}

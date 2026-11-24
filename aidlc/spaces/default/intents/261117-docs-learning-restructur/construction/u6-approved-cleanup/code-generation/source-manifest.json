@@ -1,0 +1,12 @@
+{
+  "stage": "code-generation",
+  "unit": "u6-approved-cleanup",
+  "version": 1,
+  "writes": [
+    { "path": "docs/ai/README.md" },
+    { "path": "docs/ai/aidlc-codex.md" },
+    { "path": "docs/learning/cleanup-proposal.md" },
+    { "path": "docs/learning/file-map-inventory.md" },
+    { "path": "scripts/checks/test-approved-cleanup.mjs" }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "stage": "code-generation",
+  "unit": "u2-file-map",
+  "upstream_ids": [
+    "FR2",
+    "FR7",
+    "NFR1",
+    "NFR2",
+    "NFR3",
+    "NFR5"
+  ],
+  "coverage": [
+    {
+      "id": "FR2",
+      "status": "OK",
+      "target": "docs/learning/file-map-inventory.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/learning/start-here.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "scripts/checks/test-file-map.mjs"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "docs/learning/file-map-inventory.md"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "docs/learning/file-map.md"
+    },
+    {
+      "id": "NFR5",
+      "status": "OK",
+      "target": "scripts/checks/test-file-map.mjs"
+    }
+  ]
+}

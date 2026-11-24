@@ -1,0 +1,44 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-technology-guide",
+  "upstream_ids": [
+    "FR3",
+    "FR4",
+    "FR7",
+    "NFR1",
+    "NFR2",
+    "NFR3"
+  ],
+  "coverage": [
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "docs/learning/technology-guide.md"
+    },
+    {
+      "id": "FR4",
+      "status": "OK",
+      "target": "docs/learning/technology-guide.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/learning/start-here.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "scripts/checks/test-technology-guide.mjs"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "docs/learning/technology-guide.md"
+    },
+    {
+      "id": "NFR3",
+      "status": "OK",
+      "target": "docs/learning/technology-guide.md"
+    }
+  ]
+}

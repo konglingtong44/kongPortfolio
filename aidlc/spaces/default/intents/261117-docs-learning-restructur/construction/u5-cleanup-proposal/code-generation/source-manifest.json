@@ -1,0 +1,11 @@
+{
+  "stage": "code-generation",
+  "unit": "u5-cleanup-proposal",
+  "version": 1,
+  "writes": [
+    { "path": "docs/learning/cleanup-proposal.md" },
+    { "path": "docs/learning/README.md" },
+    { "path": "docs/learning/file-map-inventory.md" },
+    { "path": "scripts/checks/test-cleanup-proposal.mjs" }
+  ]
+}

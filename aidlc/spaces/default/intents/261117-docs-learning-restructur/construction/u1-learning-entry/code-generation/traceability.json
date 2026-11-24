@@ -1,0 +1,32 @@
+{
+  "stage": "code-generation",
+  "unit": "u1-learning-entry",
+  "upstream_ids": [
+    "FR1",
+    "FR3",
+    "FR7",
+    "NFR1"
+  ],
+  "coverage": [
+    {
+      "id": "FR1",
+      "status": "OK",
+      "target": "docs/learning/start-here.md"
+    },
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "docs/learning/README.md"
+    },
+    {
+      "id": "FR7",
+      "status": "OK",
+      "target": "docs/README.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "scripts/checks/check-docs.mjs"
+    }
+  ]
+}

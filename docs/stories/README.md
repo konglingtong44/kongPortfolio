@@ -14,6 +14,10 @@
 | [007](007-regex-feature.md) | `frontend/src/features/regex/` | 正则组件及测试归类，前端81项和构建通过 |
 | [008](008-profile-presentation.md) | `frontend/src/features/profile/` | 时间线与技能展示5文件归类，保持内容、CSS和手机展开逻辑 |
 | [009](009-local-checkpoint.md) | 累计审阅、完整本地检查与版本检查点 | 保存已验证增量，保留浏览器、自动技能发现和AWS验证缺口 |
+| [010](010-browser-regression.md) | 本地浏览器回归与真实正则Worker | Chrome核心回归、语言检测与桌面拖动补测，47张截图；其余覆盖边界单列 |
+| [011](011-aidlc-codex-probe.md) | 官方AI-DLC的Codex适配预演 | 固定2.11.4、隔离配置审阅、启动入口与doctor；主仓库激活另作增量 |
+| [012](012-aidlc-codex-main.md) | 主仓库配置、项目方法与新CLI加载 | 配置及Skill发现、11项hook信任已验证；首次真实工作流与hook健康仍待验证 |
+| [013](013-codex-cli-discovery.md) | 普通PowerShell的CLI发现修复 | 无Codex PATH时回退官方VS Code扩展，Version实测通过；用户交互待重试 |
 
 `frontend/`、`backend/` 已是清晰的两应用边界，暂不套一层 `apps/`。Terraform 的五个根栈与远程 State key 保持稳定；现阶段不为目录整理添加 module、迁移 State 或创建环境。`codebuild/` 已按交付阶段拆分，脚本迁移时再同步引用。
 

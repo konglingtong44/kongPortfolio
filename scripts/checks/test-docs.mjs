@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmdirSync, unlinkSync, writeFileSync } from 'no
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { checkLinks, localLinks } from './check-docs.mjs';
+import { checkLinks, isProjectMarkdown, localLinks } from './check-docs.mjs';
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -40,6 +40,13 @@ test('reports the source line for a broken migration and detects a missing refer
 test('rejects paths outside the repository and malformed encodings', () => {
   const failures = checkLinks(root, 'docs/intro.md', '[escape](../../outside.md) [bad](bad%zz.md)');
   assert.deepEqual(failures.map(failure => failure.reason), ['target leaves repository', 'invalid URL encoding']);
+});
+
+test('checks authored documentation while excluding generated AI-DLC audit shards', () => {
+  assert.equal(isProjectMarkdown('docs/learning/start-here.md'), true);
+  assert.equal(isProjectMarkdown('aidlc/spaces/default/intents/example/audit/desktop.md'), false);
+  assert.equal(isProjectMarkdown('aidlc\\spaces\\default\\intents\\example\\audit\\desktop.md'), false);
+  assert.equal(isProjectMarkdown('aidlc/spaces/default/intents/example/inception/requirements.md'), true);
 });
 
 test('both CLI entry points find root-level broken links from another cwd and preserve legacy exports', async () => {

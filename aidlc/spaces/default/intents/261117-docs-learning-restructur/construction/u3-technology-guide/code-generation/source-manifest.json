@@ -1,0 +1,12 @@
+{
+  "stage": "code-generation",
+  "unit": "u3-technology-guide",
+  "version": 1,
+  "writes": [
+    { "path": "docs/learning/technology-guide.md" },
+    { "path": "docs/learning/start-here.md" },
+    { "path": "docs/learning/README.md" },
+    { "path": "docs/learning/file-map-inventory.md" },
+    { "path": "scripts/checks/test-technology-guide.mjs" }
+  ]
+}
